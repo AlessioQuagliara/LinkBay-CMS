@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    {% include 'admin/cms/heading/admin_head.html' %}
+    <style>
+        body {
+            background-image: url('../../static/images/background.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .form-floating {
+            margin-bottom: 10px;
+        }
+        .text-muted {
+            margin-top: 20px;
+        }
+        img {
+            max-width: 150px;
+        }
+    </style>
+</head>
+<body class="text-center">
+    
+    <div class="card">
+        <main class="form-signin">
+            <form method="POST" action="">
+                <p class="btn text-success">
+                </p>
+                <img class="mb-4" src="../../static/images/linkbay_logo.png" alt="Logo LinkBay">
+                <h1 class="h3 mb-3 fw-normal">Ripristina Password</h1>
+                <p>Inserisci la tua email</p>
+                
+                <div class="form-floating">
+                    <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
+                    <label for="email">Email</label>
+                </div>
+                <p class="text-danger"></p>
+                <button class="btn btn-danger w-100" type="submit">Ripristina</button>
+                <p class="mt-3">
+                    Email dimenticata? <strong><a href="restore" class="text-decoration-none link-danger">Ripristina l'account</a></strong>
+                </p>
+                <p class="mt-5 mb-3 text-muted">Sviluppato da Spotex Srl <br> <strong>Versione</strong></p>
+            </form>
+        </main>
+    </div>
+    {% include 'admin/cms/footing/admin_footing.html' %}
+</body>
+</html>
