@@ -4,7 +4,11 @@ from app import app
 # Store Routes -------------------------------------------------------------------------
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', title='home')
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 # Admin Routes -------------------------------------------------------------------------
 @app.route('/admin/')
 @app.route('/admin/login')
@@ -22,4 +26,4 @@ def restore():
 @app.route('/admin/cms/interface/')
 @app.route('/admin/cms/interface/render')
 def render_interface():
-    return render_template('/admin/cms/interface/render.html', title='LinkBay - HomePage')
+    return render_template('/admin/cms/interface/render.html', title='LinkBay - CMS')
