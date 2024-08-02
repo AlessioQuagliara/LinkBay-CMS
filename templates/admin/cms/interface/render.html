@@ -7,9 +7,32 @@
     {% include 'admin/cms/heading/admin_head.html' %}
 </head>
 <body>
-    <div class="section">
-        ciao
-    </div>
+    <nav class="navbar navbar-dark bg-dark d-md-none">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </nav>
+    <main class="d-flex flex-nowrap">
+        {% include 'admin/cms/ui/sidebar.html' %}
+        <div class="content">
+            <h1>Contenuto Principale</h1>
+            <p>Qui puoi inserire il contenuto principale della tua pagina.</p>
+        </div>
+    </main>
     {% include 'admin/cms/footing/admin_footing.html' %}
+    <script>
+        $(document).ready(function(){
+            $('.navbar-toggler').on('click', function(){
+                $('#sidebar').toggleClass('show');
+            });
+    
+            // Nasconde la sidebar quando si clicca fuori da essa
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('#sidebar, .navbar-toggler').length) {
+                    $('#sidebar').removeClass('show');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

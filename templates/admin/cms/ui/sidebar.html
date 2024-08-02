@@ -1,0 +1,66 @@
+<style>
+    .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+        color: whitesmoke !important;
+        background-color: #ff5757 !important;
+    }
+    .sidebar {
+        width: 280px;
+        background-color: #343a40;
+        color: white;
+        padding: 15px;
+    }
+    .content {
+        flex-grow: 1;
+        padding: 20px;
+    }
+    @media (max-width: 768px) {
+        .sidebar {
+            position: absolute;
+            left: -280px;
+            top: 0;
+            height: 100%;
+            z-index: 1000;
+            transition: left 0.3s;
+        }
+        .sidebar.show {
+            left: 0;
+        }
+        .content {
+            padding: 20px;
+        }
+        .navbar-toggler {
+            margin-right: 15px;
+        }
+    }
+</style>
+<div id="sidebar" class="d-flex flex-column flex-shrink-0 sidebar collapse">
+    <a href="#" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+        <img src="../../../../static/images/lb-logo-w.svg" width="200px" alt="Logo">
+    </a>
+    <hr>
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item">
+            <a href="#" class="nav-link active" aria-current="page">
+                <i class="fa-solid fa-table-columns"></i>&nbsp; Home 
+            </a>
+        </li>
+        <li><a href="#" class="nav-link text-white">Dashboard</a></li>
+        <li><a href="#" class="nav-link text-white">Orders</a></li>
+        <li><a href="#" class="nav-link text-white">Products</a></li>
+        <li><a href="#" class="nav-link text-white">Customers</a></li>
+    </ul>
+    <hr>
+    <div class="dropdown">
+        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+            <strong>User Name</strong>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+            <li><a class="dropdown-item" href="#">I Miei Progetti</a></li>
+            <li><a class="dropdown-item" href="#">Impostazioni</a></li>
+            <li><a class="dropdown-item" href="#">Profilo</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{{ url_for('logout') }}">Esci</a></li>
+        </ul>
+    </div>
+</div>
