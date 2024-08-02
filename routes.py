@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, request
 from app import app
 
 # Store Routes -------------------------------------------------------------------------
@@ -30,6 +30,7 @@ def render_interface():
 
 # CMS Routes -------------------------------------------------------------------------
 
+@app.route('/admin/cms/pages/')
 @app.route('/admin/cms/pages/homepage')
 def homepage():
     return render_template('/admin/cms/pages/home.html', title='HomePage')

@@ -40,25 +40,25 @@
 </head>
 <body class="text-center">
     
-    <div class="card">
+    <div class="card" data-aos="fade-up">
         <main class="form-signin">
             <form method="POST" action="">
                 <p class="btn text-success">
                 </p>
                 <img class="mb-4" src="../../static/images/lb-logo.svg" alt="Logo LinkBay">
-                <h1 class="h3 mb-3 fw-normal">Ripristina Password</h1>
-                <p>Inserisci la tua email</p>
+                <h1 class="h3 mb-3 fw-normal">{{ _('Restore password') }}</h1>
+                <p>{{ _('Enter your email address') }}</p>
                 
                 <div class="form-floating">
                     <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
                     <label for="email">Email</label>
                 </div>
                 <p class="text-danger"></p>
-                <button class="btn btn-danger w-100" type="submit">Ripristina</button>
+                <button class="btn btn-danger w-100" type="submit">{{ _('Restore') }}</button>
                 <p class="mt-3">
-                    Email dimenticata? <strong><a href="restore" class="text-decoration-none link-danger">Ripristina l'account</a></strong>
+                    {{ _('Forgot your Email?') }} <strong><a href="restore" class="text-decoration-none link-danger">{{ _('Restore the account') }}</a></strong>
                 </p>
-                <p class="mt-5 mb-3 text-muted">Sviluppato da Spotex Srl <br> <strong>Versione</strong></p>
+                <p class="mt-5 mb-3 text-muted">{{ _('Develop by') }} <a href="https://www.spotexsrl.it/" target="_blank" class="text-decoration-none link-secondary">Spotex SRL</a> </p>
             </form>
         </main>
     </div>

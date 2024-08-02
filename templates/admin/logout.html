@@ -40,18 +40,18 @@
 </head>
 <body class="text-center">
     
-    <div class="card">
+    <div class="card" data-aos="fade-up">
         <main class="form-signin">
             <form method="POST" action="">
                 <p class="btn text-success">
                 </p>
                 <img class="mb-4" src="../../static/images/lb-logo.svg" alt="Logo LinkBay">
-                <h1 class="h3 mb-3 fw-normal">Sei Uscito</h1>
-                <p>La Sessione è Stata Terminata</p>
+                <h1 class="h3 mb-3 fw-normal">{{ _('You Got Out') }}</h1>
+                <p>{{ _('The session has been closed') }}</p>
                 <p class="mt-3">
-                    <strong><a href="login" class="text-decoration-none link-danger">Accedi</a></strong>
+                    <strong><a href="login" class="text-decoration-none link-danger">{{ _('Login') }}</a></strong>
                 </p>
-                <p class="mt-5 mb-3 text-muted">Sviluppato da Spotex Srl <br> <strong>Versione</strong></p>
+                <p class="mt-5 mb-3 text-muted">{{ _('Develop by') }} <a href="https://www.spotexsrl.it/" target="_blank" class="text-decoration-none link-secondary">Spotex SRL</a> </p>
             </form>
         </main>
     </div>

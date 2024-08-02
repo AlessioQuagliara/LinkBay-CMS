@@ -31,7 +31,50 @@
                 </div>
 
             </div>
-            <!-- Aggiungi altre card qui se necessario -->
+            <div class="col md-12 mb-3" data-aos="fade-up">
+              <style>
+                .card {
+                    position: relative;
+                    height: 200px; /* Altezza ridotta */
+                    overflow: hidden;
+                }
+                .card-img {
+                    height: 100%;
+                    object-fit: cover;
+                    filter: brightness(40%); /* Velo opaco */
+                }
+                .card-img-overlay {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    color: white;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: flex-start; /* Allinea il contenuto a sinistra */
+                }
+                .card-title, .card-text {
+                    margin-bottom: 0.5rem;
+                }
+                .btn-small {
+                    padding: 0.25rem 0.5rem; /* Dimensioni ridotte del bottone */
+                    font-size: 0.875rem; /* Font piccolo */
+                }
+                </style>
+                <div class="card text-bg-dark">
+                  <img src="https://cdn.shopify.com/s/files/1/0070/7032/files/shopify-store-freshheritage.png?v=1694804945" class="card-img" alt="...">
+                  <div class="card-img-overlay">
+                      <h5 class="card-title">Your Online Store</h5>
+                      <p class="card-text"><i class="fa-regular fa-circle-dot text-danger"></i> 12 Visitors Now</p>
+                      <p class="card-text"><small>Last updated 3 mins ago</small></p>
+                      <button type="button" class="btn btn-light btn-small">View Online Store</button>
+                  </div>
+                </div>
+
+            </div>
+
         </div>
 
 

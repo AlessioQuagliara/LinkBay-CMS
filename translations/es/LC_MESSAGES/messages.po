@@ -1,0 +1,57 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+# ---------------------------------------------------------------------------------------------
+# Pagina di 404 not found ---------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
+msgid "Page Not Found"
+msgstr "Page Not Found"
+
+# ---------------------------------------------------------------------------------------------
+# Pagina di admin/login.html ------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
+msgid "Login"
+msgstr "Login"
+
+msgid "Continue on your CMS"
+msgstr "Continue on your CMS"
+
+msgid "Forgot your password?"
+msgstr "Forgot your password?"
+
+msgid "Restore"
+msgstr "Restore"
+
+msgid "Develop by"
+msgstr "Develop by"
+
+# ---------------------------------------------------------------------------------------------
+# Pagina di admin/restore.html ----------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
+msgid "Restore password"
+msgstr "Restore password"
+
+msgid "Enter your email address"
+msgstr "Enter your email address"
+
+msgid "Restore"
+msgstr "Restore"
+
+msgid "Forgot your Email?"
+msgstr "Forgot your Email?"
+
+msgid "Restore the account"
+msgstr "Restore the account"
+
+# ---------------------------------------------------------------------------------------------
+# Pagina di admin/logout.html -----------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
+msgid "You Got Out"
+msgstr "You Got Out"
+
+msgid "The session has been closed"
+msgstr "The session has been closed"
+
+msgid "Login"
+msgstr "Login"
