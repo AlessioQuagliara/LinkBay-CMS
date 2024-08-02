@@ -27,3 +27,37 @@ def restore():
 @app.route('/admin/cms/interface/render')
 def render_interface():
     return render_template('/admin/cms/interface/render.html', title='LinkBay - CMS')
+
+# CMS Routes -------------------------------------------------------------------------
+
+@app.route('/admin/cms/pages/homepage')
+def homepage():
+    return render_template('/admin/cms/pages/home.html', title='HomePage')
+
+@app.route('/admin/cms/pages/orders')
+def orders():
+    return render_template('/admin/cms/pages/orders.html', title='Orders')
+
+@app.route('/admin/cms/pages/products')
+def products():
+    return render_template('/admin/cms/pages/products.html', title='Products')
+
+@app.route('/admin/cms/pages/customers')
+def customers():
+    return render_template('/admin/cms/pages/customers.html', title='Customers')
+
+@app.route('/admin/cms/pages/marketing')
+def marketing():
+    return render_template('/admin/cms/pages/marketing.html', title='Marketing')
+
+@app.route('/admin/cms/pages/online-content')
+def online_content():
+    return render_template('/admin/cms/pages/content.html', title='Online Content')
+
+@app.route('/admin/cms/pages/domain')
+def domain():
+    return render_template('/admin/cms/pages/domain.html', title='Domain')
+
+@app.route('/admin/cms/pages/shipping')
+def shipping():
+    return render_template('/admin/cms/pages/shipping.html', title='Shipping')
