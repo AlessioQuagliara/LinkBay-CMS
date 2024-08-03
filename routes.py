@@ -42,7 +42,7 @@ def signin():
         return redirect(url_for('login'))
     return render_template('/admin/sign-in.html', title='LinkBay - Sign-in')
 
-@app.route('/admin/')
+@app.route('/admin/', methods=['GET', 'POST'])
 @app.route('/admin/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
