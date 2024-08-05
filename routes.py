@@ -151,3 +151,54 @@ def shipping():
         return redirect(url_for('login'))
     username = session['username']
     return render_template('admin/cms/pages/shipping.html', title='Shipping', username=username)
+
+
+# Client Store Routes --------------------------------------------------------------------------------------------------------------
+ # Funzione per ottenere la lingua preferita
+def get_preferred_language():
+    return request.accept_languages.best_match(['en', 'it'])
+
+@app.route('/admin/pages')
+def view_pages():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    cursor.execute("SELECT * FROM pages")
+    pages = cursor.fetchall()
+    
+    cursor.close()
+    conn.close()
+    
+    return render_template('admin/cms/function/view_table.html', pages=pages)
+
+@app.route('/admin/create-page', methods=['GET', 'POST'])
+def create_page():
+    if request.method == 'POST':
+        title = request.form['title']
+        description = request.form['description']
+        keywords = request.form['keywords']
+        slug = request.form['slug']
+        content = request.form['content']
+        theme_name = request.form['theme_name']
+        language = request.form['language']
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("INSERT INTO pages (title, description, keywords, slug, content, theme_name, language) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                       (title, description, keywords, slug, content, theme_name, language))
+        conn.commit()
+        
+        cursor.close()
+        conn.close()
+        
+        flash('Page created successfully!', 'success')
+        return redirect(url_for('view_pages'))
+    
+    return render_template('admin/cms/function/create_page.html')
+
+
+@app.route('/set-language/<language>')
+def set_language(language):
+    session['language'] = language
+    return redirect(request.referrer or url_for('index'))
