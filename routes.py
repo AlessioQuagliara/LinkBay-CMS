@@ -153,8 +153,18 @@ def shipping():
     return render_template('admin/cms/pages/shipping.html', title='Shipping', username=username)
 
 
+# Editor Store Content --------------------------------------------------------------------------------------------------------------
+@app.route('/admin/cms/store_editor/')
+@app.route('/admin/cms/store_editor/editor_interface')
+def editor_interface():
+    if 'user_id' not in session:
+        flash('You need to log in first.', 'danger')
+        return redirect(url_for('login'))
+    username = session['username']
+    return render_template('/admin/cms/store_editor/editor_interface.html', title='CMS Editor', username=username)
+
 # Client Store Routes --------------------------------------------------------------------------------------------------------------
- # Funzione per ottenere la lingua preferita
+# Funzione per ottenere la lingua preferita
 def get_preferred_language():
     return request.accept_languages.best_match(['en', 'it'])
 
@@ -171,7 +181,7 @@ def view_pages():
     
     return render_template('admin/cms/function/view_table.html', pages=pages)
 
-@app.route('/admin/create-page', methods=['GET', 'POST'])
+@app.route('/admin/cms/function/create-page', methods=['GET', 'POST'])
 def create_page():
     if request.method == 'POST':
         title = request.form['title']

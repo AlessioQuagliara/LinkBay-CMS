@@ -2,6 +2,156 @@
 
 {% block content %}
    
-{% include "/admin/cms/function/view_table.html" %}
+<div class="row" data-aos="fade-up">
+    <div class="col-md-12 mb-3">
+        <style>
+            .card {
+                position: relative;
+                height: 200px; /* Altezza ridotta */
+                overflow: hidden;
+            }
+            .card-img {
+                height: 100%;
+                object-fit: cover;
+                filter: brightness(40%); /* Velo opaco */
+            }
+            .card-img-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                color: white;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+            .card-title, .card-text {
+                margin-bottom: 0.5rem;
+            }
+            .btn-small {
+                padding: 0.25rem 0.5rem; /* Dimensioni ridotte del bottone */
+                font-size: 0.875rem; /* Font piccolo */
+            }
+            .form-check-input:checked {
+                background-color: #ff5757 !important;
+                border-color: #ff5757 !important;
+            }
+            .card-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+        </style>
+        <div class="card text-bg-dark">
+            <img src="https://cdn.shopify.com/s/files/1/0070/7032/files/shopify-store-freshheritage.png?v=1694804945" class="card-img" alt="...">
+            <div class="card-img-overlay d-flex flex-column">
+                <h5 class="card-title">Your Online Store</h5>
+                <div class="mt-auto">
+                    <div class="card-footer">
+                        <div>
+                            <p class="card-text"><span class="badge text-bg-secondary">Theme used: Norman</span></p>
+                            <p class="card-text"><small>Last Theme Edit: <span class="badge text-bg-secondary">5 minutes ago</span></small></p>
+                        </div>
+                        <div>
+                            <a href="{{ url_for('index') }}" target="_blank" class="btn btn-light btn-small">View Online Store</a>
+                            <a href="{{ url_for('editor_interface') }}" class="btn btn-danger btn-small">Edit Store</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h5 class="mt-4" data-aos="fade-up">Other Available Themes</h5>
+<div class="row" data-aos="fade-up">
+    <div class="col-md-4 text-dark">
+        <div class="theme-card card">
+            <div class="theme-preview">
+                <img src="https://via.placeholder.com/300x200" alt="Theme Preview">
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Theme Name</h5>
+                <p class="card-text">A brief description of the theme.</p>
+                <button class="btn btn-primary" onclick="selectTheme()">Select Theme</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="theme-card card">
+            <div class="theme-preview">
+                <img src="https://via.placeholder.com/300x200" alt="Theme Preview">
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Theme Name</h5>
+                <p class="card-text">A brief description of the theme.</p>
+                <button class="btn btn-primary" onclick="selectTheme()">Select Theme</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="theme-card card">
+            <div class="theme-preview">
+                <img src="https://via.placeholder.com/300x200" alt="Theme Preview">
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Theme Name</h5>
+                <p class="card-text">A brief description of the theme.</p>
+                <button class="btn btn-primary" onclick="selectTheme()">Select Theme</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function addTheme() {
+        Swal.fire({
+            title: 'Add New Theme',
+            text: 'Add new theme functionality',
+            icon: 'info',
+            confirmButtonText: 'OK'
+        });
+    }
+
+    function updateTheme() {
+        Swal.fire({
+            title: 'Update Theme',
+            text: 'Update theme functionality',
+            icon: 'info',
+            confirmButtonText: 'OK'
+        });
+    }
+
+    function removeTheme() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, remove it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire(
+                    'Removed!',
+                    'Your theme has been removed.',
+                    'success'
+                )
+            }
+        })
+    }
+
+    function selectTheme() {
+        Swal.fire({
+            title: 'Select Theme',
+            text: 'Select theme functionality',
+            icon: 'info',
+            confirmButtonText: 'OK'
+        });
+    }
+</script>
 
 {% endblock %}
