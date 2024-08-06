@@ -1,0 +1,59 @@
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    color: whitesmoke !important;
+    background-color: #ff5757 !important;
+}
+.sidebar {
+    width: 280px;
+    background-color: #343a40;
+    color: white;
+    padding: 15px;
+    height: 100vh; 
+    position: fixed;
+    transition: transform 0.3s ease;
+}
+.content {
+    margin-left: 280px; 
+    padding: 20px;
+    flex-grow: 1;
+    height: 100vh; 
+    overflow-y: auto; 
+}
+.nav-link {
+    transition: transform 0.3s ease; 
+}
+.nav-link:hover {
+    transform: scale(1.1); 
+}
+@media (max-width: 768px) {
+    .sidebar {
+        position: absolute;
+        left: -280px;
+        top: 0;
+        height: 100%;
+        z-index: 1000;
+        transition: left 0.3s;
+    }
+    .sidebar.show {
+        left: 0;
+    }
+    .content {
+        margin-left: 0; 
+        padding: 20px;
+    }
+    .navbar-toggler {
+        margin-right: 15px;
+    }
+}
+/* PERSONALIZZAZIONE GRAPESJS */
+.gjs-cv-canvas {
+    background-color: #f0f0f0; 
+}
+.gjs-block {
+    border-radius: 8px; 
+}
+.gjs-pn-commands {
+    background-color: #343a40; 
+}
+.gjs-pn-buttons .gjs-pn-btn {
+    color: #fff; 
+}

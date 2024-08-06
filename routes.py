@@ -1,6 +1,8 @@
-from flask import render_template, redirect, url_for, request, flash, session
+from flask import render_template, redirect, url_for, request, flash, session, g, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
+import mysql.connector
 from app import app, get_db_connection
+from datetime import datetime
 
 # Store Routes -------------------------------------------------------------------------
 @app.route('/')
@@ -152,60 +154,120 @@ def shipping():
     username = session['username']
     return render_template('admin/cms/pages/shipping.html', title='Shipping', username=username)
 
-
 # Editor Store Content --------------------------------------------------------------------------------------------------------------
-@app.route('/admin/cms/store_editor/')
-@app.route('/admin/cms/store_editor/editor_interface')
-def editor_interface():
+def load_page_content(slug):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM pages WHERE slug = %s", (slug,))
+    page = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return page
+
+def get_all_pages():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT slug, title FROM pages")
+    pages = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return pages
+
+@app.route('/admin/cms/store_editor/editor_interface', defaults={'slug': None})
+@app.route('/admin/cms/store_editor/editor_interface/<slug>')
+def editor_interface(slug):
     if 'user_id' not in session:
         flash('You need to log in first.', 'danger')
         return redirect(url_for('login'))
-    username = session['username']
-    return render_template('/admin/cms/store_editor/editor_interface.html', title='CMS Editor', username=username)
 
-# Client Store Routes --------------------------------------------------------------------------------------------------------------
-# Funzione per ottenere la lingua preferita
-def get_preferred_language():
-    return request.accept_languages.best_match(['en', 'it'])
-
-@app.route('/admin/pages')
-def view_pages():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    
-    cursor.execute("SELECT * FROM pages")
+    cursor.execute('SELECT * FROM pages')
     pages = cursor.fetchall()
-    
+
+    page = None
+    page_title = 'CMS Interface'
+    if slug:
+        cursor.execute('SELECT * FROM pages WHERE slug = %s', (slug,))
+        page = cursor.fetchone()
+        if page:
+            page_title = page['title']
+
     cursor.close()
     conn.close()
-    
-    return render_template('admin/cms/function/view_table.html', pages=pages)
 
-@app.route('/admin/cms/function/create-page', methods=['GET', 'POST'])
+    current_url = request.path
+
+    return render_template('admin/cms/store_editor/editor_interface.html', title=page_title, pages=pages, page=page, current_url=current_url)
+
+@app.route('/admin/cms/function/edit/<slug>')
+def edit_page(slug):
+    if 'user_id' not in session:
+        flash('You need to log in first.', 'danger')
+        return redirect(url_for('login'))
+    page = load_page_content(slug)
+    return render_template('admin/cms/function/edit.html', title='Edit Page', page=page)
+
+
+
+# Modifica la rotta di salvataggio della pagina per includere solo il contenuto
+@app.route('/admin/cms/function/save', methods=['POST'])
+def save_page():
+    data = request.get_json()
+    page_id = data.get('id')
+    content = data.get('content')
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            UPDATE pages SET content=%s, updated_at=NOW() WHERE id=%s
+        """, (content, page_id))
+        conn.commit()
+        success = cursor.rowcount > 0
+    except Exception as e:
+        conn.rollback()
+        success = False
+        print(f"Error saving page: {e}")
+    cursor.close()
+    conn.close()
+    return jsonify({'success': success})
+
+@app.route('/admin/cms/function/create', methods=['GET', 'POST'])
 def create_page():
+    if 'user_id' not in session:
+        flash('You need to log in first.', 'danger')
+        return redirect(url_for('login'))
+    
     if request.method == 'POST':
-        title = request.form['title']
-        description = request.form['description']
-        keywords = request.form['keywords']
-        slug = request.form['slug']
-        content = request.form['content']
-        theme_name = request.form['theme_name']
-        language = request.form['language']
-        
+        title = request.form.get('title')
+        description = request.form.get('description')
+        keywords = request.form.get('keywords')
+        slug = request.form.get('slug')
+        content = request.form.get('content')
+        theme_name = request.form.get('theme_name')
+        paid = request.form.get('paid')
+        language = request.form.get('language')
+        published = request.form.get('published')
+
         conn = get_db_connection()
         cursor = conn.cursor()
-        
-        cursor.execute("INSERT INTO pages (title, description, keywords, slug, content, theme_name, language) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                       (title, description, keywords, slug, content, theme_name, language))
+        cursor.execute("""
+            INSERT INTO pages (title, description, keywords, slug, content, theme_name, paid, language, published, created_at, updated_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+        """, (title, description, keywords, slug, content, theme_name, paid, language, published))
         conn.commit()
-        
         cursor.close()
         conn.close()
-        
         flash('Page created successfully!', 'success')
-        return redirect(url_for('view_pages'))
-    
-    return render_template('admin/cms/function/create_page.html')
+        return redirect(url_for('editor_interface'))
+
+    return render_template('admin/cms/function/create.html', title='Create Page')
+
+# Client Store Routes --------------------------------------------------------------------------------------------------------------
+
+def get_preferred_language():
+    return request.accept_languages.best_match(['en', 'it'])
 
 
 @app.route('/set-language/<language>')

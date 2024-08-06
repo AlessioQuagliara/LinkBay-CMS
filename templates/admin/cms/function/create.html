@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkBay - Create Page</title>
+    {% include 'admin/cms/heading/admin_head.html' %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/editor.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+</head>
+<body style="background-color: #f0f0f0;">
+    <nav class="navbar navbar-dark d-md-none" style="background-color: #343a40;">
+        <img src="{{ url_for('static', filename='images/lb-logo-w.svg') }}" width="200px" alt="Logo">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </nav>
+    <main class="d-flex">
+        {% include 'admin/cms/ui/editor_bar.html' %}
+        <div class="content d-flex justify-content-center align-items-center" style="padding: 0 !important; width: 100%; height: 100vh;">
+            <div class="card shadow-sm" style="width: 100%; max-width: 800px; background-color: #ffffff;">
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-4">Create Page</h5>
+                    <form method="POST" action="{{ url_for('create_page') }}">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="title" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="slug" class="form-label">Slug</label>
+                                <input type="text" class="form-control" id="slug" name="slug" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="keywords" class="form-label">Keywords</label>
+                                <input type="text" class="form-control" id="keywords" name="keywords" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="content" class="form-label">Content</label>
+                                <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="theme_name" class="form-label">Theme Name</label>
+                                <input type="text" class="form-control" id="theme_name" name="theme_name">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="paid" class="form-label">Paid</label>
+                                <input type="text" class="form-control" id="paid" name="paid">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="language" class="form-label">Language</label>
+                                <input type="text" class="form-control" id="language" name="language">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="published" class="form-label">Published</label>
+                                <input type="text" class="form-control" id="published" name="published">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100">Create Page</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    {% include 'admin/cms/footing/admin_footing.html' %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

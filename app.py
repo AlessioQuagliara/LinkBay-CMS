@@ -19,13 +19,24 @@ babel.locale_selector_func = get_locale
 
 # Connessione al database "Globale"
 def get_db_connection():
-    return mysql.connector.connect(
-        host=app.config['DB_HOST'],
-        user=app.config['DB_USER'],
-        password=app.config['DB_PASSWORD'],
-        database=app.config['DB_NAME'],
-        port=app.config['DB_PORT']
-    )
+    if 'db' not in g:
+        g.db = mysql.connector.connect(
+            host=app.config['DB_HOST'],
+            user=app.config['DB_USER'],
+            password=app.config['DB_PASSWORD'],
+            database=app.config['DB_NAME'],
+            port=app.config['DB_PORT']
+        )
+    return g.db
+
+@app.teardown_appcontext
+def teardown_db(exception):
+    close_db_connection()
+
+def close_db_connection(e=None):
+    db = g.pop('db', None)
+    if db is not None:
+        db.close()
 
 # Includo le rotte
 from routes import *
