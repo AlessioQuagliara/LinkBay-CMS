@@ -5,9 +5,9 @@ from app import app, get_db_connection
 from datetime import datetime
 
 # Store Routes -------------------------------------------------------------------------
-@app.route('/')
-def index():
-    return render_template('index.html', title='home')
+#@app.route('/')
+#def index():
+#    return render_template('index.html', title='home')
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -270,7 +270,7 @@ def get_preferred_language():
     return request.accept_languages.best_match(['en', 'it'])
 
 
-@app.route('/set-language/<language>')
-def set_language(language):
-    session['language'] = language
-    return redirect(request.referrer or url_for('index'))
+#@app.route('/set-language/<language>')
+#def set_language(language):
+#    session['language'] = language
+#    return redirect(request.referrer or url_for('index'))

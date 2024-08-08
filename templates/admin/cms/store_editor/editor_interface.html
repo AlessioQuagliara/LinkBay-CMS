@@ -18,6 +18,7 @@
     <main class="d-flex">
         {% include 'admin/cms/ui/editor_bar.html' %}
         <div class="content" style="padding: 0 !important;">
+            {% include 'admin/cms/pages/editor_tutorial.html' %}
             <div id="editor" style="height: 100vh;">{{ page.content | safe }}</div>
         </div>
     </main>

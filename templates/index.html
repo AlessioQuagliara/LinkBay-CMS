@@ -1,22 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ language }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>{{ title }}</title>
+    <meta name="description" content="{{ description }}">
+    <meta name="keywords" content="{{ keywords }}">
     {% include 'head.html' %}
 </head>
 <body>
-    <h1>Pages</h1>
-    <nav>
-        <a href="{{ url_for('set_language', language='en') }}">English</a>
-        <a href="{{ url_for('set_language', language='it') }}">Italian</a>
-    </nav>
-    <ul>
-        {% for page in pages %}
-        <li><a href="{{ url_for('render_page', slug=page.slug) }}">{{ page.title }}</a></li>
-        {% endfor %}
-    </ul>
-    <a href="{{ url_for('create_page') }}">Create New Page</a>
+    {{ content|safe }}
 </body>
 </html>
