@@ -88,22 +88,22 @@
                 }).then(response => response.json()).then(data => {
                     if (data.success) {
                         Swal.fire(
-                            'Salvato!',
-                            'La tua pagina è stata salvata con successo.',
+                            'Saved!',
+                            'Your page has been successfully saved.',
                             'success'
                         );
                     } else {
                         Swal.fire(
-                            'Errore!',
-                            'C\'è stato un errore nel salvataggio della pagina.',
+                            'Error!',
+                            'There was an error saving the page.',
                             'error'
                         );
                     }
                 }).catch(error => {
                     console.error('Error:', error);
                     Swal.fire(
-                        'Errore!',
-                        'C\'è stato un errore nel salvataggio della pagina.',
+                        'Error!',
+                        'There was an error saving the page.',
                         'error'
                     );
                 });

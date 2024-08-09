@@ -74,14 +74,6 @@ def create_dynamic_routes():
         endpoint_name = f"dynamic_page_{page['slug']}"
         app.add_url_rule(f"/{page['slug']}", endpoint=endpoint_name, view_func=lambda slug=page['slug']: render_dynamic_page(slug))
 
-@app.route('/home', endpoint='home_page')
-def home_index():
-    return render_template('index.html', 
-                           title='Home', 
-                           description='Pagina principale', 
-                           keywords='home, main', 
-                           content='<p>Benvenuto alla home page!</p>', 
-                           language=get_locale())
 
 # Creazione delle rotte dinamiche
 with app.app_context():

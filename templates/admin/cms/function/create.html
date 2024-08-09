@@ -7,6 +7,38 @@
     {% include 'admin/cms/heading/admin_head.html' %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/editor.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+    <style>
+        .chip {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 2px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+    
+        .chip .close-btn {
+            margin-left: 5px;
+            cursor: pointer;
+            color: white;
+        }
+    
+        #keywords-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            border: 1px solid #ced4da;
+            padding: 4px;
+            min-height: 38px;
+        }
+    
+        #keywords-container input {
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body style="background-color: #f0f0f0;">
     <nav class="navbar navbar-dark d-md-none" style="background-color: #343a40;">
@@ -29,7 +61,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="slug" class="form-label">Slug</label>
-                                <input type="text" class="form-control" id="slug" name="slug" required>
+                                <input type="text" class="form-control" id="slug" name="slug" readonly>
                             </div>
                         </div>
                         <div class="row">
@@ -39,7 +71,8 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="keywords" class="form-label">Keywords</label>
-                                <input type="text" class="form-control" id="keywords" name="keywords" required>
+                                <div id="keywords-container" class="form-control" style="min-height: 38px;"></div>
+                                <input type="hidden" id="keywords" name="keywords">
                             </div>
                         </div>
                         <div class="row">
@@ -75,6 +108,75 @@
         </div>
     </main>
     {% include 'admin/cms/footing/admin_footing.html' %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const titleInput = document.getElementById('title');
+            const slugInput = document.getElementById('slug');
+        
+            titleInput.addEventListener('input', function() {
+                let slug = titleInput.value
+                    .toLowerCase()  // Converti tutto in minuscolo
+                    .replace(/[^a-z0-9\s-]/g, '')  // Rimuove tutti i caratteri non alfanumerici eccetto gli spazi e i trattini
+                    .replace(/\s+/g, '-')  // Sostituisce gli spazi con i trattini
+                    .replace(/-+/g, '-');  // Elimina i trattini multipli consecutivi
+        
+                slugInput.value = slug;
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            const keywordsContainer = document.getElementById('keywords-container');
+            const keywordsInput = document.createElement('input');
+            const hiddenKeywordsInput = document.getElementById('keywords');
+        
+            keywordsInput.type = 'text';
+            keywordsInput.placeholder = 'Add a keyword';
+            keywordsContainer.appendChild(keywordsInput);
+        
+            keywordsInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    const keyword = keywordsInput.value.trim();
+        
+                    if (keyword && !isDuplicate(keyword)) {
+                        addKeywordChip(keyword);
+                        updateHiddenInput();
+                        keywordsInput.value = '';
+                    }
+                }
+            });
+        
+            keywordsContainer.addEventListener('click', function(event) {
+                if (event.target.classList.contains('close-btn')) {
+                    event.target.parentElement.remove();
+                    updateHiddenInput();
+                }
+            });
+        
+            function addKeywordChip(keyword) {
+                const chip = document.createElement('div');
+                chip.classList.add('chip');
+                chip.textContent = keyword;
+        
+                const closeBtn = document.createElement('span');
+                closeBtn.classList.add('close-btn');
+                closeBtn.textContent = 'x';
+                chip.appendChild(closeBtn);
+        
+                keywordsContainer.insertBefore(chip, keywordsInput);
+            }
+        
+            function updateHiddenInput() {
+                const chips = keywordsContainer.getElementsByClassName('chip');
+                const keywordsArray = Array.from(chips).map(chip => chip.textContent.slice(0, -1));
+                hiddenKeywordsInput.value = keywordsArray.join(',');
+            }
+        
+            function isDuplicate(keyword) {
+                const chips = keywordsContainer.getElementsByClassName('chip');
+                return Array.from(chips).some(chip => chip.textContent.slice(0, -1).toLowerCase() === keyword.toLowerCase());
+            }
+        });
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

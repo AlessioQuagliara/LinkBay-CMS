@@ -229,36 +229,66 @@ def save_page():
     conn.close()
     return jsonify({'success': success})
 
-@app.route('/admin/cms/function/create', methods=['GET', 'POST'])
+@app.route('/admin/cms/function/save-seo', methods=['POST'])
+def save_seo_page():
+    data = request.get_json()
+    page_id = data.get('id')
+    title = data.get('title')
+    description = data.get('description')
+    keywords = data.get('keywords')
+    slug = data.get('slug')
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            UPDATE pages 
+            SET title=%s, description=%s, keywords=%s, slug=%s, updated_at=NOW() 
+            WHERE id=%s
+        """, ( title, description, keywords, slug, page_id))
+        conn.commit()
+        success = cursor.rowcount > 0
+    except Exception as e:
+        conn.rollback()
+        success = False
+        print(f"Error saving page: {e}")
+    cursor.close()
+    conn.close()
+    return jsonify({'success': success})
+
+@app.route('/admin/cms/function/create', methods=['POST'])
 def create_page():
     if 'user_id' not in session:
-        flash('You need to log in first.', 'danger')
-        return redirect(url_for('login'))
+        return jsonify({'success': False, 'message': 'You need to log in first.'})
     
     if request.method == 'POST':
-        title = request.form.get('title')
-        description = request.form.get('description')
-        keywords = request.form.get('keywords')
-        slug = request.form.get('slug')
-        content = request.form.get('content')
-        theme_name = request.form.get('theme_name')
-        paid = request.form.get('paid')
-        language = request.form.get('language')
-        published = request.form.get('published')
+        data = request.get_json()
+        title = data.get('title')
+        description = data.get('description')
+        keywords = data.get('keywords')
+        slug = data.get('slug')
+        content = data.get('content')
+        theme_name = data.get('theme_name')
+        paid = data.get('paid')
+        language = data.get('language')
+        published = data.get('published')
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO pages (title, description, keywords, slug, content, theme_name, paid, language, published, created_at, updated_at)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
-        """, (title, description, keywords, slug, content, theme_name, paid, language, published))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        flash('Page created successfully!', 'success')
-        return redirect(url_for('editor_interface'))
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO pages (title, description, keywords, slug, content, theme_name, paid, language, published, created_at, updated_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+            """, (title, description, keywords, slug, content, theme_name, paid, language, published))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return jsonify({'success': True})
+        except Exception as e:        
+            print(f"Error creating page: {e}")
+            return jsonify({'success': False, 'message': 'There was an error creating the page.'})
 
-    return render_template('admin/cms/function/create.html', title='Create Page')
+    return jsonify({'success': False, 'message': 'Invalid request method.'})
 
 # Client Store Routes --------------------------------------------------------------------------------------------------------------
 
