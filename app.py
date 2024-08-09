@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, flash, session, g, render_template_string
+from flask import Flask, render_template, redirect, url_for, request, flash, session, g
 from flask_babel import Babel, _
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
@@ -39,7 +39,7 @@ def close_db_connection(e=None):
         db.close()
 
 # Includo le rotte
-from routes import *
+
 
 # Funzione per caricare il contenuto della pagina
 def load_page_content(slug):
@@ -50,18 +50,6 @@ def load_page_content(slug):
     cursor.close()
     conn.close()
     return page
-
-# Funzione per creare le rotte dinamiche
-def create_dynamic_routes():
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT slug FROM pages")
-    pages = cursor.fetchall()
-    cursor.close()
-    conn.close()
-
-    for page in pages:
-        app.add_url_rule(f"/{page['slug']}", page['slug'], lambda slug=page['slug']: render_dynamic_page(slug))
 
 # Funzione che renderizza il contenuto dinamico
 def render_dynamic_page(slug):
@@ -76,8 +64,21 @@ def render_dynamic_page(slug):
     else:
         return render_template('404.html'), 404
 
-@app.route('/')
-def index():
+# Funzione per creare le rotte dinamiche
+def create_dynamic_routes():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT slug FROM pages")
+    pages = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    for page in pages:
+        endpoint_name = f"dynamic_page_{page['slug']}"
+        app.add_url_rule(f"/{page['slug']}", endpoint=endpoint_name, view_func=lambda slug=page['slug']: render_dynamic_page(slug))
+
+@app.route('/home', endpoint='home_page')
+def home_index():
     return render_template('index.html', 
                            title='Home', 
                            description='Pagina principale', 
