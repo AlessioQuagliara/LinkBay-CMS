@@ -38,9 +38,6 @@ def close_db_connection(e=None):
     if db is not None:
         db.close()
 
-# Includo le rotte
-
-
 # Funzione per caricare il contenuto della pagina
 def load_page_content(slug):
     conn = get_db_connection()
@@ -89,6 +86,9 @@ def home_index():
 # Creazione delle rotte dinamiche
 with app.app_context():
     create_dynamic_routes()
+
+# Includo le rotte
+from routes import *
 
 if __name__ == '__main__':
     app.run(debug=True)
