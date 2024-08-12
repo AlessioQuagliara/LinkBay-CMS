@@ -49,6 +49,7 @@ def load_page_content(slug):
     return page
 
 # Funzione che renderizza il contenuto dinamico
+@app.route('/<slug>')
 def render_dynamic_page(slug):
     page = load_page_content(slug)
     if page:
@@ -61,25 +62,7 @@ def render_dynamic_page(slug):
     else:
         return render_template('404.html'), 404
 
-# Funzione per creare le rotte dinamiche
-def create_dynamic_routes():
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT slug FROM pages")
-    pages = cursor.fetchall()
-    cursor.close()
-    conn.close()
-
-    for page in pages:
-        endpoint_name = f"dynamic_page_{page['slug']}"
-        app.add_url_rule(f"/{page['slug']}", endpoint=endpoint_name, view_func=lambda slug=page['slug']: render_dynamic_page(slug))
-
-
-# Creazione delle rotte dinamiche
-with app.app_context():
-    create_dynamic_routes()
-
-# Includo le rotte
+# Includo le rotte statiche definite nel file routes.py
 from routes import *
 
 if __name__ == '__main__':
