@@ -59,10 +59,17 @@
                         <label for="seo-title" class="form-label">Title</label>
                         <input type="text" class="form-control" id="seo-title" name="title" value="{{ page.title }}" required>
                     </div>
+                    {% if page.slug in ['home', 'about-us', 'catalogs', 'products'] %}
+                    <div class="mb-3">
+                        <label for="seo-slug" class="form-label">Slug</label>
+                        <input type="text" class="form-control" id="seo-slug" name="slug" value="{{ page.slug }}" readonly>
+                    </div>
+                    {% else %}
                     <div class="mb-3">
                         <label for="seo-slug" class="form-label">Slug</label>
                         <input type="text" class="form-control" id="seo-slug" name="slug" value="{{ page.slug }}" required>
                     </div>
+                    {% endif %}
                     <div class="mb-3">
                         <label for="seo-description" class="form-label">Description</label>
                         <textarea class="form-control" id="seo-description" name="description" rows="3" required>{{ page.description }}</textarea>
