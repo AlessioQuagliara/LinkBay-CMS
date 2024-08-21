@@ -46,16 +46,16 @@
         <div class="card text-bg-dark">
             <img src="https://cdn.shopify.com/s/files/1/0070/7032/files/shopify-store-freshheritage.png?v=1694804945" class="card-img" alt="...">
             <div class="card-img-overlay d-flex flex-column">
-                <h5 class="card-title">Your Online Store</h5>
+                <h5 class="card-title">{{ _('Your Online Store') }}</h5>
                 <div class="mt-auto">
                     <div class="card-footer">
                         <div>
-                            <p class="card-text"><span class="badge text-bg-secondary">Theme used: Norman</span></p>
-                            <p class="card-text"><small>Last Theme Edit: <span class="badge text-bg-secondary">5 minutes ago</span></small></p>
+                            <p class="card-text"><span class="badge text-bg-secondary">{{ _('Theme Name') }}: Norman</span></p>
+                            <p class="card-text"><small>{{ _('Last Theme Edit') }}: <span class="badge text-bg-secondary">5 minutes ago</span></small></p>
                         </div>
                         <div>
-                            <a href="../../../index" target="_blank" class="btn btn-light btn-small">View Online Store</a>
-                            <a href="{{ url_for('editor_interface') }}" class="btn btn-danger btn-small">Edit Store</a>
+                            <a href="../../../index" target="_blank" class="btn btn-light btn-small">{{ _('View Online Store') }}</a>
+                            <a href="{{ url_for('editor_interface') }}" class="btn btn-danger btn-small">{{ _('Edit Store') }}</a>
                         </div>
                     </div>
                 </div>
@@ -64,7 +64,7 @@
     </div>
 </div>
 
-<h5 class="mt-4" data-aos="fade-up">Other Available Themes</h5>
+<h5 class="mt-4" data-aos="fade-up">{{ _('Other Theme Avaible') }}</h5>
 <div class="row" data-aos="fade-up">
     <div class="col-md-4 text-dark">
         <div class="theme-card card">
@@ -72,9 +72,9 @@
                 <img src="https://via.placeholder.com/300x200" alt="Theme Preview">
             </div>
             <div class="card-body">
-                <h5 class="card-title">Theme Name</h5>
-                <p class="card-text">A brief description of the theme.</p>
-                <button class="btn btn-primary" onclick="selectTheme()">Select Theme</button>
+                <h5 class="card-title">{{ _('Theme Name') }}</h5>
+                <p class="card-text">{{ _('A brief description of the theme') }}.</p>
+                <button class="btn btn-primary" onclick="selectTheme()">{{ _('Select Theme') }}</button>
             </div>
         </div>
     </div>

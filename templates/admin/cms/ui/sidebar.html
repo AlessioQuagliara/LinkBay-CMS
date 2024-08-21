@@ -6,42 +6,42 @@
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
             <a href="{{ url_for('homepage') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
-                <i class="fa-solid fa-table-columns {% if title == 'HomePage' %}fa-bounce{% endif %}"></i>&nbsp; Home
+                <i class="fa-solid fa-table-columns {% if title == 'HomePage' %}fa-bounce{% endif %}"></i>&nbsp; {{ _('Home') }}
             </a>
         </li>
         <li>
             <a href="{{ url_for('orders') }}" class="nav-link {% if title == 'Orders' %}active{% endif %} text-white">
-                <i class="fa-solid fa-clipboard-list {% if title == 'Orders' %}fa-bounce{% endif %}"></i>&nbsp; Orders
+                <i class="fa-solid fa-clipboard-list {% if title == 'Orders' %}fa-bounce{% endif %}"></i>&nbsp; {{ _('Orders') }}
             </a>
         </li>
         <li>
             <a href="{{ url_for('products') }}" class="nav-link {% if title == 'Products' %}active{% endif %} text-white">
-                <i class="fa-solid fa-tags {% if title == 'Products' %}fa-bounce{% endif %}"></i>&nbsp; Products
+                <i class="fa-solid fa-tags {% if title == 'Products' %}fa-bounce{% endif %}"></i>&nbsp; {{ _('Products') }}
             </a>
         </li>
         <li>
             <a href="{{ url_for('customers') }}" class="nav-link {% if title == 'Customers' %}active{% endif %} text-white">
-                <i class="fa-solid fa-user-group {% if title == 'Customers' %}fa-bounce{% endif %}"></i>&nbsp; Customers
+                <i class="fa-solid fa-user-group {% if title == 'Customers' %}fa-bounce{% endif %}"></i>&nbsp; {{ _('Customers') }}
             </a>
         </li>
         <li>
             <a href="{{ url_for('marketing') }}" class="nav-link {% if title == 'Marketing' %}active{% endif %} text-white">
-                <i class="fa-solid fa-chart-pie {% if title == 'Marketing' %}fa-bounce{% endif %}"></i>&nbsp; Marketing
+                <i class="fa-solid fa-chart-pie {% if title == 'Marketing' %}fa-bounce{% endif %}"></i>&nbsp; {{ _('Marketing') }}
             </a>
         </li>
         <li>
             <a href="{{ url_for('online_content') }}" class="nav-link {% if title == 'Online Content' %}active{% endif %} text-white">
-                <i class="fa-solid fa-store {% if title == 'Online Content' %}fa-bounce{% endif %}"></i>&nbsp; Online Content
+                <i class="fa-solid fa-store {% if title == 'Online Content' %}fa-bounce{% endif %}"></i>&nbsp; {{ _('Online Content') }}
             </a>
         </li>
         <li>
             <a href="{{ url_for('domain') }}" class="nav-link {% if title == 'Domain' %}active{% endif %} text-white">
-                <i class="fa-solid fa-globe {% if title == 'Domain' %}fa-bounce{% endif %}"></i>&nbsp; Domain
+                <i class="fa-solid fa-globe {% if title == 'Domain' %}fa-bounce{% endif %}"></i>&nbsp; {{ _('Domain') }}
             </a>
         </li>
         <li>
             <a href="{{ url_for('shipping') }}" class="nav-link {% if title == 'Shipping' %}active{% endif %} text-white">
-                <i class="fa-solid fa-truck {% if title == 'Shipping' %}fa-bounce{% endif %}"></i>&nbsp; Shipping
+                <i class="fa-solid fa-truck {% if title == 'Shipping' %}fa-bounce{% endif %}"></i>&nbsp; {{ _('Shipping') }}
             </a>
         </li>
     </ul>
@@ -52,10 +52,10 @@
             <strong>{{ username }}</strong>
         </a>
         <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-            <li><a class="dropdown-item" href="#">Settings</a></li>
-            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><a class="dropdown-item" href="#">{{ _('Settings') }}</a></li>
+            <li><a class="dropdown-item" href="#">{{ _('Profile') }}</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('logout') }}">{{ _('Logout') }}</a></li>
         </ul>
     </div>
 </div>

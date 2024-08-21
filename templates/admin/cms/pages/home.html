@@ -5,8 +5,8 @@
 
         <div class="row" data-aos="fade-up">
             <div class="col-12 mb-3 ">
-                <button type="button" class="btn btn-dark btn-sm"><i class="fa-solid fa-inbox"></i> Orders to be Processed <span class="badge text-bg-secondary">4</span></button>
-                <button type="button" class="btn btn-dark btn-sm">Orders to Ship</button>
+                <button type="button" class="btn btn-dark btn-sm"><i class="fa-solid fa-inbox"></i> {{ _('Orders to be Processed') }} <span class="badge text-bg-secondary">4</span></button>
+                <button type="button" class="btn btn-dark btn-sm">{{ _('Orders to Ship') }}</button>
             </div>
             <div class="col-md-12 mb-3">
               <style>
@@ -47,11 +47,11 @@
                 <div class="card text-bg-dark">
                   <img src="https://cdn.shopify.com/s/files/1/0070/7032/files/shopify-store-freshheritage.png?v=1694804945" class="card-img" alt="...">
                   <div class="card-img-overlay">
-                      <h5 class="card-title">Your Online Store</h5>
-                      <p class="card-text"><i class="fa-regular fa-circle-dot text-danger"></i> 12 Visitors Now</p>
-                      <p class="card-text"><small>Last updated 3 mins ago</small></p>
-                      <a href="../../../index" target="_blank" class="btn btn-light btn-small">View Online Store</a>
-                      <a href="{{ url_for('online_content') }}" class="btn btn-danger btn-small">Edit Store</a>
+                      <h5 class="card-title">{{ _('Your Online Store') }}</h5>
+                      <p class="card-text"><i class="fa-regular fa-circle-dot text-danger"></i> {{ _('12 Visitors Now') }}</p>
+                      <p class="card-text"><small>{{ _('Last updated 3 mins ago') }}</small></p>
+                      <a href="../../../index" target="_blank" class="btn btn-light btn-small">{{ _('View Online Store') }}</a>
+                      <a href="{{ url_for('online_content') }}" class="btn btn-danger btn-small">{{ _('Edit Store') }}</a>
                   </div>
                 </div>
 
@@ -61,29 +61,29 @@
                     <div class="accordion-item">
                       <h2 class="accordion-header">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
-                        Brief Guide
+                          {{ _('Brief Guide') }}
                         </button>
                       </h2>
                       <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show">
                         <div class="accordion-body">
-                          <strong>Welcome to your online shop! </strong> Create an innovative design to stand out from the crowd with our 360° editor, get help from experts if you can’t do it yourself. Add your products, set up shipping, payment methods and start selling!
+                          <strong>{{ _('Welcome to your online shop') }}! </strong> {{ _('Create an innovative design to stand out from the crowd with our 360° editor, get help from experts if you can’t do it yourself. Add your products, set up shipping, payment methods and start selling') }}!
                         </div>
                       </div>
                     </div>
                     <div class="accordion-item">
                       <h2 class="accordion-header">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
-                          How To Sell
+                          {{ _('How To Sell') }}
                         </button>
                       </h2>
                       <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
                         <div class="accordion-body">
                             <ul class="list-group">
-                                <li class="list-group-item"><input class="form-check-input" type="checkbox" >&nbsp;  Add your first product &nbsp;<a href="products" class="btn btn-small btn-danger"><i class="fa-solid fa-share-from-square"></i></a></li>
-                                <li class="list-group-item"><input class="form-check-input" type="checkbox" >&nbsp;  Customize your own store &nbsp;<a href="online-content" class="btn btn-small btn-danger"><i class="fa-solid fa-share-from-square"></i></a></li>
-                                <li class="list-group-item"><input class="form-check-input" type="checkbox" >&nbsp;  Get your own internet domain &nbsp;<a href="domain" class="btn btn-small btn-danger"><i class="fa-solid fa-share-from-square"></i></a></li>
-                                <li class="list-group-item"><input class="form-check-input" type="checkbox" >&nbsp;  Enter shipping details &nbsp;<a href="shipping" class="btn btn-small btn-danger"><i class="fa-solid fa-share-from-square"></i></a></li>
-                                <li class="list-group-item"><input class="form-check-input" type="checkbox" >&nbsp;  Enter the payment system &nbsp;<a href="" class="btn btn-small btn-danger"><i class="fa-solid fa-share-from-square"></i></a></li>
+                                <li class="list-group-item"><input class="form-check-input" type="checkbox" >&nbsp;  {{ _('Add your first product') }} &nbsp;<a href="products" class="btn btn-small btn-danger"><i class="fa-solid fa-share-from-square"></i></a></li>
+                                <li class="list-group-item"><input class="form-check-input" type="checkbox" >&nbsp;  {{ _('Customize your own store') }} &nbsp;<a href="online-content" class="btn btn-small btn-danger"><i class="fa-solid fa-share-from-square"></i></a></li>
+                                <li class="list-group-item"><input class="form-check-input" type="checkbox" >&nbsp;  {{ _('Get your own internet domain') }} &nbsp;<a href="domain" class="btn btn-small btn-danger"><i class="fa-solid fa-share-from-square"></i></a></li>
+                                <li class="list-group-item"><input class="form-check-input" type="checkbox" >&nbsp;  {{ _('Enter shipping details') }} &nbsp;<a href="shipping" class="btn btn-small btn-danger"><i class="fa-solid fa-share-from-square"></i></a></li>
+                                <li class="list-group-item"><input class="form-check-input" type="checkbox" >&nbsp;  {{ _('Enter the payment system') }} &nbsp;<a href="" class="btn btn-small btn-danger"><i class="fa-solid fa-share-from-square"></i></a></li>
                               </ul>
                         </div>
                       </div>
@@ -91,12 +91,12 @@
                     <div class="accordion-item">
                       <h2 class="accordion-header">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
-                          Start to Sell
+                          {{ _('Start to Sell') }}
                         </button>
                       </h2>
                       <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse">
                         <div class="accordion-body">
-                          Subscribe a subscription plan with us to be able to use your online store for sale. &nbsp;<a href="" class="btn btn-small btn-danger"><i class="fa-solid fa-share-from-square"></i></a>
+                          {{ _('Subscribe a subscription plan with us to be able to use your online store for sale') }}. &nbsp;<a href="" class="btn btn-small btn-danger"><i class="fa-solid fa-share-from-square"></i></a>
                         </div>
                       </div>
                     </div>

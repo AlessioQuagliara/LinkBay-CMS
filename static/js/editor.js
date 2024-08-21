@@ -1,4 +1,6 @@
-// Edit SEO
+// -------------------------------------------------------------------------------------------------------------------------
+// Edit SEO ----------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", function() {
     const saveSeoButton = document.getElementById('save-seo');
     const seoForm = document.getElementById('seo-form');
@@ -49,7 +51,10 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // Script per gestire i keywords come chips
+// -------------------------------------------------------------------------------------------------------------------------
+// Chips Script ------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------
+    
     const keywordsContainer = document.getElementById('seo-keywords-container');
     const keywordsInput = document.createElement('input');
     const hiddenKeywordsInput = document.getElementById('seo-keywords');
@@ -109,23 +114,11 @@ document.addEventListener("DOMContentLoaded", function() {
         return Array.from(chips).some(chip => chip.textContent.slice(0, -1).toLowerCase() === keyword.toLowerCase());
     }
 });
+    
 
-document.addEventListener("DOMContentLoaded", function() {
-    const titleInput = document.getElementById('seo-title');
-    const slugInput = document.getElementById('seo-slug');
-
-    titleInput.addEventListener('input', function() {
-        let slug = titleInput.value
-            .toLowerCase()  // Converti tutto in minuscolo
-            .replace(/[^a-z0-9\s-]/g, '')  // Rimuove tutti i caratteri non alfanumerici eccetto gli spazi e i trattini
-            .replace(/\s+/g, '-')  // Sostituisce gli spazi con i trattini
-            .replace(/-+/g, '-');  // Elimina i trattini multipli consecutivi
-
-        slugInput.value = slug;
-    });
-});
-
-// Create page
+// -------------------------------------------------------------------------------------------------------------------------
+// Create page -------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------
 
 document.addEventListener("DOMContentLoaded", function() {
     const createPageButton = document.getElementById('create-page');
@@ -182,7 +175,10 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // Script per gestire i keywords come chips
+// -------------------------------------------------------------------------------------------------------------------------
+// Chips Script ------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------
+
     const keywordsContainer = document.getElementById('keywords-container');
     const keywordsInput = document.createElement('input');
     const hiddenKeywordsInput = document.getElementById('keywords');
@@ -236,6 +232,10 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
+// -------------------------------------------------------------------------------------------------------------------------
+// Edit SLUG ----------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------
+
 document.addEventListener("DOMContentLoaded", function() {
     const titleInput = document.getElementById('title');
     const slugInput = document.getElementById('slug');
@@ -251,7 +251,9 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-// SIDEBAR
+// -------------------------------------------------------------------------------------------------------------------------
+// SIDEBAR ----------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------
 
 $(document).ready(function(){
     $('.navbar-toggler').on('click', function(){
