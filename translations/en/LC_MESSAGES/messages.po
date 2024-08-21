@@ -191,7 +191,38 @@ msgstr "Welcome to your online shop"
 msgid "You Got Out"
 msgstr "You Got Out"
 
-msgid "EDITA"
-msgstr "EDITA"
+msgid "Page Not Found"
+msgstr "Page Not Found"
 
+msgid "Login"
+msgstr "Login"
 
+msgid "Profile"
+msgstr "Profile"
+
+msgid "Develop by"
+msgstr "Develop by"
+
+msgid "Restore"
+msgstr "Restore"
+
+msgid "Your Online Store"
+msgstr "Your Online Store"
+
+msgid "Visitors Now"
+msgstr "Visitors Now"
+
+msgid "Last updated"
+msgstr "Last updated"
+
+msgid "mins ago"
+msgstr "mins ago"
+
+msgid "View Online Store"
+msgstr "View Online Store"
+
+msgid "Edit Store"
+msgstr "Edit Store"
+
+msgid "Theme Name"
+msgstr "Theme Name"

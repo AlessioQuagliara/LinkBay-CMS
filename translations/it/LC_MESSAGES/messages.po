@@ -3,55 +3,226 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
 # ---------------------------------------------------------------------------------------------
-# Pagina di 404 not found ---------------------------------------------------------------------
+# TRADUZIONE ---------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------
-msgid "Page Not Found"
-msgstr "Page Not Found"
+msgid "A brief description of the theme"
+msgstr "Breve descrizione del tema"
 
-# ---------------------------------------------------------------------------------------------
-# Pagina di admin/login.html ------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------
-msgid "Login"
-msgstr "Login"
+msgid "Add"
+msgstr "Aggiungi"
+
+msgid "Add Page"
+msgstr "Aggiungi Pagina"
+
+msgid "Add your first product"
+msgstr "Aggiungi il tuo primo prodotto"
+
+msgid "Already Registered?"
+msgstr "Sei già registrato?"
+
+msgid "Back to home"
+msgstr "Torna indietro"
+
+msgid "Back to list"
+msgstr "Torna indietro"
+
+msgid "Brief Guide"
+msgstr "Breve Guida"
 
 msgid "Continue on your CMS"
-msgstr "Continue on your CMS"
+msgstr "Continua sul tuo CMS"
 
-msgid "Forgot your password?"
-msgstr "Forgot your password?"
+msgid "Create an innovative design to stand out from the crowd with our 360° editor, get help from experts if you can’t do it yourself. Add your products, set up shipping, payment methods and start selling"
+msgstr "Crea un design innovativo per differenziarti dalla folla con il nostro editor a 360°, ricevi aiuto da esperti se non riesci da solo. Aggiumgi i tuoi prodotti, imposta le spedizioni, metodi di pagamento e comincia a vendere"
 
-msgid "Restore"
-msgstr "Restore"
+msgid "Create New Page"
+msgstr "Crea Una Nuova Pagina"
 
-msgid "Develop by"
-msgstr "Develop by"
+msgid "Create View"
+msgstr "Crea Vista"
 
-# ---------------------------------------------------------------------------------------------
-# Pagina di admin/restore.html ----------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------
-msgid "Restore password"
-msgstr "Restore password"
+msgid "Customers"
+msgstr "Clienti"
+
+msgid "Customize your own store"
+msgstr "Personalizza il tuo negozio"
+
+msgid "Delete"
+msgstr "Elimina"
+
+msgid "Domain"
+msgstr "Dominio"
+
+msgid "Edit SEO"
+msgstr "Modifica SEO"
+
+msgid "Edit SEO Settings"
+msgstr "Modifica Impostazioni SEO"
+
+msgid "Enter shipping details"
+msgstr "Inserisci dettagli spedizione"
+
+msgid "Enter the payment system"
+msgstr "Inserisci sistema di pagamento"
 
 msgid "Enter your email address"
-msgstr "Enter your email address"
+msgstr "Inserisci il tuo indirizzo email"
 
-msgid "Restore"
-msgstr "Restore"
+msgid "Export"
+msgstr "Esporta"
 
 msgid "Forgot your Email?"
-msgstr "Forgot your Email?"
+msgstr "Hai dimenticato la tua Email?"
+
+msgid "Forgot your password?"
+msgstr "Hai dimenticato la tua Password?"
+
+msgid "Get your own internet domain"
+msgstr "Ottieni il tuo dominio internet"
+
+msgid "Home"
+msgstr "Home"
+
+msgid "How To Sell"
+msgstr "Come Vendere"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Import"
+msgstr "Importa"
+
+msgid "Last Theme Edit"
+msgstr "Ultima Modifica del Tema"
+
+msgid "Last updated"
+msgstr "Ultimo aggiornamento"
+
+msgid "Logout"
+msgstr "Disconnettiti"
+
+msgid "Marketing"
+msgstr "Marketing"
+
+msgid "mins ago"
+msgstr "minuti fa"
+
+msgid "minutes ago"
+msgstr "minutes ago"
+
+msgid "Name"
+msgstr "Nome"
+
+msgid "Online Content"
+msgstr "Contenuto Online"
+
+msgid "Orders"
+msgstr "Ordini"
+
+msgid "Orders to be Processed"
+msgstr "Ordini da Processare"
+
+msgid "Orders to Ship"
+msgstr "Ordini da Spedire"
+
+msgid "Other Theme Avaible"
+msgstr "Altri Temi Disponibili"
+
+msgid "Products"
+msgstr "Prodotti"
+
+msgid "Report"
+msgstr "Report"
+
+msgid "Restore password"
+msgstr "Recupera Password"
 
 msgid "Restore the account"
-msgstr "Restore the account"
+msgstr "Recupera account"
 
-# ---------------------------------------------------------------------------------------------
-# Pagina di admin/logout.html -----------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------
-msgid "You Got Out"
-msgstr "You Got Out"
+msgid "Save changes"
+msgstr "Salva le Modifiche"
+
+msgid "Save Page"
+msgstr "Salva Pagina"
+
+msgid "Search"
+msgstr "Cerca"
+
+msgid "Select"
+msgstr "Seleziona"
+
+msgid "Select Theme"
+msgstr "Seleziona Temi"
+
+msgid "Settings"
+msgstr "Impostazioni"
+
+msgid "Shipping"
+msgstr "Spedizione"
+
+msgid "Sign-in"
+msgstr "Registrati"
+
+msgid "Start to Sell"
+msgstr "Inizia a Vendere"
+
+msgid "Store-Name"
+msgstr "Nome-Negozio"
+
+msgid "Subscribe a subscription plan with us to be able to use your online store for sale"
+msgstr "Abbonati a noi per usare il tuo negozio online e iniziare a vendere"
+
+msgid "Surname"
+msgstr "Cognome"
 
 msgid "The session has been closed"
-msgstr "The session has been closed"
+msgstr "La sessione è scaduta"
+
+msgid "View Online"
+msgstr "Visualizza Online"
+
+msgid "Visitors Now"
+msgstr "Visite"
+
+msgid "Welcome to your online shop"
+msgstr "Benvenuto nel tuo negozio online"
+
+msgid "You Got Out"
+msgstr "Sei Uscito"
+
+msgid "Page Not Found"
+msgstr "Pagina Non Trovata"
 
 msgid "Login"
-msgstr "Login"
+msgstr "Accedi"
+
+msgid "Profile"
+msgstr "Profilo"
+
+msgid "Develop by"
+msgstr "Sviluppato da"
+
+msgid "Restore"
+msgstr "Ripristina"
+
+msgid "Your Online Store"
+msgstr "Il Tuo Negozio Online"
+
+msgid "Visitors Now"
+msgstr "Visite"
+
+msgid "Last updated"
+msgstr "Ultimo aggiornamento"
+
+msgid "mins ago"
+msgstr "minuti fa"
+
+msgid "View Online Store"
+msgstr "Visualizza Online"
+
+msgid "Edit Store"
+msgstr "Modifica Negozio"
+
+msgid "Theme Name"
+msgstr "Nome del Tema"

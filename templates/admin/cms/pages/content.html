@@ -50,8 +50,8 @@
                 <div class="mt-auto">
                     <div class="card-footer">
                         <div>
-                            <p class="card-text"><span class="badge text-bg-secondary">{{ _('Theme Name') }}: Norman</span></p>
-                            <p class="card-text"><small>{{ _('Last Theme Edit') }}: <span class="badge text-bg-secondary">5 minutes ago</span></small></p>
+                            <p class="card-text"><span class="badge text-bg-secondary">{{ _('Theme Name') }}<strong>: Norman</strong></span></p>
+                            <p class="card-text"><small>{{ _('Last Theme Edit') }}: <span class="badge text-bg-secondary"> <strong>5</strong> {{ _('minutes ago') }}</span></small></p>
                         </div>
                         <div>
                             <a href="../../../index" target="_blank" class="btn btn-light btn-small">{{ _('View Online Store') }}</a>
@@ -67,10 +67,7 @@
 <h5 class="mt-4" data-aos="fade-up">{{ _('Other Theme Avaible') }}</h5>
 <div class="row" data-aos="fade-up">
     <div class="col-md-4 text-dark">
-        <div class="theme-card card">
-            <div class="theme-preview">
-                <img src="https://via.placeholder.com/300x200" alt="Theme Preview">
-            </div>
+        <div class="theme-card card" style="background-image: url(https://via.placeholder.com/300x200); background-size: cover;">
             <div class="card-body">
                 <h5 class="card-title">{{ _('Theme Name') }}</h5>
                 <p class="card-text">{{ _('A brief description of the theme') }}.</p>

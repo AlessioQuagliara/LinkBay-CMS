@@ -3,55 +3,226 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
 # ---------------------------------------------------------------------------------------------
-# Pagina di 404 not found ---------------------------------------------------------------------
+# TRADUZIONE ---------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------
-msgid "Page Not Found"
-msgstr "Page Not Found"
+msgid "A brief description of the theme"
+msgstr "Eine kurze Beschreibung des Themas"
 
-# ---------------------------------------------------------------------------------------------
-# Pagina di admin/login.html ------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------
-msgid "Login"
-msgstr "Login"
+msgid "Add"
+msgstr "fügen"
+
+msgid "Add Page"
+msgstr "Seite hinzufügen"
+
+msgid "Add your first product"
+msgstr "Fügen Sie Ihr erstes Produkt hinzu"
+
+msgid "Already Registered?"
+msgstr "Bereits registriert?"
+
+msgid "Back to home"
+msgstr "zurück nach Hause"
+
+msgid "Back to list"
+msgstr "Zurück zur Übersicht"
+
+msgid "Brief Guide"
+msgstr "Kurze Anleitung"
 
 msgid "Continue on your CMS"
-msgstr "Continue on your CMS"
+msgstr "Weiter auf Ihrem CMS"
 
-msgid "Forgot your password?"
-msgstr "Forgot your password?"
+msgid "Create an innovative design to stand out from the crowd with our 360° editor, get help from experts if you can’t do it yourself. Add your products, set up shipping, payment methods and start selling"
+msgstr "Erstellen Sie ein innovatives Design, um sich von der Masse mit unserem 360° Editor abzuheben, und holen Sie sich Hilfe von Experten, wenn Sie es nicht selbst tun können. Fügen Sie Ihre Produkte hinzu, richten Sie den Versand und die Zahlungsmethoden ein und beginnen Sie mit dem Verkauf"
 
-msgid "Restore"
-msgstr "Restore"
+msgid "Create New Page"
+msgstr "Neue Seite erstellen"
 
-msgid "Develop by"
-msgstr "Develop by"
+msgid "Create View"
+msgstr "Ansicht erstellen"
 
-# ---------------------------------------------------------------------------------------------
-# Pagina di admin/restore.html ----------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------
-msgid "Restore password"
-msgstr "Restore password"
+msgid "Customers"
+msgstr "Kunden"
+
+msgid "Customize your own store"
+msgstr "Passen Sie Ihren eigenen Shop an"
+
+msgid "Delete"
+msgstr "löschen"
+
+msgid "Domain"
+msgstr "Domäne"
+
+msgid "Edit SEO"
+msgstr "Bearbeiten SEO"
+
+msgid "Edit SEO Settings"
+msgstr "Bearbeiten von SEO-Einstellungen"
+
+msgid "Enter shipping details"
+msgstr "Geben Sie die Versanddetails ein"
+
+msgid "Enter the payment system"
+msgstr "Geben Sie das Zahlungssystem ein"
 
 msgid "Enter your email address"
-msgstr "Enter your email address"
+msgstr "Ihre E-Mail-Adresse eingeben"
 
-msgid "Restore"
-msgstr "Restore"
+msgid "Export"
+msgstr "Exportieren"
 
 msgid "Forgot your Email?"
-msgstr "Forgot your Email?"
+msgstr "Haben Sie Ihre E-Mail-Adresse vergessen?"
+
+msgid "Forgot your password?"
+msgstr "Passwort vergessen?"
+
+msgid "Get your own internet domain"
+msgstr "Holen Sie sich Ihre eigene Internet-Domain"
+
+msgid "Home"
+msgstr "Home"
+
+msgid "How To Sell"
+msgstr "So verkaufen"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Import"
+msgstr "importieren"
+
+msgid "Last Theme Edit"
+msgstr "Last Theme Edit"
+
+msgid "Last updated"
+msgstr "Letzte Änderung des Themas"
+
+msgid "Logout"
+msgstr "Abmelden"
+
+msgid "Marketing"
+msgstr "Marketing"
+
+msgid "mins ago"
+msgstr "Minuten vorher"
+
+msgid "minutes ago"
+msgstr "Minuten"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Online Content"
+msgstr "Online-Inhalte"
+
+msgid "Orders"
+msgstr "Bestellungen"
+
+msgid "Orders to be Processed"
+msgstr "Aufträge, die bearbeitet werden sollen"
+
+msgid "Orders to Ship"
+msgstr "Bestellungen an Versand"
+
+msgid "Other Theme Avaible"
+msgstr "Andere Themen verfügbar"
+
+msgid "Products"
+msgstr "Produkten"
+
+msgid "Report"
+msgstr "Bericht"
+
+msgid "Restore password"
+msgstr "Passwort wiederherstellen"
 
 msgid "Restore the account"
-msgstr "Restore the account"
+msgstr "Das Konto wiederherstellen"
 
-# ---------------------------------------------------------------------------------------------
-# Pagina di admin/logout.html -----------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------
-msgid "You Got Out"
-msgstr "You Got Out"
+msgid "Save changes"
+msgstr "Änderungen speichern"
+
+msgid "Save Page"
+msgstr "Seite speichern"
+
+msgid "Search"
+msgstr "Suche"
+
+msgid "Select"
+msgstr "Wählen"
+
+msgid "Select Theme"
+msgstr "Thema auswählen"
+
+msgid "Settings"
+msgstr "Einstellungen"
+
+msgid "Shipping"
+msgstr "Versand"
+
+msgid "Sign-in"
+msgstr "Anmeldung"
+
+msgid "Start to Sell"
+msgstr "Verkaufen"
+
+msgid "Store-Name"
+msgstr "Store-Name"
+
+msgid "Subscribe a subscription plan with us to be able to use your online store for sale"
+msgstr "Abonnieren Sie einen Abonnement-Plan bei uns, um Ihren Online-Shop zum Verkauf nutzen zu können"
+
+msgid "Surname"
+msgstr "Nachname"
 
 msgid "The session has been closed"
-msgstr "The session has been closed"
+msgstr "Die Sitzung ist geschlossen"
+
+msgid "View Online"
+msgstr "Online-Ansicht"
+
+msgid "Visitors Now"
+msgstr "Besucher nun"
+
+msgid "Welcome to your online shop"
+msgstr "Willkommen in Ihrem Online-Shop"
+
+msgid "You Got Out"
+msgstr "Du bist aus"
+
+msgid "Page Not Found"
+msgstr "Seite nicht gefunden"
 
 msgid "Login"
-msgstr "Login"
+msgstr "Anmeldung"
+
+msgid "Profile"
+msgstr "Profil"
+
+msgid "Develop by"
+msgstr "Entwickeln durch"
+
+msgid "Restore"
+msgstr "Wiederherstellen"
+
+msgid "Your Online Store"
+msgstr "Ihren Online-Shop"
+
+msgid "Visitors Now"
+msgstr "Besucher nun"
+
+msgid "Last updated"
+msgstr "Zuletzt aktualisiert"
+
+msgid "mins ago"
+msgstr "Minuten vorher"
+
+msgid "View Online Store"
+msgstr "Online Store anzeigen"
+
+msgid "Edit Store"
+msgstr "Bearbeiten Store"
+
+msgid "Theme Name"
+msgstr "Designnamen"
