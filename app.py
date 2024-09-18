@@ -17,7 +17,7 @@ def get_locale():
 
 babel.locale_selector_func = get_locale
 
-# Connessione al database "Globale"
+# Connessione al database "Dell'App"
 def get_db_connection():
     if 'db' not in g:
         g.db = mysql.connector.connect(
