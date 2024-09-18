@@ -49,8 +49,11 @@ def load_page_content(slug):
     return page
 
 # Funzione che renderizza il contenuto dinamico
+@app.route('/')
 @app.route('/<slug>')
-def render_dynamic_page(slug):
+def render_dynamic_page(slug=None):
+    if slug is None:
+        slug = 'home'  # Imposta lo slug come 'home' se non è fornito
     page = load_page_content(slug)
     if page:
         return render_template('index.html', 

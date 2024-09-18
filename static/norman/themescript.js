@@ -1,4 +1,4 @@
-function contentTheme() {
+
     editor.BlockManager.add('bootstrap-header', {
         label: '<img src="https://via.placeholder.com/50x50.png?text=Header" alt="Header" /> Header',
         content: '<header class="bg-primary text-white text-center py-5"><h1>Welcome to LinkBay</h1></header>',
@@ -22,4 +22,3 @@ function contentTheme() {
         content: '<div class="card" style="width: 18rem;"><img class="card-img-top" src="https://via.placeholder.com/150" alt="Card image cap"><div class="card-body"><h5 class="card-title">Card title</h5><p class="card-text">Some quick example text to build on the card title and make up the bulk of the card\'s content.</p><a href="#" class="btn btn-primary">Go somewhere</a></div></div>',
         category: 'Bootstrap'
     });
-}
