@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request, flash, ses
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config
 from database import Database 
+import mysql.connector
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -29,9 +30,30 @@ def get_db_connection():
         g.db = db.connect()
     return g.db
 
+# Connessione al database globale
+def get_auth_db_connection():
+    if 'auth_db' not in g:
+        g.auth_db = mysql.connector.connect(
+            host=app.config['AUTH_DB_HOST'],
+            user=app.config['AUTH_DB_USER'],
+            password=app.config['AUTH_DB_PASSWORD'],
+            database=app.config['AUTH_DB_NAME'],
+            port=app.config['AUTH_DB_PORT']
+        )
+    return g.auth_db
+
 @app.teardown_appcontext
 def teardown_db(exception):
     db.close()
+
+@app.teardown_appcontext
+def close_db_connection(exception):
+    db = g.pop('db', None)
+    if db is not None:
+        db.close()
+    auth_db = g.pop('auth_db', None)
+    if auth_db is not None:
+        auth_db.close()
 
 # Funzione per caricare il contenuto della pagina
 def load_page_content(slug):

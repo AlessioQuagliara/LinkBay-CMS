@@ -48,12 +48,15 @@
     <hr>
     <div class="dropdown">
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        {% if not session['profile_photo'] or session['profile_photo'] == ' ' %}
             <img src="../../../../static/images/male_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
-            <strong>{{ username }}</strong>
+        {% else %}
+            <img src="../../../../../LinkBay_site/static/uploads/profile_pictures/{{ session['profile_photo'] }}" alt="" width="32" height="32" class="rounded-circle me-2">
+        {% endif %}
+            <strong>{{ session['username'] }} {{ session['surname'] }}</strong>
         </a>
         <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
             <li><a class="dropdown-item" href="#">Settings</a></li>
-            <li><a class="dropdown-item" href="#">Profile</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
         </ul>

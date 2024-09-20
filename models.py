@@ -1,7 +1,7 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
 
-# CLASSE PER GESTIONE DATABASE
+# CLASSE PER GESTIONE DATABASE ---------------------------------------------------------------------------------------------------
 
 class Database:
     def __init__(self, config):
@@ -24,7 +24,7 @@ class Database:
             self.conn.close()
             self.conn = None
 
-# CLASSE PER GESTIONE UTENTI
+# CLASSE PER GESTIONE UTENTI ---------------------------------------------------------------------------------------------------
 
 class User:
     def __init__(self, db_conn):
@@ -32,7 +32,7 @@ class User:
 
     def get_all_users(self):
         cursor = self.conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM user")
+        cursor.execute("SELECT id, email, nome, cognome, telefono, profilo_foto, is_2fa_enabled FROM user")
         users = cursor.fetchall()
         cursor.close()
         return users
@@ -43,7 +43,7 @@ class User:
         user = cursor.fetchone()
         cursor.close()
         return user
-    
+
     def get_user_by_email(self, email):
         cursor = self.conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM user WHERE email = %s", (email,))
@@ -51,18 +51,22 @@ class User:
         cursor.close()
         return user
 
-    def create_user(self, name, surname, email, password):
+    def create_user(self, email, password, nome, cognome, telefono, profilo_foto):
         cursor = self.conn.cursor()
         hashed_password = generate_password_hash(password)
-        cursor.execute("INSERT INTO user (name, surname, email, password) VALUES (%s, %s, %s, %s)",
-                       (name, surname, email, hashed_password))
+        cursor.execute(
+            "INSERT INTO user (email, password, nome, cognome, telefono, profilo_foto) VALUES (%s, %s, %s, %s, %s, %s)",
+            (email, hashed_password, nome, cognome, telefono, profilo_foto)
+        )
         self.conn.commit()
         cursor.close()
 
-    def update_user(self, user_id, name, surname, email):
+    def update_user(self, user_id, nome, cognome, telefono, profilo_foto):
         cursor = self.conn.cursor()
-        cursor.execute("UPDATE user SET name = %s, surname = %s, email = %s WHERE id = %s",
-                       (name, surname, email, user_id))
+        cursor.execute(
+            "UPDATE user SET nome = %s, cognome = %s, telefono = %s, profilo_foto = %s WHERE id = %s",
+            (nome, cognome, telefono, profilo_foto, user_id)
+        )
         self.conn.commit()
         cursor.close()
 
@@ -72,7 +76,7 @@ class User:
         self.conn.commit()
         cursor.close()
 
-# Classe per ShopList
+# Classe per ShopList ---------------------------------------------------------------------------------------------------
 class ShopList:
     def __init__(self, db_conn):
         self.conn = db_conn
@@ -115,7 +119,7 @@ class ShopList:
         self.conn.commit()
         cursor.close()
 
-# Classe per Pages
+# Classe per Pages ---------------------------------------------------------------------------------------------------
 
 class Page:
     def __init__(self, db_conn):
@@ -207,3 +211,13 @@ class Page:
             print(f"Error deleting page: {e}")
             cursor.close()
             return False
+        
+
+
+
+
+
+
+
+
+    

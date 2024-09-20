@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, request, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import User, ShopList, Page
-from app import app, get_db_connection
+from app import app, get_db_connection, get_auth_db_connection
 from datetime import datetime
 
 # Se non trova la pagina va in 404 ------------------------------------------------------
@@ -45,22 +45,30 @@ def signin():
 @app.route('/admin/', methods=['GET', 'POST'])
 @app.route('/admin/login', methods=['GET', 'POST'])
 def login():
-    db_conn = get_db_connection()
-    user_model = User(db_conn)
+    auth_db_conn = get_auth_db_connection()  # Usa la connessione separata per CMS_INDEX
+    user_model = User(auth_db_conn)  # Usa il modello User con la connessione al database di autenticazione
 
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
 
-        # Cerca l'utente nel database usando il modello User
+        # Cerca l'utente nel database CMS_INDEX usando il modello User
         user = user_model.get_user_by_email(email)
 
         if user and check_password_hash(user['password'], password):
             session['user_id'] = user['id']
-            session['username'] = user['name']
-            session['surname'] = user['surname']
+            session['username'] = user['nome']  # Usa 'nome' invece di 'name'
+            session['surname'] = user['cognome']  # Usa 'cognome' invece di 'surname'
             session['email'] = user['email']
-            return redirect(url_for('homepage'))
+            session['phone'] = user['telefono']  # Aggiungi numero di telefono alla sessione
+            session['profile_photo'] = user['profilo_foto']  # Aggiungi foto profilo alla sessione
+
+            # Gestione del 2FA (autenticazione a due fattori)
+            if user['is_2fa_enabled']:
+                session['otp_secret'] = user['otp_secret']
+                return redirect(url_for('verify_otp'))  # Reindirizza a una schermata per inserire OTP
+            else:
+                return redirect(url_for('homepage'))
         else:
             flash('Login failed. Please check your email and password.', 'danger')
             return redirect(url_for('login'))

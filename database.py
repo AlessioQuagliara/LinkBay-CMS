@@ -35,3 +35,4 @@ class Database:
         last_id = cursor.lastrowid
         cursor.close()
         return last_id
+    
