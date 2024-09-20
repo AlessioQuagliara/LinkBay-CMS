@@ -140,8 +140,25 @@ def marketing():
 @app.route('/admin/cms/pages/online-content')
 def online_content():
     username = check_user_authentication()
+    
     if isinstance(username, str):
-        return render_template('admin/cms/pages/content.html', title='Online Content', username=username)
+        auth_db_conn = get_auth_db_connection()  # Connessione al database di autenticazione
+        shoplist_model = ShopList(auth_db_conn)  # Inizializza il modello ShopList
+        
+        # Recupera il negozio specifico per l'utente autenticato
+        shop_name = 'erboristeria'
+        shop = shoplist_model.get_shop_by_name(shop_name)
+        
+        if shop:
+            return render_template(
+                'admin/cms/pages/content.html', 
+                title='Online Content', 
+                username=username, 
+                shop=shop  # Passa i dati del negozio al template
+            )
+        else:
+            flash('Nessun negozio trovato.')
+            return redirect(url_for('homepage'))  # Reindirizza se non trovi il negozio
     return username
 
 @app.route('/admin/cms/pages/domain')

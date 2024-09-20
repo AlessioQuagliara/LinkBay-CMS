@@ -81,43 +81,17 @@ class ShopList:
     def __init__(self, db_conn):
         self.conn = db_conn
 
-    def get_all_shops(self):
+    def get_shop_by_name(self, shop_name):
         cursor = self.conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM ShopList")
-        shops = cursor.fetchall()
-        cursor.close()
-        return shops
-
-    def get_shop_by_id(self, shop_id):
-        cursor = self.conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM ShopList WHERE id = %s", (shop_id,))
-        shop = cursor.fetchone()
+        query = """
+            SELECT id, shop_name, themeOptions, domain, user_id, partner_id
+            FROM ShopList
+            WHERE shop_name = %s
+        """
+        cursor.execute(query, (shop_name,))
+        shop = cursor.fetchone()  # Usa fetchone per ottenere un singolo negozio
         cursor.close()
         return shop
-
-    def create_shop(self, shop_name, user_id, themeOptions):
-        cursor = self.conn.cursor()
-        cursor.execute(
-            "INSERT INTO ShopList (shop_name, user_id, themeOptions) VALUES (%s, %s, %s)",
-            (shop_name, user_id, themeOptions)
-        )
-        self.conn.commit()
-        cursor.close()
-
-    def update_shop(self, shop_id, shop_name, themeOptions):
-        cursor = self.conn.cursor()
-        cursor.execute(
-            "UPDATE ShopList SET shop_name = %s, themeOptions = %s WHERE id = %s",
-            (shop_name, themeOptions, shop_id)
-        )
-        self.conn.commit()
-        cursor.close()
-
-    def delete_shop(self, shop_id):
-        cursor = self.conn.cursor()
-        cursor.execute("DELETE FROM ShopList WHERE id = %s", (shop_id,))
-        self.conn.commit()
-        cursor.close()
 
 # Classe per Pages ---------------------------------------------------------------------------------------------------
 

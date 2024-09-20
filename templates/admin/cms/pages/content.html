@@ -46,11 +46,11 @@
         <div class="card text-bg-dark">
             <img src="https://cdn.shopify.com/s/files/1/0070/7032/files/shopify-store-freshheritage.png?v=1694804945" class="card-img" alt="...">
             <div class="card-img-overlay d-flex flex-column">
-                <h5 class="card-title">Your Online Store</h5>
+                <h5 class="card-title">Your Online Store: {{ shop['shop_name'] }}</h5>
                 <div class="mt-auto">
                     <div class="card-footer">
                         <div>
-                            <p class="card-text"><span class="badge text-bg-secondary">Theme Name<strong>: Norman</strong></span></p>
+                            <p class="card-text"><span class="badge text-bg-secondary">Theme in use<strong>: {{ shop['themeOptions'] }}</strong></span></p>
                             <p class="card-text"><small>Last Theme Edit: <span class="badge text-bg-secondary"> <strong>89183</strong> minutes ago</span></small></p>
                         </div>
                         <div>

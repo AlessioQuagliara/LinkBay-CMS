@@ -2,6 +2,7 @@ class Config:
     LANGUAGES = ['en', 'it', 'es', 'fr', 'de']  
     DEFAULT_LANGUAGE = 'en'  
     SECRET_KEY = 'cxzw5H23390@sall13&'  
+    shop_name = 'erboristeria'
     
     # Configurazioni del Database dell'app
     DB_HOST = '127.0.0.1'
