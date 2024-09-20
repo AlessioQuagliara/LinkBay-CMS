@@ -1,67 +1,65 @@
-from flask import Flask, render_template, redirect, url_for, request, flash, session, g
-from flask_babel import Babel, _
+from flask import Flask, render_template, redirect, url_for, request, flash, session, g, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-import mysql.connector
 from config import Config
+from database import Database 
 
 app = Flask(__name__)
 app.config.from_object(Config)
 app.secret_key = app.config['SECRET_KEY']
 
-babel = Babel(app)
+# Crea un'istanza della classe Database
+db = Database(app.config)
 
-# Selettore di localizzazione
-def get_locale():
-    selected_locale = request.accept_languages.best_match(app.config['LANGUAGES'])
-    return selected_locale
+# Selettore di localizzazione tramite richiesta
+@app.route('/set-language', methods=['GET'])
+def set_language():
+    lang = request.args.get('lang', 'en')  # Imposta 'en' come predefinito
+    if lang in app.config['LANGUAGES']:
+        session['language'] = lang
+        return jsonify({"success": True, "message": f"Language set to {lang}"})
+    return jsonify({"success": False, "message": "Invalid language"}), 400
 
-babel.locale_selector_func = get_locale
+# Funzione per ottenere la lingua corrente
+def get_language():
+    return session.get('language', 'en')  # 'en' come predefinito se non è impostato
 
-# Connessione al database "Dell'App"
+# Connessione al database tramite la classe Database
 def get_db_connection():
     if 'db' not in g:
-        g.db = mysql.connector.connect(
-            host=app.config['DB_HOST'],
-            user=app.config['DB_USER'],
-            password=app.config['DB_PASSWORD'],
-            database=app.config['DB_NAME'],
-            port=app.config['DB_PORT']
-        )
+        g.db = db.connect()
     return g.db
 
 @app.teardown_appcontext
 def teardown_db(exception):
-    close_db_connection()
-
-def close_db_connection(e=None):
-    db = g.pop('db', None)
-    if db is not None:
-        db.close()
+    db.close()
 
 # Funzione per caricare il contenuto della pagina
 def load_page_content(slug):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT title, description, keywords, content, language FROM pages WHERE slug = %s", (slug,))
-    page = cursor.fetchone()
-    cursor.close()
-    conn.close()
-    return page
+    query = "SELECT title, description, keywords, content, language FROM pages WHERE slug = %s"
+    page = db.query(query, (slug,))
+    return page[0] if page else None
 
 # Funzione che renderizza il contenuto dinamico
 @app.route('/')
 @app.route('/<slug>')
 def render_dynamic_page(slug=None):
     if slug is None:
-        slug = 'home'  # Imposta lo slug come 'home' se non è fornito
+        slug = 'home'  # Imposta la pagina predefinita come 'home'
+    
+    # Carica il contenuto della pagina
     page = load_page_content(slug)
+    
+    # Ottieni la lingua corrente
+    language = get_language()
+
     if page:
         return render_template('index.html', 
                                title=page['title'], 
                                description=page['description'], 
                                keywords=page['keywords'], 
                                content=page['content'], 
-                               language=page['language'])
+                               language=language)
     else:
         return render_template('404.html'), 404
 

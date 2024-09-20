@@ -1,58 +1,59 @@
-from flask import render_template, redirect, url_for, request, flash, session, g, jsonify
+from flask import render_template, redirect, url_for, request, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-import mysql.connector
+from models import User, ShopList, Page
 from app import app, get_db_connection
 from datetime import datetime
 
-# Store Routes -------------------------------------------------------------------------
+# Se non trova la pagina va in 404 ------------------------------------------------------
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+# Funzione per controllare se l'utente è autenticato -----------------------------------
+def check_user_authentication():
+    if 'user_id' not in session:
+        flash('You need to log in first.', 'danger')
+        return redirect(url_for('login'))
+    return session['username']
+
 # Admin Routes -------------------------------------------------------------------------
 @app.route('/admin/sign-in', methods=['GET', 'POST'])
 def signin():
+    db_conn = get_db_connection()  
+    user_model = User(db_conn)  
+
     if request.method == 'POST':
         name = request.form.get('name')
         surname = request.form.get('surname')
         store_name = request.form.get('store_name')
         email = request.form.get('email')
         password = request.form.get('password')
-        
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
 
-        cursor.execute('SELECT * FROM user WHERE email = %s', (email,))
-        user = cursor.fetchone()
-
-        if user:
+        # Controlla se l'email esiste già nel database
+        existing_user = user_model.get_user_by_email(email)
+        if existing_user:
             flash('Email address already exists')
             return redirect(url_for('signin'))
 
-        hashed_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
-        cursor.execute('INSERT INTO user (name, surname, store_name, email, password) VALUES (%s, %s, %s, %s, %s)',
-                       (name, surname, store_name, email, hashed_password))
-        conn.commit()
-
-        cursor.close()
-        conn.close()
-
+        # Crea un nuovo utente nel database
+        user_model.create_user(name, surname, email, password)
         flash('Registration successful! You can now log in.')
         return redirect(url_for('login'))
+
     return render_template('/admin/sign-in.html', title='LinkBay - Sign-in')
 
 @app.route('/admin/', methods=['GET', 'POST'])
 @app.route('/admin/login', methods=['GET', 'POST'])
 def login():
+    db_conn = get_db_connection()
+    user_model = User(db_conn)
+
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
 
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM user WHERE email = %s", (email,))
-        user = cursor.fetchone()
-        cursor.close()
-        conn.close()
+        # Cerca l'utente nel database usando il modello User
+        user = user_model.get_user_by_email(email)
 
         if user and check_password_hash(user['password'], password):
             session['user_id'] = user['id']
@@ -76,157 +77,138 @@ def logout():
 def restore():
     return render_template('/admin/restore.html', title='LinkBay - Restore')
 
+
+# Controllo autenticazione (helper function)
+def check_user_authentication():
+    if 'user_id' not in session:
+        flash('You need to log in first.', 'danger')
+        return redirect(url_for('login'))
+    return session['username']
+
 # CMS Routes -------------------------------------------------------------------------
 @app.route('/admin/cms/interface/')
 @app.route('/admin/cms/interface/render')
 def render_interface():
-    if 'user_id' not in session:
-        flash('You need to log in first.', 'danger')
-        return redirect(url_for('login'))
-    username = session['username']
-    return render_template('admin/cms/interface/render.html', title='CMS Interface', username=username)
+    username = check_user_authentication()
+    if isinstance(username, str):
+        return render_template('admin/cms/interface/render.html', title='CMS Interface', username=username)
+    return username  
 
 @app.route('/admin/cms/pages/homepage')
 def homepage():
-    if 'user_id' not in session:
-        flash('You need to log in first.', 'danger')
-        return redirect(url_for('login'))
-    username = session['username']
-    return render_template('admin/cms/pages/home.html', title='HomePage', username=username)
+    username = check_user_authentication()
+    if isinstance(username, str):
+        return render_template('admin/cms/pages/home.html', title='HomePage', username=username)
+    return username
 
 @app.route('/admin/cms/pages/orders')
 def orders():
-    if 'user_id' not in session:
-        flash('You need to log in first.', 'danger')
-        return redirect(url_for('login'))
-    username = session['username']
-    return render_template('admin/cms/pages/orders.html', title='Orders', username=username)
+    username = check_user_authentication()
+    if isinstance(username, str):
+        return render_template('admin/cms/pages/orders.html', title='Orders', username=username)
+    return username
 
 @app.route('/admin/cms/pages/products')
 def products():
-    if 'user_id' not in session:
-        flash('You need to log in first.', 'danger')
-        return redirect(url_for('login'))
-    username = session['username']
-    return render_template('admin/cms/pages/products.html', title='Products', username=username)
+    username = check_user_authentication()
+    if isinstance(username, str):
+        return render_template('admin/cms/pages/products.html', title='Products', username=username)
+    return username
 
 @app.route('/admin/cms/pages/customers')
 def customers():
-    if 'user_id' not in session:
-        flash('You need to log in first.', 'danger')
-        return redirect(url_for('login'))
-    username = session['username']
-    return render_template('admin/cms/pages/customers.html', title='Customers', username=username)
+    username = check_user_authentication()
+    if isinstance(username, str):
+        return render_template('admin/cms/pages/customers.html', title='Customers', username=username)
+    return username
 
 @app.route('/admin/cms/pages/marketing')
 def marketing():
-    if 'user_id' not in session:
-        flash('You need to log in first.', 'danger')
-        return redirect(url_for('login'))
-    username = session['username']
-    return render_template('admin/cms/pages/marketing.html', title='Marketing', username=username)
+    username = check_user_authentication()
+    if isinstance(username, str):
+        return render_template('admin/cms/pages/marketing.html', title='Marketing', username=username)
+    return username
 
 @app.route('/admin/cms/pages/online-content')
 def online_content():
-    if 'user_id' not in session:
-        flash('You need to log in first.', 'danger')
-        return redirect(url_for('login'))
-    username = session['username']
-    return render_template('admin/cms/pages/content.html', title='Online Content', username=username)
+    username = check_user_authentication()
+    if isinstance(username, str):
+        return render_template('admin/cms/pages/content.html', title='Online Content', username=username)
+    return username
 
 @app.route('/admin/cms/pages/domain')
 def domain():
-    if 'user_id' not in session:
-        flash('You need to log in first.', 'danger')
-        return redirect(url_for('login'))
-    username = session['username']
-    return render_template('admin/cms/pages/domain.html', title='Domain', username=username)
+    username = check_user_authentication()
+    if isinstance(username, str):
+        return render_template('admin/cms/pages/domain.html', title='Domain', username=username)
+    return username
 
 @app.route('/admin/cms/pages/shipping')
 def shipping():
-    if 'user_id' not in session:
-        flash('You need to log in first.', 'danger')
-        return redirect(url_for('login'))
-    username = session['username']
-    return render_template('admin/cms/pages/shipping.html', title='Shipping', username=username)
+    username = check_user_authentication()
+    if isinstance(username, str):
+        return render_template('admin/cms/pages/shipping.html', title='Shipping', username=username)
+    return username
 
-# Editor Store Content --------------------------------------------------------------------------------------------------------------
-def load_page_content(slug):
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM pages WHERE slug = %s", (slug,))
-    page = cursor.fetchone()
-    cursor.close()
-    conn.close()
-    return page
-
-def get_all_pages():
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT slug, title FROM pages")
-    pages = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return pages
+# Editor Store Content -------------------------------------------------------------------------
 
 @app.route('/admin/cms/store_editor/editor_interface', defaults={'slug': None})
 @app.route('/admin/cms/store_editor/editor_interface/<slug>')
-def editor_interface(slug):
-    if 'user_id' not in session:
-        flash('You need to log in first.', 'danger')
-        return redirect(url_for('login'))
+def editor_interface(slug=None):
+    username = check_user_authentication()
+    
+    if isinstance(username, str):
+        db_conn = get_db_connection()  # Ottieni la connessione al DB
+        
+        # Crea un'istanza di Page passando la connessione al database
+        page_model = Page(db_conn)
+        
+        pages = page_model.get_all_pages()  # Usa il modello Page per ottenere tutte le pagine
+        page = None
+        page_title = 'CMS Interface'
+        
+        if slug:
+            page = page_model.get_page_by_slug(slug)
+            if page:
+                page_title = page['title']
 
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute('SELECT * FROM pages')
-    pages = cursor.fetchall()
-
-    page = None
-    page_title = 'CMS Interface'
-    if slug:
-        cursor.execute('SELECT * FROM pages WHERE slug = %s', (slug,))
-        page = cursor.fetchone()
-        if page:
-            page_title = page['title']
-
-    cursor.close()
-    conn.close()
-
-    current_url = request.path
-
-    return render_template('admin/cms/store_editor/editor_interface.html', title=page_title, pages=pages, page=page, current_url=current_url)
+        current_url = request.path
+        return render_template('admin/cms/store_editor/editor_interface.html', 
+                               title=page_title, 
+                               pages=pages, 
+                               page=page, 
+                               current_url=current_url, 
+                               username=username)
+    return username  # Se non autenticato, reindirizza al login
 
 @app.route('/admin/cms/function/edit/<slug>')
 def edit_page(slug):
-    if 'user_id' not in session:
-        flash('You need to log in first.', 'danger')
-        return redirect(url_for('login'))
-    page = load_page_content(slug)
-    return render_template('admin/cms/function/edit.html', title='Edit Page', page=page)
+    username = check_user_authentication()
+    
+    if isinstance(username, str):
+        db_conn = get_db_connection()  # Ottieni la connessione al DB
+        
+        # Crea un'istanza di Page passando la connessione al database
+        page_model = Page(db_conn)
+        
+        # Usa il modello Page per ottenere la pagina
+        page = page_model.get_page_by_slug(slug)
+        
+        return render_template('admin/cms/function/edit.html', title='Edit Page', page=page, username=username)
+    
+    return username  # Se non autenticato, reindirizza al login
 
-
-
-# Modifica la rotta di salvataggio della pagina per includere solo il contenuto
 @app.route('/admin/cms/function/save', methods=['POST'])
 def save_page():
     data = request.get_json()
     page_id = data.get('id')
     content = data.get('content')
-    
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("""
-            UPDATE pages SET content=%s, updated_at=NOW() WHERE id=%s
-        """, (content, page_id))
-        conn.commit()
-        success = cursor.rowcount > 0
-    except Exception as e:
-        conn.rollback()
-        success = False
-        print(f"Error saving page: {e}")
-    cursor.close()
-    conn.close()
+
+    db_conn = get_db_connection()  # Ottieni la connessione al DB
+    page_model = Page(db_conn)  # Inizializza il modello Page con la connessione
+
+    success = page_model.update_page_content(page_id, content)
+
     return jsonify({'success': success})
 
 @app.route('/admin/cms/function/save-seo', methods=['POST'])
@@ -237,30 +219,19 @@ def save_seo_page():
     description = data.get('description')
     keywords = data.get('keywords')
     slug = data.get('slug')
-    
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("""
-            UPDATE pages 
-            SET title=%s, description=%s, keywords=%s, slug=%s, updated_at=NOW() 
-            WHERE id=%s
-        """, ( title, description, keywords, slug, page_id))
-        conn.commit()
-        success = cursor.rowcount > 0
-    except Exception as e:
-        conn.rollback()
-        success = False
-        print(f"Error saving page: {e}")
-    cursor.close()
-    conn.close()
+
+    db_conn = get_db_connection()  # Ottieni la connessione al DB
+    page_model = Page(db_conn)  # Passa la connessione al modello
+
+    success = page_model.update_page_seo(page_id, title, description, keywords, slug)
+
     return jsonify({'success': success})
 
 @app.route('/admin/cms/function/create', methods=['POST'])
 def create_page():
     if 'user_id' not in session:
         return jsonify({'success': False, 'message': 'You need to log in first.'})
-    
+
     if request.method == 'POST':
         data = request.get_json()
         title = data.get('title')
@@ -273,25 +244,24 @@ def create_page():
         language = data.get('language')
         published = data.get('published')
 
-        try:
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            cursor.execute("""
-                INSERT INTO pages (title, description, keywords, slug, content, theme_name, paid, language, published, created_at, updated_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
-            """, (title, description, keywords, slug, content, theme_name, paid, language, published))
-            conn.commit()
-            cursor.close()
-            conn.close()
-            return jsonify({'success': True})
-        except Exception as e:        
-            print(f"Error creating page: {e}")
-            return jsonify({'success': False, 'message': 'There was an error creating the page.'})
+        db_conn = get_db_connection()  # Ottieni la connessione al DB
+        page_model = Page(db_conn)  # Passa la connessione al modello
 
-    return jsonify({'success': False, 'message': 'Invalid request method.'})
+        success = page_model.create_page(title, description, keywords, slug, content, theme_name, paid, language, published)
 
-# Client Store Routes --------------------------------------------------------------------------------------------------------------
+        return jsonify({'success': success})
+    
+@app.route('/admin/cms/function/delete', methods=['POST'])
+def delete_page():
+    data = request.get_json()  # Riceve i dati dal frontend
+    page_id = data.get('id')  # Estrae l'ID della pagina
 
-def get_preferred_language():
-    return request.accept_languages.best_match(['en', 'it'])
+    if not page_id:
+        return jsonify({'success': False, 'message': 'ID pagina mancante.'})
 
+    page_model = Page(get_db_connection())  # Usa la connessione al database
+    try:
+        page_model.delete_page(page_id)  # Cancella la pagina
+        return jsonify({'success': True, 'message': 'Pagina cancellata con successo.'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': f"Errore durante la cancellazione: {str(e)}"})

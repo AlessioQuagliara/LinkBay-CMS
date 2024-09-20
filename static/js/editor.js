@@ -267,3 +267,63 @@ $(document).ready(function(){
         }
     });
 });
+
+// -------------------------------------------------------------------------------------------------------------------------
+// CANCELLA PAGINA ----------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------
+document.addEventListener("DOMContentLoaded", function() {
+    const deleteButtons = document.querySelectorAll('.nav-link.text-danger');
+
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const pageId = this.getAttribute('data-id-page');
+
+            Swal.fire({
+                title: 'Sei sicuro?',
+                text: "Questa azione eliminerà definitivamente la pagina!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sì, cancellala!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Invia la richiesta al server
+                    fetch('/admin/cms/function/delete', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ id: pageId })  // Invia l'ID della pagina
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Cancellata!',
+                                text: 'La pagina è stata cancellata con successo.'
+                            }).then(() => {
+                                window.location.href = '/admin/cms/store_editor/editor_interface';  // Reindirizza dopo la cancellazione
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Errore!',
+                                text: data.message
+                            });
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Errore:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Errore!',
+                            text: 'Si è verificato un errore durante la cancellazione della pagina.'
+                        });
+                    });
+                }
+            });
+        });
+    });
+});
