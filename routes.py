@@ -142,23 +142,36 @@ def online_content():
     username = check_user_authentication()
     
     if isinstance(username, str):
-        auth_db_conn = get_auth_db_connection()  # Connessione al database di autenticazione
-        shoplist_model = ShopList(auth_db_conn)  # Inizializza il modello ShopList
+        # Recuperare i dati da ShopList
+        with get_auth_db_connection() as auth_db_conn:
+            shoplist_model = ShopList(auth_db_conn)
+            shop_name = 'erboristeria'
+            shop = shoplist_model.get_shop_by_name(shop_name)
         
-        # Recupera il negozio specifico per l'utente autenticato
-        shop_name = 'erboristeria'
-        shop = shoplist_model.get_shop_by_name(shop_name)
+        # Recupera i dati da page
+        with get_db_connection() as db_conn:
+            page_model = Page(db_conn)
+            page_slug = 'home'
+            page = page_model.get_page_by_slug(page_slug)
         
         if shop:
+            # Calcolare i minuti dalla data di aggiornamento
+            updated_at = page['updated_at']
+            now = datetime.now()
+            minutes_ago = (now - updated_at).total_seconds() // 60  # Differenza in minuti
+            
             return render_template(
                 'admin/cms/pages/content.html', 
                 title='Online Content', 
                 username=username, 
-                shop=shop  # Passa i dati del negozio al template
+                page=page,
+                shop=shop,
+                minutes_ago=int(minutes_ago)  # Passa i minuti al template
             )
         else:
             flash('Nessun negozio trovato.')
-            return redirect(url_for('homepage'))  # Reindirizza se non trovi il negozio
+            return redirect(url_for('homepage'))
+    
     return username
 
 @app.route('/admin/cms/pages/domain')
