@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const createPageButton = document.getElementById('create-page');
     const createPageForm = document.getElementById('create-page-form');
 
-    createPageButton.addEventListener('click', function() {
+    createPageButton.addEventListener('click', function(event) {
         const formData = new FormData(createPageForm);
         const data = {
             title: formData.get('title'),
@@ -138,6 +138,19 @@ document.addEventListener("DOMContentLoaded", function() {
             published: formData.get('published')
         };
 
+        // Validazione per i campi obbligatori
+        if (!data.title || !data.slug) {
+            // Impedisce al form di essere inviato
+            event.preventDefault();
+            Swal.fire(
+                'Error!',
+                'Please fill out the required fields: Title and Slug.',
+                'warning'
+            );
+            return; // Blocca l'invio se la validazione fallisce
+        }
+
+        // Invia i dati al server solo se i campi sono validi
         fetch('/admin/cms/function/create', {
             method: 'POST',
             headers: {
@@ -175,10 +188,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-// -------------------------------------------------------------------------------------------------------------------------
-// Chips Script ------------------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------------------------------
-
+    // Chips Script ------------------------------------------------------------------------------------------------------------
     const keywordsContainer = document.getElementById('keywords-container');
     const keywordsInput = document.createElement('input');
     const hiddenKeywordsInput = document.getElementById('keywords');
@@ -279,47 +289,47 @@ document.addEventListener("DOMContentLoaded", function() {
             const pageId = this.getAttribute('data-id-page');
 
             Swal.fire({
-                title: 'Sei sicuro?',
-                text: "Questa azione eliminerà definitivamente la pagina!",
+                title: 'Are you sure?',
+                text: "This action will permanently delete the page!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Sì, cancellala!'
+                confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Invia la richiesta al server
+                    // Send the request to the server
                     fetch('/admin/cms/function/delete', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ id: pageId })  // Invia l'ID della pagina
+                        body: JSON.stringify({ id: pageId })  // Send the page ID
                     })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
                             Swal.fire({
                                 icon: 'success',
-                                title: 'Cancellata!',
-                                text: 'La pagina è stata cancellata con successo.'
+                                title: 'Deleted!',
+                                text: 'The page has been successfully deleted.'
                             }).then(() => {
-                                window.location.href = '/admin/cms/store_editor/editor_interface';  // Reindirizza dopo la cancellazione
+                                window.location.href = '/admin/cms/store_editor/editor_interface';  // Redirect after deletion
                             });
                         } else {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Errore!',
+                                title: 'Error!',
                                 text: data.message
                             });
                         }
                     })
                     .catch((error) => {
-                        console.error('Errore:', error);
+                        console.error('Error:', error);
                         Swal.fire({
                             icon: 'error',
-                            title: 'Errore!',
-                            text: 'Si è verificato un errore durante la cancellazione della pagina.'
+                            title: 'Error!',
+                            text: 'An error occurred while deleting the page.'
                         });
                     });
                 }
