@@ -305,4 +305,5 @@ def delete_page():
         return jsonify({'success': False, 'message': f"Errore durante la cancellazione: {str(e)}"})
 
 
+
 # NEGOZIO ONLINE
