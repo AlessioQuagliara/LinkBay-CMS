@@ -22,20 +22,20 @@
                 </a>
             </li>
             <hr>
-            {% if page.slug in ['products'] %}
+            {% if page.slug in ['products', 'navbar', 'footer'] %}
             {% else %}
             <li class="nav-item">
                 <a href="#" class="nav-link text-white" data-bs-toggle="modal" data-bs-target="#seoModal">
                     <i class="fa-solid fa-magnifying-glass-chart"></i>&nbsp; Edit SEO
                 </a>
             </li>
-            {% endif %}
             <li class="nav-item">
                 <a href="../../../../{{page.slug}}" target="_blank"  class="nav-link text-white">
                     <i class="fa-solid fa-eye"></i>&nbsp; View Online
                 </a>
             </li>
-            {% if page.slug in ['home', 'about-us', 'catalogs', 'products'] %}
+            {% endif %}
+            {% if page.slug in ['home', 'about-us', 'catalogs', 'products', 'navbar', 'footer' ] %}
             {% else %}
             <li class="nav-item">
                 <button data-id-page="{{ page.id }}" class="nav-link text-danger" id="deletePage">
@@ -140,10 +140,10 @@
                         <div class="col-md-12 mb-3">
                             <label for="content" class="form-label">Content</label>
                             <select class="form-select" id="content" name="content" required>
-                                <option value="blank">Blank Page</option>
-                                <option value="legal">Legal Page</option>
-                                <option value="landing">Landing Page</option>
-                                <option value="blog">Blog</option>
+                                <option value="  ">Blank Page</option>
+                                <option value="<h2>This is your legal page</h1>">Legal Page</option>
+                                <option value="<h2>This is your landing</h1>">Landing Page</option>
+                                <option value="<h2>This is your blog</h1>">Blog</option>
                             </select>
                         </div>
                     </div>

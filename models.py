@@ -106,7 +106,28 @@ class Page:
         pages = cursor.fetchall()
         cursor.close()
         return pages
+    
+    # Ottieni le inclusioni navbar e footer
+    def get_navbar(self):
+        cursor = self.conn.cursor(dictionary=True)
+        cursor.execute("SELECT content FROM pages WHERE slug = 'navbar'")
+        page = cursor.fetchone()
+        cursor.close()
+        if page:
+            return page['content']
+        else:
+            return ''
 
+    def get_footer(self):
+        cursor = self.conn.cursor(dictionary=True)
+        cursor.execute("SELECT content FROM pages WHERE slug = 'footer'")
+        page = cursor.fetchone()
+        cursor.close()
+        if page:
+            return page['content']
+        else:
+            return ''
+        
     # Ottieni una pagina per slug
     def get_page_by_slug(self, slug):
         cursor = self.conn.cursor(dictionary=True)

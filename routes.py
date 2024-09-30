@@ -303,3 +303,6 @@ def delete_page():
         return jsonify({'success': True, 'message': 'Pagina cancellata con successo.'})
     except Exception as e:
         return jsonify({'success': False, 'message': f"Errore durante la cancellazione: {str(e)}"})
+
+
+# NEGOZIO ONLINE

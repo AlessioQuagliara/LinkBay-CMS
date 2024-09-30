@@ -9,8 +9,17 @@
     {% include 'head.html' %}
 </head>
 <body>
-    {% include 'navbar.html' %}
-    {{ content|safe }}
-    {% include 'footer.html' %}
+    <!-- Include la navbar -->
+    <nav>
+        {{ navbar | safe }}  <!-- Stampa il contenuto della navbar -->
+    </nav>
+
+    <!-- Contenuto della pagina -->
+    {{ content | safe }}
+
+    <!-- Include il footer -->
+    <footer>
+        {{ footer | safe }}  <!-- Stampa il contenuto del footer -->
+    </footer>
 </body>
 </html>

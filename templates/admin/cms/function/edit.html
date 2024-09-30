@@ -45,7 +45,7 @@
                     ]
                 },
             });
-
+    
             // Qui devo metterci i blocchi JS
             
             editor.BlockManager.add('bootstrap-header', {
@@ -71,20 +71,20 @@
                 content: '<div class="card" style="width: 18rem;"><img class="card-img-top" src="https://via.placeholder.com/150" alt="Card image cap"><div class="card-body"><h5 class="card-title">Card title</h5><p class="card-text">Some quick example text to build on the card title and make up the bulk of the card\'s content.</p><a href="#" class="btn btn-primary">Go somewhere</a></div></div>',
                 category: 'Theme Sections'
             });
-
-
+    
+    
             editor.BlockManager.add('bootstrap-carousel', {
                 label: '<img src="https://via.placeholder.com/50x50.png?text=Card" alt="Card" /> Card',
                 content: '<div class="card" style="width: 18rem;"><img class="card-img-top" src="https://via.placeholder.com/150" alt="Card image cap"><div class="card-body"><h5 class="card-title">Card title</h5><p class="card-text">Some quick example text to build on the card title and make up the bulk of the card\'s content.</p><a href="#" class="btn btn-primary">Go somewhere</a></div></div>',
                 category: 'Theme Sections'
             });
-
+    
             
-
+    
             document.getElementById('save-page').addEventListener('click', function() {
                 var content = editor.getHtml();
                 var slug = "{{ page.slug }}";
-
+    
                 fetch("{{ url_for('save_page') }}", {
                     method: 'POST',
                     headers: {

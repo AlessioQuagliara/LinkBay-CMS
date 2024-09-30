@@ -68,22 +68,33 @@ def load_page_content(slug):
 def render_dynamic_page(slug=None):
     if slug is None:
         slug = 'home'  # Imposta la pagina predefinita come 'home'
-    
+
+    # Ottieni la connessione al DB e crea l'istanza della classe Page
+    db_conn = get_db_connection()
+    page_model = Page(db_conn)
+
     # Carica il contenuto della pagina
-    page = load_page_content(slug)
-    
+    page = page_model.get_page_by_slug(slug)
+
     # Ottieni la lingua corrente
     language = get_language()
 
+    # Ottieni la navbar e il footer
+    navbar_content = page_model.get_navbar()
+    footer_content = page_model.get_footer()
+
     if page:
-        return render_template('index.html', 
+        return render_template('index.html',
                                title=page['title'], 
                                description=page['description'], 
                                keywords=page['keywords'], 
                                content=page['content'], 
+                               navbar=navbar_content,  # Passa la navbar al template
+                               footer=footer_content,  # Passa il footer al template
                                language=language)
     else:
         return render_template('404.html'), 404
+    
 
 # Includo le rotte statiche definite nel file routes.py
 from routes import *
