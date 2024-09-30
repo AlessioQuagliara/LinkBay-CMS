@@ -1,0 +1,547 @@
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var editor = grapesjs.init({
+            container: '#editor',
+            fromElement: true,
+            height: '100vh',
+            width: 'auto',
+            storageManager: false,
+            plugins: ['gjs-preset-webpage'],
+            pluginsOpts: {
+                'gjs-preset-webpage': {}
+            },
+            canvas: {
+                styles: [
+                    'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
+                    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css'
+                ],
+                scripts: [
+                    'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js'
+                ]
+            },
+        });
+
+        // Qui devo metterci i blocchi JS -----------------------------------------------------------------------------------------
+        
+        editor.BlockManager.add('bootstrap-hero', {
+            label: '<img src="../../../../static/images/cms-hero.png?text=Header" alt="Header" /> Hero Section',
+            content: '<section class="hero-section d-flex align-items-center justify-content-center text-center vh-100 bg-light"><div class="container"><h1 class="display-4 fw-bold text-dark">Welcome to Our Site</h1><p class="lead text-dark">Delivering high-quality services to help you grow.</p><a href="#" class="btn btn-outline-dark btn-lg mt-4">Learn More</a></div></section>',
+            category: 'Theme Sections'
+        });
+
+        editor.BlockManager.add('bootstrap-text', {
+            label: '<img src="../../../../static/images/cms-text.png?text=Header" alt="Header" /> Text Section',
+            content: '<section class="rich-text-section py-5 bg-light"><div class="container"><h2 class="fw-bold text-dark mb-4">Discover Our Services</h2><p class="text-dark lead">We offer a wide range of high-quality services to help you achieve your goals. Our team of experts is dedicated to providing innovative solutions that are tailored to your needs.</p><h3 class="fw-bold text-dark mt-4">Why Choose Us?</h3><ul class="text-dark"><li>Expert team with years of experience</li><li>Customizable solutions to fit your needs</li><li>Reliable and timely support</li><li>Cutting-edge technology and tools</li></ul><blockquote class="blockquote mt-4 text-dark"><p class="mb-0">"Success usually comes to those who are too busy to be looking for it." - Henry David Thoreau</p></blockquote><p class="text-dark mt-4">For more information about our services, feel free to <a href="#" class="text-dark fw-bold text-decoration-underline">contact us</a> or browse our <a href="#" class="text-dark fw-bold text-decoration-underline">portfolio</a>.</p></div></section>',
+            category: 'Theme Sections'
+        });
+        editor.BlockManager.add('image-with-text', {
+            label: '<img src="https://via.placeholder.com/50x50.png?text=Image+with+Text" alt="Image with Text" /> Image with Text',
+            content: `
+            <section class="image-with-text-section py-5 bg-light">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <!-- Image Column -->
+                        <div class="col-md-6">
+                            <img src="https://via.placeholder.com/500x300" alt="Image" class="img-fluid">
+                        </div>
+                        <!-- Text Column -->
+                        <div class="col-md-6">
+                            <h2 class="fw-bold text-dark">Our Amazing Product</h2>
+                            <p class="text-dark lead">
+                                Discover the best solutions tailored to your needs. Our product offers unparalleled quality and innovation.
+                            </p>
+                            <a href="#" class="btn btn-outline-dark btn-lg mt-4">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            `,
+            category: 'Theme Sections',
+        });
+
+        editor.BlockManager.add('image-banner', {
+            label: '<img src="https://via.placeholder.com/50x50.png?text=Image+Banner" alt="Image Banner" /> Image Banner',
+            content: `
+            <section class="image-banner-section position-relative text-center bg-light">
+                <img src="https://via.placeholder.com/1200x400" alt="Banner Image" class="img-fluid w-100">
+                <div class="banner-content position-absolute top-50 start-50 translate-middle">
+                    <h1 class="text-light fw-bold">Your Stunning Banner</h1>
+                    <p class="text-light lead">Create engaging experiences with a beautiful image banner</p>
+                    <a href="#" class="btn btn-outline-light btn-lg mt-4">Discover More</a>
+                </div>
+            </section>
+            `,
+            category: 'Theme Sections',
+        });
+
+        editor.BlockManager.add('slideshow', {
+            label: '<img src="../../../../static/images/cms-slide.png?text=Slideshow" alt="Slideshow" /> Slideshow',
+            content: `
+            <section class="slideshow-section py-5 bg-light">
+                <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                    </div>
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="https://via.placeholder.com/1200x400?text=Slide+1" class="d-block w-100" alt="Slide 1">
+                            <div class="carousel-caption d-none d-md-block">
+                                <h5>First Slide Label</h5>
+                                <p>Some representative placeholder content for the first slide.</p>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <img src="https://via.placeholder.com/1200x400?text=Slide+2" class="d-block w-100" alt="Slide 2">
+                            <div class="carousel-caption d-none d-md-block">
+                                <h5>Second Slide Label</h5>
+                                <p>Some representative placeholder content for the second slide.</p>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <img src="https://via.placeholder.com/1200x400?text=Slide+3" class="d-block w-100" alt="Slide 3">
+                            <div class="carousel-caption d-none d-md-block">
+                                <h5>Third Slide Label</h5>
+                                <p>Some representative placeholder content for the third slide.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </section>
+            `,
+            category: 'Theme Sections',
+        });
+
+        editor.BlockManager.add('slideshow-full-section', {
+            label: '<img src="https://via.placeholder.com/50x50.png?text=Slideshow" alt="Slideshow" /> Full Section Slideshow',
+            content: `
+            <section class="slideshow-full-section vh-100">
+                <div id="carouselFullSection" class="carousel slide h-100" data-bs-ride="carousel">
+                    <div class="carousel-inner h-100">
+                        <div class="carousel-item active h-100">
+                            <img src="https://via.placeholder.com/1920x1080?text=Slide+1" class="d-block w-100 h-100" alt="Slide 1">
+                            <div class="carousel-caption d-none d-md-block">
+                                <h5>First Slide Title</h5>
+                                <p>This is the first slide of the full section slideshow.</p>
+                            </div>
+                        </div>
+                        <div class="carousel-item h-100">
+                            <img src="https://via.placeholder.com/1920x1080?text=Slide+2" class="d-block w-100 h-100" alt="Slide 2">
+                            <div class="carousel-caption d-none d-md-block">
+                                <h5>Second Slide Title</h5>
+                                <p>This is the second slide of the full section slideshow.</p>
+                            </div>
+                        </div>
+                        <div class="carousel-item h-100">
+                            <img src="https://via.placeholder.com/1920x1080?text=Slide+3" class="d-block w-100 h-100" alt="Slide 3">
+                            <div class="carousel-caption d-none d-md-block">
+                                <h5>Third Slide Title</h5>
+                                <p>This is the third slide of the full section slideshow.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselFullSection" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselFullSection" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </section>
+            `,
+            category: 'Theme Sections',
+        });
+
+        editor.BlockManager.add('collage', {
+            label: '<img src="https://via.placeholder.com/50x50.png?text=Collage" alt="Collage" /> Collage',
+            content: `
+            <section class="collage-section py-5 bg-light">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <img src="https://via.placeholder.com/400x300" alt="Image 1" class="img-fluid rounded">
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <img src="https://via.placeholder.com/400x300" alt="Image 2" class="img-fluid rounded">
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <img src="https://via.placeholder.com/400x300" alt="Image 3" class="img-fluid rounded">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <img src="https://via.placeholder.com/600x400" alt="Image 4" class="img-fluid rounded">
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <img src="https://via.placeholder.com/600x400" alt="Image 5" class="img-fluid rounded">
+                        </div>
+                    </div>
+                </div>
+            </section>
+            `,
+            category: 'Theme Sections',
+        });
+
+        editor.BlockManager.add('multicolumn', {
+            label: '<img src="https://via.placeholder.com/50x50.png?text=Multicolumn" alt="Multicolumn" /> Multicolumn',
+            content: `
+            <section class="multicolumn-section py-5 bg-light">
+                <div class="container">
+                    <div class="row">
+                        <!-- First Column -->
+                        <div class="col-md-4">
+                            <h3 class="fw-bold text-dark">Column 1</h3>
+                            <p class="text-dark">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla ut lectus sapien. Curabitur tempor orci nec risus fermentum, ac vehicula ligula vehicula.</p>
+                            <a href="#" class="btn btn-outline-dark">Read More</a>
+                        </div>
+                        <!-- Second Column -->
+                        <div class="col-md-4">
+                            <h3 class="fw-bold text-dark">Column 2</h3>
+                            <p class="text-dark">Proin eget tortor risus. Cras ultricies ligula sed magna dictum porta. Vivamus suscipit tortor eget felis porttitor volutpat.</p>
+                            <a href="#" class="btn btn-outline-dark">Read More</a>
+                        </div>
+                        <!-- Third Column -->
+                        <div class="col-md-4">
+                            <h3 class="fw-bold text-dark">Column 3</h3>
+                            <p class="text-dark">Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Quisque velit nisi, pretium ut lacinia in, elementum id enim.</p>
+                            <a href="#" class="btn btn-outline-dark">Read More</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            `,
+            category: 'Theme Sections',
+        });
+
+        editor.BlockManager.add('collapsible-content', {
+            label: '<img src="https://via.placeholder.com/50x50.png?text=Collapse" alt="Collapsible Content" /> Collapsible Content',
+            content: `
+            <section class="collapsible-content-section py-5 bg-light">
+                <div class="container">
+                    <h2 class="fw-bold text-dark">Frequently Asked Questions</h2>
+                    <div class="accordion mt-4" id="accordionExample">
+                        <!-- First collapsible item -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    What is your return policy?
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    Our return policy allows for returns within 30 days of purchase. The product must be in original condition.
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Second collapsible item -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    How do I track my order?
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    You can track your order through the link provided in the confirmation email or by logging into your account on our website.
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Third collapsible item -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    Can I change or cancel my order?
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    Orders can be modified or canceled within 24 hours of placing the order. After that, changes may not be possible.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            `,
+            category: 'Theme Sections',
+        });
+
+        editor.BlockManager.add('email-signup', {
+            label: '<img src="https://via.placeholder.com/50x50.png?text=Email+Signup" alt="Email Signup" /> Email Signup',
+            content: `
+            <section class="email-signup-section py-5 bg-light">
+                <div class="container text-center">
+                    <h2 class="fw-bold text-dark mb-4">Subscribe to Our Newsletter</h2>
+                    <p class="text-dark mb-4">Stay updated with the latest news, offers, and tips by subscribing to our newsletter.</p>
+                    <form class="row justify-content-center">
+                        <div class="col-md-6 mb-3">
+                            <input type="email" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-outline-dark btn-lg w-100">Subscribe</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+            `,
+            category: 'Theme Sections',
+        });
+
+        editor.BlockManager.add('contact-form', {
+            label: '<img src="../../../../static/images/cms-form.png?text=Contact+Form" alt="Contact Form" /> Contact Form',
+            content: `
+            <section class="contact-form-section py-5 bg-light">
+                <div class="container">
+                    <h2 class="fw-bold text-center text-dark mb-4">Get in Touch</h2>
+                    <form>
+                        <div class="row">
+                            <!-- Name Input -->
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label text-dark">Name</label>
+                                <input type="text" class="form-control" id="name" placeholder="Your Name" required>
+                            </div>
+                            <!-- Email Input -->
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label text-dark">Email</label>
+                                <input type="email" class="form-control" id="email" placeholder="Your Email" required>
+                            </div>
+                        </div>
+                        <!-- Message Input -->
+                        <div class="mb-3">
+                            <label for="message" class="form-label text-dark">Message</label>
+                            <textarea class="form-control" id="message" rows="5" placeholder="Your Message" required></textarea>
+                        </div>
+                        <!-- Submit Button -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-outline-dark btn-lg">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+            `,
+            category: 'Theme Sections',
+        });
+
+        editor.BlockManager.add('video-section', {
+            label: '<img src="https://via.placeholder.com/50x50.png?text=Video" alt="Video" /> Video Section',
+            content: `
+            <section class="video-section py-5 bg-light">
+                <div class="container">
+                    <h2 class="fw-bold text-center text-dark mb-4">Watch Our Latest Video</h2>
+                    <div class="ratio ratio-16x9">
+                        <iframe src="https://www.youtube.com/embed/VIDEO_ID" title="YouTube video" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </section>
+            `,
+            category: 'Theme Sections',
+        });
+
+        editor.BlockManager.add('navbar', {
+            label: '<img src="https://via.placeholder.com/50x50.png?text=Navbar" alt="Navbar" /> Navbar',
+            content: `
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container">
+                    <a class="navbar-brand" href="home">YourBrand</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="home">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="about-us">About</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="">Services</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="">Contact</a>
+                            </li>
+                        </ul>
+                        <a href="#" class="btn btn-outline-dark ms-lg-3">Sign Up</a>
+                    </div>
+                </div>
+            </nav>
+            `,
+            category: 'Navbar',
+        });
+
+        editor.BlockManager.add('navbar-shop', {
+            label: '<img src="https://via.placeholder.com/50x50.png?text=Shop+Navbar" alt="Shop Navbar" /> Shop Navbar',
+            content: `
+            <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+                <div class="container">
+                    <a class="navbar-brand fw-bold" href="home">ShopBrand</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarShop" aria-controls="navbarShop" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarShop">
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="home">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="catalogs">Shop</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="catalogs">Categories</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Deals</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="about-us">Contact</a>
+                            </li>
+                        </ul>
+                        <!-- Cart icon -->
+                        <a href="#" class="btn btn-outline-dark ms-lg-3 position-relative">
+                            <i class="bi bi-cart"></i>
+                            Cart
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                3
+                            </span>
+                        </a>
+                        <!-- Login/Sign Up button -->
+                        <a href="#" class="btn btn-outline-primary ms-lg-3">Login / Sign Up</a>
+                    </div>
+                </div>
+            </nav>
+            `,
+            category: 'Navbar',
+        });
+
+        editor.BlockManager.add('footer-section', {
+            label: '<img src="https://via.placeholder.com/50x50.png?text=Footer" alt="Footer" /> Footer Section',
+            content: `
+            <footer class="footer-section bg-dark text-white py-5">
+                <div class="container">
+                    <div class="row">
+                        <!-- Company Info -->
+                        <div class="col-md-4 mb-4">
+                            <h5 class="fw-bold">About Us</h5>
+                            <p>We are a leading eCommerce platform providing a wide range of products to suit every need. Quality and customer satisfaction are our top priorities.</p>
+                        </div>
+                        <!-- Quick Links -->
+                        <div class="col-md-4 mb-4">
+                            <h5 class="fw-bold">Quick Links</h5>
+                            <ul class="list-unstyled">
+                                <li><a href="#" class="text-white text-decoration-none">Home</a></li>
+                                <li><a href="#" class="text-white text-decoration-none">Shop</a></li>
+                                <li><a href="#" class="text-white text-decoration-none">About Us</a></li>
+                                <li><a href="#" class="text-white text-decoration-none">Contact</a></li>
+                            </ul>
+                        </div>
+                        <!-- Social Media Links -->
+                        <div class="col-md-4 mb-4">
+                            <h5 class="fw-bold">Follow Us</h5>
+                            <a href="#" class="text-white me-3"><i class="bi bi-facebook"></i></a>
+                            <a href="#" class="text-white me-3"><i class="bi bi-twitter"></i></a>
+                            <a href="#" class="text-white me-3"><i class="bi bi-instagram"></i></a>
+                            <a href="#" class="text-white"><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col text-center">
+                            <p class="mb-0">&copy; 2024 YourBrand. All rights reserved.</p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+            `,
+            category: 'Footer',
+        });
+
+        editor.BlockManager.add('heading', {
+            label: '<img src="https://via.placeholder.com/50x50.png?text=Heading" alt="Heading" /> Heading',
+            content: `
+            <h1 class="fw-bold text-dark text-center">This is a Heading</h1>
+            `,
+            category: 'Basic',
+        });
+
+        editor.BlockManager.add('caption', {
+            label: '<img src="https://via.placeholder.com/50x50.png?text=Caption" alt="Caption" /> Caption',
+            content: `
+            <h2 class="text-dark text-center">This is a Caption</h2>
+            <p class="text-muted text-center">This is a description or caption text that provides more context.</p>
+            `,
+            category: 'Basic',
+        });
+
+        editor.BlockManager.add('text', {
+            label: '<img src="https://via.placeholder.com/50x50.png?text=Text" alt="Text" /> Text',
+            content: `
+            <p class="text-dark">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla ut lectus sapien. Curabitur tempor orci nec risus fermentum, ac vehicula ligula vehicula.</p>
+            `,
+            category: 'Basic',
+        });
+
+        editor.BlockManager.add('button', {
+            label: '<img src="https://via.placeholder.com/50x50.png?text=Button" alt="Button" /> Button',
+            content: `
+            <a href="#" class="btn btn-outline-dark btn-lg">Click Me</a>
+            `,
+            category: 'Basic',
+        });
+
+        editor.BlockManager.add('image', {
+            label: '<img src="https://via.placeholder.com/50x50.png?text=Image" alt="Image" /> Image',
+            content: `
+            <img src="https://via.placeholder.com/600x400" class="img-fluid" alt="Placeholder Image">
+            `,
+            category: 'Basic',
+        });
+
+        document.getElementById('save-page').addEventListener('click', function() {
+            var content = editor.getHtml();
+            var slug = "{{ page.slug }}";
+
+            fetch("{{ url_for('save_page') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: "{{ page.id }}",
+                    content: content
+                })
+            }).then(response => response.json()).then(data => {
+                if (data.success) {
+                    Swal.fire(
+                        'Saved!',
+                        'Your page has been successfully saved.',
+                        'success'
+                    );
+                } else {
+                    Swal.fire(
+                        'Error!',
+                        'There was an error saving the page.',
+                        'error'
+                    );
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+                Swal.fire(
+                    'Error!',
+                    'There was an error saving the page.',
+                    'error'
+                );
+            });
+        });
+    });
+</script>
