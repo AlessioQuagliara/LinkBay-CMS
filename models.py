@@ -128,6 +128,7 @@ class Page:
         else:
             return ''
         
+        
     # Ottieni una pagina per slug
     def get_page_by_slug(self, slug):
         cursor = self.conn.cursor(dictionary=True)

@@ -190,6 +190,23 @@ def shipping():
 
 # Editor Store Content -------------------------------------------------------------------------
 
+@app.route('/admin/cms/function/edit-code/<slug>')
+def edit_code_page(slug):
+    username = check_user_authentication()
+    
+    if isinstance(username, str):
+        db_conn = get_db_connection()  # Ottieni la connessione al DB
+        
+        # Crea un'istanza di Page passando la connessione al database
+        page_model = Page(db_conn)
+        
+        # Usa il modello Page per ottenere la pagina
+        page = page_model.get_page_by_slug(slug)
+        
+        return render_template('admin/cms/store_editor/code_editor.html', title='Edit Code Page', page=page, username=username)
+    
+    return username  # Se non autenticato, reindirizza al login
+
 @app.route('/admin/cms/store_editor/editor_interface', defaults={'slug': None})
 @app.route('/admin/cms/store_editor/editor_interface/<slug>')
 def editor_interface(slug=None):
