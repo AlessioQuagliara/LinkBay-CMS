@@ -10,11 +10,6 @@
                     <i class="fa-solid fa-arrow-left"></i>&nbsp; Back to home
                 </a>
             </li>
-            <li>
-                <a href="#" class="nav-link text-white" data-bs-toggle="modal" data-bs-target="#createPageModal">
-                    <i class="fa-solid fa-file-circle-plus fa-bounce"></i>&nbsp; Add Page
-                </a>
-            </li>
         {% else %}
             <li class="nav-item">
                 <a href="{{ url_for('editor_interface') }}"  class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
@@ -24,11 +19,6 @@
             <hr>
             {% if page.slug in ['products', 'navbar', 'footer'] %}
             {% else %}
-            <li class="nav-item">
-                <a href="#" class="nav-link text-white" data-bs-toggle="modal" data-bs-target="#seoModal">
-                    <i class="fa-solid fa-magnifying-glass-chart"></i>&nbsp; Edit SEO
-                </a>
-            </li>
             <li class="nav-item">
                 <a href="../../../../{{page.slug}}" target="_blank"  class="nav-link text-white">
                     <i class="fa-solid fa-eye"></i>&nbsp; View Online
@@ -60,50 +50,6 @@
         <p>Choose the page you want to edit.</p>
     </div>
     {% endif %}
-</div>
-
-<!---------------------------------------------------------- SEO MODAL ------------------------------------------------------>
-<div class="modal fade" id="seoModal" tabindex="-1" aria-labelledby="seoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="seoModalLabel">Edit SEO Settings</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="seo-form">
-                    <div class="mb-3">
-                        <label for="seo-title" class="form-label">Title</label>
-                        <input type="text" class="form-control" id="seo-title" name="title" value="{{ page.title }}" required>
-                    </div>
-                    {% if page.slug in ['home', 'about-us', 'catalogs', 'products'] %}
-                    <div class="mb-3">
-                        <label for="seo-slug" class="form-label">Slug</label>
-                        <input type="text" class="form-control" id="seo-slug" name="slug" value="{{ page.slug }}" readonly>
-                    </div>
-                    {% else %}
-                    <div class="mb-3">
-                        <label for="seo-slug" class="form-label">Slug</label>
-                        <input type="text" class="form-control" id="seo-slug" name="slug" value="{{ page.slug }}" required>
-                    </div>
-                    {% endif %}
-                    <div class="mb-3">
-                        <label for="seo-description" class="form-label">Description</label>
-                        <textarea class="form-control" id="seo-description" name="description" rows="3" required>{{ page.description }}</textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="seo-keywords" class="form-label">Keywords</label>
-                        <div id="seo-keywords-container" class="form-control" style="min-height: 38px;"></div>
-                        <input type="hidden" id="seo-keywords" name="keywords" value="{{ page.keywords }}">
-                    </div>
-                    <input type="hidden" id="seo-page-id" name="id" value="{{ page.id }}">
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" id="save-seo" class="btn btn-danger">Save changes</button>
-            </div>
-        </div>
-    </div>
 </div>
 <!------------------------------------------------------ CREATE PAGE MODAL -------------------------------------------------->
 <div class="modal fade" id="createPageModal" tabindex="-1" aria-labelledby="createPageModalLabel" aria-hidden="true">
