@@ -174,6 +174,25 @@ class Page:
             print(f"Error updating page content: {e}")
             cursor.close()
             return False
+        
+    def update_page_code_content(self, page_id, content):
+        cursor = self.conn.cursor()
+        try:
+            print(f"Salvataggio del contenuto per la pagina {page_id} nel database...")  # Log per debug
+            cursor.execute(
+                """UPDATE pages 
+                SET content = %s, updated_at = NOW() 
+                WHERE slug = %s""",  # Nota: se usi 'slug', assicurati di passare il parametro corretto
+                (content, page_id)  # Passa 'slug' come page_id se slug è utilizzato per identificare la pagina
+            )
+            self.conn.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error updating page content: {e}")
+            cursor.close()
+            return False
 
     # Aggiorna i metadati SEO di una pagina
     def update_page_seo(self, page_id, title, description, keywords, slug):

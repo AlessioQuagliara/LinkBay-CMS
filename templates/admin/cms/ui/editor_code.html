@@ -15,23 +15,17 @@
                     <i class="fa-solid fa-eye"></i>&nbsp; View Online
                 </a>
             </li>
+        <hr>
         {% for page in pages %}
         <li>
-            <a href="{{ url_for('edit_page', slug=page.slug) }}" class="nav-link {% if page.slug == slug %}active{% endif %} text-white">
+            <a href="{{ page.slug }}" class="nav-link {% if page.slug == slug %}active{% endif %} text-white">
                 <i class="fa-solid fa-file"></i>&nbsp; {{ page.slug }}.html
             </a>
         </li>
         {% endfor %}
     </ul>
     <hr>
-    {% if page.slug in ['home', 'about-us', 'catalogs', 'products'] %}
-    
     <button type="button" id="external-save-button" class="btn btn-danger mt-2">Save Page</button>
-    {% else %}
-    <div class="modal-footer">
-        <p>Choose the page you want to edit.</p>
-    </div>
-    {% endif %}
 </div>
 <!------------------------------------------------------ CREATE PAGE MODAL -------------------------------------------------->
 <div class="modal fade" id="createPageModal" tabindex="-1" aria-labelledby="createPageModalLabel" aria-hidden="true">

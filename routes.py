@@ -190,6 +190,8 @@ def shipping():
 
 # Editor Store Content -------------------------------------------------------------------------
 
+# Editor code ----------------------------------------------------------------
+
 @app.route('/admin/cms/function/edit-code/<slug>')
 def edit_code_page(slug):
     username = check_user_authentication()
@@ -200,6 +202,9 @@ def edit_code_page(slug):
         # Crea un'istanza di Page passando la connessione al database
         page_model = Page(db_conn)
         
+        pages = page_model.get_all_pages()  # Usa il modello Page per ottenere tutte le pagine
+        page = None
+
         # Usa il modello Page per ottenere la pagina
         page = page_model.get_page_by_slug(slug)
         
@@ -207,11 +212,41 @@ def edit_code_page(slug):
             content = page.get('content', '')  # Assicurati che 'content' esista e passalo al template
             return render_template('admin/cms/store_editor/code_editor.html', 
                                    title=page['title'], 
+                                   pages=pages, 
                                    page=page, 
                                    content=content, 
                                    username=username)
     
     return username  # Se non autenticato, reindirizza al login
+
+@app.route('/admin/cms/function/save_code', methods=['POST'])
+def save_code_page():
+    content = request.form.get('content')
+    page_id = request.form.get('page_id')
+
+    # Aggiungi un log per vedere cosa viene passato
+    print(f"Received content for page {page_id}: {content[:100]}...")  # Log del contenuto (i primi 100 caratteri)
+    
+    # Se il contenuto è vuoto, lo stampiamo nel log per capire il problema
+    if not content:
+        print("Errore: Il contenuto è vuoto.")
+        flash('Errore durante il salvataggio del contenuto. Il contenuto è vuoto.', 'danger')
+        return redirect(url_for('edit_code_page', slug=page_id))
+
+    db_conn = get_db_connection()  # Ottieni la connessione al DB
+    page_model = Page(db_conn)  # Inizializza il modello Page con la connessione
+
+    # Prova a salvare il contenuto
+    success = page_model.update_page_code_content(page_id, content)
+
+    if success:
+        flash('Contenuto aggiornato con successo.', 'success')
+    else:
+        flash('Errore durante il salvataggio del contenuto.', 'danger')
+
+    return redirect(url_for('edit_code_page', slug=page_id))
+
+# Editor block ----------------------------------------------------------------
 
 @app.route('/admin/cms/store_editor/editor_interface', defaults={'slug': None})
 @app.route('/admin/cms/store_editor/editor_interface/<slug>')

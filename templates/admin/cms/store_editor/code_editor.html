@@ -16,6 +16,8 @@
             border: 1px solid #ddd;
         }
     </style>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <nav class="navbar navbar-dark d-md-none" style="background-color: #343a40;">
@@ -33,8 +35,7 @@
             <form method="POST" action="/admin/cms/function/save_code" id="editor-form">
                 <div id="editor-container"></div>
                 <input type="hidden" id="content" name="content" value="{{ content|tojson|safe }}">
-                <input type="hidden" id="page_id" name="page_id" value="{{ page.id }}">
-                <!--<button type="submit" class="btn btn-primary mt-3">Salva Modifiche</button>-->
+                <input type="hidden" id="page_id" name="page_id" value="{{ page.slug }}">
             </form>
         </div>
     </main>
@@ -44,23 +45,36 @@
         document.addEventListener('DOMContentLoaded', function () {
             // Associa l'evento di click al pulsante di salvataggio esterno
             document.getElementById('external-save-button').addEventListener('click', function () {
-                // Esegui il submit del form principale
-                document.getElementById('editor-form').submit();
+                // Mostra avviso di conferma del salvataggio
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'Do you want to save the changes?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Save',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Esegui il submit del form principale
+                        document.getElementById('editor-form').submit();
+                    }
+                });
             });
         });
+
         require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs' }});
         require(['vs/editor/editor.main'], function() {
             var editor = monaco.editor.create(document.getElementById('editor-container'), {
-                value: decodeHtml(`{{ content|tojson|safe }}`),  // Decodifica il contenuto per evitare problemi di escape
+                value: formatHTML(`{{ content|tojson|safe }}`),  // Formattare il contenuto HTML
                 language: 'html',  // Puoi cambiare in 'javascript', 'css', ecc.
-                theme: 'vs-dark'  // Tema scuro
+                theme: 'vs-dark',  // Tema scuro
+                automaticLayout: true
             });
         
-            // Funzione per decodificare l'HTML dal template
-            function decodeHtml(html) {
-                var txt = document.createElement("textarea");
-                txt.innerHTML = html;
-                return txt.value;
+            // Funzione per formattare l'HTML
+            function formatHTML(html) {
+                var formatted = html.replace(/(>)(<)(\/*)/g, '$1\r\n$2$3');
+                return formatted;
             }
         
             // Aggiorna il contenuto del campo nascosto al submit
@@ -71,5 +85,24 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Verifica flash messages per SweetAlert (successo o errore) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    {% for category, message in messages %}
+                        Swal.fire({
+                            icon: '{{ 'success' if category == 'success' else 'error' }}',
+                            title: '{{ 'Success!' if category == 'success' else 'Error!' }}',
+                            text: '{{ message }}',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                    {% endfor %}
+                });
+            </script>
+        {% endif %}
+    {% endwith %}
 </body>
 </html>
