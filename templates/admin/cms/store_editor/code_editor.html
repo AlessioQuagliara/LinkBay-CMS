@@ -32,7 +32,7 @@
             <!-- Form per salvare il contenuto -->
             <form method="POST" action="/admin/cms/function/save_code" id="editor-form">
                 <div id="editor-container"></div>
-                <input type="hidden" id="content" name="content" value="{{ content }}">
+                <input type="hidden" id="content" name="content" value="{{ content|tojson|safe }}">
                 <input type="hidden" id="page_id" name="page_id" value="{{ page.id }}">
                 <!--<button type="submit" class="btn btn-primary mt-3">Salva Modifiche</button>-->
             </form>
@@ -41,14 +41,28 @@
 
     <!-- Inizializza Monaco Editor -->
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Associa l'evento di click al pulsante di salvataggio esterno
+            document.getElementById('external-save-button').addEventListener('click', function () {
+                // Esegui il submit del form principale
+                document.getElementById('editor-form').submit();
+            });
+        });
         require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs' }});
         require(['vs/editor/editor.main'], function() {
             var editor = monaco.editor.create(document.getElementById('editor-container'), {
-                value: `{{ content|escape }}`,  // Contenuto attuale della pagina
+                value: decodeHtml(`{{ content|tojson|safe }}`),  // Decodifica il contenuto per evitare problemi di escape
                 language: 'html',  // Puoi cambiare in 'javascript', 'css', ecc.
                 theme: 'vs-dark'  // Tema scuro
             });
-
+        
+            // Funzione per decodificare l'HTML dal template
+            function decodeHtml(html) {
+                var txt = document.createElement("textarea");
+                txt.innerHTML = html;
+                return txt.value;
+            }
+        
             // Aggiorna il contenuto del campo nascosto al submit
             document.getElementById('editor-form').onsubmit = function() {
                 document.getElementById('content').value = editor.getValue();

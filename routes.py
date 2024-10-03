@@ -203,7 +203,13 @@ def edit_code_page(slug):
         # Usa il modello Page per ottenere la pagina
         page = page_model.get_page_by_slug(slug)
         
-        return render_template('admin/cms/store_editor/code_editor.html', title='Edit Code Page', page=page, username=username)
+        if page:
+            content = page.get('content', '')  # Assicurati che 'content' esista e passalo al template
+            return render_template('admin/cms/store_editor/code_editor.html', 
+                                   title=page['title'], 
+                                   page=page, 
+                                   content=content, 
+                                   username=username)
     
     return username  # Se non autenticato, reindirizza al login
 
