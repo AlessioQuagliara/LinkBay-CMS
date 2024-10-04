@@ -203,10 +203,7 @@ def edit_code_page(slug):
         page_model = Page(db_conn)
         
         pages = page_model.get_all_pages()  # Usa il modello Page per ottenere tutte le pagine
-        page = None
-
-        # Usa il modello Page per ottenere la pagina
-        page = page_model.get_page_by_slug(slug)
+        page = page_model.get_page_by_slug(slug)  # Usa il modello Page per ottenere la pagina corrente
         
         if page:
             content = page.get('content', '')  # Assicurati che 'content' esista e passalo al template
@@ -214,37 +211,33 @@ def edit_code_page(slug):
                                    title=page['title'], 
                                    pages=pages, 
                                    page=page, 
+                                   slug=slug,  # Passa lo slug della pagina corrente
                                    content=content, 
                                    username=username)
     
     return username  # Se non autenticato, reindirizza al login
-
+    
 @app.route('/admin/cms/function/save_code', methods=['POST'])
 def save_code_page():
-    content = request.form.get('content')
-    page_id = request.form.get('page_id')
+    try:
+        data = request.get_json()  # Ricevi i dati come JSON
+        content = data.get('content')
+        slug = data.get('slug')
 
-    # Aggiungi un log per vedere cosa viene passato
-    print(f"Received content for page {page_id}: {content[:100]}...")  # Log del contenuto (i primi 100 caratteri)
-    
-    # Se il contenuto è vuoto, lo stampiamo nel log per capire il problema
-    if not content:
-        print("Errore: Il contenuto è vuoto.")
-        flash('Errore durante il salvataggio del contenuto. Il contenuto è vuoto.', 'danger')
-        return redirect(url_for('edit_code_page', slug=page_id))
+        # Controlla che content e slug non siano vuoti
+        if not content or not slug:
+            return jsonify({'success': False, 'error': 'Missing content or slug'}), 400
 
-    db_conn = get_db_connection()  # Ottieni la connessione al DB
-    page_model = Page(db_conn)  # Inizializza il modello Page con la connessione
+        db_conn = get_db_connection()
+        page_model = Page(db_conn)
 
-    # Prova a salvare il contenuto
-    success = page_model.update_page_code_content(page_id, content)
+        # Usa lo slug per aggiornare il contenuto della pagina
+        success = page_model.update_page_content_by_slug(slug, content)
 
-    if success:
-        flash('Contenuto aggiornato con successo.', 'success')
-    else:
-        flash('Errore durante il salvataggio del contenuto.', 'danger')
+        return jsonify({'success': success})
 
-    return redirect(url_for('edit_code_page', slug=page_id))
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
 
 # Editor block ----------------------------------------------------------------
 
@@ -273,6 +266,7 @@ def editor_interface(slug=None):
                                title=page_title, 
                                pages=pages, 
                                page=page, 
+                               slug=slug,  # Passa lo slug al template
                                current_url=current_url, 
                                username=username)
     return username  # Se non autenticato, reindirizza al login

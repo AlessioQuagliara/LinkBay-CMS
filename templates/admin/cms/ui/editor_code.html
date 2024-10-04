@@ -10,16 +10,29 @@
                 </a>
             </li>
             <hr>
+            {% if page.slug in ['navbar', 'footer' ] %}
+            <li class="nav-item">
+                <a href="#" class="nav-link text-white">
+                    <i class="fa-solid fa-eye-slash"></i>&nbsp; View Online
+                </a>
+            </li>
+            {% else %}
             <li class="nav-item">
                 <a href="../../../../{{page.slug}}" target="_blank"  class="nav-link text-white">
                     <i class="fa-solid fa-eye"></i>&nbsp; View Online
                 </a>
             </li>
+            {% endif %}
         <hr>
         {% for page in pages %}
         <li>
             <a href="{{ page.slug }}" class="nav-link {% if page.slug == slug %}active{% endif %} text-white">
-                <i class="fa-solid fa-file"></i>&nbsp; {{ page.slug }}.html
+                {% if page.slug == slug %} 
+                <i class="fa-solid fa-file fa-beat-fade"></i>  <!-- Icona animata per la pagina attiva -->
+                {% else %}
+                <i class="fa-solid fa-file"></i>  <!-- Icona normale per le altre pagine -->
+                {% endif %}
+                &nbsp; {{ page.slug }}.html
             </a>
         </li>
         {% endfor %}
@@ -111,4 +124,4 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{{ url_for('static', filename='js/editor.js') }}"></script>
+<!--<script src="{{ url_for('static', filename='js/editor.js') }}"></script>-->

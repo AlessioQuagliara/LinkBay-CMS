@@ -227,8 +227,23 @@ class Page:
             cursor.close()
             return False
         
-
-
+    def update_page_content_by_slug(self, slug, content):
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute(
+                """UPDATE pages 
+                SET content = %s, updated_at = NOW() 
+                WHERE slug = %s""",
+                (content, slug)
+            )
+            self.conn.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error updating page content: {e}")
+            cursor.close()
+            return False
 
 
 
