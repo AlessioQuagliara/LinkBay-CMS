@@ -1,0 +1,83 @@
+<!-- MODIFICA HEAD, FOOT e SCRIPT -->
+<div class="modal fade" id="editScriptModal" tabindex="-1" aria-labelledby="editScriptModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editScriptModalLabel">Script Personalizzati</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-script-form">
+                    <!-- Campo per 'head' -->
+                    <div class="mb-3">
+                        <label for="head" class="form-label">Tag &lt;head&gt;</label>
+                        <textarea class="form-control" id="head" name="head" rows="4" placeholder="Inserisci il codice da inserire nel tag &lt;head&gt;" required></textarea>
+                    </div>
+
+                    <!-- Campo per 'foot' -->
+                    <div class="mb-3">
+                        <label for="foot" class="form-label">Tag &lt;footer&gt;</label>
+                        <textarea class="form-control" id="foot" name="foot" rows="4" placeholder="Inserisci il codice da inserire nel tag &lt;footer&gt;"></textarea>
+                    </div>
+
+                    <!-- Campo per 'script' -->
+                    <div class="mb-3">
+                        <label for="script" class="form-label">Script Personalizzato</label>
+                        <textarea class="form-control" id="script" name="script" rows="4" placeholder="Inserisci lo script personalizzato (ad esempio, tracciamento o altro)." required></textarea>
+                    </div>
+
+                    <!-- Pulsante per salvare -->
+                    <div class="d-grid">
+                        <button type="button" id="save-script-settings" class="btn btn-danger">Salva Modifiche</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.getElementById('save-script-settings').addEventListener('click', function() {
+    const head = document.getElementById('head').value;
+    const foot = document.getElementById('foot').value;
+    const script = document.getElementById('script').value;
+
+    // Esegui la chiamata AJAX per salvare i dati
+    $.ajax({
+        url: '/admin/settings/update_scripts',  // Endpoint che gestisce il salvataggio
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            head: head,
+            foot: foot,
+            script: script
+        }),
+        success: function(response) {
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Salvato!',
+                    text: 'Le impostazioni sono state aggiornate con successo.',
+                    timer: 1500
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Errore!',
+                    text: 'Si è verificato un errore durante il salvataggio.',
+                    showConfirmButton: true
+                });
+            }
+        },
+        error: function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Errore di rete!',
+                text: 'Si è verificato un errore di connessione.',
+                showConfirmButton: true
+            });
+        }
+    });
+});
+</script>

@@ -92,6 +92,40 @@ class ShopList:
         shop = cursor.fetchone()  # Usa fetchone per ottenere un singolo negozio
         cursor.close()
         return shop
+    
+# Classe per Web_Settings --------------------------------------------------------------------------------------------
+
+class WebSettings:
+    def __init__(self, db_conn):
+        self.conn = db_conn
+
+    # Metodo per ottenere le impostazioni web
+    def get_web_settings(self):
+        cursor = self.conn.cursor(dictionary=True)
+        query = """SELECT * FROM web_settings"""
+        cursor.execute(query)
+        web_settings = cursor.fetchall()
+        cursor.close()
+        return web_settings
+
+    # Metodo per aggiornare head, foot e script nella tabella web_settings
+    def update_web_settings(self, head_content, foot_content, script_content):
+        cursor = self.conn.cursor()
+        try:
+            query = """
+                UPDATE web_settings 
+                SET head = %s, foot = %s, script = %s, updated_at = NOW()
+                """
+            cursor.execute(query, (head_content, foot_content, script_content))
+            self.conn.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error updating web settings: {e}")
+            cursor.close()
+            return False
+
 
 # Classe per Pages ---------------------------------------------------------------------------------------------------
 
