@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for, request, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import User, ShopList, Page
+from models import User, ShopList, Page, WebSettings
 from app import app, get_db_connection, get_auth_db_connection
 from datetime import datetime
 
@@ -238,6 +238,56 @@ def save_code_page():
 
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 400
+    
+# Editor Script ----------------------------------------------------------------
+
+@app.route('/admin/web_settings/edit')
+def edit_web_settings():
+    username = check_user_authentication()
+
+    if isinstance(username, str):
+        # Ottieni la connessione al database
+        db_conn = get_db_connection()
+        
+        # Ottieni i dati da web_settings usando il modello
+        web_settings_model = WebSettings(db_conn)
+        web_settings = web_settings_model.get_web_settings()
+
+        if web_settings:
+            # Renderizza la pagina script_editor.html con i dati di web_settings
+            return render_template(
+                'admin/cms/store_editor/script_editor.html',
+                title='Edit Web Settings',
+                username=username,
+                web_settings=web_settings  # Passa i dati delle impostazioni al template
+            )
+        else:
+            flash('Web settings not found.', 'danger')
+            return redirect(url_for('homepage'))
+    
+    return redirect(url_for('login'))  # Se l'utente non è autenticato
+    
+@app.route('/admin/web_settings/update', methods=['POST'])
+def update_web_settings():
+    try:
+        data = request.get_json()
+        head_content = data.get('head')
+        script_content = data.get('script')
+        foot_content = data.get('foot')
+
+        # Verifica che i dati non siano vuoti
+        if not head_content or not script_content or not foot_content:
+            return jsonify({'success': False, 'error': 'Missing content'}), 400
+
+        db_conn = get_db_connection()
+        web_settings_model = WebSettings(db_conn)
+
+        success = web_settings_model.update_web_settings(head_content, script_content, foot_content)
+
+        return jsonify({'success': success})
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
 
 # Editor block ----------------------------------------------------------------
 
@@ -356,6 +406,6 @@ def delete_page():
     except Exception as e:
         return jsonify({'success': False, 'message': f"Errore durante la cancellazione: {str(e)}"})
 
-
+# SCRIPT PAGE
 
 # NEGOZIO ONLINE

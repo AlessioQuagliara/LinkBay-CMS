@@ -99,24 +99,24 @@ class WebSettings:
     def __init__(self, db_conn):
         self.conn = db_conn
 
-    # Metodo per ottenere le impostazioni web
+    # Metodo per ottenere le impostazioni web 
     def get_web_settings(self):
         cursor = self.conn.cursor(dictionary=True)
         query = """SELECT * FROM web_settings"""
         cursor.execute(query)
-        web_settings = cursor.fetchall()
+        web_settings = cursor.fetchone()  # Assuming only one row in web_settings
         cursor.close()
         return web_settings
 
     # Metodo per aggiornare head, foot e script nella tabella web_settings
-    def update_web_settings(self, head_content, foot_content, script_content):
+    def update_web_settings(self, head_content, script_content, foot_content):
         cursor = self.conn.cursor()
         try:
             query = """
                 UPDATE web_settings 
-                SET head = %s, foot = %s, script = %s, updated_at = NOW()
+                SET head = %s, script = %s, foot = %s
                 """
-            cursor.execute(query, (head_content, foot_content, script_content))
+            cursor.execute(query, (head_content, script_content, foot_content))
             self.conn.commit()
             cursor.close()
             return True

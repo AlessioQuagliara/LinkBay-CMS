@@ -83,6 +83,15 @@ def render_dynamic_page(slug=None):
     navbar_content = page_model.get_navbar()
     footer_content = page_model.get_footer()
 
+    # Ottieni i dati da web_settings
+    web_settings_model = WebSettings(db_conn)
+    web_settings = web_settings_model.get_web_settings()
+
+    # Estrai 'head', 'script', e 'foot' da web_settings
+    head_content = web_settings['head'] if 'head' in web_settings else ''
+    script_content = web_settings['script'] if 'script' in web_settings else ''
+    foot_content = web_settings['foot'] if 'foot' in web_settings else ''
+
     if page:
         return render_template('index.html',
                                title=page['title'], 
@@ -91,7 +100,10 @@ def render_dynamic_page(slug=None):
                                content=page['content'], 
                                navbar=navbar_content,  # Passa la navbar al template
                                footer=footer_content,  # Passa il footer al template
-                               language=language)
+                               language=language,
+                               head=head_content,  # Passa il contenuto del tag head
+                               script=script_content,  # Passa i script personalizzati
+                               foot=foot_content)  # Passa il contenuto del footer script
     else:
         return render_template('404.html'), 404
     

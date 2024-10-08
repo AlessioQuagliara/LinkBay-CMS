@@ -7,6 +7,8 @@
     <meta name="description" content="{{ description }}">
     <meta name="keywords" content="{{ keywords }}">
     {% include 'head.html' %}
+    <!-- Include head scripts dinamicamente -->
+    {{ head | safe }}  <!-- Questo carica gli script personalizzati nella testa -->
 </head>
 <body>
     <!-- Include la navbar -->
@@ -21,6 +23,11 @@
     <footer>
         {{ footer | safe }}  <!-- Stampa il contenuto del footer -->
     </footer>
-    {% include 'foot.html' %}
+    
+    <!-- Carica script personalizzati -->
+    {{ script | safe }}  <!-- Questo carica gli script personalizzati nel body -->
+    
+    <!-- Carica gli script del footer -->
+    {{ foot | safe }}  <!-- Questo carica gli script specifici per il footer -->
 </body>
 </html>
