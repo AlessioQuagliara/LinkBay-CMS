@@ -44,7 +44,10 @@
             }
         </style>
         <div class="card text-bg-dark">
-            <img src="../../../../static/screenshot_result.png" class="card-img" alt="...">
+            <img src="{{ url_for('static', filename='images/screenshot_result.png') }}" 
+            class="card-img" 
+            alt="..."
+            style="object-fit: cover; object-position: center;">
             <div class="card-img-overlay d-flex flex-column">
                 <h5 class="card-title">Your Online Store: {{ shop['shop_name'] }}</h5>
                 <div class="mt-auto">
@@ -54,7 +57,7 @@
                             <p class="card-text"><small>Last Theme Edit: <span class="badge text-bg-secondary"> <strong>{{ minutes_ago }}</strong> minutes ago</span></small></p>
                         </div>
                         <div>
-                            <a href="../../../" target="_blank" class="btn btn-light btn-small">View Online Store</a>
+                            <a href="#" id="capture-screenshot-btn" class="btn btn-light btn-small">View Online Store</a>
                             <a href="{{ url_for('editor_interface') }}" class="btn btn-danger btn-small">Edit Store</a>
                         </div>
                     </div>
@@ -177,6 +180,26 @@
             confirmButtonText: 'OK'
         });
     }
+
+    // Rendeirizza alla homepage e fai uno screen
+    document.getElementById('capture-screenshot-btn').addEventListener('click', function(event) {
+        event.preventDefault();  // Evita il comportamento di default del link
+        
+        // Effettua una chiamata AJAX per avviare lo screenshot
+        fetch('/capture-screenshot', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Apri una nuova pagina alla rotta "home"
+                window.open('/home', '_blank');
+            }
+        })
+        .catch(error => {
+            console.error('Errore nel processo di screenshot:', error);
+        });
+    });
 </script>
 
 {% endblock %}

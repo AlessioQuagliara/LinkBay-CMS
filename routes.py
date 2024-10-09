@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models import User, ShopList, Page, WebSettings
 from app import app, get_db_connection, get_auth_db_connection
 from datetime import datetime
+from creators import capture_screenshot
 
 # Se non trova la pagina va in 404 ------------------------------------------------------
 @app.errorhandler(404)
@@ -409,3 +410,11 @@ def delete_page():
 # SCRIPT PAGE
 
 # NEGOZIO ONLINE
+@app.route('/capture-screenshot', methods=['POST'])
+def capture_screenshot_route():
+    try:
+        # Esegui lo script per catturare lo screenshot
+        capture_screenshot('http://127.0.0.1:5000/', 'static/images/screenshot_result.png')
+        return jsonify({'success': True}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500

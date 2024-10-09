@@ -1,10 +1,20 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
 from PIL import Image
 import time
 
 def capture_screenshot(url, output_path):
-    # Imposta il driver di Selenium (ad esempio, ChromeDriver)
-    driver = webdriver.Chrome()  # Assicurati che ChromeDriver sia nel PATH
+    # Imposta le opzioni di Chrome
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # Esegui Chrome in modalità headless
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    
+    # Avvia il driver di Chrome con le opzioni e il servizio
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
 
     # Carica la pagina da cui vuoi catturare uno screenshot
     driver.get(url)
@@ -17,16 +27,7 @@ def capture_screenshot(url, output_path):
 
     # Elabora lo screenshot se necessario
     img = Image.open('screenshot.png')
-    img = img.crop((0, 0, 1200, 800))  # Taglia l'immagine se necessario
     img.save(output_path)
 
     # Chiudi il driver
     driver.quit()
-
-# Cattura uno screenshot della route '/'
-capture_screenshot('http://127.0.0.1:5000/', 'screenshot_result.png')
-
-# Se vuoi catturare uno screenshot ogni 5 minuti, puoi impostare un ciclo:
-while True:
-    capture_screenshot('http://127.0.0.1:5000/', 'screenshot_result.png')
-    time.sleep(3)  # Attendi 5 minuti (300 secondi)
