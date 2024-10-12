@@ -1,9 +1,11 @@
 from flask import render_template, redirect, url_for, request, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from models import User, ShopList, Page, WebSettings
 from app import app, get_db_connection, get_auth_db_connection
 from datetime import datetime
 from creators import capture_screenshot
+import base64, os
 
 # Se non trova la pagina va in 404 ------------------------------------------------------
 @app.errorhandler(404)
@@ -339,6 +341,31 @@ def edit_page(slug):
     
     return username  # Se non autenticato, reindirizza al login
 
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def save_image(base64_image, page_id):
+    try:
+        # Decodifica l'immagine base64
+        header, encoded = base64_image.split(",", 1)
+        binary_data = base64.b64decode(encoded)
+
+        # Crea un nome file sicuro usando l'ID della pagina
+        image_name = f"{page_id}_{secure_filename('uploaded_image.png')}"
+        image_path = os.path.join('static/uploads/', image_name)
+
+        # Salva il file sul server
+        with open(image_path, "wb") as f:
+            f.write(binary_data)
+
+        # Restituisci l'URL dell'immagine salvata
+        return f"/static/uploads/{image_name}"
+    except Exception as e:
+        print(f"Error saving image: {str(e)}")
+        return None
+
 @app.route('/admin/cms/function/save', methods=['POST'])
 def save_page():
     data = request.get_json()
@@ -348,9 +375,25 @@ def save_page():
     db_conn = get_db_connection()  # Ottieni la connessione al DB
     page_model = Page(db_conn)  # Inizializza il modello Page con la connessione
 
-    success = page_model.update_page_content(page_id, content)
+    try:
+        # Cerca le immagini base64 nel contenuto
+        import re
+        img_tags = re.findall(r'<img.*?src=["\'](data:image/[^"\']+)["\']', content)
 
-    return jsonify({'success': success})
+        # Mantieni traccia delle immagini convertite
+        for base64_img in img_tags:
+            # Salva l'immagine sul server
+            image_url = save_image(base64_img, page_id)
+
+            # Se l'immagine è stata salvata correttamente, sostituisci il riferimento nel contenuto
+            if image_url:
+                content = content.replace(base64_img, image_url)
+
+        # Salva il contenuto aggiornato nel database
+        success = page_model.update_page_content(page_id, content)
+        return jsonify({'success': success})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/admin/cms/function/save-seo', methods=['POST'])
 def save_seo_page():

@@ -5,71 +5,84 @@
 <div class="row" data-aos="fade-up">
     <div class="col-md-12 mb-3">
         <style>
-            .card {
+            .store-banner {
                 position: relative;
-                height: 200px; /* Altezza ridotta */
-                overflow: hidden;
+                height: 400px; /* Altezza maggiore per la foto dello store */
+                background-image: url("{{ url_for('static', filename='images/screenshot_result.png') }}");
+                background-size: cover;
+                background-position: center;
+                filter: brightness(50%); /* Riduzione della luminosità per effetto opaco */
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 15px; /* Bordi arrotondati */
             }
-            .card-img {
-                height: 100%;
-                object-fit: cover;
-                filter: brightness(40%); /* Velo opaco */
-            }
-            .card-img-overlay {
+            
+            .store-overlay {
                 position: absolute;
                 top: 0;
                 left: 0;
                 width: 100%;
                 height: 100%;
-                color: white;
                 display: flex;
                 flex-direction: column;
-                justify-content: space-between;
+                justify-content: center;
+                text-align: center;
+                color: white;
+                border-radius: 15px; /* Bordi arrotondati anche per il contenuto */
             }
-            .card-title, .card-text {
-                margin-bottom: 0.5rem;
+
+            .store-title {
+                font-size: 2.5rem;
+                font-weight: bold;
+                text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
             }
-            .btn-small {
-                padding: 0.25rem 0.5rem; /* Dimensioni ridotte del bottone */
-                font-size: 0.875rem; /* Font piccolo */
+
+            .store-buttons {
+                margin-top: 1rem;
             }
-            .form-check-input:checked {
-                background-color: #ff5757 !important;
-                border-color: #ff5757 !important;
+
+            .store-buttons a {
+                margin: 0 10px;
             }
+
             .card-footer {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                border-radius: 15px;
+            }
+
+            .card {
+                border-radius: 15px; /* Bordi arrotondati per tutte le card */
+            }
+
+            .card-body {
+                border-radius: 15px;
+            }
+
+            .card img {
+                border-radius: 15px;
+            }
+
+            .btn {
+                border-radius: 15px;
             }
         </style>
-        <div class="card text-bg-dark">
-            <img src="{{ url_for('static', filename='images/screenshot_result.png') }}" 
-            class="card-img" 
-            alt="..."
-            style="object-fit: cover; object-position: center;">
-            <div class="card-img-overlay d-flex flex-column">
-                <h5 class="card-title">Your Online Store: {{ shop['shop_name'] }}</h5>
-                <div class="mt-auto">
-                    <div class="card-footer">
-                        <div>
-                            <p class="card-text"><span class="badge text-bg-secondary">Theme in use<strong>: {{ shop['themeOptions'] }}</strong></span></p>
-                            <p class="card-text"><small>Last Theme Edit: <span class="badge text-bg-secondary"> <strong>{{ minutes_ago }}</strong> minutes ago</span></small></p>
-                        </div>
-                        <div>
-                            <a href="#" id="capture-screenshot-btn" class="btn btn-light btn-small">View Online Store</a>
-                            <a href="{{ url_for('editor_interface') }}" class="btn btn-danger btn-small">Edit Store</a>
-                        </div>
-                    </div>
-                </div>
+
+        <div class="store-banner">
+            <div class="store-overlay">
+                <h2 class="store-title">Your Online Store: {{ shop['shop_name'] }}</h2>
             </div>
         </div>
     </div>
 </div>
 
 <h5 class="mt-4 text-center" data-aos="fade-up">More Options</h5>
-<div class="row d-flex justify-content-center align-items-center" data-aos="fade-up">
-    <div class="col-md-4 text-dark theme-card-container d-flex align-items-stretch mb-4">
+
+<!-- Imposta il layout delle card con Bootstrap  -->
+<div class="row row-cols-1 row-cols-md-3 g-4" data-aos="fade-up">
+    <div class="col">
         <div class="theme-card card" style="background-image: url(https://via.placeholder.com/300x200); background-size: cover;">
             <div class="card-body mt-4">
                 <h5 class="card-title">More Design Tool</h5>
@@ -79,17 +92,20 @@
         </div>
     </div>
 
-    <div class="col-md-4 text-dark theme-card-container d-flex align-items-stretch mb-4">
-        <div class="theme-card card text-white" style="background-image: url(../../../../static/images/scripteditor.png); background-size: cover;">
+    <div class="col">
+        <div class="theme-card card text-dark" style="background-image: url(../../../../static/images/screenshot_result.png); background-size: cover;">
             <div class="card-body mt-4">
-                <h5 class="card-title">Add Personal Script</h5>
-                <p class="card-text">Create your own custom script and integrate it into your site seamlessly.</p>
-                <a href="/admin/web_settings/edit" class="btn btn-danger btn-small">Edit Store</a>
+                <h5 class="card-title">Edit Store Drag&Drop</h5>
+                <p class="card-text"><span class="badge text-bg-secondary">Theme in use<strong>: {{ shop['themeOptions'] }}</strong></span></p>
+                <p class="card-text"><small>Last Theme Edit: <span class="badge text-bg-secondary"><strong>{{ minutes_ago }}</strong> minutes ago</span></small></p>
+                <a href="{{ url_for('editor_interface') }}" class="btn btn-danger btn-small">Edit Store</a>
+                <a href="/home" target="_blank" class="btn btn-dark btn-small">View Online Store</a>
+                <a href="" id="capture-screenshot-btn" class="btn btn-dark btn-small"><i class="fa-solid fa-arrows-rotate"></i></a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4 theme-card-container d-flex align-items-stretch mb-4">
+    <div class="col">
         <div class="theme-card card text-white" style="background-image: url(../../../../static/images/codeeditor.png); background-size: cover;">
             <div class="card-body mt-4">
                 <h5 class="card-title">Edit Code</h5>
@@ -99,7 +115,17 @@
         </div>
     </div>
 
-    <div class="col-md-4 text-dark theme-card-container d-flex align-items-stretch mb-4">
+    <div class="col">
+        <div class="theme-card card text-white" style="background-image: url(../../../../static/images/scripteditor.png); background-size: cover;">
+            <div class="card-body mt-4">
+                <h5 class="card-title">Add Personal Script</h5>
+                <p class="card-text">Create your own custom script and integrate it into your site seamlessly.</p>
+                <a href="/admin/web_settings/edit" class="btn btn-danger btn-small">Edit Store</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
         <div class="theme-card card" style="background-image: url(https://via.placeholder.com/300x200); background-size: cover;">
             <div class="card-body mt-4">
                 <h5 class="card-title">Add Cookie Bar</h5>
@@ -109,8 +135,7 @@
         </div>
     </div>
 
-    <!-- New Card for Captcha -->
-    <div class="col-md-4 text-dark theme-card-container d-flex align-items-stretch mb-4">
+    <div class="col">
         <div class="theme-card card" style="background-image: url(https://via.placeholder.com/300x200); background-size: cover;">
             <div class="card-body mt-4">
                 <h5 class="card-title">Add Captcha</h5>
@@ -120,8 +145,7 @@
         </div>
     </div>
 
-    <!-- New Card for Pop-Up -->
-    <div class="col-md-4 text-dark theme-card-container d-flex align-items-stretch mb-4">
+    <div class="col">
         <div class="theme-card card" style="background-image: url(https://via.placeholder.com/300x200); background-size: cover;">
             <div class="card-body mt-4">
                 <h5 class="card-title">Add Pop-Up</h5>
@@ -192,8 +216,8 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Apri una nuova pagina alla rotta "home"
-                window.open('/home', '_blank');
+                // Effettua il refresh della pagina corrente
+                window.location.reload();
             }
         })
         .catch(error => {
