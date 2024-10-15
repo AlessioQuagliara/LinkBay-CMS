@@ -461,3 +461,12 @@ def capture_screenshot_route():
         return jsonify({'success': True}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+# Addons e Componenti a pagamento aggiuntive
+
+@app.route('/store-components')
+def store_components():
+    username = check_user_authentication()
+    if isinstance(username, str):
+        return render_template('admin/cms/store-components/shop_page.html', title='Addons', username=username)
+    return username
