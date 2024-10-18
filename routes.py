@@ -456,7 +456,7 @@ def delete_page():
 @app.route('/capture-screenshot', methods=['POST'])
 def capture_screenshot_route():
     try:
-        # Esegui lo script per catturare lo screenshot
+        # Il plugin esegue il software 
         capture_screenshot('http://127.0.0.1:5000/', 'static/images/screenshot_result.png')
         return jsonify({'success': True}), 200
     except Exception as e:
