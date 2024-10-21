@@ -515,77 +515,77 @@
         });
 
         document.getElementById('save-page').addEventListener('click', async function() {
-    var content = editor.getHtml();
-    var slug = "{{ page.slug }}";
-    
-    // Funzione per convertire immagini base64 in file e inviarle al server
-    async function uploadBase64Image(base64Image) {
-        const response = await fetch('/upload-image', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ image: base64Image })
-        });
-        const data = await response.json();
-        return data.url; // URL dell'immagine sul server
-    }
-
-    // Trova tutte le immagini nel contenuto del page editor
-    var div = document.createElement('div');
-    div.innerHTML = content;
-    var images = div.querySelectorAll('img');
-
-    // Array per conservare le promesse di upload
-    var uploadPromises = [];
-
-    // Cicla su ogni immagine
-    for (let img of images) {
-        // Controlla se l'immagine è in formato base64
-        if (img.src.startsWith('data:image')) {
-            // Carica l'immagine sul server e ottieni l'URL
-            const uploadPromise = uploadBase64Image(img.src).then(url => {
-                img.src = url;  // Sostituisci il src con l'URL
+            var content = editor.getHtml();
+            var slug = "{{ page.slug }}";
+            
+            // Funzione per convertire immagini base64 in file e inviarle al server
+            async function uploadBase64Image(base64Image) {
+                const response = await fetch('/upload-image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ image: base64Image })
+                });
+                const data = await response.json();
+                return data.url; // URL dell'immagine sul server
+            }
+        
+            // Trova tutte le immagini nel contenuto del page editor
+            var div = document.createElement('div');
+            div.innerHTML = content;
+            var images = div.querySelectorAll('img');
+        
+            // Array per conservare le promesse di upload
+            var uploadPromises = [];
+        
+            // Cicla su ogni immagine
+            for (let img of images) {
+                // Controlla se l'immagine è in formato base64
+                if (img.src.startsWith('data:image')) {
+                    // Carica l'immagine sul server e ottieni l'URL
+                    const uploadPromise = uploadBase64Image(img.src).then(url => {
+                        img.src = url;  // Sostituisci il src con l'URL
+                    });
+                    uploadPromises.push(uploadPromise);
+                }
+            }
+        
+            // Attendi che tutte le immagini siano state caricate e sostituite
+            await Promise.all(uploadPromises);
+        
+            // Salva il contenuto con le immagini convertite in URL
+            fetch("{{ url_for('save_page') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: "{{ page.id }}",
+                    content: div.innerHTML // Nuovo contenuto con immagini sostituite
+                })
+            }).then(response => response.json()).then(data => {
+                if (data.success) {
+                    Swal.fire(
+                        'Saved!',
+                        'Your page has been successfully saved.',
+                        'success'
+                    );
+                } else {
+                    Swal.fire(
+                        'Error!',
+                        'There was an error saving the page.',
+                        'error'
+                    );
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+                Swal.fire(
+                    'Error!',
+                    'There was an error saving the page.',
+                    'error'
+                );
             });
-            uploadPromises.push(uploadPromise);
-        }
-    }
-
-    // Attendi che tutte le immagini siano state caricate e sostituite
-    await Promise.all(uploadPromises);
-
-    // Salva il contenuto con le immagini convertite in URL
-    fetch("{{ url_for('save_page') }}", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            id: "{{ page.id }}",
-            content: div.innerHTML // Nuovo contenuto con immagini sostituite
-        })
-    }).then(response => response.json()).then(data => {
-        if (data.success) {
-            Swal.fire(
-                'Saved!',
-                'Your page has been successfully saved.',
-                'success'
-            );
-        } else {
-            Swal.fire(
-                'Error!',
-                'There was an error saving the page.',
-                'error'
-            );
-        }
-    }).catch(error => {
-        console.error('Error:', error);
-        Swal.fire(
-            'Error!',
-            'There was an error saving the page.',
-            'error'
-        );
-    });
-});
-});
+        });
+        });
 </script>

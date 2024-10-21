@@ -5,7 +5,7 @@ from models import User, ShopList, Page, WebSettings
 from app import app, get_db_connection, get_auth_db_connection
 from datetime import datetime
 from creators import capture_screenshot
-import base64, os
+import base64, os, uuid  
 
 # Se non trova la pagina va in 404 ------------------------------------------------------
 @app.errorhandler(404)
@@ -292,7 +292,7 @@ def update_web_settings():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
-# Editor block ----------------------------------------------------------------
+# Editor block -------------------------------------------------------------------------------------------------------------------
 
 @app.route('/admin/cms/store_editor/editor_interface', defaults={'slug': None})
 @app.route('/admin/cms/store_editor/editor_interface/<slug>')
@@ -365,7 +365,7 @@ def save_image(base64_image, page_id):
     except Exception as e:
         print(f"Error saving image: {str(e)}")
         return None
-
+    
 @app.route('/admin/cms/function/save', methods=['POST'])
 def save_page():
     data = request.get_json()
@@ -394,6 +394,56 @@ def save_page():
         return jsonify({'success': success})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
+    
+# Configurazione per la cartella di upload
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Funzione per verificare che il file abbia un'estensione valida
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# Funzione per salvare le immagini base64
+def save_base64_image(base64_image):
+    try:
+        # Decodifica l'immagine Base64
+        header, encoded = base64_image.split(",", 1)
+        binary_data = base64.b64decode(encoded)
+
+        # Genera un nome file univoco usando UUID
+        unique_filename = f"{uuid.uuid4().hex}.png"
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+
+        # Salva l'immagine sul server
+        with open(file_path, "wb") as f:
+            f.write(binary_data)
+
+        # Restituisce l'URL dell'immagine salvata
+        return f"/static/uploads/{unique_filename}"
+    except Exception as e:
+        print(f"Errore durante il salvataggio dell'immagine: {str(e)}")
+        return None
+
+# Endpoint Flask per gestire l'upload delle immagini
+@app.route('/upload-image', methods=['POST'])
+def upload_image():
+    data = request.get_json()
+
+    # Riceve l'immagine in base64
+    base64_image = data.get('image')
+
+    if not base64_image:
+        return jsonify({'error': 'No image provided'}), 400
+
+    # Salva l'immagine
+    image_url = save_base64_image(base64_image)
+
+    if image_url:
+        return jsonify({'url': image_url}), 200
+    else:
+        return jsonify({'error': 'Failed to upload image'}), 500
 
 @app.route('/admin/cms/function/save-seo', methods=['POST'])
 def save_seo_page():
@@ -450,9 +500,9 @@ def delete_page():
     except Exception as e:
         return jsonify({'success': False, 'message': f"Errore durante la cancellazione: {str(e)}"})
 
-# SCRIPT PAGE
+# SCRIPT PAGE --------------------------------------------------------------------------------------------------------
 
-# NEGOZIO ONLINE
+# NEGOZIO ONLINE -----------------------------------------------------------------------------------------------------
 @app.route('/capture-screenshot', methods=['POST'])
 def capture_screenshot_route():
     try:
