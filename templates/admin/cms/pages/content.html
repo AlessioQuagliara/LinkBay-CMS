@@ -63,7 +63,7 @@
 
         <div class="store-banner">
             <div class="store-overlay">
-                <h2 class="store-title">Your Online Store: {{ shop['shop_name'] }}</h2>
+                <h2 class="store-title">{{ shop['shop_name'] }}</h2>
             </div>
         </div>
     </div>
@@ -102,11 +102,11 @@
     <div class="col">
         <div class="theme-card card text-light" style="background-image: url(../../../../static/images/store_image.webp); background-size: cover;">
             <div class="card-body mt-4">
-                <h5 class="card-title">Edit Store Drag&Drop</h5>
+                <h5 class="card-title">Edit Site Drag&Drop</h5>
                 <p class="card-text"><span class="badge text-bg-secondary">Theme in use<strong>: {{ shop['themeOptions'] }}</strong></span></p>
                 <p class="card-text"><small>Last Theme Edit: <span class="badge text-bg-secondary"><strong>{{ minutes_ago }}</strong> minutes ago</span></small></p>
-                <a href="{{ url_for('editor_interface') }}" class="btn btn-danger btn-small">Edit Store</a>
-                <a href="/home" target="_blank" class="btn btn-dark btn-small">View Online Store</a>
+                <a href="{{ url_for('editor_interface') }}" class="btn btn-danger btn-small">Edit Site</a>
+                <a href="/home" target="_blank" class="btn btn-dark btn-small">View Online</a>
                 <!--<a href="" id="capture-screenshot-btn" class="btn btn-dark btn-small"><i class="fa-solid fa-arrows-rotate"></i></a>-->
             </div>
         </div>

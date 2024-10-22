@@ -5,7 +5,7 @@ from models import User, ShopList, Page, WebSettings
 from app import app, get_db_connection, get_auth_db_connection
 from datetime import datetime
 from creators import capture_screenshot
-import base64, os, uuid  
+import base64, os, uuid, re
 
 # Se non trova la pagina va in 404 ------------------------------------------------------
 @app.errorhandler(404)
@@ -32,13 +32,12 @@ def signin():
         email = request.form.get('email')
         password = request.form.get('password')
 
-        # Controlla se l'email esiste già nel database
+
         existing_user = user_model.get_user_by_email(email)
         if existing_user:
             flash('Email address already exists')
             return redirect(url_for('signin'))
 
-        # Crea un nuovo utente nel database
         user_model.create_user(name, surname, email, password)
         flash('Registration successful! You can now log in.')
         return redirect(url_for('login'))
@@ -52,18 +51,16 @@ def log_session_info():
     print(f"Session data: {session}")
     print(f"Cookies: {request.cookies}")
 
-# Funzione di login
+# Funzione di login -------------------------------------------------
 @app.route('/admin/', methods=['GET', 'POST'])
 @app.route('/admin/login', methods=['GET', 'POST'])
 def login():
-    auth_db_conn = get_auth_db_connection()  # Usa la connessione separata per CMS_INDEX
-    user_model = User(auth_db_conn)  # Usa il modello User con la connessione al database di autenticazione
+    auth_db_conn = get_auth_db_connection()  
+    user_model = User(auth_db_conn)  
 
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-
-        # Cerca l'utente nel database CMS_INDEX usando il modello User
         user = user_model.get_user_by_email(email)
 
         if user and check_password_hash(user['password'], password):
@@ -76,10 +73,9 @@ def login():
 
             print(f"Session after login: {session}")
 
-            # Gestione del 2FA (autenticazione a due fattori)
             if user['is_2fa_enabled']:
                 session['otp_secret'] = user['otp_secret']
-                return redirect(url_for('verify_otp'))  # Reindirizza a una schermata per inserire OTP
+                return redirect(url_for('verify_otp'))  
             else:
                 return redirect(url_for('homepage'))
         else:
@@ -100,7 +96,7 @@ def restore():
     return render_template('/admin/restore.html', title='LinkBay - Restore')
 
 
-# Verifica autenticazione utente
+# Verifica autenticazione utente -----------------------------------
 def check_user_authentication():
     if 'user_id' not in session:
         flash('You need to log in first.', 'danger')
@@ -160,34 +156,36 @@ def online_content():
     username = check_user_authentication()
     
     if isinstance(username, str):
-        # Recuperare i dati da ShopList
+        shop_subdomain = request.host.split('.')[0]  
+
         with get_auth_db_connection() as auth_db_conn:
             shoplist_model = ShopList(auth_db_conn)
-            shop_name = 'erboristeria'
-            shop = shoplist_model.get_shop_by_name(shop_name)
-        
-        # Recupera i dati da page
-        with get_db_connection() as db_conn:
-            page_model = Page(db_conn)
-            page_slug = 'home'
-            page = page_model.get_page_by_slug(page_slug)
-        
+            shop = shoplist_model.get_shop_by_name(shop_subdomain)  
+
         if shop:
-            # Calcolare i minuti dalla data di aggiornamento
-            updated_at = page['updated_at']
-            now = datetime.now()
-            minutes_ago = (now - updated_at).total_seconds() // 60  # Differenza in minuti
-            
-            return render_template(
-                'admin/cms/pages/content.html', 
-                title='Online Content', 
-                username=username, 
-                page=page,
-                shop=shop,
-                minutes_ago=int(minutes_ago)  # Passa i minuti al template
-            )
+            with get_db_connection() as db_conn:
+                page_model = Page(db_conn)
+                page_slug = 'home'
+                page = page_model.get_page_by_slug(page_slug, shop_subdomain) 
+
+            if page:
+                updated_at = page['updated_at']
+                now = datetime.now()
+                minutes_ago = (now - updated_at).total_seconds() // 60  
+
+                return render_template(
+                    'admin/cms/pages/content.html', 
+                    title='Online Content', 
+                    username=username, 
+                    page=page,
+                    shop=shop,
+                    minutes_ago=int(minutes_ago)  
+                )
+            else:
+                flash('Contenuto della pagina non trovato.')
+                return redirect(url_for('homepage'))
         else:
-            flash('Nessun negozio trovato.')
+            flash('Nessun negozio trovato per questo nome.')
             return redirect(url_for('homepage'))
     
     return username
@@ -206,7 +204,7 @@ def shipping():
         return render_template('admin/cms/pages/shipping.html', title='Shipping', username=username)
     return username
 
-# Editor Store Content -------------------------------------------------------------------------
+# Editor Store Content ---------------------------------------------------------------------------------------------
 
 # Editor code ----------------------------------------------------------------
 
@@ -215,42 +213,45 @@ def edit_code_page(slug):
     username = check_user_authentication()
     
     if isinstance(username, str):
-        db_conn = get_db_connection()  # Ottieni la connessione al DB
+        db_conn = get_db_connection() 
+
+        shop_subdomain = request.host.split('.')[0]  
         
-        # Crea un'istanza di Page passando la connessione al database
         page_model = Page(db_conn)
         
-        pages = page_model.get_all_pages()  # Usa il modello Page per ottenere tutte le pagine
-        page = page_model.get_page_by_slug(slug)  # Usa il modello Page per ottenere la pagina corrente
+        pages = page_model.get_all_pages(shop_subdomain)  
+        page = page_model.get_page_by_slug(slug, shop_subdomain) 
         
         if page:
-            content = page.get('content', '')  # Assicurati che 'content' esista e passalo al template
+            content = page.get('content', '')  
             return render_template('admin/cms/store_editor/code_editor.html', 
                                    title=page['title'], 
                                    pages=pages, 
                                    page=page, 
-                                   slug=slug,  # Passa lo slug della pagina corrente
+                                   slug=slug,  
                                    content=content, 
                                    username=username)
     
-    return username  # Se non autenticato, reindirizza al login
-    
+    return username
+
+# Funzione per salvare il codice modificato
 @app.route('/admin/cms/function/save_code', methods=['POST'])
 def save_code_page():
     try:
-        data = request.get_json()  # Ricevi i dati come JSON
+        data = request.get_json()  
         content = data.get('content')
         slug = data.get('slug')
 
-        # Controlla che content e slug non siano vuoti
         if not content or not slug:
             return jsonify({'success': False, 'error': 'Missing content or slug'}), 400
 
         db_conn = get_db_connection()
+        
+        shop_subdomain = request.host.split('.')[0]  
+        
         page_model = Page(db_conn)
 
-        # Usa lo slug per aggiornare il contenuto della pagina
-        success = page_model.update_page_content_by_slug(slug, content)
+        success = page_model.update_page_content_by_slug(slug, content, shop_subdomain)
 
         return jsonify({'success': success})
 
@@ -264,27 +265,25 @@ def edit_web_settings():
     username = check_user_authentication()
 
     if isinstance(username, str):
-        # Ottieni la connessione al database
         db_conn = get_db_connection()
-        
-        # Ottieni i dati da web_settings usando il modello
+        shop_subdomain = request.host.split('.')[0]  
         web_settings_model = WebSettings(db_conn)
-        web_settings = web_settings_model.get_web_settings()
+        web_settings = web_settings_model.get_web_settings(shop_subdomain)  
 
         if web_settings:
-            # Renderizza la pagina script_editor.html con i dati di web_settings
             return render_template(
                 'admin/cms/store_editor/script_editor.html',
                 title='Edit Web Settings',
                 username=username,
-                web_settings=web_settings  # Passa i dati delle impostazioni al template
+                web_settings=web_settings 
             )
         else:
-            flash('Web settings not found.', 'danger')
+            flash('Web settings not found for this shop.', 'danger')
             return redirect(url_for('homepage'))
-    
-    return redirect(url_for('login'))  # Se l'utente non è autenticato
-    
+        
+    return redirect(url_for('login'))  
+
+# Funzione per aggiornare le impostazioni web
 @app.route('/admin/web_settings/update', methods=['POST'])
 def update_web_settings():
     try:
@@ -293,14 +292,13 @@ def update_web_settings():
         script_content = data.get('script')
         foot_content = data.get('foot')
 
-        # Verifica che i dati non siano vuoti
         if not head_content or not script_content or not foot_content:
             return jsonify({'success': False, 'error': 'Missing content'}), 400
 
         db_conn = get_db_connection()
+        shop_subdomain = request.host.split('.')[0]  
         web_settings_model = WebSettings(db_conn)
-
-        success = web_settings_model.update_web_settings(head_content, script_content, foot_content)
+        success = web_settings_model.update_web_settings(shop_subdomain, head_content, script_content, foot_content)
 
         return jsonify({'success': success})
 
@@ -315,17 +313,24 @@ def editor_interface(slug=None):
     username = check_user_authentication()
     
     if isinstance(username, str):
-        db_conn = get_db_connection()  # Ottieni la connessione al DB
-        
-        # Crea un'istanza di Page passando la connessione al database
+        db_conn = get_db_connection()  
+        shop_subdomain = request.host.split('.')[0]
+
+        with get_auth_db_connection() as auth_db_conn:
+            shoplist_model = ShopList(auth_db_conn)
+            shop = shoplist_model.get_shop_by_name(shop_subdomain)
+
+        if not shop:
+            flash('Nessun negozio selezionato o negozio non trovato.', 'danger')
+            return redirect(url_for('homepage'))
+
         page_model = Page(db_conn)
-        
-        pages = page_model.get_all_pages()  # Usa il modello Page per ottenere tutte le pagine
+        pages = page_model.get_all_pages(shop_name=shop_subdomain)
         page = None
         page_title = 'CMS Interface'
         
         if slug:
-            page = page_model.get_page_by_slug(slug)
+            page = page_model.get_page_by_slug(slug, shop_subdomain)
             if page:
                 page_title = page['title']
 
@@ -334,132 +339,126 @@ def editor_interface(slug=None):
                                title=page_title, 
                                pages=pages, 
                                page=page, 
-                               slug=slug,  # Passa lo slug al template
+                               slug=slug,  
                                current_url=current_url, 
                                username=username)
-    return username  # Se non autenticato, reindirizza al login
+    return username  
 
 @app.route('/admin/cms/function/edit/<slug>')
 def edit_page(slug):
     username = check_user_authentication()
     
     if isinstance(username, str):
-        db_conn = get_db_connection()  # Ottieni la connessione al DB
-        
-        # Crea un'istanza di Page passando la connessione al database
+        db_conn = get_db_connection()  
+        shop_subdomain = request.host.split('.')[0]  
+
+        with get_auth_db_connection() as auth_db_conn:
+            shoplist_model = ShopList(auth_db_conn)
+            shop = shoplist_model.get_shop_by_name(shop_subdomain)
+
+        if not shop:
+            flash('Nessun negozio selezionato o negozio non trovato.', 'danger')
+            return redirect(url_for('homepage'))
+
+
         page_model = Page(db_conn)
-        
-        # Usa il modello Page per ottenere la pagina
-        page = page_model.get_page_by_slug(slug)
-        
+        page = page_model.get_page_by_slug(slug, shop_subdomain)  
+
+        if not page:
+            flash('Pagina non trovata.', 'danger')
+            return redirect(url_for('homepage'))
+
         return render_template('admin/cms/function/edit.html', title='Edit Page', page=page, username=username)
     
-    return username  # Se non autenticato, reindirizza al login
+    return username  
+
+# SALVATAGGIO IMMAGINI ----------------------------------------------------------------------------------------
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def save_image(base64_image, page_id):
+def save_image(base64_image, page_id, shop_subdomain):
     try:
-        # Decodifica l'immagine base64
         header, encoded = base64_image.split(",", 1)
         binary_data = base64.b64decode(encoded)
+        upload_folder = f"static/uploads/{shop_subdomain}"
+        if not os.path.exists(upload_folder):
+            os.makedirs(upload_folder)  
 
-        # Crea un nome file sicuro usando l'ID della pagina
         image_name = f"{page_id}_{secure_filename('uploaded_image.png')}"
-        image_path = os.path.join('static/uploads/', image_name)
+        image_path = os.path.join(upload_folder, image_name)
 
-        # Salva il file sul server
         with open(image_path, "wb") as f:
             f.write(binary_data)
 
-        # Restituisci l'URL dell'immagine salvata
-        return f"/static/uploads/{image_name}"
+        return f"/{upload_folder}/{image_name}"
     except Exception as e:
         print(f"Error saving image: {str(e)}")
         return None
-    
+
+# Funzione per salvare il contenuto della pagina con gestione delle immagini ---------------------------------
 @app.route('/admin/cms/function/save', methods=['POST'])
 def save_page():
-    data = request.get_json()
-    page_id = data.get('id')
-    content = data.get('content')
-
-    db_conn = get_db_connection()  # Ottieni la connessione al DB
-    page_model = Page(db_conn)  # Inizializza il modello Page con la connessione
-
     try:
-        # Cerca le immagini base64 nel contenuto
-        import re
+        data = request.get_json()
+        page_id = data.get('id')
+        content = data.get('content')
+        shop_subdomain = request.host.split('.')[0]
+        
+        print(f"Salvataggio pagina con ID: {page_id} per il negozio: {shop_subdomain}")
+        
+        db_conn = get_db_connection()  
+        page_model = Page(db_conn)  
+        
         img_tags = re.findall(r'<img.*?src=["\'](data:image/[^"\']+)["\']', content)
-
-        # Mantieni traccia delle immagini convertite
         for base64_img in img_tags:
-            # Salva l'immagine sul server
-            image_url = save_image(base64_img, page_id)
-
-            # Se l'immagine è stata salvata correttamente, sostituisci il riferimento nel contenuto
+            image_url = save_image(base64_img, page_id, shop_subdomain)
             if image_url:
                 content = content.replace(base64_img, image_url)
-
-        # Salva il contenuto aggiornato nel database
-        success = page_model.update_page_content(page_id, content)
+        
+        success = page_model.update_page_content(page_id, content, shop_subdomain)
         return jsonify({'success': success})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
     
-# Configurazione per la cartella di upload
-UPLOAD_FOLDER = 'static/uploads'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+    except Exception as e:
+        print(f"Errore durante il salvataggio della pagina: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
 
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# Funzione per verificare che il file abbia un'estensione valida
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-# Funzione per salvare le immagini base64
+# Funzione per salvare un'immagine base64 generica ---------------------------------------------------------------
 def save_base64_image(base64_image):
     try:
-        # Decodifica l'immagine Base64
         header, encoded = base64_image.split(",", 1)
         binary_data = base64.b64decode(encoded)
 
-        # Genera un nome file univoco usando UUID
         unique_filename = f"{uuid.uuid4().hex}.png"
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
 
-        # Salva l'immagine sul server
         with open(file_path, "wb") as f:
             f.write(binary_data)
 
-        # Restituisce l'URL dell'immagine salvata
         return f"/static/uploads/{unique_filename}"
     except Exception as e:
         print(f"Errore durante il salvataggio dell'immagine: {str(e)}")
         return None
 
-# Endpoint Flask per gestire l'upload delle immagini
+# Endpoint Flask per gestire l'upload delle immagini generiche -------------------------------------------------------
 @app.route('/upload-image', methods=['POST'])
 def upload_image():
     data = request.get_json()
-
-    # Riceve l'immagine in base64
     base64_image = data.get('image')
 
     if not base64_image:
         return jsonify({'error': 'No image provided'}), 400
-
-    # Salva l'immagine
     image_url = save_base64_image(base64_image)
 
     if image_url:
         return jsonify({'url': image_url}), 200
     else:
         return jsonify({'error': 'Failed to upload image'}), 500
+    
+# Upload SEO -------------------------------------------------------
 
+# Funzione per salvare i dati SEO della pagina
 @app.route('/admin/cms/function/save-seo', methods=['POST'])
 def save_seo_page():
     data = request.get_json()
@@ -469,13 +468,17 @@ def save_seo_page():
     keywords = data.get('keywords')
     slug = data.get('slug')
 
-    db_conn = get_db_connection()  # Ottieni la connessione al DB
-    page_model = Page(db_conn)  # Passa la connessione al modello
+    shop_subdomain = request.host.split('.')[0]  
 
-    success = page_model.update_page_seo(page_id, title, description, keywords, slug)
+    db_conn = get_db_connection()  
+    page_model = Page(db_conn)  
+
+    success = page_model.update_page_seo(page_id, title, description, keywords, slug, shop_name=shop_subdomain)
 
     return jsonify({'success': success})
 
+
+# Funzione per creare una nuova pagina per un negozio specifico
 @app.route('/admin/cms/function/create', methods=['POST'])
 def create_page():
     if 'user_id' not in session:
@@ -493,24 +496,29 @@ def create_page():
         language = data.get('language')
         published = data.get('published')
 
-        db_conn = get_db_connection()  # Ottieni la connessione al DB
-        page_model = Page(db_conn)  # Passa la connessione al modello
+        shop_subdomain = request.host.split('.')[0]  
 
-        success = page_model.create_page(title, description, keywords, slug, content, theme_name, paid, language, published)
+        db_conn = get_db_connection()
+        page_model = Page(db_conn)  
+
+        success = page_model.create_page(title, description, keywords, slug, content, theme_name, paid, language, published, shop_name=shop_subdomain)
 
         return jsonify({'success': success})
     
+
+# Funzione per eliminare una pagina di un negozio specifico
 @app.route('/admin/cms/function/delete', methods=['POST'])
 def delete_page():
-    data = request.get_json()  # Riceve i dati dal frontend
-    page_id = data.get('id')  # Estrae l'ID della pagina
+    data = request.get_json()
+    page_id = data.get('id')  
 
     if not page_id:
         return jsonify({'success': False, 'message': 'ID pagina mancante.'})
+    shop_subdomain = request.host.split('.')[0]  
 
-    page_model = Page(get_db_connection())  # Usa la connessione al database
+    page_model = Page(get_db_connection())  
     try:
-        page_model.delete_page(page_id)  # Cancella la pagina
+        page_model.delete_page(page_id, shop_name=shop_subdomain)  
         return jsonify({'success': True, 'message': 'Pagina cancellata con successo.'})
     except Exception as e:
         return jsonify({'success': False, 'message': f"Errore durante la cancellazione: {str(e)}"})
@@ -521,7 +529,6 @@ def delete_page():
 @app.route('/capture-screenshot', methods=['POST'])
 def capture_screenshot_route():
     try:
-        # Il plugin esegue il software 
         capture_screenshot('http://127.0.0.1:5000/', 'static/images/screenshot_result.png')
         return jsonify({'success': True}), 200
     except Exception as e:

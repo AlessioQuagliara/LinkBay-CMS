@@ -61,18 +61,32 @@
     }
 }
 /* PERSONALIZZAZIONE GRAPESJS */
-.gjs-cv-canvas {
-    background-color: #f0f0f0; 
-}
-.gjs-block {
-    border-radius: 8px; 
-}
-.gjs-pn-commands {
-    background-color: #343a40; 
-}
-.gjs-pn-buttons .gjs-pn-btn {
-    color: #fff; 
-}
+#gjs {
+    border: none;
+  }
+  /* Theming */
+  
+  /* Primary color for the background */
+  .gjs-one-bg {
+    background-color: #343a40 !important;
+  }
+  
+  /* Secondary color for the text color */
+  .gjs-two-color {
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
+  
+  /* Tertiary color for the background */
+  .gjs-three-bg {
+    background-color: #d93444 !important;
+    color: white !important;
+  }
+  
+  /* Quaternary color for the text color */
+  .gjs-four-color,
+  .gjs-four-color-h:hover {
+    color: #d93444 !important;
+  }
 
 /* PERSONALIZZAZIONE CHIP */
 .chip {
@@ -108,4 +122,3 @@
     margin-left: 2px;
     margin-right: 2px;
 }
-

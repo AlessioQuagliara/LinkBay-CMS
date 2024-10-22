@@ -99,24 +99,25 @@ class WebSettings:
     def __init__(self, db_conn):
         self.conn = db_conn
 
-    # Metodo per ottenere le impostazioni web 
-    def get_web_settings(self):
+    # Metodo per ottenere le impostazioni web di un negozio specifico
+    def get_web_settings(self, shop_name):
         cursor = self.conn.cursor(dictionary=True)
-        query = """SELECT * FROM web_settings"""
-        cursor.execute(query)
-        web_settings = cursor.fetchone()  # Assuming only one row in web_settings
+        query = """SELECT * FROM web_settings WHERE shop_name = %s"""
+        cursor.execute(query, (shop_name,))
+        web_settings = cursor.fetchone()  # Ottieni le impostazioni specifiche per il negozio
         cursor.close()
         return web_settings
 
-    # Metodo per aggiornare head, foot e script nella tabella web_settings
-    def update_web_settings(self, head_content, script_content, foot_content):
+    # Metodo per aggiornare head, foot e script nella tabella web_settings per un negozio specifico
+    def update_web_settings(self, shop_name, head_content, script_content, foot_content):
         cursor = self.conn.cursor()
         try:
             query = """
                 UPDATE web_settings 
                 SET head = %s, script = %s, foot = %s
-                """
-            cursor.execute(query, (head_content, script_content, foot_content))
+                WHERE shop_name = %s
+            """
+            cursor.execute(query, (head_content, script_content, foot_content, shop_name))
             self.conn.commit()
             cursor.close()
             return True
@@ -126,60 +127,53 @@ class WebSettings:
             cursor.close()
             return False
 
-
-# Classe per Pages ---------------------------------------------------------------------------------------------------
+# Classe per PAGES --------------------------------------------------------------------------------------------
 
 class Page:
     def __init__(self, db_conn):
         self.conn = db_conn
 
-    # Ottieni tutte le pagine
-    def get_all_pages(self):
+    # Ottieni tutte le pagine per un negozio specifico
+    def get_all_pages(self, shop_name):
         cursor = self.conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM pages")
+        cursor.execute("SELECT * FROM pages WHERE shop_name = %s", (shop_name,))
         pages = cursor.fetchall()
         cursor.close()
         return pages
     
-    # Ottieni le inclusioni navbar e footer
-    def get_navbar(self):
+    # Ottieni le inclusioni navbar per un negozio specifico
+    def get_navbar(self, shop_name):
         cursor = self.conn.cursor(dictionary=True)
-        cursor.execute("SELECT content FROM pages WHERE slug = 'navbar'")
+        cursor.execute("SELECT content FROM pages WHERE slug = 'navbar' AND shop_name = %s", (shop_name,))
         page = cursor.fetchone()
         cursor.close()
-        if page:
-            return page['content']
-        else:
-            return ''
+        return page['content'] if page else ''
 
-    def get_footer(self):
+    # Ottieni il footer per un negozio specifico
+    def get_footer(self, shop_name):
         cursor = self.conn.cursor(dictionary=True)
-        cursor.execute("SELECT content FROM pages WHERE slug = 'footer'")
+        cursor.execute("SELECT content FROM pages WHERE slug = 'footer' AND shop_name = %s", (shop_name,))
         page = cursor.fetchone()
         cursor.close()
-        if page:
-            return page['content']
-        else:
-            return ''
+        return page['content'] if page else ''
         
-        
-    # Ottieni una pagina per slug
-    def get_page_by_slug(self, slug):
+    # Ottieni una pagina per slug e negozio
+    def get_page_by_slug(self, slug, shop_name):
         cursor = self.conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM pages WHERE slug = %s", (slug,))
+        cursor.execute("SELECT * FROM pages WHERE slug = %s AND shop_name = %s", (slug, shop_name))
         page = cursor.fetchone()
         cursor.close()
         return page
 
-    # Crea una nuova pagina
-    def create_page(self, title, description, keywords, slug, content, theme_name, paid, language, published):
+    # Crea una nuova pagina per un negozio specifico
+    def create_page(self, title, description, keywords, slug, content, theme_name, paid, language, published, shop_name):
         cursor = self.conn.cursor()
         try:
             cursor.execute(
                 """INSERT INTO pages 
-                (title, description, keywords, slug, content, theme_name, paid, language, published, created_at, updated_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())""",
-                (title, description, keywords, slug, content, theme_name, paid, language, published)
+                (title, description, keywords, slug, content, theme_name, paid, language, published, shop_name, created_at, updated_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())""",
+                (title, description, keywords, slug, content, theme_name, paid, language, published, shop_name)
             )
             self.conn.commit()
             cursor.close()
@@ -190,15 +184,15 @@ class Page:
             cursor.close()
             return False
 
-    # Aggiorna il contenuto della pagina
-    def update_page_content(self, page_id, content):
+    # Aggiorna il contenuto della pagina per un negozio specifico
+    def update_page_content(self, page_id, content, shop_name):
         cursor = self.conn.cursor()
         try:
             cursor.execute(
                 """UPDATE pages 
                 SET content = %s, updated_at = NOW() 
-                WHERE id = %s""",
-                (content, page_id)
+                WHERE id = %s AND shop_name = %s""",
+                (content, page_id, shop_name)
             )
             self.conn.commit()
             cursor.close()
@@ -209,34 +203,15 @@ class Page:
             cursor.close()
             return False
         
-    def update_page_code_content(self, page_id, content):
-        cursor = self.conn.cursor()
-        try:
-            print(f"Salvataggio del contenuto per la pagina {page_id} nel database...")  # Log per debug
-            cursor.execute(
-                """UPDATE pages 
-                SET content = %s, updated_at = NOW() 
-                WHERE slug = %s""",  # Nota: se usi 'slug', assicurati di passare il parametro corretto
-                (content, page_id)  # Passa 'slug' come page_id se slug è utilizzato per identificare la pagina
-            )
-            self.conn.commit()
-            cursor.close()
-            return True
-        except Exception as e:
-            self.conn.rollback()
-            print(f"Error updating page content: {e}")
-            cursor.close()
-            return False
-
-    # Aggiorna i metadati SEO di una pagina
-    def update_page_seo(self, page_id, title, description, keywords, slug):
+    # Aggiorna i metadati SEO di una pagina per un negozio specifico
+    def update_page_seo(self, page_id, title, description, keywords, slug, shop_name):
         cursor = self.conn.cursor()
         try:
             cursor.execute(
                 """UPDATE pages 
                 SET title = %s, description = %s, keywords = %s, slug = %s, updated_at = NOW() 
-                WHERE id = %s""",
-                (title, description, keywords, slug, page_id)
+                WHERE id = %s AND shop_name = %s""",
+                (title, description, keywords, slug, page_id, shop_name)
             )
             self.conn.commit()
             cursor.close()
@@ -247,11 +222,11 @@ class Page:
             cursor.close()
             return False
 
-    # Elimina una pagina
-    def delete_page(self, page_id):
+    # Elimina una pagina per un negozio specifico
+    def delete_page(self, page_id, shop_name):
         cursor = self.conn.cursor()
         try:
-            cursor.execute("DELETE FROM pages WHERE id = %s", (page_id,))
+            cursor.execute("DELETE FROM pages WHERE id = %s AND shop_name = %s", (page_id, shop_name))
             self.conn.commit()
             cursor.close()
             return True
@@ -261,14 +236,15 @@ class Page:
             cursor.close()
             return False
         
-    def update_page_content_by_slug(self, slug, content):
+    # Aggiorna il contenuto della pagina per slug e negozio
+    def update_page_content_by_slug(self, slug, content, shop_name):
         cursor = self.conn.cursor()
         try:
             cursor.execute(
                 """UPDATE pages 
                 SET content = %s, updated_at = NOW() 
-                WHERE slug = %s""",
-                (content, slug)
+                WHERE slug = %s AND shop_name = %s""",
+                (content, slug, shop_name)
             )
             self.conn.commit()
             cursor.close()
@@ -278,8 +254,6 @@ class Page:
             print(f"Error updating page content: {e}")
             cursor.close()
             return False
-
-
 
 
 
