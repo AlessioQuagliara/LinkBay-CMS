@@ -45,6 +45,14 @@ def signin():
 
     return render_template('/admin/sign-in.html', title='LinkBay - Sign-in')
 
+# Middleware per il debug delle sessioni
+@app.before_request
+def log_session_info():
+    print(f"Request path: {request.path}")
+    print(f"Session data: {session}")
+    print(f"Cookies: {request.cookies}")
+
+# Funzione di login
 @app.route('/admin/', methods=['GET', 'POST'])
 @app.route('/admin/login', methods=['GET', 'POST'])
 def login():
@@ -60,11 +68,13 @@ def login():
 
         if user and check_password_hash(user['password'], password):
             session['user_id'] = user['id']
-            session['username'] = user['nome']  # Usa 'nome' invece di 'name'
-            session['surname'] = user['cognome']  # Usa 'cognome' invece di 'surname'
+            session['username'] = user['nome']
+            session['surname'] = user['cognome']
             session['email'] = user['email']
-            session['phone'] = user['telefono']  # Aggiungi numero di telefono alla sessione
-            session['profile_photo'] = user['profilo_foto']  # Aggiungi foto profilo alla sessione
+            session['phone'] = user['telefono']
+            session['profile_photo'] = user['profilo_foto']
+
+            print(f"Session after login: {session}")
 
             # Gestione del 2FA (autenticazione a due fattori)
             if user['is_2fa_enabled']:
@@ -78,6 +88,7 @@ def login():
 
     return render_template('admin/login.html', title='Login')
 
+
 @app.route('/admin/logout')
 def logout():
     session.pop('user_id', None)
@@ -89,11 +100,13 @@ def restore():
     return render_template('/admin/restore.html', title='LinkBay - Restore')
 
 
-# Controllo autenticazione (helper function)
+# Verifica autenticazione utente
 def check_user_authentication():
     if 'user_id' not in session:
         flash('You need to log in first.', 'danger')
         return redirect(url_for('login'))
+    
+    print(f"User authenticated: {session.get('username')}")
     return session['username']
 
 # CMS Routes -------------------------------------------------------------------------
@@ -105,9 +118,11 @@ def render_interface():
         return render_template('admin/cms/interface/render.html', title='CMS Interface', username=username)
     return username  
 
+# Rotta per la homepage del CMS
 @app.route('/admin/cms/pages/homepage')
 def homepage():
     username = check_user_authentication()
+    print(f"Session in homepage: {session}")
     if isinstance(username, str):
         return render_template('admin/cms/pages/home.html', title='HomePage', username=username)
     return username
