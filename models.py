@@ -133,6 +133,14 @@ class Page:
     def __init__(self, db_conn):
         self.conn = db_conn
 
+    #Ottieni le pagine per id
+    def get_page_by_id_and_slug(self, page_id, slug, shop_name):
+        cursor = self.conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM pages WHERE id = %s AND slug = %s AND shop_name = %s", (page_id, slug, shop_name))
+        page = cursor.fetchone()
+        cursor.close()
+        return page
+
     # Ottieni tutte le pagine per un negozio specifico
     def get_all_pages(self, shop_name):
         cursor = self.conn.cursor(dictionary=True)
@@ -184,7 +192,7 @@ class Page:
             cursor.close()
             return False
 
-    # Aggiorna il contenuto della pagina per un negozio specifico
+#    # Aggiorna il contenuto della pagina per un negozio specifico
     def update_page_content(self, page_id, content, shop_name):
         cursor = self.conn.cursor()
         try:
@@ -202,6 +210,7 @@ class Page:
             print(f"Error updating page content: {e}")
             cursor.close()
             return False
+
         
     # Aggiorna i metadati SEO di una pagina per un negozio specifico
     def update_page_seo(self, page_id, title, description, keywords, slug, shop_name):
@@ -255,7 +264,76 @@ class Page:
             cursor.close()
             return False
 
-
-
-
-    
+# Questa funzione recupera la traduzione di una pagina in base alla lingua e al page_id.
+    def get_translation(self, page_id, language):
+        cursor = self.conn.cursor(dictionary=True)
+        query = """
+        SELECT translated_title, translated_description, translated_keywords, translated_content 
+        FROM translated_content 
+        WHERE page_id = %s AND language = %s
+        """
+        cursor.execute(query, (page_id, language))
+        translation = cursor.fetchone()
+        cursor.close()
+        return translation    
+# Questa funzione ti permette di inserire una nuova traduzione per una pagina.
+    def create_translation(self, page_id, language, title, description, keywords, content):
+        cursor = self.conn.cursor()
+        try:
+            query = """
+            INSERT INTO translated_content (page_id, language, translated_title, translated_description, translated_keywords, translated_content, created_at, updated_at)
+            VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW())
+            """
+            cursor.execute(query, (page_id, language, title, description, keywords, content))
+            self.conn.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error creating translation: {e}")
+            cursor.close()
+            return False
+# Questa funzione aggiorna i campi di una traduzione già esistente.
+    def update_translation(self, page_id, language, title, description, keywords, content):
+        cursor = self.conn.cursor()
+        try:
+            query = """
+            UPDATE translated_content 
+            SET translated_title = %s, translated_description = %s, translated_keywords = %s, translated_content = %s, updated_at = NOW()
+            WHERE page_id = %s AND language = %s
+            """
+            cursor.execute(query, (title, description, keywords, content, page_id, language))
+            self.conn.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error updating translation: {e}")
+            cursor.close()
+            return False
+# Questa funzione ti permette di eliminare una traduzione specifica per una pagina.
+    def delete_translation(self, page_id, language):
+        cursor = self.conn.cursor()
+        try:
+            query = "DELETE FROM translated_content WHERE page_id = %s AND language = %s"
+            cursor.execute(query, (page_id, language))
+            self.conn.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error deleting translation: {e}")
+            cursor.close()
+            return False
+# questa funzione recupera tutte le traduzioni di una pagina per mostrarle, ad esempio, in un’interfaccia di gestione.
+    def get_all_translations(self, page_id):
+        cursor = self.conn.cursor(dictionary=True)
+        query = """
+        SELECT language, translated_title, translated_description, translated_keywords, translated_content 
+        FROM translated_content 
+        WHERE page_id = %s
+        """
+        cursor.execute(query, (page_id,))
+        translations = cursor.fetchall()
+        cursor.close()
+        return translations

@@ -7,17 +7,37 @@
     {% include 'admin/cms/heading/admin_head.html' %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/editor.css') }}">
     
-    <!-- Includi CodeMirror CSS e tema "material" -->
+    <!-- CodeMirror CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/material.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/fold/foldgutter.min.css">
+    
+    <!-- CodeMirror JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/xml/xml.min.js"></script>
+    
+    <!-- Addons -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/edit/closetag.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/edit/matchtags.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/fold/foldcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/fold/foldgutter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/fold/brace-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/fold/xml-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/selection/active-line.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/search/match-highlighter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/keymap/vim.min.js"></script>
     
     <style>
         /* Layout per l'editor */
         .CodeMirror {
             min-height: 720px;
+        }
+        /* Applica white-space per preservare gli spazi e i ritorni a capo */
+        .code-editor {
+            white-space: pre-wrap !important;
         }
     </style>
 </head>
@@ -35,7 +55,7 @@
         <div class="content" style="padding: 0 !important;">
             <!-- Form per salvare il contenuto -->
             <form method="POST" action="/admin/cms/function/save_code" id="editor-form">
-                <textarea id="code-editor">{{ content }}</textarea>  <!-- Textarea per CodeMirror -->
+                <textarea id="code-editor" class="code-editor">{{ content }}</textarea>  <!-- Textarea per CodeMirror -->
                 <input type="hidden" id="content" name="content">  <!-- Questo viene aggiornato da JavaScript -->
             </form>
         </div>
@@ -46,9 +66,18 @@
         document.addEventListener('DOMContentLoaded', function () {
             var editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
                 mode: 'htmlmixed',
-                theme: 'material',  
+                theme: 'material',
                 lineNumbers: true,
-                autoCloseTags: true
+                autoCloseTags: true,
+                matchBrackets: true,
+                autofocus: true,
+                foldGutter: true,
+                gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                matchTags: {bothTags: true},
+                styleActiveLine: true,
+                highlightSelectionMatches: {showToken: /\w/},
+                lineWrapping: true,  // Assicurati di includere il keymap Vim
+                lint: true  // Se usi lint, assicurati di avere l'addon per il linting
             });
 
             // Associa l'evento di click al pulsante di salvataggio esterno

@@ -344,6 +344,7 @@ def editor_interface(slug=None):
                                username=username)
     return username  
 
+
 @app.route('/admin/cms/function/edit/<slug>')
 def edit_page(slug):
     username = check_user_authentication()
@@ -372,9 +373,9 @@ def edit_page(slug):
     
     return username  
 
-# SALVATAGGIO IMMAGINI ----------------------------------------------------------------------------------------
-
+# SALVATAGGIO PAGINA CON CARICAMENTO IMMAGINI ----------------------------------------------------------------------------------------
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -382,13 +383,17 @@ def save_image(base64_image, page_id, shop_subdomain):
     try:
         header, encoded = base64_image.split(",", 1)
         binary_data = base64.b64decode(encoded)
+
+        # Creazione della cartella per il negozio specifico
         upload_folder = f"static/uploads/{shop_subdomain}"
         if not os.path.exists(upload_folder):
             os.makedirs(upload_folder)  
 
-        image_name = f"{page_id}_{secure_filename('uploaded_image.png')}"
+        # Nome univoco per ogni immagine, ad esempio usando un UUID
+        image_name = f"{page_id}_{uuid.uuid4().hex}.png"
         image_path = os.path.join(upload_folder, image_name)
 
+        # Salva l'immagine
         with open(image_path, "wb") as f:
             f.write(binary_data)
 
@@ -405,18 +410,22 @@ def save_page():
         page_id = data.get('id')
         content = data.get('content')
         shop_subdomain = request.host.split('.')[0]
-        
+
         print(f"Salvataggio pagina con ID: {page_id} per il negozio: {shop_subdomain}")
         
         db_conn = get_db_connection()  
         page_model = Page(db_conn)  
         
+        # Cerca immagini base64 nel contenuto
         img_tags = re.findall(r'<img.*?src=["\'](data:image/[^"\']+)["\']', content)
         for base64_img in img_tags:
+            # Salva l'immagine base64
             image_url = save_image(base64_img, page_id, shop_subdomain)
             if image_url:
+                # Sostituisci l'immagine base64 con l'URL dell'immagine salvata
                 content = content.replace(base64_img, image_url)
         
+        # Aggiorna il contenuto della pagina nel database
         success = page_model.update_page_content(page_id, content, shop_subdomain)
         return jsonify({'success': success})
     
@@ -430,9 +439,11 @@ def save_base64_image(base64_image):
         header, encoded = base64_image.split(",", 1)
         binary_data = base64.b64decode(encoded)
 
+        # Genera un nome file unico usando UUID
         unique_filename = f"{uuid.uuid4().hex}.png"
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
 
+        # Salva il file sul server
         with open(file_path, "wb") as f:
             f.write(binary_data)
 
@@ -449,8 +460,9 @@ def upload_image():
 
     if not base64_image:
         return jsonify({'error': 'No image provided'}), 400
-    image_url = save_base64_image(base64_image)
 
+    image_url = save_base64_image(base64_image)
+    
     if image_url:
         return jsonify({'url': image_url}), 200
     else:
