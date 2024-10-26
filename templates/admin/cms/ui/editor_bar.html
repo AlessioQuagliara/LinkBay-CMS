@@ -34,6 +34,18 @@
                     <i class="fa-solid fa-eye"></i>&nbsp; View Online
                 </a>
             </li>
+            <hr>
+            <li class="nav-item">
+                <p class="nav-link text-white">
+                    Select language
+                </p>
+                <select id="language-selector" class="form-select">
+                    <option value="en" {% if page.language == 'en' %}selected{% endif %}>English</option>
+                    <option value="it" {% if page.language == 'it' %}selected{% endif %}>Italian</option>
+                    <option value="fr" {% if page.language == 'fr' %}selected{% endif %}>French</option>
+                    <option value="de" {% if page.language == 'de' %}selected{% endif %}>German</option>
+                </select>
+            </li>
             {% endif %}
             {% if page.slug in ['home', 'about-us', 'catalogs', 'products', 'navbar', 'footer' ] %}
             {% else %}

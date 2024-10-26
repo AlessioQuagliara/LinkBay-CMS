@@ -361,9 +361,11 @@ def edit_page(slug):
             flash('Nessun negozio selezionato o negozio non trovato.', 'danger')
             return redirect(url_for('homepage'))
 
+        # Recupera la lingua selezionata
+        language = request.args.get('language', 'en')  # Default "en" se non è specificata
 
         page_model = Page(db_conn)
-        page = page_model.get_page_by_slug(slug, shop_subdomain)  
+        page = page_model.get_page_by_slug_and_language(slug, language, shop_subdomain)  
 
         if not page:
             flash('Pagina non trovata.', 'danger')
@@ -371,7 +373,7 @@ def edit_page(slug):
 
         return render_template('admin/cms/function/edit.html', title='Edit Page', page=page, username=username)
     
-    return username  
+    return username
 
 # SALVATAGGIO PAGINA CON CARICAMENTO IMMAGINI ----------------------------------------------------------------------------------------
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -409,9 +411,10 @@ def save_page():
         data = request.get_json()
         page_id = data.get('id')
         content = data.get('content')
+        language = data.get('language')  # Aggiungiamo il parametro lingua
         shop_subdomain = request.host.split('.')[0]
 
-        print(f"Salvataggio pagina con ID: {page_id} per il negozio: {shop_subdomain}")
+        print(f"Salvataggio pagina con ID: {page_id}, lingua: {language} per il negozio: {shop_subdomain}")
         
         db_conn = get_db_connection()  
         page_model = Page(db_conn)  
@@ -425,8 +428,8 @@ def save_page():
                 # Sostituisci l'immagine base64 con l'URL dell'immagine salvata
                 content = content.replace(base64_img, image_url)
         
-        # Aggiorna il contenuto della pagina nel database
-        success = page_model.update_page_content(page_id, content, shop_subdomain)
+        # Aggiorna il contenuto della pagina nel database con la lingua specifica
+        success = page_model.update_or_create_page_content(page_id, content, language, shop_subdomain)
         return jsonify({'success': success})
     
     except Exception as e:
