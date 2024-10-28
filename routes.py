@@ -5,7 +5,8 @@ from models import User, ShopList, Page, WebSettings
 from app import app, get_db_connection, get_auth_db_connection
 from datetime import datetime
 from creators import capture_screenshot
-import base64, os, uuid, re
+import base64, os, uuid, re, mysql.connector
+
 
 # Se non trova la pagina va in 404 ------------------------------------------------------
 @app.errorhandler(404)
@@ -157,35 +158,46 @@ def online_content():
     
     if isinstance(username, str):
         shop_subdomain = request.host.split('.')[0]  
+        print(f"Subdomain: {shop_subdomain}")  # Log del subdominio
 
-        with get_auth_db_connection() as auth_db_conn:
-            shoplist_model = ShopList(auth_db_conn)
-            shop = shoplist_model.get_shop_by_name(shop_subdomain)  
+        try:
+            with get_auth_db_connection() as auth_db_conn:
+                shoplist_model = ShopList(auth_db_conn)
+                shop = shoplist_model.get_shop_by_name(shop_subdomain)
 
-        if shop:
-            with get_db_connection() as db_conn:
-                page_model = Page(db_conn)
-                page_slug = 'home'
-                page = page_model.get_page_by_slug(page_slug, shop_subdomain) 
+            if shop:
+                print(f"Shop trovato: {shop}")  # Log per il negozio
 
-            if page:
-                updated_at = page['updated_at']
-                now = datetime.now()
-                minutes_ago = (now - updated_at).total_seconds() // 60  
+                with get_db_connection() as db_conn:
+                    page_model = Page(db_conn)
+                    page_slug = 'home'
+                    # Esegui la query e leggi il risultato
+                    page = page_model.get_page_by_slug(page_slug, shop_subdomain)
 
-                return render_template(
-                    'admin/cms/pages/content.html', 
-                    title='Online Content', 
-                    username=username, 
-                    page=page,
-                    shop=shop,
-                    minutes_ago=int(minutes_ago)  
-                )
+                    if page:
+                        updated_at = page['updated_at']
+                        now = datetime.now()
+                        minutes_ago = (now - updated_at).total_seconds() // 60  
+                        return render_template(
+                            'admin/cms/pages/content.html', 
+                            title='Online Content', 
+                            username=username, 
+                            page=page,
+                            shop=shop,
+                            minutes_ago=int(minutes_ago)  
+                        )
+                    else:
+                        flash('Contenuto della pagina non trovato.')
+                        return redirect(url_for('homepage'))
+
             else:
-                flash('Contenuto della pagina non trovato.')
+                print("Nessun negozio trovato.")  # Log per negozio non trovato
+                flash('Nessun negozio trovato per questo nome.')
                 return redirect(url_for('homepage'))
-        else:
-            flash('Nessun negozio trovato per questo nome.')
+
+        except mysql.connector.Error as e:
+            print(f"Errore nel database: {str(e)}")  # Log del messaggio di errore
+            flash('Errore durante l\'accesso ai dati del negozio o della pagina.')
             return redirect(url_for('homepage'))
     
     return username

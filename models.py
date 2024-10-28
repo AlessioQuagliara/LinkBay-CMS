@@ -160,9 +160,15 @@ class Page:
     # Ottieni una pagina per slug e negozio
     def get_page_by_slug(self, slug, shop_name):
         cursor = self.conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM pages WHERE slug = %s AND shop_name = %s", (slug, shop_name))
-        page = cursor.fetchone()
-        cursor.close()
+        try:
+            cursor.execute("SELECT * FROM pages WHERE slug = %s AND shop_name = %s", (slug, shop_name))
+            page = cursor.fetchone()
+        except Exception as e:
+            print(f"Errore durante il recupero della pagina: {e}")
+            page = None
+        finally:
+            cursor.close()
+        
         return page
 
     # Crea una nuova pagina per un negozio specifico
@@ -259,20 +265,26 @@ class Page:
     # ottieni la pagina tradotta
     def get_page_by_slug_and_language(self, slug, language, shop_name):
         cursor = self.conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM pages WHERE slug = %s AND language = %s AND shop_name = %s", 
-                    (slug, language, shop_name))
-        page = cursor.fetchone()
-        cursor.close()
+        try:
+            cursor.execute("SELECT * FROM pages WHERE slug = %s AND language = %s AND shop_name = %s", 
+                        (slug, language, shop_name))
+            page = cursor.fetchone()
+        except Exception as e:
+            print(f"Error fetching translated page: {e}")
+            page = None
+        finally:
+            cursor.close()
         return page
     
+    # Crea la pagina tradotta nel caso non ci sia
     def update_or_create_page_content(self, page_id, content, language, shop_name):
         cursor = self.conn.cursor()
         try:
             # Verifica se esiste già una pagina con lo stesso ID e lingua
             cursor.execute("SELECT id FROM pages WHERE id = %s AND language = %s AND shop_name = %s", 
-                           (page_id, language, shop_name))
+                        (page_id, language, shop_name))
             existing_page = cursor.fetchone()
-            
+
             if existing_page:
                 # Se esiste, aggiornala
                 cursor.execute(
@@ -290,10 +302,10 @@ class Page:
                 )
 
             self.conn.commit()
-            cursor.close()
             return True
         except Exception as e:
             self.conn.rollback()
             print(f"Error updating or creating page content: {e}")
-            cursor.close()
             return False
+        finally:
+            cursor.close()
