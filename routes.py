@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, request, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from models import User, ShopList, Page, WebSettings
+from models import User, ShopList, Page, WebSettings, CookiePolicy
 from app import app, get_db_connection, get_auth_db_connection
 from datetime import datetime
 from creators import capture_screenshot
@@ -569,3 +569,55 @@ def store_components():
     if isinstance(username, str):
         return render_template('admin/cms/store-components/shop_page.html', title='UI Kit', username=username)
     return username
+
+@app.route('/admin/cms/function/cookie-policy', methods=['GET', 'POST'])
+def cookie_setting():
+    username = check_user_authentication()
+    if not isinstance(username, str):
+        return username
+
+    shop_name = request.host.split('.')[0] 
+
+    with get_db_connection() as db_conn:
+        cookie_model = CookiePolicy(db_conn)
+
+        if request.method == 'POST':
+            # Prendi i dati dal form
+            text_content = request.form.get('text_content')
+            button_text = request.form.get('button_text')
+            background_color = request.form.get('background_color')
+            button_color = request.form.get('button_color')
+            text_color = request.form.get('text_color')
+            use_third_party = request.form.get('use_third_party') == 'on'
+            third_party_script = request.form.get('third_party_script')
+
+            # Controlla se esiste già una configurazione per questo negozio
+            existing_setting = cookie_model.get_policy_by_shop(shop_name)
+
+            # Aggiorna o crea la configurazione
+            if existing_setting:
+                success = cookie_model.update_policy(shop_name, text_content, button_text, 
+                                                     background_color, button_color, text_color, 
+                                                     use_third_party, third_party_script)
+            else:
+                success = cookie_model.create_policy(shop_name, text_content, button_text, 
+                                                     background_color, button_color, text_color, 
+                                                     use_third_party, third_party_script)
+
+            if success:
+                flash('Cookie settings updated successfully!', 'success')
+            else:
+                flash('Error updating cookie settings.', 'danger')
+            
+            return redirect(url_for('cookie_setting'))
+
+        else:
+            # Recupera le impostazioni esistenti, se presenti
+            cookie_settings = cookie_model.get_policy_by_shop(shop_name)
+
+            return render_template(
+                'admin/cms/function/cookie-policy.html',
+                title='Cookie Bar Settings',
+                username=username,
+                cookie_settings=cookie_settings 
+            )

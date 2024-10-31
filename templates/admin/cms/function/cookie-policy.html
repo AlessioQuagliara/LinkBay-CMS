@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkBay - {{ title }}</title>
+    {% include 'admin/cms/heading/admin_head.html' %}
+    <style>
+        /* Sidebar and general styling */
+        .sidebar {
+            width: 280px;
+            background-color: #343a40;
+            color: white;
+            padding: 15px;
+            height: 100vh;
+            position: fixed;
+            transition: transform 0.3s ease;
+        }
+        .content {
+            margin-left: 280px;
+            padding: 20px;
+            flex-grow: 1;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                left: -280px;
+                top: 0;
+                height: 100%;
+                z-index: 1000;
+                transition: left 0.3s;
+            }
+            .sidebar.show {
+                left: 0;
+            }
+            .content {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+
+        /* Cookie preview and settings styling */
+        .cookie-preview {
+            background-color: var(--background-color, #343a40);
+            color: var(--text-color, white);
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .cookie-preview button {
+            background-color: var(--button-color, #ff5757);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark d-md-none" style="background-color: #343a40;">
+        <img src="../../../../static/images/lb-logo-w.svg" width="200px" alt="Logo">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </nav>
+    <main class="d-flex">
+        {% include 'admin/cms/ui/sidebar.html' %}
+        <div class="content">
+            <h1 class="display-4">Cookie Bar Settings</h1>
+            
+            <!-- Form per le impostazioni del cookie banner -->
+            <form id="cookie-settings-form">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="text-content" class="form-label">Banner Text</label>
+                        <textarea id="text-content" class="form-control" name="text_content" rows="3">{{ cookie_settings.text_content }}</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="button-text" class="form-label">Button Text</label>
+                        <input type="text" id="button-text" class="form-control" name="button_text" value="{{ cookie_settings.button_text }}">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="background-color" class="form-label">Background Color</label>
+                        <input type="color" id="background-color" class="form-control" name="background_color" value="{{ cookie_settings.background_color }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="button-color" class="form-label">Button Color</label>
+                        <input type="color" id="button-color" class="form-control" name="button_color" value="{{ cookie_settings.button_color }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="text-color" class="form-label">Text Color</label>
+                        <input type="color" id="text-color" class="form-control" name="text_color" value="{{ cookie_settings.text_color }}">
+                    </div>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="use-third-party" name="use_third_party" {% if cookie_settings.use_third_party %}checked{% endif %}>
+                    <label for="use-third-party" class="form-check-label">Use Third-Party Cookie Solution</label>
+                </div>
+
+                <div class="mb-3" id="third-party-script-container" style="display: {% if cookie_settings.use_third_party %}block{% else %}none{% endif %};">
+                    <label for="third-party-script" class="form-label">Third-Party Script</label>
+                    <textarea id="third-party-script" class="form-control" name="third_party_script" rows="3">{{ cookie_settings.third_party_script }}</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Save Settings</button>
+            </form>
+
+            <!-- Anteprima del cookie banner -->
+            <div id="cookie-preview" class="cookie-preview mt-4">
+                <p id="preview-text">{{ cookie_settings.text_content }}</p>
+                <button id="preview-button">{{ cookie_settings.button_text }}</button>
+            </div>
+        </div>
+    </main>
+
+    {% include 'admin/cms/footing/admin_footing.html' %}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Aggiorna anteprima in tempo reale
+            const textContentInput = document.getElementById('text-content');
+            const buttonTextInput = document.getElementById('button-text');
+            const backgroundColorInput = document.getElementById('background-color');
+            const buttonColorInput = document.getElementById('button-color');
+            const textColorInput = document.getElementById('text-color');
+            const useThirdPartyCheckbox = document.getElementById('use-third-party');
+            const thirdPartyScriptContainer = document.getElementById('third-party-script-container');
+
+            const previewText = document.getElementById('preview-text');
+            const previewButton = document.getElementById('preview-button');
+            const cookiePreview = document.getElementById('cookie-preview');
+
+            // Event listeners per l'anteprima
+            textContentInput.addEventListener('input', () => previewText.innerText = textContentInput.value);
+            buttonTextInput.addEventListener('input', () => previewButton.innerText = buttonTextInput.value);
+            backgroundColorInput.addEventListener('input', () => cookiePreview.style.setProperty('--background-color', backgroundColorInput.value));
+            buttonColorInput.addEventListener('input', () => previewButton.style.backgroundColor = buttonColorInput.value);
+            textColorInput.addEventListener('input', () => cookiePreview.style.setProperty('--text-color', textColorInput.value));
+
+            useThirdPartyCheckbox.addEventListener('change', () => {
+                thirdPartyScriptContainer.style.display = useThirdPartyCheckbox.checked ? 'block' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

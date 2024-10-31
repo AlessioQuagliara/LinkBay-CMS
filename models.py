@@ -309,3 +309,63 @@ class Page:
             return False
         finally:
             cursor.close()
+
+
+# Classe per PAGES --------------------------------------------------------------------------------------------
+
+class CookiePolicy:
+    def __init__(self, db_conn):
+        self.conn = db_conn
+
+    # Metodo per ottenere le impostazioni del banner dei cookie per uno specifico negozio
+    def get_policy_by_shop(self, shop_name):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT * FROM cookie_policy WHERE shop_name = %s", (shop_name,))
+            policy = cursor.fetchone()
+        finally:
+            cursor.close()
+        return policy
+
+    # Metodo per aggiornare le impostazioni esistenti del banner dei cookie
+    def update_policy(self, shop_name, text_content, button_text, background_color, 
+                      button_color, text_color, use_third_party, third_party_script):
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute("""
+                UPDATE cookie_policy
+                SET text_content = %s, button_text = %s, background_color = %s, 
+                    button_color = %s, text_color = %s, use_third_party = %s, 
+                    third_party_script = %s, updated_at = NOW()
+                WHERE shop_name = %s
+            """, (text_content, button_text, background_color, button_color, text_color, 
+                  use_third_party, third_party_script, shop_name))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error updating cookie policy: {e}")
+            self.conn.rollback()
+            return False
+        finally:
+            cursor.close()
+
+    # Metodo per creare una nuova impostazione del banner dei cookie
+    def create_policy(self, shop_name, text_content, button_text, background_color, 
+                      button_color, text_color, use_third_party, third_party_script):
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute("""
+                INSERT INTO cookie_policy 
+                (shop_name, text_content, button_text, background_color, button_color, 
+                 text_color, use_third_party, third_party_script, created_at, updated_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+            """, (shop_name, text_content, button_text, background_color, button_color, 
+                  text_color, use_third_party, third_party_script))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error creating cookie policy: {e}")
+            self.conn.rollback()
+            return False
+        finally:
+            cursor.close()
