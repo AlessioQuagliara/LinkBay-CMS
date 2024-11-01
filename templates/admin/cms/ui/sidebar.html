@@ -2,8 +2,38 @@
     <a href="#" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
         <img src="../../../../static/images/lb-logo-w.svg" width="200px" alt="Logo">
     </a>
+    <style>
+        .nav-link {
+            transition: transform 0.3s ease; /* Durata e tipo di transizione */
+        }
+        
+        .nav-link:hover {
+            transform: scale(1.1); /* Ingrandisce l'elemento quando si passa sopra con il cursore */
+        }
+        .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+            color: whitesmoke !important;
+            background-color: #ff5757 !important;
+        }
+    </style>
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
+        {% if title in ['Cookie Bar Settings', 'Third-Party Cookie Settings'] %}
+        <li class="nav-item mb-2">
+            <a href="{{ url_for('online_content') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
+                <i class="fa-solid fa-arrow-left"></i>&nbsp; Back to Content
+            </a>
+        </li>
+        <li>
+            <a href="/admin/cms/function/cookie-policy" class="nav-link {% if title == 'Cookie Bar Settings' %}active{% endif %} text-white">
+                <i class="fa-solid fa-clipboard-list {% if title == 'Cookie Bar Settings' %}fa-bounce{% endif %}"></i>&nbsp; Cookie Policy
+            </a>
+        </li>
+        <li>
+            <a href="/admin/cms/function/cookie-policy-third-party" class="nav-link {% if title == 'Third-Party Cookie Settings' %}active{% endif %} text-white">
+                <i class="fa-solid fa-clipboard-list {% if title == 'Third-Party Cookie Settings' %}fa-bounce{% endif %}"></i>&nbsp; Integrations
+            </a>
+        </li>
+        {% else %}
         <li class="nav-item">
             <a href="{{ url_for('homepage') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
                 <i class="fa-solid fa-table-columns {% if title == 'HomePage' %}fa-bounce{% endif %}"></i>&nbsp; Home
@@ -44,9 +74,13 @@
                 <i class="fa-solid fa-truck {% if title == 'Shipping' %}fa-bounce{% endif %}"></i>&nbsp; Shipping
             </a>
         </li>
+        {% endif %}
     </ul>
     <hr>
     <div class="dropdown">
+    {% if title in ['Cookie Bar Settings', 'Third-Party Cookie Settings'] %}
+        <button id="save-content" type="submit" class="btn btn-danger w-100">Save</button>
+    {% else %}
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
         {% if not session['profile_photo'] or session['profile_photo'] == ' ' %}
             <img src="../../../../static/images/male_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
@@ -60,5 +94,6 @@
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
         </ul>
+    {% endif %}
     </div>
 </div>

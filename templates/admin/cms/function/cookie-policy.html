@@ -5,150 +5,212 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LinkBay - {{ title }}</title>
     {% include 'admin/cms/heading/admin_head.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
     <style>
-        /* Sidebar and general styling */
+        /* Stili generali */
+        body {
+            background-color: #f8f9fa;
+        }
         .sidebar {
-            width: 280px;
+            width: 250px;
             background-color: #343a40;
             color: white;
-            padding: 15px;
-            height: 100vh;
             position: fixed;
-            transition: transform 0.3s ease;
-        }
-        .content {
-            margin-left: 280px;
-            padding: 20px;
-            flex-grow: 1;
             height: 100vh;
-            overflow-y: auto;
+            padding: 15px;
         }
-        @media (max-width: 768px) {
-            .sidebar {
-                position: absolute;
-                left: -280px;
-                top: 0;
-                height: 100%;
-                z-index: 1000;
-                transition: left 0.3s;
-            }
-            .sidebar.show {
-                left: 0;
-            }
-            .content {
-                margin-left: 0;
-                padding: 20px;
-            }
+        .content-container {
+            margin-left: 250px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            height: 100vh;
         }
-
-        /* Cookie preview and settings styling */
+        .card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: white;
+        }
+        .preview-container, .settings-container {
+            padding: 60px;
+            width: 48%;
+        }
+        .preview-container {
+            background-image: url('../../../../static/images/template.png'); /* Sostituisci con URL dell'immagine */
+            background-size: cover;
+            position: relative;
+        }
         .cookie-preview {
             background-color: var(--background-color, #343a40);
-            color: var(--text-color, white);
-            border-radius: 5px;
+            color: var(--text-color, white); /* Aggiungi qui il colore del testo */
             padding: 20px;
+            border-radius: 5px;
+            position: absolute;
+            bottom: 10%;
+            left: 10%;
+            width: 80%;
             text-align: center;
-            margin-top: 20px;
         }
         .cookie-preview button {
             background-color: var(--button-color, #ff5757);
-            color: white;
+            color: var(--button-text-color, white);
             border: none;
             padding: 10px 20px;
             border-radius: 3px;
             cursor: pointer;
         }
+        .settings-container .form-label {
+            font-weight: bold;
+        }
+        .third-party-settings {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-dark d-md-none" style="background-color: #343a40;">
-        <img src="../../../../static/images/lb-logo-w.svg" width="200px" alt="Logo">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </nav>
-    <main class="d-flex">
-        {% include 'admin/cms/ui/sidebar.html' %}
-        <div class="content">
-            <h1 class="display-4">Cookie Bar Settings</h1>
-            
-            <!-- Form per le impostazioni del cookie banner -->
-            <form id="cookie-settings-form">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="text-content" class="form-label">Banner Text</label>
-                        <textarea id="text-content" class="form-control" name="text_content" rows="3">{{ cookie_settings.text_content }}</textarea>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="button-text" class="form-label">Button Text</label>
-                        <input type="text" id="button-text" class="form-control" name="button_text" value="{{ cookie_settings.button_text }}">
-                    </div>
-                </div>
+    <!-- Sidebar -->
+    {% include 'admin/cms/ui/sidebar.html' %}
 
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <label for="background-color" class="form-label">Background Color</label>
-                        <input type="color" id="background-color" class="form-control" name="background_color" value="{{ cookie_settings.background_color }}">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="button-color" class="form-label">Button Color</label>
-                        <input type="color" id="button-color" class="form-control" name="button_color" value="{{ cookie_settings.button_color }}">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="text-color" class="form-label">Text Color</label>
-                        <input type="color" id="text-color" class="form-control" name="text_color" value="{{ cookie_settings.text_color }}">
-                    </div>
-                </div>
-
-                <div class="form-check mb-3">
-                    <input type="checkbox" class="form-check-input" id="use-third-party" name="use_third_party" {% if cookie_settings.use_third_party %}checked{% endif %}>
-                    <label for="use-third-party" class="form-check-label">Use Third-Party Cookie Solution</label>
-                </div>
-
-                <div class="mb-3" id="third-party-script-container" style="display: {% if cookie_settings.use_third_party %}block{% else %}none{% endif %};">
-                    <label for="third-party-script" class="form-label">Third-Party Script</label>
-                    <textarea id="third-party-script" class="form-control" name="third_party_script" rows="3">{{ cookie_settings.third_party_script }}</textarea>
-                </div>
-
-                <button type="submit" class="btn btn-primary w-100">Save Settings</button>
-            </form>
-
-            <!-- Anteprima del cookie banner -->
-            <div id="cookie-preview" class="cookie-preview mt-4">
+    <!-- Container principale -->
+    <div class="content-container" data-aos="fade-up">
+        <!-- Card anteprima -->
+        <div class="card preview-container">
+            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            <div id="cookie-preview" class="cookie-preview" data-aos="{{ cookie_settings.animation }}">
+                <h5 id="preview-title">{{ cookie_settings.title }}</h5>
                 <p id="preview-text">{{ cookie_settings.text_content }}</p>
                 <button id="preview-button">{{ cookie_settings.button_text }}</button>
+                <button>Nega</button>
             </div>
+            <br><br><br><br><br>
         </div>
-    </main>
+
+        <!-- Card impostazioni -->
+        <div class="card settings-container">
+            <h3 class="text-center mb-4">Cookie Bar Settings</h3>
+            <form id="cookie-settings-form">
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" id="title" class="form-control" name="title" value="{{ cookie_settings.title }}">
+                </div>
+                <div class="mb-3">
+                    <label for="text-content" class="form-label">Text of the Banner</label>
+                    <textarea id="text-content" class="form-control" name="text_content" rows="2">{{ cookie_settings.text_content }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="button-text" class="form-label">Button Text</label>
+                    <input type="text" id="button-text" class="form-control" name="button_text" value="{{ cookie_settings.button_text }}">
+                </div>
+
+                <!-- Colori -->
+                <div class="row mb-3">
+                    <div class="col-md-2">
+                        <label for="background-color" class="form-label">&nbsp;&nbsp;<i class="fa-solid fa-square"></i></label>
+                        <input type="color" id="background-color" class="form-control" name="background_color" 
+                               value="{{ cookie_settings.background_color or '#ffffff' }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="button-color" class="form-label">&nbsp;&nbsp;<i class="fa-regular fa-square-minus"></i></label>
+                        <input type="color" id="button-color" class="form-control" name="button_color" 
+                               value="{{ cookie_settings.button_color or '#ff5757' }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="button-text-color" class="form-label">&nbsp;&nbsp;<i class="fa-solid fa-tablet-screen-button"></i></label>
+                        <input type="color" id="button-text-color" class="form-control" name="button_text_color" 
+                               value="{{ cookie_settings.button_text_color or '#ffffff' }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="text-color" class="form-label">&nbsp;&nbsp;<i class="fa-solid fa-font"></i></label>
+                        <input type="color" id="text-color" class="form-control" name="text_color" 
+                               value="{{ cookie_settings.text_color or '#000000' }}">
+                    </div>
+                </div>
+
+                <!-- Animazione -->
+                <div class="mb-3">
+                    <label for="animation" class="form-label">Animation Entry</label>
+                    <select id="animation" class="form-select" name="animation">
+                        <option value="fade" {% if cookie_settings.animation == 'fade' %}selected{% endif %}>Fade</option>
+                        <option value="slide-up" {% if cookie_settings.animation == 'slide-up' %}selected{% endif %}>Slide Up</option>
+                        <option value="slide-down" {% if cookie_settings.animation == 'slide-down' %}selected{% endif %}>Slide Down</option>
+                        <option value="zoom-in" {% if cookie_settings.animation == 'zoom-in' %}selected{% endif %}>Zoom In</option>
+                    </select>
+                </div>
+                
+            </form>
+        </div>
+    </div>
 
     {% include 'admin/cms/footing/admin_footing.html' %}
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     <script>
+        // -----------------------------------------------------------------------------------------------------------------------------------------
         document.addEventListener('DOMContentLoaded', function () {
-            // Aggiorna anteprima in tempo reale
+            AOS.init();
+
+            // Riferimenti agli input
+            const titleInput = document.getElementById('title');
             const textContentInput = document.getElementById('text-content');
             const buttonTextInput = document.getElementById('button-text');
             const backgroundColorInput = document.getElementById('background-color');
             const buttonColorInput = document.getElementById('button-color');
-            const textColorInput = document.getElementById('text-color');
+            const buttonTextColorInput = document.getElementById('button-text-color');
+            const animationInput = document.getElementById('animation');
             const useThirdPartyCheckbox = document.getElementById('use-third-party');
-            const thirdPartyScriptContainer = document.getElementById('third-party-script-container');
+            const thirdPartySettings = document.getElementById('third-party-settings');
+            const textColorInput = document.getElementById('text-color'); // Nuovo input per il colore del testo
 
+            const previewTitle = document.getElementById('preview-title');
             const previewText = document.getElementById('preview-text');
             const previewButton = document.getElementById('preview-button');
             const cookiePreview = document.getElementById('cookie-preview');
 
-            // Event listeners per l'anteprima
+            // Event listeners per l'anteprima dinamica
+            titleInput.addEventListener('input', () => previewTitle.innerText = titleInput.value);
             textContentInput.addEventListener('input', () => previewText.innerText = textContentInput.value);
             buttonTextInput.addEventListener('input', () => previewButton.innerText = buttonTextInput.value);
             backgroundColorInput.addEventListener('input', () => cookiePreview.style.setProperty('--background-color', backgroundColorInput.value));
             buttonColorInput.addEventListener('input', () => previewButton.style.backgroundColor = buttonColorInput.value);
-            textColorInput.addEventListener('input', () => cookiePreview.style.setProperty('--text-color', textColorInput.value));
+            buttonTextColorInput.addEventListener('input', () => previewButton.style.color = buttonTextColorInput.value);
+            textColorInput.addEventListener('input', () => cookiePreview.style.color = textColorInput.value);
 
-            useThirdPartyCheckbox.addEventListener('change', () => {
-                thirdPartyScriptContainer.style.display = useThirdPartyCheckbox.checked ? 'block' : 'none';
+        });
+
+        // -----------------------------------------------------------------------------------------------------------------------------------------
+
+        document.getElementById('save-content').addEventListener('click', function() {
+            const formData = {
+                title: document.getElementById('title').value,
+                text_content: document.getElementById('text-content').value,
+                button_text: document.getElementById('button-text').value,
+                background_color: document.getElementById('background-color').value,
+                button_color: document.getElementById('button-color').value,
+                button_text_color: document.getElementById('button-text-color').value,
+                text_color: document.getElementById('text-color').value,
+                animation: document.getElementById('animation').value,
+            };
+        
+            fetch('/admin/cms/function/cookie-policy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire('Success!', 'The settings have been saved.', 'success');
+                } else {
+                    Swal.fire('Error', 'An error occurred while saving.', 'error');
+                }
+            })
+            .catch(error => {
+                Swal.fire('Error', 'Unable to complete save.', 'error');
+                console.error('Errore:', error);
             });
         });
+
     </script>
 </body>
 </html>
