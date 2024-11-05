@@ -1,0 +1,69 @@
+<script>
+    // Gestione del pulsante "Select This"
+    document.querySelectorAll('.confirm-select').forEach(button => {
+        button.addEventListener('click', function() {
+            const addonId = this.getAttribute('data-addon-id');
+            const addonType = this.getAttribute('data-addon-type');
+
+            Swal.fire({
+                title: 'Confirm Selection',
+                text: "Are you sure you want to select this addon?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, select it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/api/select-addon', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ addon_id: addonId, addon_type: addonType })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            Swal.fire('Selected!', data.message, 'success').then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire('Error', data.message, 'error');
+                        }
+                    });
+                }
+            });
+        });
+    });
+
+    // Gestione del pulsante "Buy for €..."
+    document.querySelectorAll('.confirm-purchase').forEach(button => {
+        button.addEventListener('click', function() {
+            const addonId = this.getAttribute('data-addon-id');
+            const addonType = this.getAttribute('data-addon-type');
+
+            Swal.fire({
+                title: 'Confirm Purchase',
+                text: "Do you want to purchase this addon?",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, buy it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/api/purchase-addon', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ addon_id: addonId, addon_type: addonType })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            Swal.fire('Purchased!', data.message, 'success').then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire('Error', data.message, 'error');
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>

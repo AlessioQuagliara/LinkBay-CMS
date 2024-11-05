@@ -33,6 +33,32 @@
                 <i class="fa-solid fa-clipboard-list {% if title == 'Third-Party Cookie Settings' %}fa-bounce{% endif %}"></i>&nbsp; Integrations
             </a>
         </li>
+        {% elif title in ['Theme UI', 'Plugin', 'Services', 'Themes']%}
+        <li class="nav-item mb-2">
+            <a href="{{ url_for('online_content') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
+                <i class="fa-solid fa-arrow-left"></i>&nbsp; Back to Content
+            </a>
+        </li>
+        <li>
+            <a href="/store-components/theme-ui" class="nav-link {% if title == 'Theme UI' %}active{% endif %} text-white">
+                <i class="fa-brands fa-uikit {% if title == 'Theme UI' %}fa-bounce{% endif %}"></i>&nbsp; Theme UI
+            </a>
+        </li>
+        <li>
+            <a href="/store-components/plugin" class="nav-link {% if title == 'Plugin' %}active{% endif %} text-white">
+                <i class="fa-solid fa-square-plus {% if title == 'Plugin' %}fa-bounce{% endif %}"></i>&nbsp; Plugins
+            </a>
+        </li>
+        <li>
+            <a href="/store-components/services" class="nav-link {% if title == 'Services' %}active{% endif %} text-white">
+                <i class="fa-solid fa-hard-drive {% if title == 'Services' %}fa-bounce{% endif %}"></i>&nbsp; Services
+            </a>
+        </li>
+        <li>
+            <a href="/store-components/themes" class="nav-link {% if title == 'Themes' %}active{% endif %} text-white">
+                <i class="fa-solid fa-file-lines {% if title == 'Themes' %}fa-bounce{% endif %}"></i>&nbsp; Themes
+            </a>
+        </li>
         {% else %}
         <li class="nav-item">
             <a href="{{ url_for('homepage') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">

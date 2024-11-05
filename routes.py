@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, request, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from models import User, ShopList, Page, WebSettings, CookiePolicy
+from models import User, ShopList, Page, WebSettings, CookiePolicy, CMSAddon
 from app import app, get_db_connection, get_auth_db_connection
 from datetime import datetime
 from creators import capture_screenshot
@@ -346,6 +346,10 @@ def editor_interface(slug=None):
             if page:
                 page_title = page['title']
 
+        # Ottenere l'addon di tipo 'theme_ui' con status 'selected' per il negozio attuale
+        addon_model = CMSAddon(db_conn)
+        selected_theme_ui = addon_model.get_selected_addon_for_shop(shop_subdomain, 'theme_ui')
+
         current_url = request.path
         return render_template('admin/cms/store_editor/editor_interface.html', 
                                title=page_title, 
@@ -353,7 +357,8 @@ def editor_interface(slug=None):
                                page=page, 
                                slug=slug,  
                                current_url=current_url, 
-                               username=username)
+                               username=username,
+                               selected_theme_ui=selected_theme_ui)
     return username  
 
 
@@ -383,7 +388,17 @@ def edit_page(slug):
             flash('Pagina non trovata.', 'danger')
             return redirect(url_for('homepage'))
 
-        return render_template('admin/cms/function/edit.html', title='Edit Page', page=page, username=username)
+        # Recupera il tema UI selezionato per lo shop
+        addon_model = CMSAddon(db_conn)
+        selected_theme_ui = addon_model.get_selected_addon_for_shop(shop_subdomain, 'theme_ui')
+
+        return render_template(
+            'admin/cms/function/edit.html', 
+            title='Edit Page', 
+            page=page, 
+            username=username, 
+            selected_theme_ui=selected_theme_ui
+        )
     
     return username
 
@@ -561,14 +576,124 @@ def capture_screenshot_route():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
-# Addons e Componenti a pagamento aggiuntive
+# Addons e Componenti a pagamento aggiuntive -----------------------------------------------------------------------------
 
-@app.route('/store-components')
-def store_components():
+@app.route('/store-components/theme-ui')
+def theme_ui():
     username = check_user_authentication()
     if isinstance(username, str):
-        return render_template('admin/cms/store-components/shop_page.html', title='UI Kit', username=username)
+        shop_name = request.host.split('.')[0]
+        with get_db_connection() as db_conn:
+            addon_model = CMSAddon(db_conn)
+            theme_ui_addons = addon_model.get_addons_by_type('theme_ui')
+            for addon in theme_ui_addons:
+                status = addon_model.get_addon_status(shop_name, addon['id'])
+                addon['status'] = status if status else 'select'
+        return render_template(
+            'admin/cms/store-components/theme-ui.html',
+            title='Theme UI',
+            username=username,
+            addons=theme_ui_addons
+        )
     return username
+
+
+@app.route('/store-components/plugin')
+def plugin():
+    username = check_user_authentication()
+    if isinstance(username, str):
+        shop_name = request.host.split('.')[0]
+        with get_db_connection() as db_conn:
+            addon_model = CMSAddon(db_conn)
+            plugin_addons = addon_model.get_addons_by_type('plugin')
+            for addon in plugin_addons:
+                status = addon_model.get_addon_status(shop_name, addon['id'])
+                addon['status'] = status if status else 'select'
+        return render_template(
+            'admin/cms/store-components/plugin.html',
+            title='Plugin',
+            username=username,
+            addons=plugin_addons
+        )
+    return username
+
+
+@app.route('/store-components/services')
+def services():
+    username = check_user_authentication()
+    if isinstance(username, str):
+        shop_name = request.host.split('.')[0]
+        with get_db_connection() as db_conn:
+            addon_model = CMSAddon(db_conn)
+            service_addons = addon_model.get_addons_by_type('service')
+            for addon in service_addons:
+                status = addon_model.get_addon_status(shop_name, addon['id'])
+                addon['status'] = status if status else 'select'
+        return render_template(
+            'admin/cms/store-components/services.html',
+            title='Services',
+            username=username,
+            addons=service_addons
+        )
+    return username
+
+
+@app.route('/store-components/themes')
+def themes():
+    username = check_user_authentication()
+    if isinstance(username, str):
+        shop_name = request.host.split('.')[0]
+        with get_db_connection() as db_conn:
+            addon_model = CMSAddon(db_conn)
+            theme_addons = addon_model.get_addons_by_type('theme')
+            for addon in theme_addons:
+                status = addon_model.get_addon_status(shop_name, addon['id'])
+                addon['status'] = status if status else 'select'
+        return render_template(
+            'admin/cms/store-components/themes.html',
+            title='Themes',
+            username=username,
+            addons=theme_addons
+        )
+    return username
+
+
+# Route per selezionare un addon
+@app.route('/api/select-addon', methods=['POST'])
+def select_addon():
+    data = request.get_json()
+    shop_name = request.host.split('.')[0]
+    addon_id = data.get('addon_id')
+    addon_type = data.get('addon_type')
+    with get_db_connection() as db_conn:
+        addon_model = CMSAddon(db_conn)
+        
+        # Assicurati di impostare "selected" per l'addon attuale e "deselected" per tutti gli altri dello stesso tipo
+        success = addon_model.update_shop_addon_status(shop_name, addon_id, addon_type, 'selected')
+        if success:
+            # Deseleziona altri addon dello stesso tipo per lo stesso negozio
+            addon_model.deselect_other_addons(shop_name, addon_id, addon_type)
+
+    if success:
+        return jsonify({'status': 'success', 'message': 'Addon selected successfully'})
+    return jsonify({'status': 'error', 'message': 'Failed to select addon'}), 500
+
+
+# Route per acquistare un addon
+@app.route('/api/purchase-addon', methods=['POST'])
+def purchase_addon():
+    data = request.get_json()
+    shop_name = request.host.split('.')[0]
+    addon_id = data.get('addon_id')
+    addon_type = data.get('addon_type')
+    with get_db_connection() as db_conn:
+        addon_model = CMSAddon(db_conn)
+        success = addon_model.update_shop_addon_status(shop_name, addon_id, addon_type, 'paid')
+    if success:
+        return jsonify({'status': 'success', 'message': 'Addon purchased successfully'})
+    return jsonify({'status': 'error', 'message': 'Failed to purchase addon'}), 500
+
+# ----------- Cookie e policy ----------------------------------------------------------------------------------------
 
 @app.route('/admin/cms/function/cookie-policy', methods=['GET', 'POST'])
 def cookie_setting():

@@ -88,7 +88,7 @@
             
             <div class="row mb-4">
                 <div class="col-md-6">
-                    <h1 class="display-4">Theme UI</h1>
+                    <h1 class="display-4">{{ title }}</h1>
                 </div>
                 <div class="col-md-6 d-flex align-items-center">
                     <div class="input-group">
@@ -100,64 +100,47 @@
                 </div>
             </div>
             
-            <!-- Filter section -->
-            <div class="row mb-4">
-                <div class="col-md-12">
-                    <div class="btn-group" role="group" aria-label="Filter addons">
-                        <button type="button" class="btn btn-outline-dark active" aria-pressed="true">Theme UI</button>
-                        <button type="button" class="btn btn-outline-dark">Plugins</button>
-                        <button type="button" class="btn btn-outline-dark">Services</button>
-                        <button type="button" class="btn btn-outline-dark">Themes</button>
-                    </div>
-                </div>
-            </div>
     
             <!-- Addon Cards -->
-            <div class="row">
-                <!-- Card 1 -->
+            <div class="row" data-aos="fade-up">
+                
+                {% for addon in addons %}
                 <div class="col-md-4 mb-4">
                     <div class="card addon-card shadow-sm">
-                        <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Addon Image">
+                        <img src="../../../../static/images/{{ addon.name }}.jpeg" class="card-img-top" alt="{{ addon.name }} Image">
                         <div class="card-body">
-                            <h5 class="card-title">Modern eCommerce Theme</h5>
-                            <p class="card-text">A sleek and modern theme for online stores. Optimized for performance and SEO.</p>
-                            <span class="badge badge-free">Free</span>
+                            <h5 class="card-title">{{ addon.name }}</h5>
+                            <p class="card-text">{{ addon.description }}</p>
+                
+                            {% if addon.price == 0 %}
+                                <span class="badge badge-free">Free</span>
+                            {% else %}
+                                <span class="badge badge-premium">€{{ addon.price }}</span>
+                            {% endif %}
                         </div>
                         <div class="card-footer bg-transparent border-0">
-                            <button class="btn btn-outline-dark w-100">Select This</button>
+                            {% if addon.status == 'selected' %}
+                                <button class="btn btn-dark w-100" disabled>Selected</button>
+                            {% elif addon.status == 'purchased' %}
+                                <button 
+                                    class="btn btn-danger w-100 confirm-purchase" 
+                                    data-addon-id="{{ addon.id }}" 
+                                    data-addon-type="{{ addon.type }}">
+                                    Buy for €{{ addon.price }}
+                                </button>
+                            {% else %}
+                                <button 
+                                    class="btn btn-outline-dark w-100 confirm-select" 
+                                    data-addon-id="{{ addon.id }}" 
+                                    data-addon-type="{{ addon.type }}">
+                                    Select This
+                                </button>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-    
-                <!-- Card 2 -->
-                <div class="col-md-4 mb-4">
-                    <div class="card addon-card shadow-sm">
-                        <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Addon Image">
-                        <div class="card-body">
-                            <h5 class="card-title">Premium Blog Theme</h5>
-                            <p class="card-text">A premium theme for professional bloggers with customizable layout options.</p>
-                            <span class="badge badge-premium">Premium</span>
-                        </div>
-                        <div class="card-footer bg-transparent border-0">
-                            <button class="btn btn-danger w-100">Buy for €14,90</button>
-                        </div>
-                    </div>
-                </div>
-    
-                <!-- Card 3 -->
-                <div class="col-md-4 mb-4">
-                    <div class="card addon-card shadow-sm">
-                        <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Addon Image">
-                        <div class="card-body">
-                            <h5 class="card-title">SEO Booster Plugin</h5>
-                            <p class="card-text">Enhance your site's SEO with this powerful plugin for better search rankings.</p>
-                            <span class="badge badge-free">Free</span>
-                        </div>
-                        <div class="card-footer bg-transparent border-0">
-                            <button class="btn btn-outline-dark w-100">Download</button>
-                        </div>
-                    </div>
-                </div>
+                {% endfor %}
+
             </div>
     
             
@@ -165,6 +148,8 @@
 
         </div>
     </main>
+    {% include 'admin/cms/store-components/store_modals.html' %}
+    {% include 'admin/cms/store-components/store_java.html' %}
     {% include 'admin/cms/footing/admin_footing.html' %}
 </body>
 </html>
