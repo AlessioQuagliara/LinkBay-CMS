@@ -3,3 +3,4 @@ mysql.connector
 selenium
 webdriver-manager
 Pillow
+Stripe

@@ -100,6 +100,11 @@
                 <i class="fa-solid fa-truck {% if title == 'Shipping' %}fa-bounce{% endif %}"></i>&nbsp; Shipping
             </a>
         </li>
+        <li>
+            <a href="{{ url_for('subscription') }}" class="nav-link {% if title == 'Subscription' %}active{% endif %} text-white">
+                <i class="fa-solid fa-money-check {% if title == 'Subscription' %}fa-bounce{% endif %}"></i>&nbsp; Subscription
+            </a>
+        </li>
         {% endif %}
     </ul>
     <hr>

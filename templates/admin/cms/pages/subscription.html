@@ -1,0 +1,183 @@
+{% extends "/admin/cms/interface/render.html" %}
+
+{% block content %}
+
+<style>
+    .plan-card {
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+    .plan-card:hover {
+        transform: scale(1.05);
+    }
+    .plan-card .card-header {
+        font-size: 1.5em;
+        font-weight: bold;
+    }
+    .transaction-table {
+        margin-top: 30px;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<!--  QUI INSERISCI IL CODICE TEMPLATE -->
+
+<div class="container my-5" data-aos="fade-up">
+    <h2 class="text-center mb-5">Choose Your Subscription Plan</h2>
+
+    <!-- Subscription Plans Section -->
+    <div class="row g-4">
+        <!-- Basic Plan Card -->
+        <div class="col-md-4">
+            <div class="card plan-card text-center p-3 border-danger">
+                <div class="card-header bg-danger text-white">Basic</div>
+                <div class="card-body">
+                    <h3 class="card-title">€28 / month</h3>
+                    <p class="card-text">Perfect for Small Shops.</p>
+                    <ul class="list-unstyled">
+                        <li>1 Account Admin</li>
+                        <li>Up to 600 products</li>
+                        <li>Basic Integrations</li>
+                        <li>Email Support</li>
+                    </ul>
+                    <button 
+                        class="btn btn-danger w-100 mt-3 subscribe-button" 
+                        data-plan-id="price_1QJYxcDLzaeBHrX0aGnJW5PO">Subscribe</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pro Plan Card -->
+        <div class="col-md-4">
+            <div class="card plan-card text-center p-3 border-danger">
+                <div class="card-header bg-danger text-white">Professional</div>
+                <div class="card-body">
+                    <h3 class="card-title">€78 / month</h3>
+                    <p class="card-text">Perfect for Growing Business</p>
+                    <ul class="list-unstyled">
+                        <li>5 Account Admin</li>
+                        <li>Up to 3,000 products</li>
+                        <li>Advanced Integrations</li>
+                        <li>Priority Support</li>
+                    </ul>
+                    <button 
+                        class="btn btn-danger w-100 mt-3 subscribe-button" 
+                        data-plan-id="professional_plan_id">Subscribe</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enterprise Plan Card -->
+        <div class="col-md-4">
+            <div class="card plan-card text-center p-3 border-danger">
+                <div class="card-header bg-danger text-white">Enterprise</div>
+                <div class="card-body">
+                    <h3 class="card-title">€289 / month</h3>
+                    <p class="card-text">Best for Large Enterprises</p>
+                    <ul class="list-unstyled">
+                        <li>Unlimited Accounts</li>
+                        <li>Unlimited products</li>
+                        <li>Premium integrations</li>
+                        <li>Dedicated 24/7 Support</li>
+                    </ul>
+                    <button 
+                        class="btn btn-danger w-100 mt-3 subscribe-button" 
+                        data-plan-id="enterprise_plan_id">Subscribe</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction History Section -->
+    <h2 class="text-center my-5">Transaction History</h2>
+    <div class="transaction-table">
+        <table class="table table-hover table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Transaction ID</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Amount (€)</th>
+                    <th scope="col">Payment Method</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Example transaction data, this should be dynamically populated -->
+                <tr>
+                    <td>txn_01ABC</td>
+                    <td>2024-11-05</td>
+                    <td>29.99</td>
+                    <td>Credit Card</td>
+                    <td><span class="badge bg-success">Completed</span></td>
+                </tr>
+                <tr>
+                    <td>txn_01XYZ</td>
+                    <td>2024-10-10</td>
+                    <td>9.99</td>
+                    <td>PayPal</td>
+                    <td><span class="badge bg-danger">Failed</span></td>
+                </tr>
+                <tr>
+                    <td>txn_01DEF</td>
+                    <td>2024-09-15</td>
+                    <td>99.99</td>
+                    <td>Credit Card</td>
+                    <td><span class="badge bg-success">Completed</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script type="text/javascript">
+const stripe = Stripe("{{ stripe_publishable_key }}");
+
+document.querySelectorAll(".subscribe-button").forEach(button => {
+    button.addEventListener("click", async (event) => {
+        const planId = event.target.getAttribute("data-plan-id");
+
+        try {
+            const response = await fetch("/subscription/checkout", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ plan_id: planId })
+            });
+            
+            const session = await response.json();
+
+            if (!session.sessionId) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to create checkout session',
+                    text: 'There was an issue creating the checkout session. Please try again later.'
+                });
+                return;
+            }
+
+            const result = await stripe.redirectToCheckout({ sessionId: session.sessionId });
+
+            if (result.error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Payment Error',
+                    text: result.error.message
+                });
+            }
+        } catch (error) {
+            console.error('Error during subscription:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Network Error',
+                text: 'There was a network error. Please check your connection and try again.'
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

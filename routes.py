@@ -5,8 +5,12 @@ from models import User, ShopList, Page, WebSettings, CookiePolicy, CMSAddon
 from app import app, get_db_connection, get_auth_db_connection
 from datetime import datetime
 from creators import capture_screenshot
-import base64, os, uuid, re, mysql.connector
+from dotenv import load_dotenv
+import base64, os, uuid, re, mysql.connector, stripe
+from config import Config
 
+stripe.api_key = Config.STRIPE_SECRET_KEY
+STRIPE_PUBLISHABLE_KEY = Config.STRIPE_PUBLISHABLE_KEY
 
 # Se non trova la pagina va in 404 ------------------------------------------------------
 @app.errorhandler(404)
@@ -215,6 +219,57 @@ def shipping():
     if isinstance(username, str):
         return render_template('admin/cms/pages/shipping.html', title='Shipping', username=username)
     return username
+
+
+
+# INTERN - Subscription Script Page ---------------------------------------------------------------------------------------------
+
+@app.route('/admin/cms/pages/subscription')
+def subscription():
+    username = check_user_authentication()
+    if isinstance(username, str):
+        return render_template(
+            'admin/cms/pages/subscription.html', 
+            title='Subscription', 
+            username=username, 
+            stripe_publishable_key=STRIPE_PUBLISHABLE_KEY
+        )
+    return username
+
+@app.route('/subscription/checkout', methods=['POST'])
+def create_checkout_session():
+    data = request.get_json()
+    plan_id = data.get('plan_id')  # Assicurati che qui ci sia un price ID valido
+
+    if not plan_id:
+        return jsonify(error="Invalid plan ID"), 400
+
+    try:
+        # Crea una sessione di checkout su Stripe
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'price': plan_id,  # Usa il price ID specifico
+                'quantity': 1,
+            }],
+            mode='subscription',
+            success_url=url_for('subscription_success', _external=True) + '?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url=url_for('subscription_cancel', _external=True),
+        )
+        
+        return jsonify({'sessionId': session.id})
+    
+    except Exception as e:
+        print(f"Error creating checkout session: {e}")
+        return jsonify(error=str(e)), 500
+    
+@app.route('/subscription/success')
+def subscription_success():
+    return render_template('admin/cms/pages/sub_success.html', title="Subscription Successful")
+
+@app.route('/subscription/cancel')
+def subscription_cancel():
+    return render_template('admin/cms/pages/sub_cancel.html', title="Subscription Canceled")
 
 # Editor Store Content ---------------------------------------------------------------------------------------------
 
