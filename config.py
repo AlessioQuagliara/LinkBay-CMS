@@ -18,7 +18,8 @@ class Config:
     AUTH_DB_PORT = 8889
 
     # Configurazioni Stripe interne
-    
+    STRIPE_SECRET_KEY='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'
+    STRIPE_PUBLISHABLE_KEY='pk_live_51MijPqDLzaeBHrX0rui4jtJnGx1kTSKVNbVy6hbQQYUfoMhVTMVEFoN6U7jfYh2tyRgLhvSgOSM5wpSmi55nS3PH00XUmvoSY0'
     
     # Altre configurazioni 
     SESSION_COOKIE_SECURE = False  # PER CHI MODIFICA = Sicuro solo su HTTPS, disabilitato in locale
