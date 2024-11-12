@@ -8,29 +8,25 @@ app = Flask(__name__)
 app.config.from_object(Config)
 app.secret_key = app.config['SECRET_KEY']
 
-# Crea un'istanza della classe Database
 db = Database(app.config)
 
-# Selettore di localizzazione tramite richiesta
 @app.route('/set-language', methods=['GET'])
 def set_language():
-    lang = request.args.get('lang', 'en')  # Imposta 'en' come predefinito
+    lang = request.args.get('lang', 'en')
     if lang in app.config['LANGUAGES']:
         session['language'] = lang
         return jsonify({"success": True, "message": f"Language set to {lang}"})
     return jsonify({"success": False, "message": "Invalid language"}), 400
 
-# Funzione per ottenere la lingua corrente
 def get_language():
-    return session.get('language', 'en')  # 'en' come predefinito se non è impostato
+    return session.get('language', 'en') 
 
-# Connessione al database tramite la classe Database
+# Per chi fa manutenzione = Qui prendo il db dal file db_helper.py, sotto mi connetto al database globale
 def get_db_connection():
     if 'db' not in g:
         g.db = db.connect()
     return g.db
 
-# Connessione al database globale
 def get_auth_db_connection():
     if 'auth_db' not in g:
         g.auth_db = mysql.connector.connect(
@@ -55,22 +51,20 @@ def close_db_connection(exception):
     if auth_db is not None:
         auth_db.close()
 
-# Funzione per caricare il contenuto della pagina in base al sottodominio
 def load_page_content(slug, shop_subdomain):
-    # Connessione per i dati della pagina (usa cms_def)
     conn = get_db_connection()
     page_model = Page(conn)
 
-    # Rimuovi ".local" dal sottodominio
+    # cancellazione ".local" prendendo la stringa
     shop_subdomain = shop_subdomain.split('.')[0]
 
-    # Usa la connessione al database cms_index per recuperare il negozio
+    # Connessione al Negozio
     auth_conn = get_auth_db_connection()
     shoplist_model = ShopList(auth_conn)
     shop = shoplist_model.get_shop_by_name(shop_subdomain)
 
     if shop:
-        # Carica i dati della pagina associati al negozio dal database cms_def
+        # darti associati
         query = """
         SELECT title, description, keywords, content, language 
         FROM pages 
@@ -85,28 +79,27 @@ def load_page_content(slug, shop_subdomain):
     else:
         return None
 
-# Rotta per gestire i negozi in base al sottodominio
+# Rotta principale
 @app.route('/', defaults={'slug': 'home'})
 @app.route('/<slug>')
 def render_dynamic_page(slug=None):
-    # Ottieni il sottodominio dalla richiesta (prima parte del request.host)
+    # ri-ottengo il sottodominio per problemi
     shop_subdomain = request.host.split('.')[0]
 
-    # Carica il contenuto della pagina per il negozio e il sottodominio
     page = load_page_content(slug, shop_subdomain)
 
     if page:
-        # Ottieni la lingua corrente
+        # lingua corrente
         language = get_language()
 
-        # Ottieni la navbar e il footer specifici per il negozio
+        # navbar e il footer specifici 
         navbar_content = get_navbar_content(shop_subdomain)
         footer_content = get_footer_content(shop_subdomain)
 
-        # Ottieni i dati da web_settings
+        # dati da web_settings
         web_settings = get_web_settings(shop_subdomain)
 
-        # Estrai 'head', 'script', e 'foot' da web_settings
+        # 'head', 'script', e 'foot' da web_settings
         head_content = web_settings.get('head', '')
         script_content = web_settings.get('script', '')
         foot_content = web_settings.get('foot', '')
@@ -125,12 +118,12 @@ def render_dynamic_page(slug=None):
     else:
         return render_template('404.html'), 404
 
-# Funzione per ottenere i contenuti della navbar
+#  contenuti della navbar
 def get_navbar_content(shop_subdomain):
-    conn = get_db_connection()  # Connessione al database cms_def
-    auth_conn = get_auth_db_connection()  # Connessione al database cms_index
+    conn = get_db_connection()  # cms_def
+    auth_conn = get_auth_db_connection()  # cms_index
     shoplist_model = ShopList(auth_conn)
-    # Rimuovi ".local" dal sottodominio
+    # sottodominio
     shop_subdomain = shop_subdomain.split('.')[0]
     shop = shoplist_model.get_shop_by_name(shop_subdomain)
 
@@ -148,12 +141,12 @@ def get_navbar_content(shop_subdomain):
     else:
         return ''
 
-# Funzione per ottenere i contenuti del footer
+# footer
 def get_footer_content(shop_subdomain):
-    conn = get_db_connection()  # Connessione al database cms_def
-    auth_conn = get_auth_db_connection()  # Connessione al database cms_index
+    conn = get_db_connection()  # cms_def
+    auth_conn = get_auth_db_connection()  # cms_index
     shoplist_model = ShopList(auth_conn)
-    # Rimuovi ".local" dal sottodominio
+    # cancello ".local"
     shop_subdomain = shop_subdomain.split('.')[0]
     shop = shoplist_model.get_shop_by_name(shop_subdomain)
 
@@ -171,7 +164,7 @@ def get_footer_content(shop_subdomain):
     else:
         return ''
 
-# Funzione per ottenere le impostazioni web del negozio
+# impostazioni web del negozio
 def get_web_settings(shop_subdomain):
     conn = get_db_connection()
     web_settings_model = WebSettings(conn)
@@ -187,7 +180,7 @@ def get_web_settings(shop_subdomain):
 
     return settings if settings else {}
 
-# Includo le rotte statiche definite nel file routes.py
+# rotte statiche 
 from routes import *
 
 

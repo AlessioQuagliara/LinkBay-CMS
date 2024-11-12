@@ -22,8 +22,8 @@ class Config:
     STRIPE_PUBLISHABLE_KEY='pk_live_51MijPqDLzaeBHrX0rui4jtJnGx1kTSKVNbVy6hbQQYUfoMhVTMVEFoN6U7jfYh2tyRgLhvSgOSM5wpSmi55nS3PH00XUmvoSY0'
     
     # Altre configurazioni 
-    SESSION_COOKIE_SECURE = False  # Sicuro solo su HTTPS, disabilitato in locale
-    SESSION_PERMANENT = False  # Non mantenere la sessione dopo la chiusura del browser
+    SESSION_COOKIE_SECURE = False  # PER CHI MODIFICA = Sicuro solo su HTTPS, disabilitato in locale
+    SESSION_PERMANENT = False  # PER CHI MODIFICA = Non mantenere la sessione dopo la chiusura del browser
 
-    # Prova a commentare SESSION_COOKIE_DOMAIN per evitare problemi locali con i sottodomini
+    # SESSION_COOKIE_DOMAIN su test ho visto che provoca danno 
     # SESSION_COOKIE_DOMAIN = '.local'

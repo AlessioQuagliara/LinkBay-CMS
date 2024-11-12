@@ -5,7 +5,6 @@ from models import User, ShopList, Page, WebSettings, CookiePolicy, CMSAddon
 from app import app, get_db_connection, get_auth_db_connection
 from datetime import datetime
 from creators import capture_screenshot
-from dotenv import load_dotenv
 import base64, os, uuid, re, mysql.connector, stripe
 from config import Config
 
@@ -88,7 +87,6 @@ def login():
             return redirect(url_for('login'))
 
     return render_template('admin/login.html', title='Login')
-
 
 @app.route('/admin/logout')
 def logout():
@@ -239,17 +237,16 @@ def subscription():
 @app.route('/subscription/checkout', methods=['POST'])
 def create_checkout_session():
     data = request.get_json()
-    plan_id = data.get('plan_id')  # Assicurati che qui ci sia un price ID valido
+    plan_id = data.get('plan_id')  
 
     if not plan_id:
         return jsonify(error="Invalid plan ID"), 400
 
     try:
-        # Crea una sessione di checkout su Stripe
         session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[{
-                'price': plan_id,  # Usa il price ID specifico
+                'price': plan_id, 
                 'quantity': 1,
             }],
             mode='subscription',

@@ -89,7 +89,7 @@ class ShopList:
             WHERE shop_name = %s
         """
         cursor.execute(query, (shop_name,))
-        shop = cursor.fetchone()  # Usa fetchone per ottenere un singolo negozio
+        shop = cursor.fetchone() 
         cursor.close()
         return shop
     
