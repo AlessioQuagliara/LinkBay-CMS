@@ -93,6 +93,86 @@ class ShopList:
         cursor.close()
         return shop
     
+    def get_shop_by_name_or_domain(self, value):
+        cursor = self.conn.cursor(dictionary=True)
+        query = """
+            SELECT id, shop_name, themeOptions, domain, user_id, partner_id
+            FROM ShopList
+            WHERE shop_name = %s OR domain = %s
+        """
+        cursor.execute(query, (value, value))
+        shop = cursor.fetchone()
+        cursor.close()
+        return shop
+    
+# Classe per UserStoreAccess --------------------------------------------------------------------------------------------
+
+class UserStoreAccess:
+    def __init__(self, db_conn):
+        self.conn = db_conn
+
+    def grant_access(self, user_id, shop_id, access_level='viewer'):
+        """
+        Concede accesso a un utente per uno specifico store con un livello di accesso.
+        """
+        cursor = self.conn.cursor()
+        query = """
+            INSERT INTO user_store_access (user_id, shop_id, access_level)
+            VALUES (%s, %s, %s)
+            ON DUPLICATE KEY UPDATE access_level = %s
+        """
+        cursor.execute(query, (user_id, shop_id, access_level, access_level))
+        self.conn.commit()
+        cursor.close()
+
+    def revoke_access(self, user_id, shop_id):
+        """
+        Revoca l'accesso di un utente per uno specifico store.
+        """
+        cursor = self.conn.cursor()
+        query = "DELETE FROM user_store_access WHERE user_id = %s AND shop_id = %s"
+        cursor.execute(query, (user_id, shop_id))
+        self.conn.commit()
+        cursor.close()
+
+    def has_access(self, user_id, shop_id):
+        """
+        Controlla se un utente ha accesso a uno specifico store.
+        """
+        cursor = self.conn.cursor(dictionary=True)
+        query = "SELECT * FROM user_store_access WHERE user_id = %s AND shop_id = %s"
+        cursor.execute(query, (user_id, shop_id))
+        access = cursor.fetchone()
+        cursor.close()
+        return access is not None
+
+    def get_access_level(self, user_id, shop_id):
+        """
+        Recupera il livello di accesso di un utente per uno specifico store.
+        """
+        cursor = self.conn.cursor(dictionary=True)
+        query = "SELECT access_level FROM user_store_access WHERE user_id = %s AND shop_id = %s"
+        cursor.execute(query, (user_id, shop_id))
+        access = cursor.fetchone()
+        cursor.close()
+        return access['access_level'] if access else None
+
+    def get_user_stores(self, user_id):
+        """
+        Recupera tutti gli store a cui un utente ha accesso.
+        """
+        cursor = self.conn.cursor(dictionary=True)
+        query = """
+            SELECT ShopList.id, ShopList.shop_name, user_store_access.access_level
+            FROM user_store_access
+            JOIN ShopList ON user_store_access.shop_id = ShopList.id
+            WHERE user_store_access.user_id = %s
+        """
+        cursor.execute(query, (user_id,))
+        stores = cursor.fetchall()
+        cursor.close()
+        return stores
+
 # Classe per Web_Settings --------------------------------------------------------------------------------------------
 
 class WebSettings:

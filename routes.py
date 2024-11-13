@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, request, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from models import User, ShopList, Page, WebSettings, CookiePolicy, CMSAddon
+from models import User, ShopList, Page, WebSettings, CookiePolicy, CMSAddon, UserStoreAccess
 from app import app, get_db_connection, get_auth_db_connection
 from datetime import datetime
 from creators import capture_screenshot
@@ -61,6 +61,22 @@ def log_session_info():
 def login():
     auth_db_conn = get_auth_db_connection()  
     user_model = User(auth_db_conn)  
+    access_model = UserStoreAccess(auth_db_conn)  
+    shop_list_model = ShopList(auth_db_conn)  # Modello per ottenere i dettagli dello store
+
+    # Rileva il sottodominio o il dominio principale
+    domain_parts = request.host.split('.')
+    subdomain_or_domain = domain_parts[0] if len(domain_parts) > 1 else request.host
+
+    # Ottieni lo shop basato su `shop_name` o `domain`
+    shop = shop_list_model.get_shop_by_name_or_domain(subdomain_or_domain)
+
+    if not shop:
+        flash('Store not found for this domain or subdomain.', 'danger')
+        return redirect(url_for('login'))
+
+    shop_id = shop['id']  # Identifica lo store attuale per l'accesso
+    shop_name = shop['shop_name']  # Per visualizzazione nel template
 
     if request.method == 'POST':
         email = request.form['email']
@@ -68,25 +84,36 @@ def login():
         user = user_model.get_user_by_email(email)
 
         if user and check_password_hash(user['password'], password):
-            session['user_id'] = user['id']
-            session['username'] = user['nome']
-            session['surname'] = user['cognome']
-            session['email'] = user['email']
-            session['phone'] = user['telefono']
-            session['profile_photo'] = user['profilo_foto']
+            # Verifica se l'utente ha accesso a questo specifico store
+            if access_model.has_access(user['id'], shop_id):
+                # Se ha accesso, imposta la sessione
+                session['user_id'] = user['id']
+                session['username'] = user['nome']
+                session['surname'] = user['cognome']
+                session['email'] = user['email']
+                session['phone'] = user['telefono']
+                session['profile_photo'] = user['profilo_foto']
+                session['shop_id'] = shop_id  # Salva lo shop_id nella sessione
 
-            print(f"Session after login: {session}")
+                print(f"Session after login: {session}")
 
-            if user['is_2fa_enabled']:
-                session['otp_secret'] = user['otp_secret']
-                return redirect(url_for('verify_otp'))  
+                # Controllo per 2FA
+                if user['is_2fa_enabled']:
+                    session['otp_secret'] = user['otp_secret']
+                    return redirect(url_for('verify_otp'))
+                else:
+                    return redirect(url_for('homepage'))
             else:
-                return redirect(url_for('homepage'))
+                # Se l'utente non ha accesso a questo store
+                flash('Access denied for this store.', 'danger')
+                return redirect(url_for('login'))
         else:
+            # Se email o password non sono corretti
             flash('Login failed. Please check your email and password.', 'danger')
             return redirect(url_for('login'))
 
-    return render_template('admin/login.html', title='Login')
+    # Passa shop_name al template per mostrare il nome dello store
+    return render_template('admin/login.html', title='Login', shop_name=shop_name)
 
 @app.route('/admin/logout')
 def logout():
