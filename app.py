@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, request, flash, session, g, jsonify, abort
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config
-from models import Database, User, ShopList, Page, WebSettings  # Importiamo le classi dal tuo models.py
+from models import Database, ShopList, Page, WebSettings  # Importiamo le classi dal tuo models.py
 import mysql.connector
 
 app = Flask(__name__)
