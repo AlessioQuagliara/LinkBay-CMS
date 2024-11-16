@@ -99,11 +99,9 @@
                     </div>
                 </div>
             </div>
-            
     
             <!-- Addon Cards -->
             <div class="row" data-aos="fade-up">
-
                 {% for addon in addons %}
                 <div class="col-md-4 mb-4">
                     <div class="card addon-card shadow-sm">
@@ -119,15 +117,17 @@
                             {% endif %}
                         </div>
                         <div class="card-footer bg-transparent border-0">
-                            {% if addon.status == 'selected' %}
-                                <button class="btn btn-dark w-100" disabled>Selected</button>
-                            {% elif addon.status == 'paid' %}
+                            {% if addon.status == 'purchased' %}
+                                <button class="btn btn-success w-100" disabled>Purchased</button>
+                            {% elif addon.status == 'selected' and addon.price > 0 %}
                                 <button 
                                     class="btn btn-danger w-100 confirm-purchase" 
                                     data-addon-id="{{ addon.id }}" 
                                     data-addon-type="{{ addon.type }}">
                                     Buy for €{{ addon.price }}
                                 </button>
+                            {% elif addon.status == 'selected' %}
+                                <button class="btn btn-dark w-100" disabled>Selected</button>
                             {% else %}
                                 <button 
                                     class="btn btn-outline-dark w-100 confirm-select" 
@@ -140,12 +140,10 @@
                     </div>
                 </div>
                 {% endfor %}
-
             </div>
     
-            
             <!-- CONTENUTO STORE -->
-
+    
         </div>
     </main>
     {% include 'admin/cms/store-components/store_modals.html' %}

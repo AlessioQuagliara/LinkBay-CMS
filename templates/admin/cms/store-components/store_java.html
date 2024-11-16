@@ -4,6 +4,12 @@
         button.addEventListener('click', function() {
             const addonId = this.getAttribute('data-addon-id');
             const addonType = this.getAttribute('data-addon-type');
+            const addonStatus = this.getAttribute('data-addon-status'); // Aggiungiamo l'attributo status
+            
+            if (addonStatus === 'purchased') {
+                Swal.fire('Notice', 'This addon has already been purchased and cannot be re-selected.', 'info');
+                return;
+            }
 
             Swal.fire({
                 title: 'Confirm Selection',
@@ -38,6 +44,12 @@
         button.addEventListener('click', function() {
             const addonId = this.getAttribute('data-addon-id');
             const addonType = this.getAttribute('data-addon-type');
+            const addonStatus = this.getAttribute('data-addon-status'); // Aggiungiamo l'attributo status
+
+            if (addonStatus === 'purchased') {
+                Swal.fire('Notice', 'This addon has already been purchased and cannot be bought again.', 'info');
+                return;
+            }
 
             Swal.fire({
                 title: 'Confirm Purchase',

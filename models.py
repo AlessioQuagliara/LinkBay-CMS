@@ -523,7 +523,19 @@ class CMSAddon:
     def select_addon(self, shop_name, addon_id, addon_type):
         cursor = self.conn.cursor()
         try:
-            # Deseleziona altri addon del tipo specificato per il negozio
+            # Verifica se l'addon è già stato acquistato
+            cursor.execute("""
+                SELECT status FROM shop_addons 
+                WHERE shop_name = %s AND addon_id = %s
+            """, (shop_name, addon_id))
+            result = cursor.fetchone()
+            
+            if result and result['status'] == 'purchased':
+                # Se l'add-on è già acquistato, non modificarlo
+                print(f"Addon {addon_id} is already purchased and cannot be re-selected.")
+                return False
+            
+            # Deseleziona altri addon dello stesso tipo per il negozio, eccetto quelli "purchased"
             cursor.execute("""
                 UPDATE shop_addons
                 SET status = 'deselected'
@@ -599,13 +611,14 @@ class CMSAddon:
         finally:
             cursor.close()
 
+    # Metodo per deselezionare altri addon dello stesso tipo, eccetto quelli "purchased"
     def deselect_other_addons(self, shop_name, addon_id, addon_type):
         cursor = self.conn.cursor()
         try:
             cursor.execute("""
                 UPDATE shop_addons
                 SET status = 'deselected'
-                WHERE shop_name = %s AND addon_type = %s AND addon_id != %s
+                WHERE shop_name = %s AND addon_type = %s AND addon_id != %s AND status != 'purchased'
             """, (shop_name, addon_type, addon_id))
             self.conn.commit()
         except Exception as e:
@@ -699,7 +712,7 @@ class StorePayment:
                 SELECT * FROM store_payments
                 WHERE stripe_payment_id = %s
             """, (stripe_payment_id,))
-            return cursor.fetchone()
+            return cursor.fetchone()    
         except Exception as e:
             print(f"Error fetching payment by Stripe ID: {e}")
             return None
@@ -719,5 +732,227 @@ class StorePayment:
         except Exception as e:
             print(f"Error fetching subscription payments: {e}")
             return []
+        finally:
+            cursor.close()
+
+# Classe per PRODOTTI --------------------------------------------------------------------------------------------
+
+class Products:
+    def __init__(self, db_conn):
+        self.conn = db_conn
+
+    # Metodo per ottenere tutti i prodotti
+    def get_all_products(self, shop_name):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            # Query per estrarre tutti i dati relativi ai prodotti e tabelle correlate
+            cursor.execute("""
+                SELECT 
+                    products.id,
+                    products.name,
+                    products.description,
+                    products.short_description,
+                    products.price,
+                    products.discount_price,
+                    products.stock_quantity,
+                    products.sku,
+                    products.weight,
+                    products.dimensions,
+                    products.color,
+                    products.material,
+                    products.image_url,
+                    products.slug,
+                    products.is_active,
+                    products.created_at,
+                    products.updated_at,
+                    categories.name AS category_name,
+                    brands.name AS brand_name
+                FROM products
+                LEFT JOIN categories ON products.category_id = categories.id
+                LEFT JOIN brands ON products.brand_id = brands.id
+                WHERE products.shop_name = %s
+            """, (shop_name,))
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error fetching products for shop: {e}")
+            return []
+        finally:
+            cursor.close()
+
+    # Metodo per ottenere un prodotto per ID
+    def get_product_by_id(self, product_id):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT * FROM products WHERE id = %s", (product_id,))
+            return cursor.fetchone()
+        except Exception as e:
+            print(f"Error fetching product by ID: {e}")
+            return None
+        finally:
+            cursor.close()
+
+    # Metodo per ottenere un prodotto per slug
+    def get_product_by_slug(self, slug, shop_name):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT * FROM products WHERE slug = %s AND shop_name = %s", (slug, shop_name))
+            return cursor.fetchone()
+        except Exception as e:
+            print(f"Error fetching product by slug: {e}")
+            return None
+        finally:
+            cursor.close()
+
+    # Metodo per creare un nuovo prodotto
+    def create_product(self, shop_name, name, description, short_description, slug, price, discount_price,
+                       stock_quantity, language, sku, category_id, brand_id, weight, dimensions, color,
+                       material, image_url, is_active):
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute("""
+                INSERT INTO products (shop_name, name, description, short_description, slug, price, discount_price,
+                                      stock_quantity, language, sku, category_id, brand_id, weight, dimensions,
+                                      color, material, image_url, is_active, created_at, updated_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+            """, (shop_name, name, description, short_description, slug, price, discount_price, stock_quantity,
+                  language, sku, category_id, brand_id, weight, dimensions, color, material, image_url, is_active))
+            self.conn.commit()
+            return cursor.lastrowid
+        except Exception as e:
+            print(f"Error creating product: {e}")
+            self.conn.rollback()
+            return None
+        finally:
+            cursor.close()
+
+    # Metodo per aggiornare un prodotto esistente
+    def update_product(self, product_id, name, description, short_description, slug, price, discount_price,
+                       stock_quantity, language, sku, category_id, brand_id, weight, dimensions, color,
+                       material, image_url, is_active):
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute("""
+                UPDATE products
+                SET name = %s, description = %s, short_description = %s, slug = %s, price = %s,
+                    discount_price = %s, stock_quantity = %s, language = %s, sku = %s, category_id = %s,
+                    brand_id = %s, weight = %s, dimensions = %s, color = %s, material = %s,
+                    image_url = %s, is_active = %s, updated_at = NOW()
+                WHERE id = %s
+            """, (name, description, short_description, slug, price, discount_price, stock_quantity, language,
+                  sku, category_id, brand_id, weight, dimensions, color, material, image_url, is_active, product_id))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error updating product: {e}")
+            self.conn.rollback()
+            return False
+        finally:
+            cursor.close()
+
+    # Metodo per eliminare un prodotto
+    def delete_product(self, product_id):
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute("DELETE FROM products WHERE id = %s", (product_id,))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error deleting product: {e}")
+            self.conn.rollback()
+            return False
+        finally:
+            cursor.close()
+
+    # Metodo per ottenere i prodotti per categoria
+    def get_products_by_category(self, category_id):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT * FROM products WHERE category_id = %s", (category_id,))
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error fetching products by category: {e}")
+            return []
+        finally:
+            cursor.close()
+
+    # Metodo per ottenere i prodotti per brand
+    def get_products_by_brand(self, brand_id):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT * FROM products WHERE brand_id = %s", (brand_id,))
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error fetching products by brand: {e}")
+            return []
+        finally:
+            cursor.close()
+
+    # Metodo per ottenere le categorie
+    def get_all_categories(self, shop_name):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT * FROM categories WHERE shop_name = %s", (shop_name,))
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error fetching categories: {e}")
+            return []
+        finally:
+            cursor.close()
+
+    # Metodo per ottenere gli attributi di un prodotto
+    def get_product_attributes(self, product_id):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT * FROM product_attributes WHERE product_id = %s", (product_id,))
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error fetching product attributes: {e}")
+            return []
+        finally:
+            cursor.close()
+
+    # Metodo per ottenere le immagini di un prodotto
+    def get_product_images(self, product_id):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT * FROM product_images WHERE product_id = %s", (product_id,))
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error fetching product images: {e}")
+            return []
+        finally:
+            cursor.close()
+
+    # Metodo per aggiungere un attributo a un prodotto
+    def add_product_attribute(self, product_id, attribute_name, attribute_value):
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute("""
+                INSERT INTO product_attributes (product_id, attribute_name, attribute_value)
+                VALUES (%s, %s, %s)
+            """, (product_id, attribute_name, attribute_value))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error adding product attribute: {e}")
+            self.conn.rollback()
+            return False
+        finally:
+            cursor.close()
+
+    # Metodo per aggiungere un'immagine a un prodotto
+    def add_product_image(self, product_id, image_url, is_main=False):
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute("""
+                INSERT INTO product_images (product_id, image_url, is_main)
+                VALUES (%s, %s, %s)
+            """, (product_id, image_url, is_main))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error adding product image: {e}")
+            self.conn.rollback()
+            return False
         finally:
             cursor.close()

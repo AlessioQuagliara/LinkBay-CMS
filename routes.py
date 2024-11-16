@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, request, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from models import User, ShopList, Page, WebSettings, CookiePolicy, CMSAddon, UserStoreAccess
+from models import User, ShopList, Page, WebSettings, CookiePolicy, CMSAddon, UserStoreAccess, Products
 from app import app, get_db_connection, get_auth_db_connection
 from datetime import datetime
 from creators import capture_screenshot
@@ -164,7 +164,16 @@ def orders():
 def products():
     username = check_user_authentication()
     if isinstance(username, str):
-        return render_template('admin/cms/pages/products.html', title='Products', username=username)
+        shop_subdomain = request.host.split('.')[0]  # Ottieni il nome del negozio dal sottodominio
+        with get_db_connection() as db_conn:
+            products_model = Products(db_conn)
+            products_list = products_model.get_all_products(shop_subdomain)  # Passa shop_subdomain come parametro
+        return render_template(
+            'admin/cms/pages/products.html', 
+            title='Products', 
+            username=username, 
+            products=products_list
+        )
     return username
 
 @app.route('/admin/cms/pages/customers')
@@ -705,15 +714,25 @@ def services():
         with get_db_connection() as db_conn:
             addon_model = CMSAddon(db_conn)
             service_addons = addon_model.get_addons_by_type('service')
+            
             for addon in service_addons:
                 status = addon_model.get_addon_status(shop_name, addon['id'])
-                addon['status'] = status if status else 'select'
+                
+                # Se lo stato è 'purchased', assicuriamoci che non possa essere modificato
+                if status == 'purchased':
+                    addon['status'] = 'purchased'
+                elif status == 'selected':
+                    addon['status'] = 'selected'
+                else:
+                    addon['status'] = 'select'  # Default per add-ons non selezionati né acquistati
+
         return render_template(
             'admin/cms/store-components/services.html',
             title='Services',
             username=username,
             addons=service_addons
         )
+    
     return username
 
 
