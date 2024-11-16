@@ -1,0 +1,302 @@
+{% extends "/admin/cms/interface/render.html" %}
+
+{% block content %}
+<!-- CONTENUTO -->
+<div class="container my-4" data-aos="fade-up">
+
+    <!-- General Information Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark">
+            <h6 class="text-white mb-0">General Information</h6>
+        </div>
+        <div class="card-body">
+            <form id="product-form">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ product.name }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="short_description" class="form-label">Short Description</label>
+                        <input type="text" class="form-control" id="short_description" name="short_description" value="{{ product.short_description }}" required>
+                    </div>
+                    <div class="col-md-12">
+                        <label for="description" class="form-label">Description</label>
+                        <div id="editor-container" style="height: 300px;"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Images Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark">
+            <h6 class="text-white mb-0">Manage Images</h6>
+        </div>
+        <div class="card-body">
+            <form id="image-upload-form">
+                <div class="mb-3">
+                    <label for="image-input" class="form-label">Upload Image</label>
+                    <input type="file" class="form-control" id="image-input" accept="image/*">
+                </div>
+                <button type="button" class="btn btn-primary" id="add-image">Add Image</button>
+            </form>
+            <div id="image-preview-container" class="mt-4 d-flex flex-wrap gap-3"></div>
+        </div>
+    </div>
+
+    <!-- Pricing Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark">
+            <h6 class="text-white mb-0">Pricing</h6>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="price" class="form-label">Price</label>
+                    <input type="number" step="0.01" class="form-control" id="price" name="price" value="{{ product.price }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="discount_price" class="form-label">Discount Price</label>
+                    <input type="number" step="0.01" class="form-control" id="discount_price" name="discount_price" value="{{ product.discount_price }}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark">
+            <h6 class="text-white mb-0">Inventory</h6>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="stock_quantity" class="form-label">Stock Quantity</label>
+                    <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" value="{{ product.stock_quantity }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="sku" class="form-label">SKU</label>
+                    <input type="text" class="form-control" id="sku" name="sku" value="{{ product.sku }}" required>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Details Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark">
+            <h6 class="text-white mb-0">Product Details</h6>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="category_id" class="form-label">Category</label>
+                    <select class="form-select" id="category_id" name="category_id">
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if product.category_id == category.id %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="brand_id" class="form-label">Brand</label>
+                    <select class="form-select" id="brand_id" name="brand_id">
+                        {% for brand in brands %}
+                        <option value="{{ brand.id }}" {% if product.brand_id == brand.id %}selected{% endif %}>
+                            {{ brand.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dimensions & Weight Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark">
+            <h6 class="text-white mb-0">Dimensions & Weight</h6>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="weight" class="form-label">Weight</label>
+                    <input type="number" step="0.01" class="form-control" id="weight" name="weight" value="{{ product.weight }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="dimensions" class="form-label">Dimensions</label>
+                    <input type="text" class="form-control" id="dimensions" name="dimensions" value="{{ product.dimensions }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="color" class="form-label">Color</label>
+                    <input type="text" class="form-control" id="color" name="color" value="{{ product.color }}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Materials & Images Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark">
+            <h6 class="text-white mb-0">Materials & Images</h6>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="material" class="form-label">Material</label>
+                    <input type="text" class="form-control" id="material" name="material" value="{{ product.material }}">
+                </div>
+                <div class="col-md-6">
+                    <label for="image_url" class="form-label">Image URL</label>
+                    <input type="url" class="form-control" id="image_url" name="image_url" value="{{ product.image_url }}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark">
+            <h6 class="text-white mb-0">Status</h6>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="slug" class="form-label">Slug</label>
+                    <input type="text" class="form-control" id="slug" name="slug" value="{{ product.slug }}">
+                </div>
+                <div class="col-md-6">
+                    <label for="is_active" class="form-label">Is Active</label>
+                    <select class="form-select" id="is_active" name="is_active">
+                        <option value="1" {% if product.is_active %}selected{% endif %}>Yes</option>
+                        <option value="0" {% if not product.is_active %}selected{% endif %}>No</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Inizializza Quill
+    const quill = new Quill('#editor-container', {
+        theme: 'snow',
+        placeholder: 'Write your product description here...',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                ['link', 'image', 'video'],
+                ['clean']
+            ]
+        }
+    });
+
+    // Precarica descrizione esistente
+    quill.root.innerHTML = "{{ product.description | safe }}";
+
+
+
+
+    
+
+    document.getElementById('save-content').addEventListener('click', function () {
+    const productForm = document.getElementById('product-form');
+
+    if (!productForm) {
+        Swal.fire('Error', 'Product form not found!', 'error');
+        return;
+    }
+
+    const name = document.getElementById('name').value.trim();
+    const price = document.getElementById('price').value.trim();
+    const productId = "{{ product.id }}"; // Passa l'ID del prodotto dal template
+
+    if (!name || !price) {
+        Swal.fire('Validation Error', 'Name and Price are required fields.', 'error');
+        return;
+    }
+
+    const formData = new FormData(productForm);
+    formData.append('description', quill.root.innerHTML);
+    formData.append('id', productId); // Aggiungi l'ID del prodotto
+
+    fetch('/admin/cms/update-product', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire('Success', 'Product saved successfully!', 'success').then(() => {
+                window.location.href = '/admin/products';
+            });
+        } else {
+            Swal.fire('Error', data.message || 'Failed to save the product.', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire('Error', 'A network or server error occurred.', 'error');
+    });
+});
+
+
+
+
+    // Gestione immagine dinamica
+    const imageInput = document.getElementById('image-input');
+    const addImageButton = document.getElementById('add-image');
+    const imagePreviewContainer = document.getElementById('image-preview-container');
+
+    addImageButton.addEventListener('click', function () {
+        const file = imageInput.files[0];
+        if (!file) {
+            Swal.fire('Error', 'Please select an image.', 'error');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const imageContainer = document.createElement('div');
+            imageContainer.classList.add('position-relative', 'me-3');
+
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.alt = 'Uploaded Image';
+            img.classList.add('rounded', 'shadow-sm', 'img-thumbnail');
+
+            const removeButton = document.createElement('button');
+            removeButton.classList.add('btn', 'btn-danger', 'btn-sm', 'position-absolute', 'top-0', 'end-0', 'm-1');
+            removeButton.innerHTML = '&times;';
+            removeButton.onclick = function () {
+                imageContainer.remove();
+            };
+
+            imageContainer.appendChild(img);
+            imageContainer.appendChild(removeButton);
+            imagePreviewContainer.appendChild(imageContainer);
+        };
+        reader.readAsDataURL(file);
+    });
+});
+</script>
+<style>
+    #editor-container {
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 10px;
+        background: #fff;
+    }
+</style>
+{% endblock %}
+
+
+
+

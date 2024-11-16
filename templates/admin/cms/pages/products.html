@@ -4,27 +4,27 @@
 <div class="container my-4">
 
     <!-- Card per le funzioni della tabella -->
-    <div class="card shadow-sm mb-4">
+    <div class="card shadow-sm mb-4" data-aos="fade-up">
         <div class="card-body d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0">Products Management</h5>
             <div>
-                <button class="btn btn-warning btn-sm mx-1" title="Add Product">
+                <button class="btn btn-dark btn-sm mx-1" title="Add Product">
                     <i class="fa-solid fa-plus"></i>
                 </button>
 
-                <button class="btn btn-primary btn-sm mx-1 select-all" title="Select All">
+                <button class="btn btn-dark btn-sm mx-1 select-all" title="Select All">
                     <i class="fa-solid fa-check"></i>
                 </button>
 
-                <button class="btn btn-danger btn-sm mx-1 delete-selected" title="Delete">
+                <button class="btn btn-dark btn-sm mx-1 delete-selected" title="Delete">
                     <i class="fa-solid fa-trash"></i>
                 </button>
 
-                <button class="btn btn-success btn-sm mx-1" title="Export">
+                <button class="btn btn-dark btn-sm mx-1" title="Export">
                     <i class="fa-solid fa-file-excel"></i>
                 </button>
 
-                <button class="btn btn-secondary btn-sm mx-1" data-bs-toggle="modal" data-bs-target="#customizationModal" id="customize-columns" title="Customize Columns">
+                <button class="btn btn-dark btn-sm mx-1" data-bs-toggle="modal" data-bs-target="#customizationModal" id="customize-columns" title="Customize Columns">
                     <i class="fa-solid fa-cog"></i>
                 </button>
             </div>
@@ -32,9 +32,7 @@
     </div>
 
     <!-- Card per la tabella dei prodotti -->
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
+            <div class="table-responsive" data-aos="fade-up">
                 <table class="table table-hover table-bordered align-middle text-center" style="border-radius: 10px;">
                     <thead class="table-dark">
                         <tr>
@@ -91,8 +89,6 @@
                 </table>
             </div>
         </div>
-    </div>
-</div>
 
 <!-- Modal di configurazione -->
 <div class="modal fade" id="customizationModal" tabindex="-1" aria-labelledby="customizationModalLabel" aria-hidden="true">
@@ -248,11 +244,27 @@
 
         loadPreferences();
     });
+
+    // DOPPIO CLICK CON MODIFICA
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const tableRows = document.querySelectorAll('.table-row');
+    
+        // Gestione del doppio click su una riga della tabella
+        tableRows.forEach(row => {
+            row.addEventListener('dblclick', function () {
+                const productId = this.getAttribute('data-product-id'); // Ottieni l'ID del prodotto dalla riga
+                if (productId) {
+                    window.location.href = `/admin/cms/pages/product/${productId}`; // Reindirizza alla rotta di modifica del prodotto
+                }
+            });
+        });
+    });
 </script>
 
 <style>
     .table-row:hover {
-        background-color: rgba(0, 123, 255, 0.1);
+        background-color: rgba(255, 14, 14, 0.1);
         transition: background-color 0.2s ease-in-out;
     }
     .table-bordered {
@@ -264,6 +276,10 @@
     }
     .table-active {
         background-color: rgba(40, 167, 69, 0.2);
+    }
+    .form-check-input:checked {
+        background-color: #db3545 !important;
+        border-color: #db3545 !important;
     }
 </style>
 

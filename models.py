@@ -779,18 +779,6 @@ class Products:
         finally:
             cursor.close()
 
-    # Metodo per ottenere un prodotto per ID
-    def get_product_by_id(self, product_id):
-        cursor = self.conn.cursor(dictionary=True)
-        try:
-            cursor.execute("SELECT * FROM products WHERE id = %s", (product_id,))
-            return cursor.fetchone()
-        except Exception as e:
-            print(f"Error fetching product by ID: {e}")
-            return None
-        finally:
-            cursor.close()
-
     # Metodo per ottenere un prodotto per slug
     def get_product_by_slug(self, slug, shop_name):
         cursor = self.conn.cursor(dictionary=True)
@@ -803,49 +791,63 @@ class Products:
         finally:
             cursor.close()
 
-    # Metodo per creare un nuovo prodotto
-    def create_product(self, shop_name, name, description, short_description, slug, price, discount_price,
-                       stock_quantity, language, sku, category_id, brand_id, weight, dimensions, color,
-                       material, image_url, is_active):
-        cursor = self.conn.cursor()
-        try:
-            cursor.execute("""
-                INSERT INTO products (shop_name, name, description, short_description, slug, price, discount_price,
-                                      stock_quantity, language, sku, category_id, brand_id, weight, dimensions,
-                                      color, material, image_url, is_active, created_at, updated_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
-            """, (shop_name, name, description, short_description, slug, price, discount_price, stock_quantity,
-                  language, sku, category_id, brand_id, weight, dimensions, color, material, image_url, is_active))
-            self.conn.commit()
-            return cursor.lastrowid
-        except Exception as e:
-            print(f"Error creating product: {e}")
-            self.conn.rollback()
-            return None
-        finally:
-            cursor.close()
+    # Metodo per gestire i prodotti
+    def create_product(self, data):
+            cursor = self.conn.cursor()
+            try:
+                query = """
+                    INSERT INTO products (name, short_description, description, price, discount_price, stock_quantity, sku, category_id, brand_id, weight, dimensions, color, material, image_url, slug, is_active, created_at, updated_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+                """
+                values = (
+                    data['name'], data['short_description'], data['description'], data['price'], data['discount_price'], data['stock_quantity'], data['sku'],
+                    data['category_id'], data['brand_id'], data['weight'], data['dimensions'], data['color'], data['material'], data['image_url'],
+                    data['slug'], data['is_active']
+                )
+                cursor.execute(query, values)
+                self.conn.commit()
+                return True
+            except Exception as e:
+                print(f"Error creating product: {e}")
+                self.conn.rollback()
+                return False
+            finally:
+                cursor.close()
 
-    # Metodo per aggiornare un prodotto esistente
-    def update_product(self, product_id, name, description, short_description, slug, price, discount_price,
-                       stock_quantity, language, sku, category_id, brand_id, weight, dimensions, color,
-                       material, image_url, is_active):
+    def update_product(self, product_id, data):
         cursor = self.conn.cursor()
         try:
-            cursor.execute("""
+            query = """
                 UPDATE products
-                SET name = %s, description = %s, short_description = %s, slug = %s, price = %s,
-                    discount_price = %s, stock_quantity = %s, language = %s, sku = %s, category_id = %s,
-                    brand_id = %s, weight = %s, dimensions = %s, color = %s, material = %s,
-                    image_url = %s, is_active = %s, updated_at = NOW()
-                WHERE id = %s
-            """, (name, description, short_description, slug, price, discount_price, stock_quantity, language,
-                  sku, category_id, brand_id, weight, dimensions, color, material, image_url, is_active, product_id))
+                SET name=%s, short_description=%s, description=%s, price=%s, discount_price=%s, stock_quantity=%s, 
+                    sku=%s, category_id=%s, brand_id=%s, weight=%s, dimensions=%s, color=%s, material=%s, 
+                    image_url=%s, slug=%s, is_active=%s, updated_at=NOW()
+                WHERE id=%s
+            """
+            values = (
+                data['name'], data['short_description'], data['description'], data['price'], data['discount_price'], 
+                data['stock_quantity'], data['sku'], data['category_id'], data['brand_id'], data['weight'], 
+                data['dimensions'], data['color'], data['material'], data['image_url'], data['slug'], 
+                data['is_active'], product_id
+            )
+            cursor.execute(query, values)
             self.conn.commit()
             return True
         except Exception as e:
             print(f"Error updating product: {e}")
             self.conn.rollback()
             return False
+        finally:
+            cursor.close()
+
+    def get_product_by_id(self, product_id):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT * FROM products WHERE id = %s", (product_id,))
+            return cursor.fetchone()
+        except Exception as e:
+            print(f"Error fetching product: {e}")
+            return None
         finally:
             cursor.close()
 

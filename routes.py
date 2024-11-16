@@ -160,6 +160,8 @@ def orders():
         return render_template('admin/cms/pages/orders.html', title='Orders', username=username)
     return username
 
+# PRODOTTI, GESTIONE E ROTTE ---------------------------------------------------------------------------------------
+
 @app.route('/admin/cms/pages/products')
 def products():
     username = check_user_authentication()
@@ -175,6 +177,78 @@ def products():
             products=products_list
         )
     return username
+
+@app.route('/admin/cms/pages/product/<int:product_id>', methods=['GET', 'POST'])
+@app.route('/admin/cms/pages/product', methods=['GET', 'POST'])
+def manage_product(product_id=None):
+    username = check_user_authentication()
+    if isinstance(username, str):
+        with get_db_connection() as db_conn:
+            product_model = Products(db_conn)
+
+            if request.method == 'POST':
+                # Ottieni i dati del prodotto
+                data = request.json
+                try:
+                    if product_id:  # Modifica
+                        success = product_model.update_product(product_id, data)
+                    else:  # Creazione
+                        success = product_model.create_product(data)
+
+                    if success:
+                        return jsonify({'status': 'success', 'message': 'Product saved successfully.'})
+                    else:
+                        return jsonify({'status': 'error', 'message': 'Failed to save the product.'})
+                except Exception as e:
+                    print(f"Error managing product: {e}")
+                    return jsonify({'status': 'error', 'message': 'An error occurred.'})
+
+            # Per GET: Ottieni i dettagli del prodotto (se esiste)
+            product = product_model.get_product_by_id(product_id) if product_id else {}
+            return render_template(
+                'admin/cms/pages/manage_product.html',
+                title='Manage Product',
+                username=username,
+                product=product
+            )
+    return username
+
+@app.route('/admin/cms/update-product', methods=['POST'])
+def update_product():
+    try:
+        # Log iniziale
+        print("Incoming request to update product.")
+
+        # Ottieni i dati dalla richiesta
+        data = request.form.to_dict()  # Usa request.form per FormData
+        print(f"Request data: {data}")
+
+        product_id = data.get('id')  # ID del prodotto
+        shop_subdomain = request.host.split('.')[0]
+        print(f"Product ID: {product_id}, Shop Subdomain: {shop_subdomain}")
+
+        if not product_id or not shop_subdomain:
+            print("Invalid product ID or shop name.")
+            return jsonify({'success': False, 'message': 'Invalid product ID or shop name.'}), 400
+
+        # Connessione al database
+        with get_db_connection() as db_conn:
+            product_model = Products(db_conn)
+
+            # Aggiorna il prodotto
+            success = product_model.update_product(product_id, data)
+            print(f"Update product result: {success}")
+
+            if success:
+                return jsonify({'success': True, 'message': 'Product updated successfully!'})
+            else:
+                print("Failed to update product in the database.")
+                return jsonify({'success': False, 'message': 'Failed to update product.'}), 500
+    except Exception as e:
+        print(f"Error updating product: {e}")
+        return jsonify({'success': False, 'message': 'An error occurred.'}), 500
+    
+    
 
 @app.route('/admin/cms/pages/customers')
 def customers():
@@ -655,7 +729,7 @@ def delete_page():
 
 # SCRIPT PAGE --------------------------------------------------------------------------------------------------------
 
-# NEGOZIO ONLINE -----------------------------------------------------------------------------------------------------
+# STORE -----------------------------------------------------------------------------------------------------
 @app.route('/capture-screenshot', methods=['POST'])
 def capture_screenshot_route():
     try:
