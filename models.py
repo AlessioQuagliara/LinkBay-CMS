@@ -814,27 +814,28 @@ class Products:
             finally:
                 cursor.close()
 
+    # UPDATE PRODOTTO 
     def update_product(self, product_id, data):
         cursor = self.conn.cursor()
         try:
             query = """
                 UPDATE products
-                SET name=%s, short_description=%s, description=%s, price=%s, discount_price=%s, stock_quantity=%s, 
-                    sku=%s, category_id=%s, brand_id=%s, weight=%s, dimensions=%s, color=%s, material=%s, 
-                    image_url=%s, slug=%s, is_active=%s, updated_at=NOW()
-                WHERE id=%s
+                SET name = %s, short_description = %s, description = %s, price = %s, discount_price = %s, stock_quantity = %s,
+                    sku = %s, category_id = %s, brand_id = %s, weight = %s, dimensions = %s, color = %s, material = %s,
+                    image_url = %s, slug = %s, is_active = %s, updated_at = NOW()
+                WHERE id = %s
             """
             values = (
-                data['name'], data['short_description'], data['description'], data['price'], data['discount_price'], 
-                data['stock_quantity'], data['sku'], data['category_id'], data['brand_id'], data['weight'], 
-                data['dimensions'], data['color'], data['material'], data['image_url'], data['slug'], 
-                data['is_active'], product_id
+                data.get('name'), data.get('short_description'), data.get('description'), data.get('price'),
+                data.get('discount_price'), data.get('stock_quantity'), data.get('sku'), data.get('category_id'),
+                data.get('brand_id'), data.get('weight'), data.get('dimensions'), data.get('color'), data.get('material'),
+                data.get('image_url'), data.get('slug'), data.get('is_active'), product_id
             )
             cursor.execute(query, values)
             self.conn.commit()
             return True
         except Exception as e:
-            print(f"Error updating product: {e}")
+            print(f"Database Error: {e}")
             self.conn.rollback()
             return False
         finally:
@@ -850,6 +851,34 @@ class Products:
             return None
         finally:
             cursor.close()
+
+    def create_product(self, data):
+        cursor = self.conn.cursor()
+        try:
+            query = """
+                INSERT INTO products (
+                    name, short_description, description, price, discount_price, stock_quantity, sku, 
+                    category_id, brand_id, weight, dimensions, color, material, image_url, slug, 
+                    is_active, shop_name, created_at, updated_at
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+            """
+            values = (
+                data["name"], data["short_description"], data["description"], data["price"],
+                data["discount_price"], data["stock_quantity"], data["sku"], data["category_id"],
+                data["brand_id"], data["weight"], data["dimensions"], data["color"],
+                data["material"], data["image_url"], data["slug"], data["is_active"],
+                data["shop_name"]
+            )
+            cursor.execute(query, values)
+            self.conn.commit()
+            return cursor.lastrowid
+        except Exception as e:
+            print(f"Error creating product: {e}")
+            self.conn.rollback()
+            return None
+        finally:
+            cursor.close()
+
 
     # Metodo per eliminare un prodotto
     def delete_product(self, product_id):
@@ -913,18 +942,6 @@ class Products:
         finally:
             cursor.close()
 
-    # Metodo per ottenere le immagini di un prodotto
-    def get_product_images(self, product_id):
-        cursor = self.conn.cursor(dictionary=True)
-        try:
-            cursor.execute("SELECT * FROM product_images WHERE product_id = %s", (product_id,))
-            return cursor.fetchall()
-        except Exception as e:
-            print(f"Error fetching product images: {e}")
-            return []
-        finally:
-            cursor.close()
-
     # Metodo per aggiungere un attributo a un prodotto
     def add_product_attribute(self, product_id, attribute_name, attribute_value):
         cursor = self.conn.cursor()
@@ -942,6 +959,18 @@ class Products:
         finally:
             cursor.close()
 
+    # Metodo per ottenere le immagini di un prodotto
+    def get_product_images(self, product_id):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT * FROM product_images WHERE product_id = %s", (product_id,))
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error fetching product images: {e}")
+            return []
+        finally:
+            cursor.close()
+
     # Metodo per aggiungere un'immagine a un prodotto
     def add_product_image(self, product_id, image_url, is_main=False):
         cursor = self.conn.cursor()
@@ -951,10 +980,10 @@ class Products:
                 VALUES (%s, %s, %s)
             """, (product_id, image_url, is_main))
             self.conn.commit()
-            return True
+            return cursor.lastrowid  # Restituisci l'ID del record appena inserito
         except Exception as e:
             print(f"Error adding product image: {e}")
             self.conn.rollback()
-            return False
+            return None
         finally:
             cursor.close()

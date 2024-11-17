@@ -188,7 +188,7 @@ def manage_product(product_id=None):
 
             if request.method == 'POST':
                 # Ottieni i dati del prodotto
-                data = request.json
+                data = request.get_json()  # Assicurati che il contenuto sia JSON
                 try:
                     if product_id:  # Modifica
                         success = product_model.update_product(product_id, data)
@@ -205,50 +205,164 @@ def manage_product(product_id=None):
 
             # Per GET: Ottieni i dettagli del prodotto (se esiste)
             product = product_model.get_product_by_id(product_id) if product_id else {}
+
+            # Ottieni le immagini associate al prodotto, se esiste
+            images = product_model.get_product_images(product_id) if product_id else []
+
+            shop_subdomain = request.host.split('.')[0]  
+
+            # Log di debug per verificare i dati passati
+            print(f"Product: {product}")
+            print(f"Images: {images}")
+            print(f"Shop Subdomain: {shop_subdomain}")
+
             return render_template(
                 'admin/cms/pages/manage_product.html',
                 title='Manage Product',
                 username=username,
-                product=product
+                product=product,
+                images=images,
+                shop_subdomain=shop_subdomain  # Passa il sottodominio al template
             )
     return username
 
-@app.route('/admin/cms/update-product', methods=['POST'])
-def update_product():
+@app.route('/admin/cms/create_product', methods=['POST'])
+def create_product():
     try:
-        # Log iniziale
-        print("Incoming request to update product.")
+        # Ottieni i valori predefiniti o forniti
+        shop_subdomain = request.host.split('.')[0]  # Sottodominio per identificare il negozio
+        default_values = {
+            "name": "New Product",
+            "short_description": "Short description",
+            "description": "Detailed description",
+            "price": 0.0,
+            "discount_price": 0.0,
+            "stock_quantity": 0,
+            "sku": "NEW_SKU",
+            "category_id": None,  # Assicurati che queste categorie esistano
+            "brand_id": None,
+            "weight": 0.0,
+            "dimensions": "0x0x0",
+            "color": "Default color",
+            "material": "Default material",
+            "image_url": "/static/images/default.png",
+            "slug": f"new-product-{uuid.uuid4().hex[:8]}",
+            "is_active": False,
+            "shop_name": shop_subdomain,
+        }
 
-        # Ottieni i dati dalla richiesta
-        data = request.form.to_dict()  # Usa request.form per FormData
-        print(f"Request data: {data}")
-
-        product_id = data.get('id')  # ID del prodotto
-        shop_subdomain = request.host.split('.')[0]
-        print(f"Product ID: {product_id}, Shop Subdomain: {shop_subdomain}")
-
-        if not product_id or not shop_subdomain:
-            print("Invalid product ID or shop name.")
-            return jsonify({'success': False, 'message': 'Invalid product ID or shop name.'}), 400
-
-        # Connessione al database
         with get_db_connection() as db_conn:
             product_model = Products(db_conn)
+            new_product_id = product_model.create_product(default_values)
 
-            # Aggiorna il prodotto
-            success = product_model.update_product(product_id, data)
-            print(f"Update product result: {success}")
-
-            if success:
-                return jsonify({'success': True, 'message': 'Product updated successfully!'})
-            else:
-                print("Failed to update product in the database.")
-                return jsonify({'success': False, 'message': 'Failed to update product.'}), 500
+        return jsonify({
+            'success': True,
+            'message': 'Product created successfully.',
+            'product_id': new_product_id
+        })
     except Exception as e:
-        print(f"Error updating product: {e}")
-        return jsonify({'success': False, 'message': 'An error occurred.'}), 500
+        print(f"Error creating product: {e}")
+        return jsonify({'success': False, 'message': 'Failed to create product.'}), 500
     
+@app.route('/admin/cms/delete_products', methods=['POST'])
+def delete_products():
+    try:
+        data = request.get_json()  # Ottieni i dati dalla richiesta
+        product_ids = data.get('product_ids')  # Array di ID dei prodotti da eliminare
+
+        if not product_ids:
+            return jsonify({'success': False, 'message': 'No product IDs provided.'}), 400
+
+        with get_db_connection() as db_conn:
+            product_model = Products(db_conn)
+            for product_id in product_ids:
+                success = product_model.delete_product(product_id)
+                if not success:
+                    return jsonify({'success': False, 'message': f'Failed to delete product with ID {product_id}.'}), 500
+
+        return jsonify({'success': True, 'message': 'Selected products deleted successfully.'})
+    except Exception as e:
+        print(f"Error deleting products: {e}")
+        return jsonify({'success': False, 'message': 'An error occurred during deletion.'}), 500
+
+@app.route('/admin/cms/update_product', methods=['POST'])
+def update_product():
+    try:
+        data = request.form.to_dict()  # Usa request.form per raccogliere i dati del FormData
+        product_id = data.get('id')
+
+        if not product_id:
+            return jsonify({'success': False, 'message': 'Product ID is required.'}), 400
+
+        # Connetti al database
+        with get_db_connection() as db_conn:
+            product_model = Products(db_conn)
+            success = product_model.update_product(product_id, data)
+
+        if success:
+            return jsonify({'success': True, 'message': 'Product updated successfully!'})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to update the product.'}), 500
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500
     
+@app.route('/admin/cms/upload_image_product', methods=['POST'])
+def upload_image_product():
+    try:
+        product_id = request.form.get('product_id')
+        image = request.files.get('image')
+
+        if not product_id or not image:
+            return jsonify({'success': False, 'message': 'Product ID or image is missing.'}), 400
+
+        # Genera un nome univoco per il file
+        unique_filename = f"{uuid.uuid4().hex}_{image.filename}"
+        upload_folder = os.path.join('static', 'uploads', 'products')
+        os.makedirs(upload_folder, exist_ok=True)
+        image_path = os.path.join(upload_folder, unique_filename)
+
+        # Salva il file
+        image.save(image_path)
+
+        # Aggiungi l'immagine al database
+        db_conn = get_db_connection()
+        products_model = Products(db_conn)
+        image_id = products_model.add_product_image(product_id, f"/{image_path}")
+
+        if image_id:
+            return jsonify({'success': True, 'image_url': f"/{image_path}", 'image_id': image_id})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to save image to database.'}), 500
+    except Exception as e:
+        print(f"Error uploading image: {e}")
+        return jsonify({'success': False, 'message': 'An error occurred during upload.'}), 500
+    
+@app.route('/admin/cms/delete_image_product', methods=['POST'])
+def delete_image_product():
+    try:
+        data = request.get_json()
+        image_id = data.get('image_id')
+
+        if not image_id:
+            return jsonify({'success': False, 'message': 'Image ID is missing.'}), 400
+
+        db_conn = get_db_connection()
+        products_model = Products(db_conn)
+        image = products_model.get_product_images(image_id)
+
+        if image and os.path.exists(image[0]['image_url'][1:]):  # Rimuove '/' iniziale
+            os.remove(image[0]['image_url'][1:])
+
+        cursor = db_conn.cursor()
+        cursor.execute("DELETE FROM product_images WHERE id = %s", (image_id,))
+        db_conn.commit()
+        cursor.close()
+
+        return jsonify({'success': True, 'message': 'Image deleted successfully.'})
+    except Exception as e:
+        print(f"Error deleting image: {e}")
+        return jsonify({'success': False, 'message': 'An error occurred during deletion.'}), 500
 
 @app.route('/admin/cms/pages/customers')
 def customers():

@@ -94,6 +94,17 @@
                     });
                     return;
                 }
+                
+                // Mostra un'animazione di caricamento
+                Swal.fire({
+                    title: 'Saving...',
+                    text: 'Please wait while your content is being saved.',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => Swal.showLoading(),
+                });
+                
         
                 document.getElementById('content').value = content;
 

@@ -509,6 +509,16 @@
                 return;
             }
 
+                // Mostra un messaggio di caricamento
+                Swal.fire({
+                    title: 'Saving...',
+                    text: 'Processing your content and uploading images.',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => Swal.showLoading(),
+                });
+
             // Funzione per gestire l'upload delle immagini in formato base64
             async function uploadBase64Image(base64Image) {
                 try {
