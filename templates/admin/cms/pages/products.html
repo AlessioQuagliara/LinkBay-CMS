@@ -64,7 +64,7 @@
                             <td><input type="checkbox" class="row-checkbox"></td>
                             <td class="id">{{ product.id }}</td>
                             <td class="name">{{ product.name }}</td>
-                            <td class="description">{{ product.description }}</td>
+                            <td class="description">{{ product.description | safe }}</td>
                             <td class="short_description">{{ product.short_description }}</td>
                             <td class="price">€{{ product.price }}</td>
                             <td class="discount_price">€{{ product.discount_price }}</td>
