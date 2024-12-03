@@ -6,8 +6,23 @@
     <!-- Card per le funzioni della tabella -->
     <div class="card shadow-sm mb-4" data-aos="fade-up">
         <div class="card-body d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">Products Management</h5>
+            <div class="d-flex gap-3">
+                <a href="/admin/cms/pages/products" class="btn {% if title == 'Products' %}btn-dark{% else %}btn-outline-dark{% endif %} btn-sm text-decoration-none ">
+                    <i class="fa-solid fa-box"></i> Products
+                </a>
+                <a href="/admin/cms/pages/collections" class="btn btn-outline-dark btn-sm text-decoration-none">
+                    <i class="fa-solid fa-layer-group"></i> Collections
+                </a>
+                <a href="/categories" class="btn btn-outline-dark btn-sm text-decoration-none">
+                    <i class="fa-solid fa-tags"></i> Categories
+                </a>
+            </div>
             <div>
+                <button class="btn btn-dark btn-sm mx-1" id="search-toggle-btn" title="Search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="search-input" class="form-control form-control-sm d-none" placeholder="Search..." style="max-width: 200px;">
+                </button>
+                
                 <button class="btn btn-dark btn-sm mx-1" title="Add Product" id="add-product-btn" >
                     <i class="fa-solid fa-plus"></i>
                 </button>
@@ -20,7 +35,7 @@
                     <i class="fa-solid fa-trash"></i>
                 </button>
 
-                <button class="btn btn-dark btn-sm mx-1" title="Export">
+                <button class="btn btn-dark btn-sm mx-1" title="Export" id="export-products-btn">
                     <i class="fa-solid fa-file-excel"></i>
                 </button>
 
@@ -88,6 +103,7 @@
                     </tbody>
                 </table>
             </div>
+
         </div>
 
 <!-- Modal di configurazione -->
@@ -355,6 +371,49 @@
         }
     });
 });
+
+ // ESPORTA IN CSV I PRODOTTI
+document.getElementById('export-products-btn').addEventListener('click', function () {
+    Swal.fire({
+        title: 'Exporting...',
+        text: 'Please wait while the data is being exported.',
+        icon: 'info',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => Swal.showLoading()
+    });
+
+    // Reindirizza alla rotta di esportazione
+    window.location.href = '/admin/cms/export_products';
+});
+
+// SCRIPT DI RICERCA
+document.addEventListener('DOMContentLoaded', function () {
+    const searchToggleBtn = document.getElementById('search-toggle-btn');
+    const searchInput = document.getElementById('search-input');
+    const tableRows = document.querySelectorAll('.table-row');
+
+    // Mostra/Nascondi l'input di ricerca
+    searchToggleBtn.addEventListener('click', function () {
+        searchInput.classList.toggle('d-none');
+        searchInput.focus();
+    });
+
+    // Filtra i prodotti in base alla ricerca
+    searchInput.addEventListener('input', function () {
+        const query = searchInput.value.toLowerCase().trim();
+
+        tableRows.forEach(row => {
+            const rowText = row.innerText.toLowerCase();
+            if (rowText.includes(query)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+
 </script>
 
 <style>
@@ -375,6 +434,29 @@
     .form-check-input:checked {
         background-color: #db3545 !important;
         border-color: #db3545 !important;
+    }
+    .fixed-on-bottom {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 1050;
+        background: #f8f9fa;
+        box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+    }
+    .fixed-on-bottom .btn {
+        border-radius: 50px;
+        transition: all 0.2s ease-in-out;
+    }
+    .fixed-on-bottom .btn:hover {
+        background-color: #343a40;
+        color: white;
+    }
+    .fixed-on-bottom i {
+        margin-right: 8px;
+    }
+    #search-input {
+        transition: all 1s ease;
     }
 </style>
 

@@ -987,3 +987,132 @@ class Products:
             return None
         finally:
             cursor.close()
+
+# COLLEZIONI ---------------------------------------------------------------------------------------------------
+
+class Collections:
+    def __init__(self, db_conn):
+        self.conn = db_conn
+
+    def get_all_collections(self, shop_name):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            query = "SELECT * FROM collections WHERE shop_name = %s"
+            cursor.execute(query, (shop_name,))
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error fetching collections: {e}")
+            return []
+        finally:
+            cursor.close()
+
+    def get_collection_by_id(self, collection_id):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            query = "SELECT * FROM collections WHERE id = %s"
+            cursor.execute(query, (collection_id,))
+            return cursor.fetchone()
+        except Exception as e:
+            print(f"Error fetching collection by ID: {e}")
+            return None
+        finally:
+            cursor.close()
+
+    def create_collection(self, data):
+        cursor = self.conn.cursor()
+        try:
+            query = """
+                INSERT INTO collections (
+                    name, description,  image_url,
+                    is_active, shop_name, created_at, updated_at
+                ) VALUES (%s, %s, %s, %s, %s, NOW(), NOW())
+            """
+            values = (
+                data["name"], data["description"], data["image_url"], data["is_active"],
+                data["shop_name"]
+            )
+            cursor.execute(query, values)
+            self.conn.commit()
+            return cursor.lastrowid
+        except Exception as e:
+            print(f"Error creating product: {e}")
+            self.conn.rollback()
+            return None
+        finally:
+            cursor.close()
+
+    def update_collection(self, collection_id, data):
+        cursor = self.conn.cursor()
+        try:
+            query = """
+                UPDATE collections
+                SET name = %s, description = %s, image_url = %s, is_active = %s, updated_at = NOW()
+                WHERE id = %s
+            """
+            values = (
+                data.get('name'), data.get('description'), data.get('image_url'),
+                data.get('is_active'), collection_id
+            )
+            cursor.execute(query, values)
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Database Error: {e}")
+            self.conn.rollback()
+            return False
+        finally:
+            cursor.close()
+
+    def delete_collection(self, collection_id):
+        cursor = self.conn.cursor()
+        try:
+            query = "DELETE FROM collections WHERE id = %s"
+            cursor.execute(query, (collection_id,))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error deleting collection: {e}")
+            self.conn.rollback()
+            return False
+        finally:
+            cursor.close()
+
+    def add_collection_image(self, collection_id, image_url, is_main=False):
+        cursor = self.conn.cursor()
+        try:
+            query = """
+                INSERT INTO collection_images (collection_id, image_url, is_main)
+                VALUES (%s, %s, %s)
+            """
+            cursor.execute(query, (collection_id, image_url, is_main))
+            self.conn.commit()
+            return cursor.lastrowid
+        except Exception as e:
+            print(f"Error adding collection image: {e}")
+            self.conn.rollback()
+            return None
+        finally:
+            cursor.close()
+
+    def get_collection_images(self, collection_id):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            query = "SELECT * FROM collection_images WHERE collection_id = %s"
+            cursor.execute(query, (collection_id,))
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error fetching collection images: {e}")
+            return []
+        finally:
+            cursor.close()
+    def get_collection_image_by_id(self, image_id):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            query = "SELECT * FROM collection_images WHERE id = %s"
+            cursor.execute(query, (image_id,))
+            return cursor.fetchone()
+        except Exception as e:
+            print(f"Error fetching collection image by ID: {e}")
+            return None
+        finally:
+            cursor.close()

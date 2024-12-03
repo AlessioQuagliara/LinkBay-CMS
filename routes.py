@@ -1,11 +1,11 @@
-from flask import render_template, redirect, url_for, request, flash, session, jsonify
+from flask import render_template, redirect, url_for, request, flash, session, jsonify, Response
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from models import User, ShopList, Page, WebSettings, CookiePolicy, CMSAddon, UserStoreAccess, Products
+from models import User, ShopList, Page, WebSettings, CookiePolicy, CMSAddon, UserStoreAccess, Products, Collections
 from app import app, get_db_connection, get_auth_db_connection
 from datetime import datetime
 from creators import capture_screenshot
-import base64, os, uuid, re, mysql.connector, stripe
+import base64, os, uuid, re, mysql.connector, stripe, csv, io
 from config import Config
 
 stripe.api_key = Config.STRIPE_SECRET_KEY
@@ -160,7 +160,199 @@ def orders():
         return render_template('admin/cms/pages/orders.html', title='Orders', username=username)
     return username
 
-# PRODOTTI, GESTIONE E ROTTE ---------------------------------------------------------------------------------------
+# PRODOTTI, COLLEZIONI, CATEGORIE, GESTIONE E ROTTE ---------------------------------------------------------------------------------------
+
+# COLLEZIONI -------------------------------- >
+
+@app.route('/admin/cms/pages/collections')
+def collections():
+    username = check_user_authentication()
+    if isinstance(username, str):
+        shop_subdomain = request.host.split('.')[0]  # Ottieni il nome del negozio dal sottodominio
+        with get_db_connection() as db_conn:
+            collections_model = Collections(db_conn)
+            collections_list = collections_model.get_all_collections(shop_subdomain)  # Passa shop_subdomain come parametro
+        return render_template(
+            'admin/cms/pages/collections.html', 
+            title='Collections', 
+            username=username, 
+            collections=collections_list
+        )
+    return username
+
+@app.route('/admin/cms/create_collection', methods=['POST'])
+def create_collection():
+    try:
+        # Ottieni i valori predefiniti o forniti
+        shop_subdomain = request.host.split('.')[0]  # Sottodominio per identificare il negozio
+        default_values = {
+            "name": "New Collection",
+            "description": "Detailed description",
+            "image_url": "/static/images/default.png",
+            "is_active": False,
+            "shop_name": shop_subdomain,
+        }
+
+        with get_db_connection() as db_conn:
+            collection_model = Collections(db_conn)
+            new_collection_id = collection_model.create_collection(default_values)
+
+        return jsonify({
+            'success': True,
+            'message': 'Collection created successfully.',
+            'collection_id': new_collection_id
+        })
+    except Exception as e:
+        print(f"Error creating collection: {e}")
+        return jsonify({'success': False, 'message': 'Failed to create Collection.'}), 500
+    
+@app.route('/admin/cms/pages/collection/<int:collection_id>', methods=['GET', 'POST'])
+@app.route('/admin/cms/pages/collection', methods=['GET', 'POST'])
+def manage_collection(collection_id=None):
+    username = check_user_authentication()
+    if isinstance(username, str):
+        with get_db_connection() as db_conn:
+            collection_model = Collections(db_conn)
+
+            if request.method == 'POST':
+                data = request.get_json()  
+                try:
+                    if collection_id:  # Modifica
+                        success = collection_model.update_collection(collection_id, data)
+                    else:  # Creazione
+                        success = collection_model.create_collection(data)
+
+                    if success:
+                        return jsonify({'status': 'success', 'message': 'Collection saved successfully.'})
+                    else:
+                        return jsonify({'status': 'error', 'message': 'Failed to save the collection.'})
+                except Exception as e:
+                    print(f"Error managing collection: {e}")
+                    return jsonify({'status': 'error', 'message': 'An error occurred.'})
+
+            # Per GET: Ottieni i dettagli del prodotto (se esiste)
+            collection = collection_model.get_collection_by_id(collection_id) if collection_id else {}
+
+            # Ottieni le immagini associate al prodotto, se esiste
+            images = collection_model.get_collection_images(collection_id) if collection_id else []
+
+            shop_subdomain = request.host.split('.')[0]  
+
+            # Log di debug per verificare i dati passati
+            print(f"Collection: {collection}")
+            print(f"Shop Subdomain: {shop_subdomain}")
+
+            return render_template(
+                'admin/cms/pages/manage_collection.html',
+                title='Manage Collection',
+                username=username,
+                collection=collection,
+                images=images,
+                shop_subdomain=shop_subdomain  # Passa il sottodominio al template
+            )
+    return username
+
+@app.route('/admin/cms/delete_collections', methods=['POST'])
+def delete_collection():
+    try:
+        data = request.get_json()  # Ottieni i dati dalla richiesta
+        collection_ids = data.get('collection_ids')  # Array di ID dei prodotti da eliminare
+
+        if not collection_ids:
+            return jsonify({'success': False, 'message': 'No collection IDs provided.'}), 400
+
+        with get_db_connection() as db_conn:
+            collection_model = Collections(db_conn)
+            for collection_id in collection_ids:
+                success = collection_model.delete_collection(collection_id)
+                if not success:
+                    return jsonify({'success': False, 'message': f'Failed to delete collection with ID {collection_id}.'}), 500
+
+        return jsonify({'success': True, 'message': 'Selected collections deleted successfully.'})
+    except Exception as e:
+        print(f"Error deleting collections: {e}")
+        return jsonify({'success': False, 'message': 'An error occurred during deletion.'}), 500
+
+@app.route('/admin/cms/update_collection', methods=['POST'])
+def update_collection():
+    try:
+        data = request.form.to_dict()  # Usa request.form per raccogliere i dati del FormData
+        collection_id = data.get('id')
+
+        if not collection_id:
+            return jsonify({'success': False, 'message': 'Collection ID is required.'}), 400
+
+        # Connetti al database
+        with get_db_connection() as db_conn:
+            collection_model = Collections(db_conn)
+            success = collection_model.update_collection(collection_id, data)
+
+        if success:
+            return jsonify({'success': True, 'message': 'Collection updated successfully!'})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to update the collection.'}), 500
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500
+
+@app.route('/admin/cms/upload_image_collection', methods=['POST'])
+def upload_image_collection():
+    try:
+        collection_id = request.form.get('collection_id')
+        image = request.files.get('image')
+
+        if not collection_id or not image:
+            return jsonify({'success': False, 'message': 'Collection ID or image is missing.'}), 400
+
+        # Genera un nome univoco per il file
+        unique_filename = f"{uuid.uuid4().hex}_{image.filename}"
+        upload_folder = os.path.join('static', 'uploads', 'collections')
+        os.makedirs(upload_folder, exist_ok=True)
+        image_path = os.path.join(upload_folder, unique_filename)
+
+        # Salva il file
+        image.save(image_path)
+
+        # Aggiungi l'immagine al database
+        db_conn = get_db_connection()
+        collections_model = Collections(db_conn)
+        image_id = collections_model.add_collection_image(collection_id, f"/{image_path}")
+
+        if image_id:
+            return jsonify({'success': True, 'image_url': f"/{image_path}", 'image_id': image_id})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to save image to database.'}), 500
+    except Exception as e:
+        print(f"Error uploading image: {e}")
+        return jsonify({'success': False, 'message': 'An error occurred during upload.'}), 500
+
+@app.route('/admin/cms/delete_image_collection', methods=['POST'])
+def delete_image_collection():
+    try:
+        data = request.get_json()
+        image_id = data.get('image_id')
+
+        if not image_id:
+            return jsonify({'success': False, 'message': 'Image ID is missing.'}), 400
+
+        db_conn = get_db_connection()
+        collections_model = Collections(db_conn)
+        image = collections_model.get_collection_image_by_id(image_id)  # Usa il nuovo metodo
+
+        if image and os.path.exists(image['image_url'][1:]):  # Rimuove '/' iniziale
+            os.remove(image['image_url'][1:])
+
+        cursor = db_conn.cursor()
+        cursor.execute("DELETE FROM collection_images WHERE id = %s", (image_id,))
+        db_conn.commit()
+        cursor.close()
+
+        return jsonify({'success': True, 'message': 'Image deleted successfully.'})
+    except Exception as e:
+        print(f"Error deleting image: {e}")
+        return jsonify({'success': False, 'message': 'An error occurred during deletion.'}), 500
+
+# PRODOTTI -------------------------------- >
 
 @app.route('/admin/cms/pages/products')
 def products():
@@ -363,6 +555,71 @@ def delete_image_product():
     except Exception as e:
         print(f"Error deleting image: {e}")
         return jsonify({'success': False, 'message': 'An error occurred during deletion.'}), 500
+    
+@app.route('/admin/cms/export_products', methods=['GET'])
+def export_products():
+    shop_name = request.host.split('.')[0]  # Sottodominio per identificare il negozio
+
+    try:
+        # Connessione al database
+        with get_db_connection() as db_conn:
+            product_model = Products(db_conn)
+
+            # Assicurati che il metodo supporti il filtraggio per `shop_name`
+            products = product_model.get_all_products(shop_name)
+
+            if not products:
+                return jsonify({'success': False, 'message': 'No products found for this shop.'}), 404
+
+        # Creazione del file CSV in memoria
+        output = io.StringIO()
+        writer = csv.writer(output)
+
+        # Intestazioni
+        headers = [
+            "ID", "Name", "Description", "Short Description", "Price", "Discount Price",
+            "Stock", "SKU", "Category", "Brand", "Weight", "Dimensions", "Color",
+            "Material", "Image URL", "Slug", "Is Active", "Created At", "Updated At"
+        ]
+        writer.writerow(headers)
+
+        # Righe dei dati
+        for product in products:
+            writer.writerow([
+                product.get('id', ''),
+                product.get('name', ''),
+                product.get('description', ''),
+                product.get('short_description', ''),
+                product.get('price', 0.0),
+                product.get('discount_price', 0.0),
+                product.get('stock_quantity', 0),
+                product.get('sku', ''),
+                product.get('category_id', ''),
+                product.get('brand_id', ''),
+                product.get('weight', 0.0),
+                product.get('dimensions', ''),
+                product.get('color', ''),
+                product.get('material', ''),
+                product.get('image_url', ''),
+                product.get('slug', ''),
+                'Yes' if product.get('is_active') else 'No',
+                product.get('created_at', ''),
+                product.get('updated_at', '')
+            ])
+
+        # Generazione del file CSV
+        output.seek(0)
+        return Response(
+            output,
+            mimetype="text/csv",
+            headers={"Content-Disposition": "attachment;filename=products.csv"}
+        )
+    except mysql.connector.Error as e:
+        print(f"Database error: {e}")
+        return jsonify({'success': False, 'message': 'Database error occurred.'}), 500
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500
 
 @app.route('/admin/cms/pages/customers')
 def customers():
