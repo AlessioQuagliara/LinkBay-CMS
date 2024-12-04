@@ -13,9 +13,6 @@
                 <a href="/admin/cms/pages/collections" class="btn btn-outline-dark btn-sm text-decoration-none">
                     <i class="fa-solid fa-layer-group"></i> Collections
                 </a>
-                <a href="/categories" class="btn btn-outline-dark btn-sm text-decoration-none">
-                    <i class="fa-solid fa-tags"></i> Categories
-                </a>
             </div>
             <div>
                 <button class="btn btn-dark btn-sm mx-1" id="search-toggle-btn" title="Search">
@@ -25,6 +22,10 @@
                 
                 <button class="btn btn-dark btn-sm mx-1" title="Add Product" id="add-product-btn" >
                     <i class="fa-solid fa-plus"></i>
+                </button>
+
+                <button class="btn btn-dark btn-sm mx-1" title="Copy Selected" id="copy-selected-btn">
+                    <i class="fa-solid fa-copy"></i>
                 </button>
 
                 <button class="btn btn-dark btn-sm mx-1 select-all" title="Select All">
@@ -85,7 +86,7 @@
                             <td class="discount_price">€{{ product.discount_price }}</td>
                             <td class="stock_quantity">{{ product.stock_quantity }}</td>
                             <td class="sku">{{ product.sku }}</td>
-                            <td class="category">{{ product.category_id }}</td>
+                            <td class="category">{{ product.category_name or 'No Category' }}</td>
                             <td class="brand">{{ product.brand_id }}</td>
                             <td class="weight">{{ product.weight }}</td>
                             <td class="dimensions">{{ product.dimensions }}</td>
@@ -414,6 +415,30 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const copySelectedButton = document.getElementById('copy-selected-btn');
+    const tableRows = document.querySelectorAll('.table-row');
+
+    copySelectedButton.addEventListener('click', function () {
+        const selectedRows = document.querySelectorAll('.row-checkbox:checked');
+        if (selectedRows.length === 0) {
+            Swal.fire('No Selection', 'Please select at least one product to copy.', 'warning');
+            return;
+        }
+
+        // Recupera gli ID dei prodotti selezionati
+        const productIds = Array.from(selectedRows).map(row =>
+            row.closest('.table-row').getAttribute('data-product-id')
+        );
+
+        // Salva gli ID nel sessionStorage
+        sessionStorage.setItem('copiedProductIds', productIds.join(','));
+
+        Swal.fire('Copied!', `${productIds.length} products have been copied.`, 'success');
+    });
+});
 </script>
 
 <style>

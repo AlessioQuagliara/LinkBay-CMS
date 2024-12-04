@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="{{ language }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }}</title>
+    <meta name="description" content="{{ product.short_description }}">
+    <meta name="keywords" content="{{ product.keywords | join(', ') }}">
+    {% include 'head.html' %}
+    <!-- Include head scripts dinamicamente -->
+    {{ head | safe }}
+</head>
+<body>
+    <!-- Include la navbar -->
+    <nav>
+        {{ navbar | safe }}
+    </nav>
+
+    <!-- Contenuto dinamico gestito con GrapesJS -->
+    <div id="content-wrapper">
+        <br><br>
+        <div class="product-section">
+            <div class="container my-4">
+                <div class="row">
+                    <!-- Slideshow dinamico per immagini prodotto -->
+                    <div class="col-md-6">
+                        <div id="productImageSlideshow" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                {% if images %}
+                                    {% for image in images %}
+                                        <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
+                                            <img src="{{ image.image_url }}" class="d-block w-100" alt="{{ image.alt_text }}">
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="carousel-item active">
+                                        <img src="/static/images/placeholder.png" class="d-block w-100" alt="Placeholder">
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#productImageSlideshow" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#productImageSlideshow" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dettagli prodotto -->
+                    <div class="col-md-6">
+                        <h1 class="product-title">{{ product.name }}</h1>
+                        <p class="product-description">{{ product.description | safe }}</p>
+                        <p class="product-price">
+                            <span class="price fs-3 text-success">€{{ product.price }}</span>
+                            {% if product.discount_price %}
+                                <span class="discount-price text-danger fs-4 ms-2">€{{ product.discount_price }}</span>
+                            {% endif %}
+                        </p>
+                        <p class="product-stock">
+                            {% if product.stock_quantity > 0 %}
+                                <span class="text-success">In Stock: {{ product.stock_quantity }}</span>
+                            {% else %}
+                                <span class="text-danger">Out of Stock</span>
+                            {% endif %}
+                        </p>
+                        <button class="btn btn-dark btn-lg w-100">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{ content | safe }}
+    </div>
+
+    <!-- Include il footer -->
+    <footer>
+        {{ footer | safe }}
+    </footer>
+    
+    <!-- Carica script personalizzati -->
+    {{ script | safe }}
+    
+    <!-- Carica gli script del footer -->
+    {{ foot | safe }}
+</body>
+</html>

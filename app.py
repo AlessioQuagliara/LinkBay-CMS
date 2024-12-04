@@ -79,7 +79,7 @@ def load_page_content(slug, shop_subdomain):
     else:
         return None
 
-# Rotta principale
+# Rotta principale --- Per pagine standard
 @app.route('/', defaults={'slug': 'home'})
 @app.route('/<slug>')
 def render_dynamic_page(slug=None):
@@ -115,6 +115,92 @@ def render_dynamic_page(slug=None):
                                head=head_content,  
                                script=script_content,  
                                foot=foot_content)  
+    else:
+        return render_template('404.html'), 404
+
+# Rotta per pagina Collezioni
+@app.route('/collections/<slug>', methods=['GET'])
+@app.route('/collections', defaults={'slug': None}, methods=['GET'])
+def render_collection(slug=None):
+    shop_subdomain = request.host.split('.')[0]  # Ottieni il sottodominio
+    conn = get_db_connection()
+
+    # Inizializza il modello della collezione
+    collection_model = Collections(conn)
+    product_model = Products(conn)
+
+    # Carica i dettagli della collezione specifica o tutte le collezioni
+    if slug:
+        collection = collection_model.get_collection_by_slug(slug)
+        if not collection:
+            return render_template('404.html'), 404
+        products_in_collection = collection_model.get_products_in_collection(collection['id'])
+    else:
+        # Se non è specificato uno slug, carica tutte le collezioni con i relativi prodotti
+        collection = None
+        products_in_collection = product_model.get_all_products()  # Recupera tutti i prodotti
+
+    # Carica contenuti navbar e footer
+    navbar_content = get_navbar_content(shop_subdomain)
+    footer_content = get_footer_content(shop_subdomain)
+
+    # Impostazioni web del negozio
+    web_settings = get_web_settings(shop_subdomain)
+    head_content = web_settings.get('head', '')
+    script_content = web_settings.get('script', '')
+    foot_content = web_settings.get('foot', '')
+
+    # Render della pagina
+    return render_template(
+        'collection.html',
+        title=collection['name'] if collection else 'All Collections',
+        description=collection['description'] if collection else 'Browse our collections and products.',
+        collection=collection,
+        products=products_in_collection,
+        navbar=navbar_content,
+        footer=footer_content,
+        head=head_content,
+        script=script_content,
+        foot=foot_content
+    )
+    
+# Rotta per pagina Prodotti
+@app.route('/products/<slug>', methods=['GET'])
+def render_product(slug):
+    shop_subdomain = request.host.split('.')[0]  # Ottieni il sottodominio
+    conn = get_db_connection()
+
+    # Carica i dettagli del prodotto
+    product_model = Products(conn)
+    product = product_model.get_product_by_slug(slug, shop_subdomain)
+
+    if product:
+        # Recupera le immagini del prodotto
+        product_images = product_model.get_product_images(product['id'])
+
+        # Carica contenuti navbar e footer
+        navbar_content = get_navbar_content(shop_subdomain)
+        footer_content = get_footer_content(shop_subdomain)
+
+        # Impostazioni web del negozio
+        web_settings = get_web_settings(shop_subdomain)
+        head_content = web_settings.get('head', '')
+        script_content = web_settings.get('script', '')
+        foot_content = web_settings.get('foot', '')
+
+        # Render della pagina
+        return render_template(
+            'product.html',
+            title=product['name'],
+            description=product['short_description'],
+            product=product,
+            images=product_images,  # Passa le immagini al template
+            navbar=navbar_content,
+            footer=footer_content,
+            head=head_content,
+            script=script_content,
+            foot=foot_content
+        )
     else:
         return render_template('404.html'), 404
 

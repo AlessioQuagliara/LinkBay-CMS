@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="{{ language }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ collection.name if collection else "All Products" }}</title>
+    <meta name="description" content="{{ collection.description if collection else 'Browse our products' }}">
+    <meta name="keywords" content="{{ collection.keywords | join(', ') if collection else 'products, collections' }}">
+    {% include 'head.html' %}
+    {{ head | safe }}
+</head>
+<body>
+<!-- Include la navbar -->
+<nav>
+    {{ navbar | safe }}
+</nav>
+
+<!-- Contenuto dinamico -->
+<div class="container my-5">
+    <h1 class="text-center">
+        {{ collection.name if collection else "All Products" }}
+    </h1>
+    <p class="text-center text-muted">
+        {{ collection.description if collection else "Explore our entire catalog of products." }}
+    </p>
+
+    <div class="row g-4 mt-4">
+        {% if products %}
+            {% for product in products %}
+            <div class="col-md-4 col-lg-3">
+                <a href="/products/{{ product.slug }}" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm">
+                        <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title text-dark">{{ product.name }}</h5>
+                            <p class="card-text text-muted">{{ product.short_description }}</p>
+                            <p class="card-text text-primary">€{{ product.price }}</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center">
+                <p class="text-muted">No products found.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Include il footer -->
+<footer>
+    {{ footer | safe }}
+</footer>
+
+<!-- Carica script personalizzati -->
+{{ script | safe }}
+
+<!-- Carica gli script del footer -->
+{{ foot | safe }}
+</body>
+</html>

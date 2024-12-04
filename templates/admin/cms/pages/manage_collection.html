@@ -18,6 +18,7 @@
                     <div class="col-md-6">
                         <label for="name" class="form-label">Collection Name</label>
                         <input type="text" class="form-control" id="name" name="name" value="{{ collection.name }}" required>
+                        <input type="text" class="form-control" id="slug" name="slug" value="{{ collection.slug }}" hidden>
                     </div>
                     <div class="col-md-6">
                         <label for="is_active" class="form-label">Is Active</label>
@@ -87,6 +88,27 @@
     </div>
 </div>
 {% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const nameInput = document.getElementById('name');
+        const slugInput = document.getElementById('slug');
+    
+        nameInput.addEventListener('input', function () {
+            const nameValue = nameInput.value;
+    
+            // Genera lo slug convertendo in minuscolo e sostituendo spazi e caratteri speciali
+            const slug = nameValue
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9\s-]/g, '') // Rimuove caratteri non alfanumerici
+                .replace(/\s+/g, '-')         // Sostituisce gli spazi con trattini
+                .replace(/-+/g, '-');         // Rimuove eventuali trattini consecutivi
+    
+            slugInput.value = slug;
+        });
+    });
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {

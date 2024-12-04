@@ -390,6 +390,23 @@ class Page:
         finally:
             cursor.close()
 
+    def get_product_references(self, page_id):
+        try:
+            cursor = self.conn.cursor(dictionary=True)
+            query = """
+                SELECT product_id 
+                FROM page_products 
+                WHERE page_id = %s
+            """
+            cursor.execute(query, (page_id,))
+            results = cursor.fetchall()
+            return [row['product_id'] for row in results]
+        except Exception as e:
+            print(f"Errore durante il recupero dei riferimenti ai prodotti: {e}")
+            return []
+        finally:
+            cursor.close()
+
 
 # Classe per Cookie e Policy --------------------------------------------------------------------------------------------
 
@@ -987,6 +1004,23 @@ class Products:
             return None
         finally:
             cursor.close()
+    def search_products(self, query, shop_subdomain):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            sql = """
+                SELECT * 
+                FROM products 
+                WHERE name LIKE %s AND shop_name = %s
+            """
+            cursor.execute(sql, ('%' + query + '%', shop_subdomain))
+            products = cursor.fetchall()
+            print(f"SQL Result: {products}")  # Debug
+            return products
+        except Exception as e:
+            print(f"Error in search_products: {e}")
+            return []
+        finally:
+            cursor.close()
 
 # COLLEZIONI ---------------------------------------------------------------------------------------------------
 
@@ -1023,12 +1057,12 @@ class Collections:
         try:
             query = """
                 INSERT INTO collections (
-                    name, description,  image_url,
+                    name, slug, description,  image_url,
                     is_active, shop_name, created_at, updated_at
-                ) VALUES (%s, %s, %s, %s, %s, NOW(), NOW())
+                ) VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW())
             """
             values = (
-                data["name"], data["description"], data["image_url"], data["is_active"],
+                data["name"], data["slug"], data["description"], data["image_url"], data["is_active"],
                 data["shop_name"]
             )
             cursor.execute(query, values)
@@ -1046,11 +1080,11 @@ class Collections:
         try:
             query = """
                 UPDATE collections
-                SET name = %s, description = %s, image_url = %s, is_active = %s, updated_at = NOW()
+                SET name = %s, slug = %s, description = %s, image_url = %s, is_active = %s, updated_at = NOW()
                 WHERE id = %s
             """
             values = (
-                data.get('name'), data.get('description'), data.get('image_url'),
+                data.get('name'), data.get('slug'), data.get('description'), data.get('image_url'),
                 data.get('is_active'), collection_id
             )
             cursor.execute(query, values)
@@ -1114,5 +1148,235 @@ class Collections:
         except Exception as e:
             print(f"Error fetching collection image by ID: {e}")
             return None
+        finally:
+            cursor.close()
+    def get_collection_by_slug(self, slug):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            query = "SELECT * FROM collections WHERE slug = %s"
+            cursor.execute(query, (slug,))
+            collection = cursor.fetchone()
+            return collection
+        except Exception as e:
+            print(f"Error retrieving collection by slug: {e}")
+            return None
+        finally:
+            cursor.close()
+
+    # PRODUCT TO COLLECTION --- Altra tabella del database
+    def add_product_to_collection(self, collection_id, product_id):
+        cursor = self.conn.cursor()
+        try:
+            query = """
+                INSERT INTO collection_products (collection_id, product_id)
+                VALUES (%s, %s)
+            """
+            cursor.execute(query, (collection_id, product_id))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error adding product to collection: {e}")
+            self.conn.rollback()
+            return False
+        finally:
+            cursor.close()
+
+    def remove_product_from_collection(self, collection_id, product_id):
+        cursor = self.conn.cursor()
+        try:
+            query = """
+                DELETE FROM collection_products
+                WHERE collection_id = %s AND product_id = %s
+            """
+            cursor.execute(query, (collection_id, product_id))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error removing product from collection: {e}")
+            self.conn.rollback()
+            return False
+        finally:
+            cursor.close()
+
+    def get_products_in_collection(self, collection_id):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            query = """
+                SELECT p.*
+                FROM products p
+                JOIN collection_products cp ON p.id = cp.product_id
+                WHERE cp.collection_id = %s
+            """
+            cursor.execute(query, (collection_id,))
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error fetching products in collection: {e}")
+            return []
+        finally:
+            cursor.close()
+
+    def get_collections_for_product(self, product_id):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            query = """
+                SELECT c.*
+                FROM collections c
+                JOIN collection_products cp ON c.id = cp.collection_id
+                WHERE cp.product_id = %s
+            """
+            cursor.execute(query, (product_id,))
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error fetching collections for product: {e}")
+            return []
+        finally:
+            cursor.close()
+
+    def remove_all_products_from_collection(self, collection_id):
+        cursor = self.conn.cursor()
+        try:
+            query = """
+                DELETE FROM collection_products
+                WHERE collection_id = %s
+            """
+            cursor.execute(query, (collection_id,))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error removing all products from collection: {e}")
+            self.conn.rollback()
+            return False
+        finally:
+            cursor.close()
+    def remove_products_from_collection(self, collection_id, product_ids):
+        cursor = self.conn.cursor()
+        try:
+            query = """
+                DELETE FROM collection_products 
+                WHERE collection_id = %s AND product_id IN (%s)
+            """
+            formatted_query = query % (collection_id, ', '.join(['%s'] * len(product_ids)))
+            cursor.execute(formatted_query, product_ids)
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error removing products from collection: {e}")
+            self.conn.rollback()
+            return False
+        finally:
+            cursor.close()
+
+    def add_products_to_collection(self, collection_id, product_ids):
+        cursor = self.conn.cursor()
+        try:
+            query = """
+                INSERT INTO collection_products (collection_id, product_id) 
+                VALUES (%s, %s)
+            """
+            values = [(collection_id, product_id) for product_id in product_ids]
+            cursor.executemany(query, values)
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error adding products to collection: {e}")
+            self.conn.rollback()
+            return False
+        finally:
+            cursor.close()
+    
+
+
+class Categories:
+    def __init__(self, db_conn):
+        self.conn = db_conn
+
+    def get_all_categories(self, shop_name):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            query = "SELECT * FROM categories WHERE shop_name = %s"
+            cursor.execute(query, (shop_name,))
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error fetching categories: {e}")
+            return []
+        finally:
+            cursor.close()
+
+    def get_category_by_id(self, category_id):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            query = "SELECT * FROM categories WHERE id = %s"
+            cursor.execute(query, (category_id,))
+            return cursor.fetchone()
+        except Exception as e:
+            print(f"Error fetching category by ID: {e}")
+            return None
+        finally:
+            cursor.close()
+
+    def create_category(self, shop_name, name, parent_id=None):
+        cursor = self.conn.cursor()
+        try:
+            query = """
+                INSERT INTO categories (shop_name, name, parent_id)
+                VALUES (%s, %s, %s)
+            """
+            cursor.execute(query, (shop_name, name, parent_id))
+            self.conn.commit()
+            return cursor.lastrowid
+        except Exception as e:
+            print(f"Error creating category: {e}")
+            self.conn.rollback()
+            return None
+        finally:
+            cursor.close()
+
+    def update_category(self, category_id, name=None, parent_id=None):
+        cursor = self.conn.cursor()
+        try:
+            fields = []
+            values = []
+            if name:
+                fields.append("name = %s")
+                values.append(name)
+            if parent_id is not None:
+                fields.append("parent_id = %s")
+                values.append(parent_id)
+
+            values.append(category_id)
+            query = f"UPDATE categories SET {', '.join(fields)} WHERE id = %s"
+            cursor.execute(query, tuple(values))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error updating category: {e}")
+            self.conn.rollback()
+            return False
+        finally:
+            cursor.close()
+
+    def delete_category(self, category_id):
+        cursor = self.conn.cursor()
+        try:
+            query = "DELETE FROM categories WHERE id = %s"
+            cursor.execute(query, (category_id,))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error deleting category: {e}")
+            self.conn.rollback()
+            return False
+        finally:
+            cursor.close()
+
+    def get_subcategories(self, parent_id):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            query = "SELECT * FROM categories WHERE parent_id = %s"
+            cursor.execute(query, (parent_id,))
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error fetching subcategories: {e}")
+            return []
         finally:
             cursor.close()

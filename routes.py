@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, request, flash, session, jsonify, Response
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from models import User, ShopList, Page, WebSettings, CookiePolicy, CMSAddon, UserStoreAccess, Products, Collections
+from models import User, ShopList, Page, WebSettings, CookiePolicy, CMSAddon, UserStoreAccess, Products, Collections, Categories
 from app import app, get_db_connection, get_auth_db_connection
 from datetime import datetime
 from creators import capture_screenshot
@@ -187,6 +187,7 @@ def create_collection():
         shop_subdomain = request.host.split('.')[0]  # Sottodominio per identificare il negozio
         default_values = {
             "name": "New Collection",
+            "slug": "new-collection",
             "description": "Detailed description",
             "image_url": "/static/images/default.png",
             "is_active": False,
@@ -251,6 +252,130 @@ def manage_collection(collection_id=None):
                 shop_subdomain=shop_subdomain  # Passa il sottodominio al template
             )
     return username
+
+# GESTIONE DELLA LISTA DELLE COLLEZIONI
+
+@app.route('/admin/cms/pages/collection-list/<int:collection_id>', methods=['GET', 'POST'])
+@app.route('/admin/cms/pages/collection-list/', methods=['GET', 'POST'])
+def manage_collection_list(collection_id=None):
+    username = check_user_authentication()
+    if isinstance(username, str):
+        with get_db_connection() as db_conn:
+            # Inizializza i modelli
+            collection_model = Collections(db_conn)
+            product_model = Products(db_conn)
+
+            # Ottieni i dettagli della collezione
+            collection = collection_model.get_collection_by_id(collection_id) if collection_id else {}
+
+            # Ottieni i prodotti associati alla collezione
+            products_in_collection = collection_model.get_products_in_collection(collection_id) if collection_id else []
+
+            # Recupera i dettagli completi per ogni prodotto
+            detailed_products = []
+            for product in products_in_collection:
+                product_details = product_model.get_product_by_id(product['id'])  # Assicurati che esista un metodo `get_product_by_id`
+                if product_details:
+                    detailed_products.append(product_details)
+
+            # Ottieni il nome del negozio dal sottodominio
+            shop_subdomain = request.host.split('.')[0]
+
+            return render_template(
+                'admin/cms/pages/manage_collection_list.html',
+                title='Manage Collection List',
+                username=username,
+                collection=collection,
+                products=detailed_products,  # Passa i dettagli completi dei prodotti al template
+                shop_subdomain=shop_subdomain
+            )
+    return username
+
+@app.route('/admin/cms/delete_products_from_collection', methods=['POST'])
+def delete_products_from_collection():
+    try:
+        data = request.get_json()
+        collection_id = data.get('collection_id')
+        product_ids = data.get('product_ids', [])
+
+        if not collection_id or not product_ids:
+            return jsonify({'success': False, 'message': 'Missing collection ID or product IDs.'}), 400
+
+        with get_db_connection() as db_conn:
+            collection_model = Collections(db_conn)
+            success = collection_model.remove_products_from_collection(collection_id, product_ids)
+
+        if success:
+            return jsonify({'success': True, 'message': 'Products removed successfully.'})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to remove products.'})
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500
+    
+@app.route('/admin/cms/add_products_to_collection', methods=['POST'])
+def add_products_to_collection():
+    try:
+        data = request.get_json()
+        collection_id = data.get('collection_id')
+        product_ids = data.get('product_ids', [])
+
+        if not collection_id or not product_ids:
+            return jsonify({'success': False, 'message': 'Missing collection ID or product IDs.'}), 400
+
+        with get_db_connection() as db_conn:
+            collection_model = Collections(db_conn)
+            success = collection_model.add_products_to_collection(collection_id, product_ids)
+
+        if success:
+            return jsonify({'success': True, 'message': 'Products added successfully.'})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to add products.'})
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500
+
+@app.route('/admin/cms/search_products', methods=['GET'])
+def search_products():
+    query = request.args.get('query', '').strip()
+    shop_subdomain = request.host.split('.')[0]
+
+    print(f"Search query: {query}")
+    print(f"Shop subdomain: {shop_subdomain}")
+
+    if not query:
+        return jsonify({'success': False, 'message': 'No search term provided.'}), 400
+
+    with get_db_connection() as db_conn:
+        product_model = Products(db_conn)
+        products = product_model.search_products(query, shop_subdomain)
+    
+    print(f"Found products: {products}")
+    return jsonify({'success': True, 'products': products})
+
+@app.route('/admin/cms/add_product_to_collection', methods=['POST'])
+def add_product_to_collection():
+    try:
+        data = request.get_json()
+        collection_id = data.get('collection_id')
+        product_id = data.get('product_id')
+
+        if not collection_id or not product_id:
+            return jsonify({'success': False, 'message': 'Missing collection ID or product ID.'}), 400
+
+        with get_db_connection() as db_conn:
+            collection_model = Collections(db_conn)
+            success = collection_model.add_product_to_collection(collection_id, product_id)
+
+        if success:
+            return jsonify({'success': True, 'message': 'Product added successfully.'})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to add product.'})
+    except Exception as e:
+        print(f"Error adding product to collection: {e}")
+        return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500
+
+# GESTIONE DELLA COLLEZIONE
 
 @app.route('/admin/cms/delete_collections', methods=['POST'])
 def delete_collection():
@@ -361,11 +486,14 @@ def products():
         shop_subdomain = request.host.split('.')[0]  # Ottieni il nome del negozio dal sottodominio
         with get_db_connection() as db_conn:
             products_model = Products(db_conn)
+            category_model = Categories(db_conn)
             products_list = products_model.get_all_products(shop_subdomain)  # Passa shop_subdomain come parametro
+            categories = category_model.get_all_categories(shop_subdomain)
         return render_template(
             'admin/cms/pages/products.html', 
             title='Products', 
             username=username, 
+            categories=categories,
             products=products_list
         )
     return username
@@ -377,10 +505,11 @@ def manage_product(product_id=None):
     if isinstance(username, str):
         with get_db_connection() as db_conn:
             product_model = Products(db_conn)
+            category_model = Categories(db_conn)
 
             if request.method == 'POST':
                 # Ottieni i dati del prodotto
-                data = request.get_json()  # Assicurati che il contenuto sia JSON
+                data = request.form.to_dict()  # Usa request.form se i dati sono inviati come FormData
                 try:
                     if product_id:  # Modifica
                         success = product_model.update_product(product_id, data)
@@ -401,12 +530,9 @@ def manage_product(product_id=None):
             # Ottieni le immagini associate al prodotto, se esiste
             images = product_model.get_product_images(product_id) if product_id else []
 
+            # Ottieni tutte le categorie per lo shop corrente
             shop_subdomain = request.host.split('.')[0]  
-
-            # Log di debug per verificare i dati passati
-            print(f"Product: {product}")
-            print(f"Images: {images}")
-            print(f"Shop Subdomain: {shop_subdomain}")
+            categories = category_model.get_all_categories(shop_subdomain)
 
             return render_template(
                 'admin/cms/pages/manage_product.html',
@@ -414,9 +540,30 @@ def manage_product(product_id=None):
                 username=username,
                 product=product,
                 images=images,
+                categories=categories,
                 shop_subdomain=shop_subdomain  # Passa il sottodominio al template
             )
     return username
+
+@app.route('/admin/cms/create_category', methods=['POST'])
+def create_category():
+    try:
+        data = request.json
+        name = data.get('name')
+        shop_name = request.host.split('.')[0]
+        if not name:
+            return jsonify({'success': False, 'message': 'Category name is required.'}), 400
+
+        with get_db_connection() as db_conn:
+            categories_model = Categories(db_conn)
+            category_id = categories_model.create_category(shop_name, name)
+            if category_id:
+                return jsonify({'success': True, 'category_id': category_id})
+            else:
+                return jsonify({'success': False, 'message': 'Failed to create category.'}), 500
+    except Exception as e:
+        print(f"Error creating category: {e}")
+        return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500
 
 @app.route('/admin/cms/create_product', methods=['POST'])
 def create_product():
@@ -925,12 +1072,23 @@ def edit_page(slug):
         addon_model = CMSAddon(db_conn)
         selected_theme_ui = addon_model.get_selected_addon_for_shop(shop_subdomain, 'theme_ui')
 
+        # Recupera i dettagli del prodotto se la pagina contiene riferimenti a prodotti
+        product_model = Products(db_conn)
+        product_references = page_model.get_product_references(page['id'])  # Supponendo esista un metodo per i riferimenti ai prodotti
+        products = []
+        for product_id in product_references:
+            product = product_model.get_product_by_id(product_id)
+            if product:
+                product['images'] = product_model.get_product_images(product['id'])
+                products.append(product)
+
         return render_template(
             'admin/cms/function/edit.html', 
             title='Edit Page', 
             page=page, 
             username=username, 
-            selected_theme_ui=selected_theme_ui
+            selected_theme_ui=selected_theme_ui,
+            products=products  # Passa i dati del prodotto al template
         )
     
     return username
@@ -1349,3 +1507,4 @@ def cookie_setting_third_party():
             username=username,
             cookie_settings=cookie_settings
         )
+    

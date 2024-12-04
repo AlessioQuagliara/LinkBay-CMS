@@ -51,6 +51,7 @@
                     <div class="col-md-6">
                         <label for="name" class="form-label">Name</label>
                         <input type="text" class="form-control" id="name" name="name" value="{{ product.name }}" required>
+                        <input type="text" class="form-control" id="slug" name="slug" value="{{ product.slug }}" hidden>
                     </div>
                     <div class="col-md-6">
                         <label for="short_description" class="form-label">Short Description</label>
@@ -110,24 +111,18 @@
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label for="category_id" class="form-label">Category</label>
-                        <select class="form-select" id="category_id" name="category_id">
-                            {% for category in categories %}
-                            <option value="{{ category.id }}" {% if product.category_id == category.id %}selected{% endif %}>
-                                {{ category.name }}
-                            </option>
-                            {% endfor %}
-                        </select>
+                        <label for="category-input" class="form-label">Category</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="category-input" name="category_name" placeholder="{{ categories | selectattr('id', 'equalto', product.category_id) | map(attribute='name') | first or '' }}" readonly>
+                            <input type="hidden" id="category-id" name="category_id" value="{{ product.category_id }}"> <!-- Campo nascosto per salvare l'ID -->
+                            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#categoryModal">
+                                Select
+                            </button>
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <label for="brand_id" class="form-label">Brand</label>
-                        <select class="form-select" id="brand_id" name="brand_id">
-                            {% for brand in brands %}
-                            <option value="{{ brand.id }}" {% if product.brand_id == brand.id %}selected{% endif %}>
-                                {{ brand.name }}
-                            </option>
-                            {% endfor %}
-                        </select>
+                        <input type="text" class="form-control" id="brand_id" name="brand_id" value="{{ product.brand_id }}">
                     </div>
                 </div>
             </div>
@@ -183,10 +178,6 @@
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label for="slug" class="form-label">Slug</label>
-                        <input type="text" class="form-control" id="slug" name="slug" value="{{ product.slug }}">
-                    </div>
-                    <div class="col-md-6">
                         <label for="is_active" class="form-label">Is Active</label>
                         <select class="form-select" id="is_active" name="is_active">
                             <option value="1" {% if product.is_active %}selected{% endif %}>Yes</option>
@@ -196,6 +187,7 @@
                 </div>
             </div>
         </div>
+
 
     </form>
 </div>
@@ -213,6 +205,128 @@
 
 
 {% endif %}
+
+
+<!--MODALI-->
+<div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoryModalLabel">Select or Create Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <ul class="list-group" id="category-list">
+                            {% for category in categories %}
+                            <li class="list-group-item category-item" data-id="{{ category.id }}">
+                                {{ category.name }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Create New Category</h6>
+                        <input type="text" id="new-category-input" class="form-control mb-2" placeholder="New category name">
+                        <button class="btn btn-danger" id="create-category-btn">Create</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const categoryInput = document.getElementById('category-input');
+    const categoryIdInput = document.getElementById('category-id');
+    const categoryList = document.getElementById('category-list');
+    const createCategoryBtn = document.getElementById('create-category-btn');
+    const newCategoryInput = document.getElementById('new-category-input');
+
+    // Seleziona una categoria esistente
+    categoryList.addEventListener('click', function (e) {
+        if (e.target.classList.contains('category-item')) {
+            const categoryId = e.target.dataset.id;
+            const categoryName = e.target.textContent.trim();
+
+            // Aggiorna l'input con i dati selezionati
+            categoryInput.value = categoryName;
+            categoryIdInput.value = categoryId;
+
+            // Chiudi il modale
+            const modal = bootstrap.Modal.getInstance(document.getElementById('categoryModal'));
+            modal.hide();
+        }
+    });
+
+    // Crea una nuova categoria
+    createCategoryBtn.addEventListener('click', function () {
+        const newCategoryName = newCategoryInput.value.trim();
+
+        if (!newCategoryName) {
+            Swal.fire('Error', 'Please enter a category name.', 'error');
+            return;
+        }
+
+        fetch('/admin/cms/create_category', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: newCategoryName })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Aggiungi la nuova categoria alla lista
+                    const newCategoryItem = document.createElement('li');
+                    newCategoryItem.classList.add('list-group-item', 'category-item');
+                    newCategoryItem.dataset.id = data.category_id;
+                    newCategoryItem.textContent = newCategoryName;
+
+                    categoryList.appendChild(newCategoryItem);
+
+                    // Imposta la nuova categoria
+                    categoryInput.value = newCategoryName;
+                    categoryIdInput.value = data.category_id;
+
+                    // Pulisci il campo di input
+                    newCategoryInput.value = '';
+
+                    // Chiudi il modale
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('categoryModal'));
+                    modal.hide();
+                } else {
+                    Swal.fire('Error', data.message || 'Failed to create category.', 'error');
+                }
+            })
+            .catch(error => {
+                Swal.fire('Error', 'A network or server error occurred.', 'error');
+                console.error(error);
+            });
+    });
+});
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const nameInput = document.getElementById('name');
+        const slugInput = document.getElementById('slug');
+    
+        nameInput.addEventListener('input', function () {
+            const nameValue = nameInput.value;
+    
+            // Genera lo slug convertendo in minuscolo e sostituendo spazi e caratteri speciali
+            const slug = nameValue
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9\s-]/g, '') // Rimuove caratteri non alfanumerici
+                .replace(/\s+/g, '-')         // Sostituisce gli spazi con trattini
+                .replace(/-+/g, '-');         // Rimuove eventuali trattini consecutivi
+    
+            slugInput.value = slug;
+        });
+    });
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
