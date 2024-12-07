@@ -33,6 +33,12 @@
                 <i class="fa-solid fa-clipboard-list {% if title == 'Third-Party Cookie Settings' %}fa-bounce{% endif %}"></i>&nbsp; Integrations
             </a>
         </li>
+        {% elif title in ['Manage Shipping Method']%}
+        <li class="nav-item mb-2">
+            <a href="{{ url_for('shipping_methods') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
+                <i class="fa-solid fa-arrow-left"></i>&nbsp; Back to Shipping Methods
+            </a>
+        </li>
         {% elif title in ['Manage Order']%}
         <li class="nav-item mb-2">
             <a href="{{ url_for('orders') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
@@ -231,8 +237,8 @@
             </a>
         </li>
         <li>
-            <a href="{{ url_for('shipping') }}" class="nav-link {% if title == 'Shipping' %}active{% endif %} text-white">
-                <i class="fa-solid fa-truck {% if title == 'Shipping' %}fa-bounce{% endif %}"></i>&nbsp; Shipping
+            <a href="{{ url_for('shipping_methods') }}" class="nav-link {% if title == 'Shipping Methods' %}active{% endif %} text-white">
+                <i class="fa-solid fa-truck {% if title == 'Shipping Methods' %}fa-bounce{% endif %}"></i>&nbsp; Shipping & Delivery
             </a>
         </li>
         <li>
@@ -244,7 +250,7 @@
     </ul>
     <hr>
     <div class="dropdown">
-    {% if title in ['Cookie Bar Settings', 'Third-Party Cookie Settings', 'Manage Product', 'Manage Collection', 'Manage Collection List', 'Manage Customer', 'Manage Order', 'Manage Order Items' ] %}
+    {% if title in ['Cookie Bar Settings', 'Third-Party Cookie Settings', 'Manage Product', 'Manage Collection', 'Manage Collection List', 'Manage Customer', 'Manage Order', 'Manage Order Items', 'Manage Shipping Method' ] %}
         <button id="save-content" type="submit" class="btn btn-danger w-100">Save</button>
     {% else %}
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">

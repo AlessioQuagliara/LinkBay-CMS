@@ -1609,16 +1609,16 @@ class Orders:
     def remove_order_items(self, order_id, product_ids):
         cursor = self.conn.cursor()
         try:
-            # Rimuove i prodotti selezionati dall'ordine
-            query = """
+            # Crea una clausola IN dinamica
+            placeholders = ', '.join(['%s'] * len(product_ids))
+            query = f"""
                 DELETE FROM order_items 
-                WHERE order_id = %s AND product_id IN (%s)
+                WHERE order_id = %s AND product_id IN ({placeholders})
             """
-            in_clause = ', '.join(['%s'] * len(product_ids))  # Crea un in-clause per il numero di prodotti
-            query = query.replace('%s', in_clause, 1)  # Sostituisce solo il primo %s con l'in-clause
+            # Passa l'ordine e i prodotti come parametri
             cursor.execute(query, [order_id] + product_ids)
             self.conn.commit()
-            return cursor.rowcount > 0  # Ritorna True se almeno una riga è stata rimossa
+            return cursor.rowcount > 0  # True se almeno una riga è stata eliminata
         except Exception as e:
             print(f"Error removing order items: {e}")
             self.conn.rollback()
@@ -1848,6 +1848,25 @@ class Shipping:
         finally:
             cursor.close()
 
+    def get_all_shippings(self, shop_name):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            query = """
+                SELECT 
+                    id, shipping_method, tracking_number, carrier_name, 
+                    estimated_delivery_date, delivery_status, created_at, updated_at
+                FROM shipping
+                WHERE shop_name = %s
+                ORDER BY created_at DESC
+            """
+            cursor.execute(query, (shop_name,))
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error fetching shipping: {e}")
+            return []
+        finally:
+            cursor.close()
+
     # Metodo per aggiungere o aggiornare i dettagli di spedizione
     def upsert_shipping(self, data):
         cursor = self.conn.cursor()
@@ -1881,5 +1900,174 @@ class Shipping:
             print(f"Error upserting shipping: {e}")
             self.conn.rollback()
             return None
+        finally:
+            cursor.close()
+
+
+class ShippingMethods:
+    def __init__(self, db_conn):
+        self.conn = db_conn
+
+    def create_shipping_method(self, data):
+        cursor = self.conn.cursor()
+        try:
+            query = """
+                INSERT INTO shipping_methods (
+                    shop_name, name, description, country, region, cost, 
+                    estimated_delivery_time, is_active, created_at, updated_at
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+            """
+            values = (
+                data["shop_name"],
+                data["name"],
+                data.get("description"),
+                data.get("country"),
+                data.get("region"),
+                data["cost"],
+                data.get("estimated_delivery_time"),
+                data.get("is_active", True)
+            )
+            cursor.execute(query, values)
+            self.conn.commit()
+            return cursor.lastrowid
+        except Exception as e:
+            print(f"Error creating shipping method: {e}")
+            self.conn.rollback()
+            return None
+        finally:
+            cursor.close()
+
+    def get_all_shipping_methods(self, shop_name):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            query = """
+                SELECT * FROM shipping_methods
+                WHERE shop_name = %s AND is_active = TRUE
+                ORDER BY created_at DESC
+            """
+            cursor.execute(query, (shop_name,))
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error fetching shipping methods: {e}")
+            return []
+        finally:
+            cursor.close()
+
+    def update_shipping_method(self, method_id, data):
+        cursor = self.conn.cursor()
+        try:
+            query = """
+                UPDATE shipping_methods
+                SET name = %s, description = %s, country = %s, region = %s,
+                    cost = %s, estimated_delivery_time = %s, is_active = %s, updated_at = NOW()
+                WHERE id = %s AND shop_name = %s
+            """
+            values = (
+                data["name"],
+                data.get("description"),
+                data.get("country"),
+                data.get("region"),
+                data["cost"],
+                data.get("estimated_delivery_time"),
+                data.get("is_active", True),
+                method_id,
+                data["shop_name"]
+            )
+            cursor.execute(query, values)
+            self.conn.commit()
+            return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Error updating shipping method: {e}")
+            self.conn.rollback()
+            return False
+        finally:
+            cursor.close()
+
+    def delete_shipping_method(self, shipping_id):
+        cursor = self.conn.cursor()
+        try:
+            query = "DELETE FROM shipping_methods WHERE id = %s"
+            cursor.execute(query, (shipping_id,))
+            self.conn.commit()
+            return cursor.rowcount > 0  # Ritorna True se è stata eliminata almeno una riga
+        except Exception as e:
+            print(f"Error deleting shipping method: {e}")
+            self.conn.rollback()
+            return False
+        finally:
+            cursor.close()
+
+    def update_shipping_method(self, shipping_id, updated_data):
+        cursor = self.conn.cursor()
+        try:
+            query = """
+                UPDATE shipping_methods
+                SET name = %s, description = %s, country = %s, region = %s,
+                    cost = %s, estimated_delivery_time = %s, is_active = %s, updated_at = NOW()
+                WHERE id = %s
+            """
+            values = (
+                updated_data['name'],
+                updated_data['description'],
+                updated_data['country'],
+                updated_data['region'],
+                updated_data['cost'],
+                updated_data['estimated_delivery_time'],
+                updated_data['is_active'],
+                shipping_id
+            )
+            cursor.execute(query, values)
+            self.conn.commit()
+            return cursor.rowcount > 0  # Ritorna True se è stata aggiornata almeno una riga
+        except Exception as e:
+            print(f"Error updating shipping method: {e}")
+            self.conn.rollback()
+            return False
+        finally:
+            cursor.close()
+
+    def get_shipping_method_by_id(self, shipping_id, shop_name):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            query = """
+                SELECT id, shop_name, name, description, country, region, cost, 
+                    estimated_delivery_time, is_active, created_at, updated_at
+                FROM shipping_methods
+                WHERE id = %s AND shop_name = %s
+            """
+            cursor.execute(query, (shipping_id, shop_name))
+            return cursor.fetchone()  # Ritorna un dizionario con i dettagli del metodo di spedizione
+        except Exception as e:
+            print(f"Error retrieving shipping method: {e}")
+            return None
+        finally:
+            cursor.close()
+
+    def update_shipping_method(self, shipping_id, updated_data):
+        cursor = self.conn.cursor()
+        try:
+            query = """
+                UPDATE shipping_methods
+                SET name = %s, description = %s, country = %s, region = %s,
+                    cost = %s, estimated_delivery_time = %s, is_active = %s, updated_at = NOW()
+                WHERE id = %s
+            """
+            values = (
+                updated_data['name'],
+                updated_data['description'],
+                updated_data['country'],
+                updated_data['region'],
+                updated_data['cost'],
+                updated_data['estimated_delivery_time'],
+                updated_data['is_active'],
+                shipping_id
+            )
+            cursor.execute(query, values)
+            self.conn.commit()
+            return cursor.rowcount > 0  # Ritorna True se è stata aggiornata almeno una riga
+        except Exception as e:
+            print(f"Error updating shipping method: {e}")
+            self.conn.rollback()
+            return False
         finally:
             cursor.close()
