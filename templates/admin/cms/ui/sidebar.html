@@ -33,6 +33,44 @@
                 <i class="fa-solid fa-clipboard-list {% if title == 'Third-Party Cookie Settings' %}fa-bounce{% endif %}"></i>&nbsp; Integrations
             </a>
         </li>
+        {% elif title in ['Manage Order']%}
+        <li class="nav-item mb-2">
+            <a href="{{ url_for('orders') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
+                <i class="fa-solid fa-arrow-left"></i>&nbsp; Back to Orders
+            </a>
+        </li>
+        <li class="nav-item mb-2" >
+            <h6 class="nav-link active text-white" >&nbsp;{{ order.order_number }}</h6>
+        </li>
+        <li>
+            <a href="/admin/cms/pages/order-list/{{ order.order_id }}" class="nav-link text-white">
+                <i class="fa-solid fa-list"></i>&nbsp; List of Products
+            </a>
+        </li>
+        {% elif title in ['Manage Order Items']%}
+        <li class="nav-item mb-2">
+            <a href="/admin/cms/pages/order/{{ order.order_id }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
+                <i class="fa-solid fa-arrow-left"></i>&nbsp; Back to Order
+            </a>
+        </li>
+        <li class="nav-item mb-2" >
+            <h6 class="nav-link active text-white" >&nbsp;{{ order.order_number }}</h6>
+        </li>
+        <li>
+            <a href="" class="nav-link text-white">
+                <i class="fa-solid fa-paste"></i>&nbsp; Paste Products 
+            </a>
+        </li>
+        <li>
+            <a href="#" class="nav-link text-white" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                <i class="fa-solid fa-square-plus"></i>&nbsp; Add Product
+            </a>
+        </li>
+        <li>
+            <a href="" class="nav-link text-white">
+                <i class="fa-solid fa-square-minus"></i>&nbsp; Remove Selected
+            </a>
+        </li>
         {% elif title in ['Manage Product']%}
         <li class="nav-item mb-2">
             <a href="{{ url_for('products') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
@@ -100,6 +138,20 @@
         <li>
             <a href="" class="nav-link text-white">
                 <i class="fa-solid fa-square-minus"></i>&nbsp; Remove Selected
+            </a>
+        </li>
+        {% elif title in ['Manage Customer']%}
+        <li class="nav-item mb-2">
+            <a href="{{ url_for('customers') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
+                <i class="fa-solid fa-arrow-left"></i>&nbsp; Back to Customers
+            </a>
+        </li>
+        <li class="nav-item mb-2">
+            <h6 class="nav-link active text-white" >&nbsp;{{ customer.first_name }}</h6>
+        </li>
+        <li>
+            <a href="" class="nav-link text-white">
+                <i class="fa-solid fa-clock-rotate-left"></i>&nbsp; View Order History 
             </a>
         </li>
         {% elif title in ['Theme UI', 'Plugin', 'Services', 'Themes']%}
@@ -192,7 +244,7 @@
     </ul>
     <hr>
     <div class="dropdown">
-    {% if title in ['Cookie Bar Settings', 'Third-Party Cookie Settings', 'Manage Product', 'Manage Collection', 'Manage Collection List' ] %}
+    {% if title in ['Cookie Bar Settings', 'Third-Party Cookie Settings', 'Manage Product', 'Manage Collection', 'Manage Collection List', 'Manage Customer', 'Manage Order', 'Manage Order Items' ] %}
         <button id="save-content" type="submit" class="btn btn-danger w-100">Save</button>
     {% else %}
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">

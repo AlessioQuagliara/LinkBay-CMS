@@ -164,28 +164,4 @@
     -->
 </div>
 
-
-<script>
-
-    // Rendeirizza alla homepage e fai uno screen
-    document.getElementById('capture-screenshot-btn').addEventListener('click', function(event) {
-        event.preventDefault();  // Evita il comportamento di default del link
-        
-        // Effettua una chiamata AJAX per avviare lo screenshot
-        fetch('/capture-screenshot', {
-            method: 'POST'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Effettua il refresh della pagina corrente
-                window.location.reload();
-            }
-        })
-        .catch(error => {
-            console.error('Errore nel processo di screenshot:', error);
-        });
-    });
-</script>
-
 {% endblock %}

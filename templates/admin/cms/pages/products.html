@@ -121,30 +121,25 @@
                     <!-- Opzioni delle colonne generate dinamicamente -->
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" id="save-customization">Save</button>
-            </div>
         </div>
     </div>
 </div>
 
 <script>
+    // GESTIONE DELLE COLONNE PER PRODUCTS
     document.addEventListener('DOMContentLoaded', function () {
         const columnsContainer = document.getElementById('columns-container');
-        const saveButton = document.getElementById('save-customization');
-        const tableRows = document.querySelectorAll('.table-row');
-        let isMouseDown = false;
+        const tablePreferencesKey = 'productsTablePreferences'; // Chiave univoca per la pagina prodotti
 
-        // Colonne disponibili nella tabella
         const columns = [
             { value: 'id', label: '#' },
             { value: 'name', label: 'Name', default: true },
-            { value: 'description', label: 'Description', default: true },
+            { value: 'description', label: 'Description' },
             { value: 'short_description', label: 'Short Description' },
-            { value: 'price', label: 'Price' },
-            { value: 'discount_price', label: 'Discount Price', default: true },
+            { value: 'price', label: 'Price', default: true },
+            { value: 'discount_price', label: 'Discount Price' },
             { value: 'stock_quantity', label: 'Stock', default: true },
-            { value: 'sku', label: 'SKU', default: true },
+            { value: 'sku', label: 'SKU' },
             { value: 'category', label: 'Category' },
             { value: 'brand', label: 'Brand' },
             { value: 'weight', label: 'Weight' },
@@ -158,7 +153,6 @@
             { value: 'updated_at', label: 'Updated At' }
         ];
 
-        // Funzione per generare dinamicamente le opzioni delle colonne
         function renderColumnOptions(preferences) {
             columnsContainer.innerHTML = '';
             columns.forEach(column => {
@@ -169,25 +163,27 @@
                         <label class="form-check-label" for="column-${column.value}">${column.label}</label>
                     </div>`;
             });
+
+            document.querySelectorAll('.column-toggle').forEach(toggle => {
+                toggle.addEventListener('change', function () {
+                    savePreferences();
+                    applyPreferences(loadPreferences());
+                });
+            });
         }
 
-        // Funzione per salvare le preferenze nel localStorage
         function savePreferences() {
             const preferences = {};
             document.querySelectorAll('.column-toggle').forEach(toggle => {
                 preferences[toggle.value] = toggle.checked;
             });
-            localStorage.setItem('tablePreferences', JSON.stringify(preferences));
+            localStorage.setItem(tablePreferencesKey, JSON.stringify(preferences));
         }
 
-        // Funzione per caricare le preferenze dal localStorage
         function loadPreferences() {
-            const preferences = JSON.parse(localStorage.getItem('tablePreferences')) || {};
-            renderColumnOptions(preferences);
-            applyPreferences(preferences);
+            return JSON.parse(localStorage.getItem(tablePreferencesKey)) || {};
         }
 
-        // Funzione per applicare le preferenze alle colonne
         function applyPreferences(preferences) {
             columns.forEach(column => {
                 const isChecked = preferences[column.value] ?? column.default;
@@ -201,19 +197,19 @@
             });
         }
 
-        // Salva preferenze e nascondi il modale
-        saveButton.addEventListener('click', function () {
-            const preferences = {};
-            document.querySelectorAll('.column-toggle').forEach(toggle => {
-                preferences[toggle.value] = toggle.checked;
-            });
-            localStorage.setItem('tablePreferences', JSON.stringify(preferences));
-            applyPreferences(preferences);
-            const modal = bootstrap.Modal.getInstance(document.getElementById('customizationModal'));
-            modal.hide();
-        });
+        // Carica preferenze al caricamento della pagina
+        const savedPreferences = loadPreferences();
+        renderColumnOptions(savedPreferences);
+        applyPreferences(savedPreferences);
+    });
+</script>
 
-        // Selezione singola e multi-riga con click e drag
+<script>
+    // SELEZIONE E MULTI-SELEZIONE DELLE RIGHE
+    document.addEventListener('DOMContentLoaded', function () {
+        const tableRows = document.querySelectorAll('.table-row');
+        let isMouseDown = false;
+
         tableRows.forEach(row => {
             row.addEventListener('mousedown', function(event) {
                 isMouseDown = true;
@@ -232,14 +228,12 @@
             isMouseDown = false;
         });
 
-        // Funzione per selezionare/deselezionare una riga
         function toggleRowSelection(row) {
             const checkbox = row.querySelector('.row-checkbox');
             checkbox.checked = !checkbox.checked;
             row.classList.toggle('table-active', checkbox.checked);
         }
 
-        // Seleziona tutte le righe
         document.querySelector('.select-all').addEventListener('click', function() {
             const allChecked = Array.from(tableRows).every(row => row.querySelector('.row-checkbox').checked);
             tableRows.forEach(row => {
@@ -249,7 +243,6 @@
             });
         });
 
-        // Checkbox per selezionare tutte le righe
         document.getElementById('select-all-checkbox').addEventListener('change', function() {
             const isChecked = this.checked;
             tableRows.forEach(row => {
@@ -258,189 +251,187 @@
                 row.classList.toggle('table-active', isChecked);
             });
         });
-
-        loadPreferences();
     });
+</script>
 
-    // DOPPIO CLICK CON MODIFICA
-
+<script>
+    // Doppio click sulla riga per andare alla pagina di modifica
     document.addEventListener('DOMContentLoaded', function () {
         const tableRows = document.querySelectorAll('.table-row');
-    
-        // Gestione del doppio click su una riga della tabella
         tableRows.forEach(row => {
             row.addEventListener('dblclick', function () {
-                const productId = this.getAttribute('data-product-id'); // Ottieni l'ID del prodotto dalla riga
+                const productId = row.getAttribute('data-product-id');
                 if (productId) {
-                    window.location.href = `/admin/cms/pages/product/${productId}`; // Reindirizza alla rotta di modifica del prodotto
+                    window.location.href = `/admin/cms/pages/product/${productId}`;
                 }
             });
         });
     });
+</script>
 
-    // CREAZIONE RIGA PRODOTTO
-    document.getElementById('add-product-btn').addEventListener('click', function () {
-    Swal.fire({
-        title: 'Creating Product...',
-        text: 'Please wait while the new product is being created.',
-        icon: 'info',
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        didOpen: () => Swal.showLoading()
-    });
+<script>
+    // Gestione della barra di ricerca
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchToggleBtn = document.getElementById('search-toggle-btn');
+        const searchInput = document.getElementById('search-input');
+        const tableRows = document.querySelectorAll('.table-row');
 
-    fetch('/admin/cms/create_product', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-    })
-    .then(response => response.json())
-    .then(data => {
-        Swal.close();
-        if (data.success) {
-            Swal.fire({
-                title: 'Success!',
-                text: data.message,
-                icon: 'success'
-            }).then(() => {
-                // Redirect to the product editing page
-                window.location.href = `/admin/cms/pages/product/${data.product_id}`;
+        // Mostra/nasconde la barra di ricerca
+        searchToggleBtn.addEventListener('click', function () {
+            searchInput.classList.toggle('d-none');
+            searchInput.focus();
+        });
+
+        // Filtro in tempo reale
+        searchInput.addEventListener('input', function () {
+            const searchText = searchInput.value.toLowerCase();
+            tableRows.forEach(row => {
+                const productName = row.querySelector('.name').textContent.toLowerCase();
+                row.style.display = productName.includes(searchText) ? '' : 'none';
             });
-        } else {
-            Swal.fire('Error!', data.message, 'error');
-        }
-    })
-    .catch(error => {
-        Swal.fire('Error!', 'A network error occurred.', 'error');
-        console.error('Error:', error);
+        });
     });
-});
+</script>
 
-    // CANCELLAZIONE PRODOTTO
-    document.querySelector('.delete-selected').addEventListener('click', function () {
-    const selectedRows = document.querySelectorAll('.row-checkbox:checked');
-    if (selectedRows.length === 0) {
-        Swal.fire('No Selection', 'Please select at least one product to delete.', 'warning');
-        return;
-    }
+<script>
+    // GESTIONE DEL PULSANTE COPIA SELEZIONATI
+    document.addEventListener('DOMContentLoaded', function () {
+        const copySelectedButton = document.getElementById('copy-selected-btn');
 
-    const productIds = Array.from(selectedRows).map(row => 
-        row.closest('.table-row').getAttribute('data-product-id')
-    );
-
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "This action will permanently delete the selected products.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete them!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            Swal.fire({
-                title: 'Deleting...',
-                text: 'Please wait while the products are being deleted.',
-                icon: 'info',
-                allowOutsideClick: false,
-                showConfirmButton: false,
-                didOpen: () => Swal.showLoading()
-            });
-
-            fetch('/admin/cms/delete_products', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ product_ids: productIds })
-            })
-            .then(response => response.json())
-            .then(data => {
-                Swal.close();
-                if (data.success) {
-                    Swal.fire('Deleted!', data.message, 'success').then(() => {
-                        // Rimuovi le righe corrispondenti dalla tabella
-                        productIds.forEach(id => {
-                            document.querySelector(`.table-row[data-product-id="${id}"]`).remove();
-                        });
-                    });
-                } else {
-                    Swal.fire('Error!', data.message || 'Failed to delete products.', 'error');
-                }
-            })
-            .catch(error => {
-                Swal.fire('Error!', 'A network error occurred.', 'error');
-                console.error('Error:', error);
-            });
-        }
-    });
-});
-
- // ESPORTA IN CSV I PRODOTTI
-document.getElementById('export-products-btn').addEventListener('click', function () {
-    Swal.fire({
-        title: 'Exporting...',
-        text: 'Please wait while the data is being exported.',
-        icon: 'info',
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        didOpen: () => Swal.showLoading()
-    });
-
-    // Reindirizza alla rotta di esportazione
-    window.location.href = '/admin/cms/export_products';
-});
-
-// SCRIPT DI RICERCA
-document.addEventListener('DOMContentLoaded', function () {
-    const searchToggleBtn = document.getElementById('search-toggle-btn');
-    const searchInput = document.getElementById('search-input');
-    const tableRows = document.querySelectorAll('.table-row');
-
-    // Mostra/Nascondi l'input di ricerca
-    searchToggleBtn.addEventListener('click', function () {
-        searchInput.classList.toggle('d-none');
-        searchInput.focus();
-    });
-
-    // Filtra i prodotti in base alla ricerca
-    searchInput.addEventListener('input', function () {
-        const query = searchInput.value.toLowerCase().trim();
-
-        tableRows.forEach(row => {
-            const rowText = row.innerText.toLowerCase();
-            if (rowText.includes(query)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
+        copySelectedButton.addEventListener('click', function () {
+            const selectedRows = document.querySelectorAll('.row-checkbox:checked');
+            if (selectedRows.length === 0) {
+                Swal.fire('No Selection', 'Please select at least one product to copy.', 'warning');
+                return;
             }
+
+            // Recupera gli ID dei prodotti selezionati
+            const productIds = Array.from(selectedRows).map(row =>
+                row.closest('.table-row').getAttribute('data-product-id')
+            );
+
+            // Salva gli ID nel sessionStorage
+            sessionStorage.setItem('copiedProductIds', productIds.join(','));
+
+            Swal.fire('Copied!', `${productIds.length} products have been copied.`, 'success');
         });
     });
-});
-
 </script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-    const copySelectedButton = document.getElementById('copy-selected-btn');
-    const tableRows = document.querySelectorAll('.table-row');
+    // CREAZIONE RIGA PRODOTTO
+    document.getElementById('add-product-btn').addEventListener('click', function () {
+        Swal.fire({
+            title: 'Creating Product...',
+            text: 'Please wait while the new product is being created.',
+            icon: 'info',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => Swal.showLoading()
+        });
 
-    copySelectedButton.addEventListener('click', function () {
+        fetch('/admin/cms/create_product', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        })
+        .then(response => response.json())
+        .then(data => {
+            Swal.close();
+            if (data.success) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: data.message,
+                    icon: 'success'
+                }).then(() => {
+                    // Redirect to the product editing page
+                    window.location.href = `/admin/cms/pages/product/${data.product_id}`;
+                });
+            } else {
+                Swal.fire('Error!', data.message, 'error');
+            }
+        })
+        .catch(error => {
+            Swal.fire('Error!', 'A network error occurred.', 'error');
+            console.error('Error:', error);
+        });
+    });
+</script>
+
+<script>
+    // CANCELLAZIONE PRODOTTO
+    document.querySelector('.delete-selected').addEventListener('click', function () {
         const selectedRows = document.querySelectorAll('.row-checkbox:checked');
         if (selectedRows.length === 0) {
-            Swal.fire('No Selection', 'Please select at least one product to copy.', 'warning');
+            Swal.fire('No Selection', 'Please select at least one product to delete.', 'warning');
             return;
         }
 
-        // Recupera gli ID dei prodotti selezionati
-        const productIds = Array.from(selectedRows).map(row =>
+        const productIds = Array.from(selectedRows).map(row => 
             row.closest('.table-row').getAttribute('data-product-id')
         );
 
-        // Salva gli ID nel sessionStorage
-        sessionStorage.setItem('copiedProductIds', productIds.join(','));
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This action will permanently delete the selected products.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete them!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Deleting...',
+                    text: 'Please wait while the products are being deleted.',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => Swal.showLoading()
+                });
 
-        Swal.fire('Copied!', `${productIds.length} products have been copied.`, 'success');
+                fetch('/admin/cms/delete_products', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ product_ids: productIds })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    Swal.close();
+                    if (data.success) {
+                        Swal.fire('Deleted!', data.message, 'success').then(() => {
+                            // Rimuovi le righe corrispondenti dalla tabella
+                            productIds.forEach(id => {
+                                document.querySelector(`.table-row[data-product-id="${id}"]`).remove();
+                            });
+                        });
+                    } else {
+                        Swal.fire('Error!', data.message || 'Failed to delete products.', 'error');
+                    }
+                })
+                .catch(error => {
+                    Swal.fire('Error!', 'A network error occurred.', 'error');
+                    console.error('Error:', error);
+                });
+            }
+        });
     });
-});
 </script>
 
+<script>
+    // ESPORTA IN CSV I PRODOTTI
+    document.getElementById('export-products-btn').addEventListener('click', function () {
+        Swal.fire({
+            title: 'Exporting...',
+            text: 'Please wait while the data is being exported.',
+            icon: 'info',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        // Reindirizza alla rotta di esportazione
+        window.location.href = '/admin/cms/export_products';
+    });
+</script>
 <style>
     .table-row:hover {
         background-color: rgba(255, 14, 14, 0.1);

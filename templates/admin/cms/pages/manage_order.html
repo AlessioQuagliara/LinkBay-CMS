@@ -1,0 +1,325 @@
+{% extends "/admin/cms/interface/render.html" %}
+
+{% block content %}
+<!-- CONTENUTO -->
+
+<div class="container my-4" data-aos="fade-up">
+
+    <!-- Prima Card: Dettagli Ordine -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Order Details</h5>
+        </div>
+        <div class="card-body">
+            <form id="order-form">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <input type="hidden" name="order_id" id="order_id" value="{{ order.order_id }}">
+                        <label for="order_number" class="form-label">Order Number</label>
+                        <input type="text" class="form-control" id="order_number" name="order_number" value="{{ order.order_number }}" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="customer_name" class="form-label">Customer</label>
+                        <div class="input-group">
+                            <!-- Input nascosto per customer_id -->
+                            <input type="hidden" class="form-control" id="customer_id" name="customer_id" value="{{ order.customer_id }}">
+                            <!-- Input visibile per il nome del cliente -->
+                            <input type="text" class="form-control" id="customer_name" name="customer_name" 
+                                   value="{{ customer.first_name + ' ' + customer.last_name if customer else 'N/A' }}" readonly>
+                            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#selectCustomerModal">
+                                Select
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="total_amount" class="form-label">Total Amount</label>
+                        <input type="number" class="form-control" id="total_amount" name="total_amount" value="{{ order.total_amount }}" readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="Draft" {% if order.status == 'Draft' %}selected{% endif %}>Draft</option>
+                            <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+                            <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                            <option value="Complete" {% if order.status == 'Complete' %}selected{% endif %}>Complete</option>
+                            <option value="Abbandoned" {% if order.status == 'Abbandoned' %}selected{% endif %}>Abbandoned</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="created_at" class="form-label">Created At: </label>
+                        <span class="bg-light">{{ order.created_at }}</span>
+                        <br>
+                        <label for="updated_at" class="form-label">Updated At: </label>
+                        <span class="bg-light">{{ order.updated_at }}</span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ARTICOLI CLIENTI -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white" data-customer-id="{{ order.customer_id }}">
+            <h5 class="mb-0">Customer Details</h5>
+        </div>
+        <div class="card-body">
+            <div id="customer-details">
+                <!-- Qui verranno caricati i dettagli del cliente con JS -->
+                <p><strong>Name:</strong> <span id="customer-name">N/A</span></p>
+                <p><strong>Email:</strong> <span id="customer-email">N/A</span></p>
+                <p><strong>Phone:</strong> <span id="customer-phone">N/A</span></p>
+                <p><strong>Address:</strong> <span id="customer-address">N/A</span></p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Terza Card: Pagamenti -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Payments</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover align-middle text-center">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Payment Method</th>
+                        <th>Status</th>
+                        <th>Paid Amount</th>
+                        <th>Transaction ID</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ payment.payment_method }}</td>
+                        <td>{{ payment.payment_status }}</td>
+                        <td>{{ payment.paid_amount }}</td>
+                        <td>{{ payment.transaction_id }}</td>
+                        <td>{{ payment.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Quarta Card: Spedizione -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Shipping</h5>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="tracking_number" class="form-label">Tracking Number</label>
+                        <input type="text" class="form-control" id="tracking_number" name="tracking_number" value="{{ shipping.tracking_number or '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="shipping_status" class="form-label">Shipping Status</label>
+                        <input type="text" class="form-control" id="shipping_status" name="shipping_status" value="{{ shipping.status or '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="delivery_date" class="form-label">Delivery Date</label>
+                        <input type="date" class="form-control" id="delivery_date" name="delivery_date" value="{{ shipping.delivery_date or '' }}">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Select Customer -->
+<div class="modal fade" id="selectCustomerModal" tabindex="-1" aria-labelledby="selectCustomerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="selectCustomerModalLabel">Select Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="searchCustomer" class="form-control mb-3" placeholder="Search for a customer...">
+                <div id="customerList" class="list-group">
+                    <!-- Dati dinamici caricati qui -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!------------------------------------------------------------------ Script ---------------------------------------------------------->
+
+
+
+<!-------------------------------------------- Script di Salvataggio ---------------------------------------------------------->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const saveButton = document.getElementById('save-content');
+        const orderForm = document.getElementById('order-form');
+    
+        if (saveButton && orderForm) {
+            saveButton.addEventListener('click', () => {
+                // Crea direttamente l'oggetto JSON dai dati del modulo
+                const formData = new FormData(orderForm);
+                const formObject = Object.fromEntries(formData.entries());
+    
+                console.log('Order data to be sent:', formObject);
+    
+                // Mostra Swal di attesa
+                Swal.fire({
+                    title: 'Saving order...',
+                    text: 'Please wait while the order is being updated.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+    
+                        // Esegui la richiesta Fetch
+                        fetch('/admin/cms/update_order', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(formObject),
+                        })
+                            .then((response) => response.json())
+                            .then((data) => {
+                                Swal.close();
+                                if (data.success) {
+                                    Swal.fire('Success!', 'Order updated successfully!', 'success').then(() => {
+                                        window.location.reload();
+                                    });
+                                } else {
+                                    Swal.fire('Error!', data.message || 'Failed to update the order.', 'error');
+                                }
+                            })
+                            .catch((error) => {
+                                Swal.close();
+                                console.error('Error:', error);
+                                Swal.fire('Error!', 'A network error occurred.', 'error');
+                            });
+                    }
+                });
+            });
+        }
+    });
+</script>
+
+
+<!-------------------------------------------- Script Caricamento Customer ---------------------------------------------------------->
+
+<script>
+    // CARICAMENTO CUSTOMER 
+document.addEventListener('DOMContentLoaded', () => {
+    const customerList = document.getElementById('customerList');
+    const searchCustomer = document.getElementById('searchCustomer');
+    const customerIdInput = document.getElementById('customer_id'); // Input nascosto
+    const customerNameInput = document.getElementById('customer_name'); // Input visibile
+
+    // Funzione per caricare i clienti
+    const loadCustomers = () => {
+        Swal.fire({
+            title: 'Loading customers...',
+            text: 'Please wait while we fetch the customer list.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+                fetch('/admin/cms/customers')
+                    .then(response => response.json())
+                    .then(data => {
+                        Swal.close();
+                        if (data.success) {
+                            renderCustomers(data.customers);
+                        } else {
+                            customerList.innerHTML = `<p class="text-danger">Failed to load customers.</p>`;
+                        }
+                    })
+                    .catch(error => {
+                        Swal.close();
+                        console.error('Error loading customers:', error);
+                        customerList.innerHTML = `<p class="text-danger">An error occurred while loading customers.</p>`;
+                    });
+            }
+        });
+    };
+
+    // Funzione per renderizzare i clienti
+    const renderCustomers = (customers) => {
+        customerList.innerHTML = customers.map(customer => `
+            <button type="button" class="list-group-item list-group-item-action" data-id="${customer.id}" data-name="${customer.first_name} ${customer.last_name}">
+                <strong>${customer.first_name} ${customer.last_name}</strong> - ${customer.email}
+            </button>
+        `).join('');
+    };
+
+    // Event Listener per il clic su un cliente
+    customerList.addEventListener('click', (event) => {
+        if (event.target.closest('.list-group-item')) {
+            const customerButton = event.target.closest('.list-group-item');
+            const customerId = customerButton.getAttribute('data-id');
+            const customerName = customerButton.getAttribute('data-name');
+
+            // Aggiorna gli input con il cliente selezionato
+            customerIdInput.value = customerId;
+            customerNameInput.value = customerName;
+
+            // Chiudi il modale
+            const modal = bootstrap.Modal.getInstance(document.getElementById('selectCustomerModal'));
+            modal.hide();
+        }
+    });
+
+    // Event Listener per il campo di ricerca
+    searchCustomer.addEventListener('input', () => {
+        const filter = searchCustomer.value.toLowerCase();
+        const buttons = customerList.querySelectorAll('.list-group-item');
+
+        buttons.forEach(button => {
+            const text = button.textContent.toLowerCase();
+            button.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
+
+    // Carica i clienti al caricamento della pagina
+    loadCustomers();
+});
+</script>
+
+<!-------------------------------------------- Script Caricamento dati cliente ---------------------------------------------------------->
+
+<script>
+    // CARICA I DATI DEL CLIENTE
+    document.addEventListener('DOMContentLoaded', () => {
+        const customerCardHeader = document.querySelector('.card-header[data-customer-id]');
+        const customerId = customerCardHeader?.dataset.customerId;
+
+        if (customerId) {
+            fetch(`/admin/cms/customer/${customerId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.customer) {
+                        const customerDetails = data.customer;
+                        document.getElementById('customer-name').textContent = `${customerDetails.first_name} ${customerDetails.last_name}`;
+                        document.getElementById('customer-email').textContent = customerDetails.email;
+                        document.getElementById('customer-phone').textContent = customerDetails.phone;
+                        document.getElementById('customer-address').textContent = `${customerDetails.address}, ${customerDetails.city}, ${customerDetails.state}, ${customerDetails.postal_code}`;
+                    } else {
+                        console.error('Failed to load customer details:', data.message || 'Unknown error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching customer details:', error);
+                });
+        } else {
+            console.log('No customer ID found.');
+        }
+    });
+
+</script>
+
+<!-------------------------------------------- Script dettaglio sui prodotti ---------------------------------------------------------->
+{% endblock %}
