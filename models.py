@@ -1053,6 +1053,22 @@ class Products:
         except Exception as e:
             print(f"Error fetching products: {e}")
             return []
+        
+    def get_images_for_products(self, product_ids):
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            query = """
+                SELECT product_id, image_url, is_main
+                FROM product_images
+                WHERE product_id IN (%s)
+            """ % ','.join(['%s'] * len(product_ids))
+            cursor.execute(query, product_ids)
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error retrieving product images: {e}")
+            return []
+        finally:
+            cursor.close()
 
 # COLLEZIONI ---------------------------------------------------------------------------------------------------
 
@@ -1315,6 +1331,23 @@ class Collections:
             return False
         finally:
             cursor.close()
+
+    def get_collections_by_shop(self, shop_name):
+            cursor = self.conn.cursor(dictionary=True)
+            try:
+                query = """
+                    SELECT * 
+                    FROM collections 
+                    WHERE shop_name = %s AND is_active = 1
+                    ORDER BY name
+                """
+                cursor.execute(query, (shop_name,))
+                return cursor.fetchall()
+            except Exception as e:
+                print(f"Error fetching collections: {e}")
+                return []
+            finally:
+                cursor.close()
     
 
 

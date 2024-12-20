@@ -1531,9 +1531,6 @@ def domain():
         return render_template('admin/cms/pages/domain.html', title='Domain', username=username)
     return username
 
-
-
-
 # INTERN - Subscription Script Page ---------------------------------------------------------------------------------------------
 
 @app.route('/admin/cms/pages/subscription')
@@ -2194,3 +2191,22 @@ def cookie_setting_third_party():
             cookie_settings=cookie_settings
         )
     
+
+
+# API STORE FUNCTION --------------------------------------------------------------------------–------------------------
+
+@app.route('/api/collections', methods=['GET'])
+def get_collections():
+    shop_name = request.host.split('.')[0]
+    if not shop_name:
+        return jsonify({'success': False, 'message': 'Shop name is required'}), 400
+
+    conn = get_db_connection()
+    collection_model = Collections(conn)
+
+    try:
+        collections = collection_model.get_collections_by_shop(shop_name)
+        return jsonify({'success': True, 'collections': collections})
+    except Exception as e:
+        print(f"Error fetching collections: {e}")
+        return jsonify({'success': False, 'message': 'An error occurred'}), 500

@@ -29,7 +29,7 @@
                 <div class="container"> 
                     <h1 class="display-4 fw-bold text-dark"> Welcome to Our Site </h1> 
                     <p class="lead text-dark">Delivering high-quality services to help you grow.</p> 
-                    <a href="#" class="btn btn-outline-dark btn-lg mt-4"> 
+                    <a href="/" class="btn btn-outline-dark btn-lg mt-4"> 
                         Learn More 
                     </a> 
                 </div> 
@@ -39,7 +39,7 @@
     
             editor.BlockManager.add('bootstrap-text', {
                 label: '<i class="fa-solid fa-square-poll-horizontal fa-5x"></i> Text Section',
-                content: `<section class="rich-text-section py-5 bg-light"><div class="container"><h2 class="fw-bold text-dark mb-4">Discover Our Services</h2><p class="text-dark lead">We offer a wide range of high-quality services to help you achieve your goals. Our team of experts is dedicated to providing innovative solutions that are tailored to your needs.</p><h3 class="fw-bold text-dark mt-4">Why Choose Us?</h3><ul class="text-dark"><li>Expert team with years of experience</li><li>Customizable solutions to fit your needs</li><li>Reliable and timely support</li><li>Cutting-edge technology and tools</li></ul><blockquote class="blockquote mt-4 text-dark"><p class="mb-0">"Success usually comes to those who are too busy to be looking for it." - Henry David Thoreau</p></blockquote><p class="text-dark mt-4">For more information about our services, feel free to <a href="#" class="text-dark fw-bold text-decoration-underline">contact us</a> or browse our <a href="#" class="text-dark fw-bold text-decoration-underline">portfolio</a>.</p></div></section>`,
+                content: `<section class="rich-text-section py-5 bg-light"><div class="container"><h2 class="fw-bold text-dark mb-4">Discover Our Services</h2><p class="text-dark lead">We offer a wide range of high-quality services to help you achieve your goals. Our team of experts is dedicated to providing innovative solutions that are tailored to your needs.</p><h3 class="fw-bold text-dark mt-4">Why Choose Us?</h3><ul class="text-dark"><li>Expert team with years of experience</li><li>Customizable solutions to fit your needs</li><li>Reliable and timely support</li><li>Cutting-edge technology and tools</li></ul><blockquote class="blockquote mt-4 text-dark"><p class="mb-0">"Success usually comes to those who are too busy to be looking for it." - Henry David Thoreau</p></blockquote><p class="text-dark mt-4">For more information about our services, feel free to <a href="/#" class="text-dark fw-bold text-decoration-underline">contact us</a> or browse our <a href="/#" class="text-dark fw-bold text-decoration-underline">portfolio</a>.</p></div></section>`,
                 category: 'Theme Sections'
             });
             editor.BlockManager.add('image-with-text', {
@@ -58,7 +58,7 @@
                                 <p class="text-dark lead">
                                     Discover the best solutions tailored to your needs. Our product offers unparalleled quality and innovation.
                                 </p>
-                                <a href="#" class="btn btn-outline-dark btn-lg mt-4">Learn More</a>
+                                <a href="/#" class="btn btn-outline-dark btn-lg mt-4">Learn More</a>
                             </div>
                         </div>
                     </div>
@@ -75,7 +75,7 @@
                     <div class="banner-content position-absolute top-50 start-50 translate-middle">
                         <h1 class="text-light fw-bold">Your Stunning Banner</h1>
                         <p class="text-light lead">Create engaging experiences with a beautiful image banner</p>
-                        <a href="#" class="btn btn-outline-light btn-lg mt-4">Discover More</a>
+                        <a href="/#" class="btn btn-outline-light btn-lg mt-4">Discover More</a>
                     </div>
                 </section>
                 `,
@@ -211,19 +211,19 @@
                             <div class="col-md-4">
                                 <h3 class="fw-bold text-dark">Column 1</h3>
                                 <p class="text-dark">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla ut lectus sapien. Curabitur tempor orci nec risus fermentum, ac vehicula ligula vehicula.</p>
-                                <a href="#" class="btn btn-outline-dark">Read More</a>
+                                <a href="/#" class="btn btn-outline-dark">Read More</a>
                             </div>
                             <!-- Second Column -->
                             <div class="col-md-4">
                                 <h3 class="fw-bold text-dark">Column 2</h3>
                                 <p class="text-dark">Proin eget tortor risus. Cras ultricies ligula sed magna dictum porta. Vivamus suscipit tortor eget felis porttitor volutpat.</p>
-                                <a href="#" class="btn btn-outline-dark">Read More</a>
+                                <a href="/#" class="btn btn-outline-dark">Read More</a>
                             </div>
                             <!-- Third Column -->
                             <div class="col-md-4">
                                 <h3 class="fw-bold text-dark">Column 3</h3>
                                 <p class="text-dark">Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Quisque velit nisi, pretium ut lacinia in, elementum id enim.</p>
-                                <a href="#" class="btn btn-outline-dark">Read More</a>
+                                <a href="/#" class="btn btn-outline-dark">Read More</a>
                             </div>
                         </div>
                     </div>
@@ -356,63 +356,40 @@
                 category: 'Theme Sections',
             });
     
-            editor.BlockManager.add('navbar', {
-                label: '<img src="../../../../static/images/cms-hero.png?text=Header" alt="Navbar" /> Navbar',
-                content: `
-                <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                    <div class="container">
-                        <a class="navbar-brand" href="home">YourBrand</a>
-                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                            <span class="navbar-toggler-icon"></span>
-                        </button>
-                        <div class="collapse navbar-collapse" id="navbarNav">
-                            <ul class="navbar-nav ms-auto">
-                                <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page" href="home">Home</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="about-us">About</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="">Services</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="">Contact</a>
-                                </li>
-                            </ul>
-                            <a href="#" class="btn btn-outline-dark ms-lg-3">Sign Up</a>
-                        </div>
-                    </div>
-                </nav>
-                `,
-                category: 'Navbar',
-            });
+            
     
             editor.BlockManager.add('navbar-shop', {
                 label: '<img src="../../../../static/images/cms-hero.png?text=Header" alt="Shop Navbar" /> Shop Navbar',
                 content: `
                 <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
                     <div class="container">
-                        <a class="navbar-brand fw-bold" href="home">ShopBrand</a>
+                        <a class="navbar-brand fw-bold" href="/home">ShopBrand</a>
                         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarShop" aria-controls="navbarShop" aria-expanded="false" aria-label="Toggle navigation">
                             <span class="navbar-toggler-icon"></span>
                         </button>
                         <div class="collapse navbar-collapse" id="navbarShop">
                             <ul class="navbar-nav ms-auto">
                                 <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page" href="home">Home</a>
+                                    <a class="nav-link active" aria-current="page" href="/home">Home</a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="collectionsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Collections
+                                    </a>
+                                    <ul class="dropdown-menu" id="collectionsMenu">
+                                    </ul>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="catalogs">Shop</a>
+                                    <a class="nav-link" href="/catalogs">Shop</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="catalogs">Categories</a>
+                                    <a class="nav-link" href="/catalogs">Categories</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="#">Deals</a>
+                                    <a class="nav-link" href="/">Deals</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="about-us">Contact</a>
+                                    <a class="nav-link" href="/about-us">Contact</a>
                                 </li>
                             </ul>
                             <!-- Cart icon -->
@@ -420,11 +397,11 @@
                                 <i class="bi bi-cart"></i>
                                 Cart
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                    3
+                                    0
                                 </span>
                             </a>
                             <!-- Login/Sign Up button -->
-                            <a href="#" class="btn btn-outline-primary ms-lg-3">Login / Sign Up</a>
+                            <a href="/login" class="btn btn-outline-primary ms-lg-3">Login / Sign Up</a>
                         </div>
                     </div>
                 </nav>
@@ -447,19 +424,19 @@
                             <div class="col-md-4 mb-4">
                                 <h5 class="fw-bold">Quick Links</h5>
                                 <ul class="list-unstyled">
-                                    <li><a href="#" class="text-white text-decoration-none">Home</a></li>
-                                    <li><a href="#" class="text-white text-decoration-none">Shop</a></li>
-                                    <li><a href="#" class="text-white text-decoration-none">About Us</a></li>
-                                    <li><a href="#" class="text-white text-decoration-none">Contact</a></li>
+                                    <li><a href="/" class="text-white text-decoration-none">Home</a></li>
+                                    <li><a href="/" class="text-white text-decoration-none">Shop</a></li>
+                                    <li><a href="/" class="text-white text-decoration-none">About Us</a></li>
+                                    <li><a href="/" class="text-white text-decoration-none">Contact</a></li>
                                 </ul>
                             </div>
                             <!-- Social Media Links -->
                             <div class="col-md-4 mb-4">
                                 <h5 class="fw-bold">Follow Us</h5>
-                                <a href="#" class="text-white me-3"><i class="bi bi-facebook"></i></a>
-                                <a href="#" class="text-white me-3"><i class="bi bi-twitter"></i></a>
-                                <a href="#" class="text-white me-3"><i class="bi bi-instagram"></i></a>
-                                <a href="#" class="text-white"><i class="bi bi-linkedin"></i></a>
+                                <a href="/" class="text-white me-3"><i class="bi bi-facebook"></i></a>
+                                <a href="/" class="text-white me-3"><i class="bi bi-twitter"></i></a>
+                                <a href="/" class="text-white me-3"><i class="bi bi-instagram"></i></a>
+                                <a href="/" class="text-white"><i class="bi bi-linkedin"></i></a>
                             </div>
                         </div>
                         <div class="row mt-4">

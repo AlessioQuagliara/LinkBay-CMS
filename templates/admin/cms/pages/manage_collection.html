@@ -266,4 +266,66 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Aggiungi listener per pulsanti di cancellazione già presenti
+    initializeDeleteButtons();
+
+    // Funzione per inizializzare i listener di cancellazione
+    function initializeDeleteButtons() {
+        document.querySelectorAll('.delete-image-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const imageId = this.getAttribute('data-id');
+                deleteImage(imageId);
+            });
+        });
+    }
+
+    // Funzione per eliminare immagine
+    function deleteImage(imageId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This will permanently delete the image.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('/admin/cms/delete_image_collection', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image_id: imageId })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Rimuovi il contenitore dell'immagine
+                            const imageContainer = document.getElementById(`image-container-${imageId}`);
+                            if (imageContainer) {
+                                imageContainer.remove();
+                            }
+                            Swal.fire('Deleted!', 'The image has been deleted.', 'success');
+                        } else {
+                            Swal.fire('Error', data.message || 'Failed to delete the image.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', 'A network error occurred.', 'error');
+                        console.error('Error:', error);
+                    });
+            }
+        });
+    }
+
+    // Aggiungi dinamicamente nuovi listener per immagini aggiunte successivamente
+    const imagePreviewContainer = document.getElementById('image-preview-container');
+    const observer = new MutationObserver(() => {
+        initializeDeleteButtons();
+    });
+
+    observer.observe(imagePreviewContainer, { childList: true });
+});
+</script>
 {% endblock %}

@@ -496,4 +496,76 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.delete-image-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const imageId = this.getAttribute('data-id');
+                deleteImage(imageId);
+            });
+        });
+
+        // Funzione per eliminare immagine
+        function deleteImage(imageId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This will permanently delete the image.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/admin/cms/delete_image_product', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ image_id: imageId })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                document.getElementById(`image-container-${imageId}`).remove();
+                                Swal.fire('Deleted!', 'The image has been deleted.', 'success');
+                            } else {
+                                Swal.fire('Error', data.message || 'Failed to delete the image.', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire('Error', 'A network error occurred.', 'error');
+                            console.error('Error:', error);
+                        });
+                }
+            });
+        }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const nameInput = document.getElementById('name'); // Input per il nome del prodotto
+        const slugInput = document.getElementById('slug'); // Campo nascosto per lo slug
+        const productLink = document.querySelector('a[data-dynamic-slug]'); // Selettore per l'elemento link
+
+        // Evento per aggiornare lo slug automaticamente
+        nameInput.addEventListener('input', function () {
+            const nameValue = nameInput.value;
+
+            // Genera lo slug convertendo in minuscolo e sostituendo spazi e caratteri speciali
+            const slug = nameValue
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9\s-]/g, '') // Rimuove caratteri non alfanumerici
+                .replace(/\s+/g, '-')         // Sostituisce gli spazi con trattini
+                .replace(/-+/g, '-');         // Rimuove eventuali trattini consecutivi
+
+            // Aggiorna i valori dello slug
+            slugInput.value = slug;
+
+            // Aggiorna il valore del link dinamico
+            if (productLink) {
+                productLink.href = `/products/${slug}`;
+            }
+        });
+    });
+</script>
 {% endblock %}

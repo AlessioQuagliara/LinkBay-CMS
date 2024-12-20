@@ -16,13 +16,14 @@
 </nav>
 
 <!-- Contenuto dinamico -->
+ <br>
 <div class="container my-5">
     <h1 class="text-center">
         {{ collection.name if collection else "All Products" }}
     </h1>
-    <p class="text-center text-muted">
-        {{ collection.description if collection else "Explore our entire catalog of products." }}
-    </p>
+    <div class="text-center text-muted">
+        {{ collection.description | safe if collection else "Explore our entire catalog of products." }}
+    </div>
 
     <div class="row g-4 mt-4">
         {% if products %}
@@ -30,10 +31,13 @@
             <div class="col-md-4 col-lg-3">
                 <a href="/products/{{ product.slug }}" class="text-decoration-none">
                     <div class="card h-100 shadow-sm">
-                        <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}">
+                        <img 
+                            src="{{ product.images[0].image_url if product.images else '/static/images/placeholder.png' }}" 
+                            class="card-img-top" 
+                            alt="{{ product.images[0].alt_text if product.images else product.name }}">
                         <div class="card-body">
                             <h5 class="card-title text-dark">{{ product.name }}</h5>
-                            <p class="card-text text-muted">{{ product.short_description }}</p>
+                            <p class="card-text text-muted">{{ product.short_description or 'No description available.' }}</p>
                             <p class="card-text text-primary">€{{ product.price }}</p>
                         </div>
                     </div>
@@ -48,6 +52,7 @@
     </div>
 </div>
 
+
 <!-- Include il footer -->
 <footer>
     {{ footer | safe }}
@@ -58,5 +63,8 @@
 
 <!-- Carica gli script del footer -->
 {{ foot | safe }}
+
+<!-- Carica gli script predefiniti da sistema -->
+{% include 'footer.html' %}
 </body>
 </html>

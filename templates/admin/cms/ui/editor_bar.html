@@ -23,6 +23,17 @@
             </li>
             <hr>
             {% if page.slug in ['products', 'navbar', 'footer'] %}
+            <li class="nav-item">
+                <p class="nav-link text-white"> 
+                    Select language
+                </p>
+                <select id="language-selector" class="form-select">
+                    <option value="en" {% if page.language == 'en' %}selected{% endif %}>English</option>
+                    <option value="it" {% if page.language == 'it' %}selected{% endif %}>Italian</option>
+                    <option value="fr" {% if page.language == 'fr' %}selected{% endif %}>French</option>
+                    <option value="de" {% if page.language == 'de' %}selected{% endif %}>German</option>
+                </select>
+            </li>
             {% else %}
             <li class="nav-item">
                 <a href="#" class="nav-link text-white" data-bs-toggle="modal" data-bs-target="#seoModal">

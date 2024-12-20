@@ -125,7 +125,7 @@ def render_collection(slug=None):
     shop_subdomain = request.host.split('.')[0]  # Ottieni il sottodominio
     conn = get_db_connection()
 
-    # Inizializza il modello della collezione
+    # Inizializza i modelli
     collection_model = Collections(conn)
     product_model = Products(conn)
 
@@ -135,10 +135,17 @@ def render_collection(slug=None):
         if not collection:
             return render_template('404.html'), 404
         products_in_collection = collection_model.get_products_in_collection(collection['id'])
+        product_images = product_model.get_images_for_products([p['id'] for p in products_in_collection])
     else:
-        # Se non è specificato uno slug, carica tutte le collezioni con i relativi prodotti
         collection = None
-        products_in_collection = product_model.get_all_products()  # Recupera tutti i prodotti
+        products_in_collection = product_model.get_all_products()
+        product_images = product_model.get_images_for_products([p['id'] for p in products_in_collection])
+
+    # Aggiungi immagini ai prodotti
+    for product in products_in_collection:
+        product['images'] = [
+            img for img in product_images if img['product_id'] == product['id']
+        ]
 
     # Carica contenuti navbar e footer
     navbar_content = get_navbar_content(shop_subdomain)

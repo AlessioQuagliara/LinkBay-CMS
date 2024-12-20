@@ -29,5 +29,8 @@
     
     <!-- Carica gli script del footer -->
     {{ foot | safe }}  <!-- Questo carica gli script specifici per il footer -->
+    
+    <!-- Carica gli script predefiniti da sistema -->
+    {% include 'footer.html' %}
 </body>
 </html>
