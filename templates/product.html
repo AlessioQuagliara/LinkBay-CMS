@@ -71,7 +71,7 @@
                             data-product-id="{{ product.id }}" 
                             data-product-name="{{ product.name }}" 
                             data-product-price="{{ product.price }}" 
-                            data-product-image="{{ images[0].image_url if images else '/static/images/placeholder.png' }}">
+                            data-product-image="{{ product.image_url }}">
                             Add to Cart
                         </button>
                     </div>
@@ -79,7 +79,7 @@
             </div>
         </div>
 
-        {{ content | safe }}
+        {{ page | safe }}
     </div>
 
     <!-- Include il footer -->

@@ -181,6 +181,10 @@ def render_product(slug):
     product_model = Products(conn)
     product = product_model.get_product_by_slug(slug, shop_subdomain)
 
+    # Carica i dettagli della pagina
+    page_model = Page(conn)
+    page = page_model.get_page_by_slug('products', shop_subdomain)
+
     if product:
         # Recupera le immagini del prodotto
         product_images = product_model.get_product_images(product['id'])
@@ -201,6 +205,7 @@ def render_product(slug):
             title=product['name'],
             description=product['short_description'],
             product=product,
+            page=page['content'],
             images=product_images,  # Passa le immagini al template
             navbar=navbar_content,
             footer=footer_content,
