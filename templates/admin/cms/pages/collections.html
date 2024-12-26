@@ -68,7 +68,11 @@
                             <td class="image_url">
                                 <img src="{{ collection.image_url }}" alt="{{ collection.name }} Image" style="max-width: 50px; max-height: 50px;">
                             </td>
-                            <td class="is_active">{{ 'Yes' if collection.is_active else 'No' }}</td>
+                            <td class="is_active">
+                                <span class="badge {{ 'bg-success' if collection.is_active else 'bg-danger' }}">
+                                    {{ 'Active' if collection.is_active else 'Inactive' }}
+                                </span>
+                            </td></td>
                             <td class="created_at">{{ collection.created_at }}</td>
                             <td class="updated_at">{{ collection.updated_at }}</td>
                         </tr>

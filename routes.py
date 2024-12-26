@@ -2210,3 +2210,10 @@ def get_collections():
     except Exception as e:
         print(f"Error fetching collections: {e}")
         return jsonify({'success': False, 'message': 'An error occurred'}), 500
+    
+
+# CHECKOUT USER SIDE ---------------------------------------------------------------------------------------------------
+
+@app.route('/checkout')
+def checkout():
+    return render_template('checkout/checkout.html', title='Checkout')

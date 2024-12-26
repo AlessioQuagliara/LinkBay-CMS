@@ -69,7 +69,11 @@
                             <td class="region">{{ method.region }}</td>
                             <td class="cost">€{{ method.cost }}</td>
                             <td class="estimated_delivery_time">{{ method.estimated_delivery_time }}</td>
-                            <td class="is_active">{{ 'Yes' if method.is_active else 'No' }}</td>
+                            <td class="is_active">
+                                <span class="badge {{ 'bg-success' if method.is_active else 'bg-danger' }}">
+                                    {{ 'Active' if method.is_active else 'Deactive' }}
+                                </span>
+                            </td>
                             <td class="created_at">{{ method.created_at }}</td>
                             <td class="updated_at">{{ method.updated_at }}</td>
                         </tr>

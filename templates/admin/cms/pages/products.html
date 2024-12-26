@@ -96,7 +96,11 @@
                                 <img src="{{ product.image_url }}" alt="{{ product.name }} Image" style="max-width: 50px; max-height: 50px;">
                             </td>
                             <td class="slug">{{ product.slug }}</td>
-                            <td class="is_active">{{ 'Yes' if product.is_active else 'No' }}</td>
+                            <td class="is_active">
+                                <span class="badge {{ 'bg-success' if product.is_active else 'bg-danger' }}">
+                                    {{ 'Active' if product.is_active else 'Inactive' }}
+                                </span>
+                            </td>
                             <td class="created_at">{{ product.created_at }}</td>
                             <td class="updated_at">{{ product.updated_at }}</td>
                         </tr>

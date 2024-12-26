@@ -26,7 +26,7 @@
           </div>
           <div class="d-flex justify-content-between align-items-center">
             <h5>Total: <span id="cartTotal" class="text-success">€0.00</span></h5>
-            <button class="btn btn-danger" id="clearCart">Clear Cart</button>
+            <button class="btn btn-danger" id="clearCart" onclick="clearCart()">Clear Cart</button>
           </div>
         </div>
         <div class="modal-footer">
@@ -93,6 +93,7 @@
                 icon: 'success',
                 confirmButtonText: 'OK'
             });
+            renderCart();
         }
     </script>
 
@@ -161,6 +162,7 @@
                 icon: 'info',
                 confirmButtonText: 'OK'
             });
+            renderCart();
         }
     </script>
 
@@ -180,6 +182,7 @@
                     confirmButtonText: 'OK'
                 });
             }
+            renderCart();
         }
     </script>
 
@@ -215,7 +218,7 @@
                         <td>€${(price * quantity).toFixed(2)}</td>
                         <td>
                             <button class="btn btn-danger" onclick="removeFromCart('${product.id}')">
-                                <i class="bi bi-trash"></i>
+                                <i class="fa-solid fa-trash"></i>
                             </button>
                         </td>
                     `;
@@ -248,4 +251,21 @@
                 cartModal.addEventListener('shown.bs.modal', renderCart);
             }
         });
+    </script>
+
+    <script>
+        // STAMPA IL NUMERO DEI PRODOTTI CON CONSOLE LOG
+        document.addEventListener('DOMContentLoaded', () => {
+            const cart = getCart();
+            console.log("Cart length:", cart.length);
+        });
+    </script>
+
+    <script>
+        // Immagini active per pagina prodotto
+        function changeImage(event, src) {
+            document.getElementById('mainImage').src = src;
+            document.querySelectorAll('.thumbnail').forEach(thumb => thumb.classList.remove('active'));
+            event.target.classList.add('active');
+        }
     </script>
