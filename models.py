@@ -1,6 +1,17 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
 
+
+
+
+
+
+imporg ajcoanmciovaniocnaipo
+
+
+
+
+
 # CLASSE PER GESTIONE DATABASE ---------------------------------------------------------------------------------------------------
 
 class Database:
