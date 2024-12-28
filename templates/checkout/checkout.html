@@ -190,27 +190,18 @@
         <div class="sidebar-right">
           <h3>Riepilogo ordine</h3>
           <ul class="list-group mb-4">
-              <!-- Lista dinamica degli articoli -->
-              <li class="list-group-item d-flex align-items-center">
-                  <img src="/static/images/product1.jpg" alt="Prodotto 1" class="img-fluid me-3" style="width: 50px; height: 50px; object-fit: cover;">
-                  <div class="flex-grow-1">
-                      <strong>Prodotto 1</strong>
-                      <p class="mb-0 text-muted small">Descrizione breve del prodotto</p>
-                      <p class="mb-0 text-muted small">Quantità: 1</p>
-                  </div>
-                  <span class="text-end">€10,00</span>
-              </li>
-              <li class="list-group-item d-flex align-items-center">
-                  <img src="/static/images/product2.jpg" alt="Prodotto 2" class="img-fluid me-3" style="width: 50px; height: 50px; object-fit: cover;">
-                  <div class="flex-grow-1">
-                      <strong>Prodotto 2</strong>
-                      <p class="mb-0 text-muted small">Descrizione breve del prodotto</p>
-                      <p class="mb-0 text-muted small">Quantità: 2</p>
-                  </div>
-                  <span class="text-end">€20,00</span>
-              </li>
-              <!-- Fine lista articoli -->
-          </ul>
+            {% for item in cart %}
+            <li class="list-group-item d-flex align-items-center">
+                <img src="{{ item.image }}" alt="{{ item.name }}" class="img-fluid me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                <div class="flex-grow-1">
+                    <strong>{{ item.name }}</strong>
+                    <p class="mb-0 text-muted small">{{ item.description }}</p>
+                    <p class="mb-0 text-muted small">Quantità: {{ item.quantity }}</p>
+                </div>
+                <span class="text-end">€{{ (item.price | float * item.quantity) | round(2) }}</span>
+            </li>
+            {% endfor %}
+        </ul>
       
           <!-- Campo codice sconto -->
           <div class="mb-4">
@@ -223,23 +214,25 @@
       
           <!-- Totale -->
           <ul class="list-group">
-              <li class="list-group-item d-flex justify-content-between">
-                  <span>Subtotale</span>
-                  <strong>€30,00</strong>
-              </li>
-              <li class="list-group-item d-flex justify-content-between">
-                  <span>Spedizione</span>
-                  <strong>€5,00</strong>
-              </li>
-              <li class="list-group-item d-flex justify-content-between">
-                  <span>Sconto</span>
-                  <strong>-€5,00</strong>
-              </li>
-              <li class="list-group-item d-flex justify-content-between">
-                  <span><strong>Totale</strong></span>
-                  <strong>€30,00</strong>
-              </li>
-          </ul>
+            <li class="list-group-item d-flex justify-content-between">
+                <span>Subtotale</span>
+                <strong>€{{ subtotal | round(2) }}</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                <span>Spedizione</span>
+                <strong>€{{ shipping_cost | round(2) }}</strong>
+            </li>
+            {% if discount and discount > 0 %}
+            <li class="list-group-item d-flex justify-content-between">
+                <span>Sconto</span>
+                <strong>-€{{ discount | round(2) }}</strong>
+            </li>
+            {% endif %}
+            <li class="list-group-item d-flex justify-content-between">
+                <span><strong>Totale</strong></span>
+                <strong>€{{ total | round(2) }}</strong>
+            </li>
+        </ul>
       </div>
 
     </div>
