@@ -128,7 +128,7 @@
         const thirdPartyTerms = document.getElementById('third-party-terms').value;
         const thirdPartyConsent = document.getElementById('third-party-consent').value;
     
-        fetch('/admin/cms/function/cookie-policy-third-party', {
+        fetch("{{ url_for('cookiepolicy.cookie_setting_third_party') }}", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

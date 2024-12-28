@@ -1,271 +1,220 @@
-<!-- MODALE BOOTSTRAP 5.3.3 PER RENDERIZZARE IL CARRELLO -->
-<div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header bg-dark text-white">
-          <h5 class="modal-title" id="cartModalLabel">Shopping Cart</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Sidebar del carrello -->
+    <div id="cartSidebar" class="cart-sidebar">
+        <div class="cart-sidebar-header">
+            <h5>Il tuo Carrello</h5>
+            <button type="button" class="btn btn-light" onclick="toggleCartSidebar()"><i class="fa-solid fa-times"></i></button></button>
         </div>
-        <div class="modal-body">
-          <div class="table-responsive">
-            <table class="table align-middle">
-              <thead class="table-dark">
-                <tr>
-                  <th scope="col">Image</th>
-                  <th scope="col">Product</th>
-                  <th scope="col">Price</th>
-                  <th scope="col">Quantity</th>
-                  <th scope="col">Total</th>
-                  <th scope="col">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="cartContainer">
-                <!-- Contenuto del carrello viene generato dinamicamente -->
-              </tbody>
-            </table>
-          </div>
-          <div class="d-flex justify-content-between align-items-center">
-            <h5>Total: <span id="cartTotal" class="text-success">€0.00</span></h5>
-            <button class="btn btn-danger" id="clearCart" onclick="clearCart()">Clear Cart</button>
-          </div>
+        <div class="cart-sidebar-body">
+            <!-- Contenitore per i prodotti -->
+            <div id="cartItemsContainer">
+                <!-- I prodotti verranno iniettati qui via JS -->
+            </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continue Shopping</button>
-          <button type="button" class="btn btn-primary" id="checkoutButton">Proceed to Checkout</button>
+        <div class="cart-sidebar-footer">
+            <!-- Totali -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span>Subtotale:</span>
+                <strong id="cartSubtotal">€0.00</strong>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <span>Totale:</span>
+                <strong id="cartTotal">€0.00</strong>
+            </div>
+            <!-- Pulsanti -->
+            <button class="btn btn-dark w-100" onclick="proceedToCheckout()">Procedi al Checkout</button>
         </div>
-      </div>
     </div>
-  </div>
 
+    <style>
+        #addToCartButton.btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
 
-<script>
-    // DROPDOWN NAVBAR --------------------------------------------------------------------------------------------------- 
-    document.addEventListener('DOMContentLoaded', function () {
-        const collectionsMenu = document.getElementById('collectionsMenu');
-    
-        // Ottieni il nome del negozio dal subdomain o altra fonte
-        const shopName = "{{ shop_subdomain }}";
-    
-        // Effettua una richiesta AJAX per ottenere le collezioni
-        fetch(`/api/collections?shop_name=${shopName}`)
+        #addToCartButton.btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 100%;
+            background-color: #f8f9fa;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 1050;
+        }
+
+        .cart-sidebar.open {
+            transform: translateX(0);
+        }
+
+        .cart-sidebar-header {
+            padding: 15px;
+            background-color: #c6c6c6;
+            color: black;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-sidebar-body {
+            padding: 15px;
+            overflow-y: auto;
+            max-height: calc(100% - 160px); /* Header + Footer */
+        }
+
+        .cart-sidebar-footer {
+            padding: 15px;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+
+    <script>
+        /* Funzione per aprire/chiudere la sidebar */
+        function toggleCartSidebar() {
+            const sidebar = document.getElementById('cartSidebar');
+            sidebar.classList.toggle('open');
+            if (sidebar.classList.contains('open')) {
+                fetchCartContents();
+            }
+        }
+        
+        /* Recupera i contenuti del carrello dal backend */
+        function fetchCartContents() {
+            fetch('/cart_contents')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.cart) {
+                        renderCartItems(data.cart);
+                        updateCartTotals(data.cart);
+                    }
+                })
+                .catch(error => console.error('Errore nel recupero del carrello:', error));
+        }
+        
+        /* Mostra i prodotti nella sidebar */
+        function renderCartItems(cart) {
+            const cartItemsContainer = document.getElementById('cartItemsContainer');
+            
+            // Logga il contenitore per verificare che esista
+            if (!cartItemsContainer) {
+                console.error('Elemento con ID "cartItemsContainer" non trovato nel DOM.');
+                return;
+            }
+
+            // Logga il contenuto del carrello
+            console.log('Carrello ricevuto per il rendering:', cart);
+
+            // Svuota il contenitore
+            cartItemsContainer.innerHTML = '';
+
+            // Controlla se il carrello è vuoto
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p>Il carrello è vuoto</p>';
+                console.log('Carrello vuoto, messaggio impostato.');
+                return;
+            }
+
+            // Itera attraverso i prodotti e crea l'HTML
+            cart.forEach(item => {
+                console.log('Rendering prodotto:', item); // Verifica i dati di ogni prodotto
+
+                const productRow = document.createElement('div');
+                productRow.classList.add('cart-item', 'd-flex', 'align-items-center', 'mb-3');
+
+                // Genera l'HTML dinamico per il prodotto
+                productRow.innerHTML = `
+                    <div class="me-3">
+                        <img src="${item.image || '/static/images/placeholder.png'}" 
+                            alt="${item.name}" 
+                            class="img-fluid" 
+                            style="width: 50px; height: 50px; object-fit: cover;">
+                    </div>
+                    <div class="flex-grow-1">
+                        <strong>${item.name}</strong><br>
+                        <span class="text-muted">€${parseFloat(item.price).toFixed(2)}</span><br>
+                        <span class="text-muted small">Quantità: ${item.quantity}</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-danger btn-sm" onclick="removeItemFromCart('${item.id}')">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+
+                // Aggiungi il prodotto al contenitore
+                cartItemsContainer.appendChild(productRow);
+            });
+
+            console.log('Prodotti renderizzati con successo.');
+}
+        
+        /* Aggiorna i totali del carrello */
+        function updateCartTotals(cart) {
+            const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            const total = subtotal; // Eventualmente aggiungi tasse/spedizione
+            document.getElementById('cartSubtotal').textContent = `€${subtotal.toFixed(2)}`;
+            document.getElementById('cartTotal').textContent = `€${total.toFixed(2)}`;
+        }
+        
+        /* Rimuove un prodotto dal carrello */
+        function removeItemFromCart(productId) {
+            fetch('/remove_from_cart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_id: productId })
+            })
             .then(response => response.json())
             .then(data => {
-                if (data.success && data.collections.length > 0) {
-                    // Popola il dropdown con le collezioni
-                    data.collections.forEach(collection => {
-                        const listItem = document.createElement('li');
-                        listItem.innerHTML = `<a class="dropdown-item" href="/collections/${collection.slug}">${collection.name}</a>`;
-                        collectionsMenu.appendChild(listItem);
-                    });
-                } else {
-                    // Nessuna collezione trovata
-                    const emptyItem = document.createElement('li');
-                    emptyItem.innerHTML = `<span class="dropdown-item text-muted">No collections available</span>`;
-                    collectionsMenu.appendChild(emptyItem);
+                if (data.success) {
+                    fetchCartContents();
                 }
             })
-            .catch(error => {
-                console.error('Error fetching collections:', error);
-            });
-    });
-    </script>
-
-    <script>
-        // AGGIUNGI AL CARRELLO -----------------------------------------------------------------------------------------------
-        function addToCart(product) {
-            console.log("Adding product:", product);
-
-            const cart = getCart();
-            const existingProduct = cart.find(item => item.id === product.id);
-
-            if (existingProduct) {
-                existingProduct.quantity += 1;
-            } else {
-                cart.push(product);
-            }
-
-            saveCart(cart);
-            console.log("Updated cart:", cart);
-
-            Swal.fire({
-                title: 'Success!',
-                text: 'Product added to cart!',
-                icon: 'success',
-                confirmButtonText: 'OK'
-            });
-            renderCart();
+            .catch(error => console.error('Errore nella rimozione del prodotto:', error));
+        }
+        
+        /* Procedi al checkout */
+        function proceedToCheckout() {
+            window.location.href = '/checkout';
         }
     </script>
 
     <script>
-        // SCRIPT DI AGGIUNTA AL CARRELLO -------------------------------------------------------------------------------------
+        // DROPDOWN NAVBAR --------------------------------------------------------------------------------------------------- 
         document.addEventListener('DOMContentLoaded', function () {
-            const addToCartButtons = document.querySelectorAll('.add-to-cart');
+            const collectionsMenu = document.getElementById('collectionsMenu');
         
-            addToCartButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const productId = button.getAttribute('data-product-id');
-                    const productName = button.getAttribute('data-product-name');
-                    const productPrice = button.getAttribute('data-product-price');
-                    const productImage = button.getAttribute('data-product-image');
+            // Ottieni il nome del negozio dal subdomain o altra fonte
+            const shopName = "{{ shop_subdomain }}";
         
-                    const product = {
-                        id: productId,
-                        name: productName,
-                        price: parseFloat(productPrice), // Assicurati che il prezzo sia un numero
-                        image: productImage,
-                        quantity: 1
-                    };
-        
-                    addToCart(product);
-        
-                    // Recupera il carrello aggiornato e loggalo
-                    const cart = getCart();
-                    console.log("Product added to cart:", product);
-                    console.log("Updated cart:", cart);
-        
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'Product added to cart!',
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    });
+            // Effettua una richiesta AJAX per ottenere le collezioni
+            fetch(`/api/collections?shop_name=${shopName}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.collections.length > 0) {
+                        // Popola il dropdown con le collezioni
+                        data.collections.forEach(collection => {
+                            const listItem = document.createElement('li');
+                            listItem.innerHTML = `<a class="dropdown-item" href="/collections/${collection.slug}">${collection.name}</a>`;
+                            collectionsMenu.appendChild(listItem);
+                        });
+                    } else {
+                        // Nessuna collezione trovata
+                        const emptyItem = document.createElement('li');
+                        emptyItem.innerHTML = `<span class="dropdown-item text-muted">No collections available</span>`;
+                        collectionsMenu.appendChild(emptyItem);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching collections:', error);
                 });
-            });
-        });
-        </script>
-
-    <script>
-        // RECUPERA IL CARRELLO DALLA SESSIONE --------------------------------------------------------------------------------
-        function getCart(){
-            const cart = localStorage.getItem('cart');
-            return cart ? JSON.parse(cart) : [];
-        }
-    </script>
-
-    <script>
-        // FUNZIONE PER SALVARE IL CARRELLO ------------------------------------------------------------------------------
-        function saveCart(cart){
-            localStorage.setItem('cart', JSON.stringify(cart));
-        }
-    </script>
-
-    <script>
-        // FUNZIONE PER RIMUOVERE UN PRODOTTO DAL CARRELLO ----------------------------------------------------------------
-        function removeFromCart(productId){
-            const cart = getCart();
-            const updatedCart = cart.filter(item => item.id !== productId);
-            saveCart(updatedCart);
-            Swal.fire({
-                title: 'Removed!',
-                text: 'Product removed from cart!',
-                icon: 'info',
-                confirmButtonText: 'OK'
-            });
-            renderCart();
-        }
-    </script>
-
-    <script>
-        // FUNZIONE PER AGGIORNARE LA QUANTITÀ DI UN PRODOTTO NEL CARRELLO ---------------------------------------------------
-        function updateQuantity(productId, quantity){
-            const cart = getCart();
-            const product = cart.find(item => item.id === productId);
-
-            if (product){
-                product.quantity = quantity;
-                saveCart(cart);
-                Swal.fire({
-                    title: 'Updated!',
-                    text: 'Cart updated!',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
-            }
-            renderCart();
-        }
-    </script>
-
-    <script>
-        // FUNZIONE PER VISUALIZZARE IL CARRELLO -------------------------------------------------------------------------------
-        function renderCart() {
-            const cart = getCart();
-            console.log("Rendering cart:", cart);
-
-            const cartContainer = document.getElementById('cartContainer');
-            const cartTotal = document.getElementById('cartTotal');
-
-            if (cart.length > 0) {
-                cartContainer.innerHTML = ''; // Svuota il contenitore
-
-                cart.forEach(product => {
-                    // Validazione dei dati del prodotto
-                    const price = parseFloat(product.price) || 0; // Converte in numero o imposta 0
-                    const quantity = parseInt(product.quantity) || 1; // Default a 1 se mancante o invalido
-
-                    console.log("Rendering product:", product);
-
-                    const productRow = document.createElement('tr');
-                    productRow.innerHTML = `
-                        <td>
-                            <img src="${product.image}" alt="${product.name}" class="img-fluid" style="max-width: 50px;">
-                        </td>
-                        <td>${product.name}</td>
-                        <td>€${price.toFixed(2)}</td>
-                        <td>
-                            <input type="number" class="form-control" value="${quantity}" min="1" onchange="updateQuantity('${product.id}', this.value)">
-                        </td>
-                        <td>€${(price * quantity).toFixed(2)}</td>
-                        <td>
-                            <button class="btn btn-danger" onclick="removeFromCart('${product.id}')">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </td>
-                    `;
-                    cartContainer.appendChild(productRow);
-                });
-
-                const total = cart.reduce((acc, item) => acc + ((parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1)), 0);
-                cartTotal.textContent = `€${total.toFixed(2)}`;
-            } else {
-                console.log("Cart is empty.");
-                cartContainer.innerHTML = '<tr><td colspan="6">Cart is empty</td></tr>';
-                cartTotal.textContent = '€0.00';
-            }
-        }
-    </script>
-
-    <script>
-        // PULIRE IL CARRELLO 
-        function clearCart(){
-            localStorage.removeItem('cart');
-            renderCart();
-        }
-    </script>
-
-    <script>
-        // LISTENER MODALE
-        document.addEventListener('DOMContentLoaded', () => {
-            const cartModal = document.getElementById('cartModal');
-            if (cartModal) {
-                cartModal.addEventListener('shown.bs.modal', renderCart);
-            }
         });
     </script>
 
-    <script>
-        // STAMPA IL NUMERO DEI PRODOTTI CON CONSOLE LOG
-        document.addEventListener('DOMContentLoaded', () => {
-            const cart = getCart();
-            console.log("Cart length:", cart.length);
-        });
-    </script>
-
-    <script>
-        // Immagini active per pagina prodotto
-        function changeImage(event, src) {
-            document.getElementById('mainImage').src = src;
-            document.querySelectorAll('.thumbnail').forEach(thumb => thumb.classList.remove('active'));
-            event.target.classList.add('active');
-        }
-    </script>
+    
