@@ -8,14 +8,16 @@ from .page_routes import page_bp
 from .websettings_routes import websettings_bp
 from .user_routes import user_bp
 from .orders_routes import orders_bp
-from .payments_routes import payments_bp
-from .shipping_routes import shipping_bp
+#from .payments_routes import payments_bp
+#from .shipping_routes import shipping_bp
 from .shippingmethods_routes import shipping_methods_bp
 from .storepayments_routes import storepayments_bp
-from .userstoreaccess_routes import userstoreaccess_bp
-from .shoplist_routes import shoplist_bp
-from .database_routes import database_bp
+#from .userstoreaccess_routes import userstoreaccess_bp
+#from .shoplist_routes import shoplist_bp
+#from .database_routes import database_bp
 from .customers_routes import customers_bp
+from .user_routes import user_bp
+from .ui_routes import ui_bp
 
 
 
@@ -34,11 +36,13 @@ def register_admin_blueprints(app):
     app.register_blueprint(websettings_bp)
     app.register_blueprint(user_bp)
     app.register_blueprint(orders_bp)
-    app.register_blueprint(payments_bp)
-    app.register_blueprint(shipping_bp)
+    #app.register_blueprint(payments_bp)
+    #app.register_blueprint(shipping_bp)
     app.register_blueprint(shipping_methods_bp)
     app.register_blueprint(storepayments_bp)
-    app.register_blueprint(userstoreaccess_bp)
-    app.register_blueprint(shoplist_bp)
-    app.register_blueprint(database_bp)
+    #app.register_blueprint(userstoreaccess_bp)
+    #app.register_blueprint(shoplist_bp)
+    #app.register_blueprint(database_bp)
     app.register_blueprint(customers_bp)
+    app.register_blueprint(user_bp)
+    app.register_blueprint(ui_bp)

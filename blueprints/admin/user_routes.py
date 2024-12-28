@@ -2,8 +2,11 @@ from flask import Blueprint, request, session, redirect, url_for, render_templat
 from models.user import User # importo la classe database
 from models.userstoreaccess import UserStoreAccess
 from models.shoplist import ShopList
-from app import get_db_connection, get_auth_db_connection
 from werkzeug.security import generate_password_hash, check_password_hash
+from db_helpers import DatabaseHelper
+from helpers import check_user_authentication
+
+db_helper = DatabaseHelper()
 
 # Blueprint
 user_bp = Blueprint('user', __name__)
@@ -20,7 +23,7 @@ def check_user_authentication():
 # Admin Routes -------------------------------------------------------------------------
 @user_bp.route('/admin/sign-in', methods=['GET', 'POST'])
 def signin():
-    db_conn = get_db_connection()  
+    db_conn = db_helper.get_db_connection()  
     user_model = User(db_conn)  
 
     if request.method == 'POST':
@@ -53,7 +56,7 @@ def log_session_info():
 @user_bp.route('/admin/', methods=['GET', 'POST'])
 @user_bp.route('/admin/login', methods=['GET', 'POST'])
 def login():
-    auth_db_conn = get_auth_db_connection()  
+    auth_db_conn = db_helper.get_auth_db_connection()  
     user_model = User(auth_db_conn)  
     access_model = UserStoreAccess(auth_db_conn)  
     shop_list_model = ShopList(auth_db_conn)  # Modello per ottenere i dettagli dello store
@@ -96,7 +99,7 @@ def login():
                     session['otp_secret'] = user['otp_secret']
                     return redirect(url_for('verify_otp'))
                 else:
-                    return redirect(url_for('homepage'))
+                    return redirect(url_for('ui.homepage'))
             else:
                 # Se l'utente non ha accesso a questo store
                 flash('Access denied for this store.', 'danger')

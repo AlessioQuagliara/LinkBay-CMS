@@ -1,6 +1,9 @@
 from flask import Blueprint, request, jsonify
 from models.categories import Categories  # importo la classe database
-from app import get_db_connection  # connessione al database
+from db_helpers import DatabaseHelper
+from helpers import check_user_authentication
+
+db_helper = DatabaseHelper()
 
 # Blueprint
 categories_bp = Blueprint('categories', __name__)
@@ -15,7 +18,7 @@ def create_category():
         if not name:
             return jsonify({'success': False, 'message': 'Category name is required.'}), 400
 
-        with get_db_connection() as db_conn:
+        with db_helper.get_db_connection() as db_conn:
             categories_model = Categories(db_conn)
             category_id = categories_model.create_category(shop_name, name)
             if category_id:

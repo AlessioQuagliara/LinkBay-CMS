@@ -19,7 +19,7 @@
     <ul class="nav nav-pills flex-column mb-auto">
         {% if title in ['Cookie Bar Settings', 'Third-Party Cookie Settings'] %}
         <li class="nav-item mb-2">
-            <a href="{{ url_for('online_content') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
+            <a href="/admin/cms/pages/online-content" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
                 <i class="fa-solid fa-arrow-left"></i>&nbsp; Back to Content
             </a>
         </li>
@@ -35,13 +35,13 @@
         </li>
         {% elif title in ['Manage Shipping Method']%}
         <li class="nav-item mb-2">
-            <a href="{{ url_for('shipping_methods') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
+            <a href="/admin/cms/pages/shipping-methods" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
                 <i class="fa-solid fa-arrow-left"></i>&nbsp; Back to Shipping Methods
             </a>
         </li>
         {% elif title in ['Manage Order']%}
         <li class="nav-item mb-2">
-            <a href="{{ url_for('orders') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
+            <a href="/admin/cms/pages/orders" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
                 <i class="fa-solid fa-arrow-left"></i>&nbsp; Back to Orders
             </a>
         </li>
@@ -79,7 +79,7 @@
         </li>
         {% elif title in ['Manage Product']%}
         <li class="nav-item mb-2">
-            <a href="{{ url_for('products') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
+            <a href="/admin/cms/pages/homepage" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
                 <i class="fa-solid fa-arrow-left"></i>&nbsp; Back to Products
             </a>
         </li>
@@ -99,7 +99,7 @@
         </li>
         {% elif title in ['Manage Collection']%}
         <li class="nav-item mb-2">
-            <a href="{{ url_for('collections') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
+            <a href="/admin/cms/pages/collections" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
                 <i class="fa-solid fa-arrow-left"></i>&nbsp; Back to Collections
             </a>
         </li>
@@ -148,7 +148,7 @@
         </li>
         {% elif title in ['Manage Customer']%}
         <li class="nav-item mb-2">
-            <a href="{{ url_for('customers') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
+            <a href="" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
                 <i class="fa-solid fa-arrow-left"></i>&nbsp; Back to Customers
             </a>
         </li>
@@ -162,7 +162,7 @@
         </li>
         {% elif title in ['Theme UI', 'Plugin', 'Services', 'Themes']%}
         <li class="nav-item mb-2">
-            <a href="{{ url_for('online_content') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
+            <a href="" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
                 <i class="fa-solid fa-arrow-left"></i>&nbsp; Back to Content
             </a>
         </li>
@@ -188,61 +188,61 @@
         </li>
         {% else %}
         <li class="nav-item">
-            <a href="{{ url_for('homepage') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
+            <a href="" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
                 <i class="fa-solid fa-table-columns {% if title == 'HomePage' %}fa-bounce{% endif %}"></i>&nbsp; Home
             </a>
         </li>
         <li>
-            <a href="{{ url_for('orders') }}" class="nav-link {% if title == 'Orders' %}active{% endif %} text-white">
+            <a href="/admin/cms/pages/orders" class="nav-link {% if title == 'Orders' %}active{% endif %} text-white">
                 <i class="fa-solid fa-clipboard-list {% if title == 'Orders' %}fa-bounce{% endif %}"></i>&nbsp; Orders
             </a>
         </li>
             {% if title == 'Collections' %}
             <li>
-                <a href="{{ url_for('collections') }}" class="nav-link {% if title == 'Collections' %}active{% endif %} text-white">
+                <a href="" class="nav-link {% if title == 'Collections' %}active{% endif %} text-white">
                     <i class="fa-solid fa-layer-group {% if title == 'Collections' %}fa-bounce{% endif %}"></i>&nbsp; Collections
                 </a>
             </li>
             {% elif title == 'Categories' %}
             <li>
-                <a href="{{ url_for('products') }}" class="nav-link {% if title == 'Categories' %}active{% endif %} text-white">
+                <a href="" class="nav-link {% if title == 'Categories' %}active{% endif %} text-white">
                     <i class="fa-solid fa-tags {% if title == 'Categories' %}fa-bounce{% endif %}"></i>&nbsp; Categories
                 </a>
             </li>
             {% else %}
             <li>
-                <a href="{{ url_for('products') }}" class="nav-link {% if title == 'Products' %}active{% endif %} text-white">
+                <a href="" class="nav-link {% if title == 'Products' %}active{% endif %} text-white">
                     <i class="fa-solid fa-box {% if title == 'Products' %}fa-bounce{% endif %}"></i>&nbsp; Products
                 </a>
             </li>
             {% endif %}
         <li>
-            <a href="{{ url_for('customers') }}" class="nav-link {% if title == 'Customers' %}active{% endif %} text-white">
+            <a href="" class="nav-link {% if title == 'Customers' %}active{% endif %} text-white">
                 <i class="fa-solid fa-user-group {% if title == 'Customers' %}fa-bounce{% endif %}"></i>&nbsp; Customers
             </a>
         </li>
         <li>
-            <a href="{{ url_for('marketing') }}" class="nav-link {% if title == 'Marketing' %}active{% endif %} text-white">
+            <a href="" class="nav-link {% if title == 'Marketing' %}active{% endif %} text-white">
                 <i class="fa-solid fa-chart-pie {% if title == 'Marketing' %}fa-bounce{% endif %}"></i>&nbsp; Marketing
             </a>
         </li>
         <li>
-            <a href="{{ url_for('online_content') }}" class="nav-link {% if title == 'Online Content' %}active{% endif %} text-white">
+            <a href="" class="nav-link {% if title == 'Online Content' %}active{% endif %} text-white">
                 <i class="fa-solid fa-store {% if title == 'Online Content' %}fa-bounce{% endif %}"></i>&nbsp; Online Content
             </a>
         </li>
         <li>
-            <a href="{{ url_for('domain') }}" class="nav-link {% if title == 'Domain' %}active{% endif %} text-white">
+            <a href="" class="nav-link {% if title == 'Domain' %}active{% endif %} text-white">
                 <i class="fa-solid fa-globe {% if title == 'Domain' %}fa-bounce{% endif %}"></i>&nbsp; Domain
             </a>
         </li>
         <li>
-            <a href="{{ url_for('shipping_methods') }}" class="nav-link {% if title == 'Shipping Methods' %}active{% endif %} text-white">
+            <a href="" class="nav-link {% if title == 'Shipping Methods' %}active{% endif %} text-white">
                 <i class="fa-solid fa-truck {% if title == 'Shipping Methods' %}fa-bounce{% endif %}"></i>&nbsp; Shipping & Delivery
             </a>
         </li>
         <li>
-            <a href="{{ url_for('subscription') }}" class="nav-link {% if title == 'Subscription' %}active{% endif %} text-white">
+            <a href="" class="nav-link {% if title == 'Subscription' %}active{% endif %} text-white">
                 <i class="fa-solid fa-money-check {% if title == 'Subscription' %}fa-bounce{% endif %}"></i>&nbsp; Subscription
             </a>
         </li>
@@ -264,7 +264,7 @@
         <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
             <li><a class="dropdown-item" href="#">Settings</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+            <li><a class="dropdown-item" href="">Logout</a></li>
         </ul>
     {% endif %}
     </div>

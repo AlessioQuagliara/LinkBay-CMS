@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify, session, url_for, redirect, Response
 from models.products import Products  # importo la classe database
 from models.categories import Categories
-from app import  app # connessione al database
 import os, uuid, csv, io, mysql.connector, base64
 from db_helpers import DatabaseHelper
 db_helper = DatabaseHelper()
@@ -283,14 +282,15 @@ def export_products():
         print(f"Unexpected error: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500
     
-def save_base64_image(base64_image):
+# Funzione per salvare un'immagine base64 generica ---------------------------------------------------------------
+def save_base64_image(base64_image, upload_folder):
     try:
         header, encoded = base64_image.split(",", 1)
         binary_data = base64.b64decode(encoded)
 
         # Genera un nome file unico usando UUID
         unique_filename = f"{uuid.uuid4().hex}.png"
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+        file_path = os.path.join(upload_folder, unique_filename)
 
         # Salva il file sul server
         with open(file_path, "wb") as f:

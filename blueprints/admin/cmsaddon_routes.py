@@ -1,6 +1,9 @@
 from flask import Blueprint, render_template, request, jsonify, session, url_for, redirect
 from models.cmsaddon import CMSAddon  # importo la classe database
-from app import get_db_connection, check_user_authentication  # connessione al database
+from db_helpers import DatabaseHelper
+from helpers import check_user_authentication
+
+db_helper = DatabaseHelper()  # connessione al database
 
 # Blueprint
 cmsaddon_bp = Blueprint('cmsaddon', __name__)
@@ -12,7 +15,7 @@ def theme_ui():
     username = check_user_authentication()
     if isinstance(username, str):
         shop_name = request.host.split('.')[0]
-        with get_db_connection() as db_conn:
+        with db_helper.get_db_connection() as db_conn:
             addon_model = CMSAddon(db_conn)
             theme_ui_addons = addon_model.get_addons_by_type('theme_ui')
             for addon in theme_ui_addons:
@@ -32,7 +35,7 @@ def plugin():
     username = check_user_authentication()
     if isinstance(username, str):
         shop_name = request.host.split('.')[0]
-        with get_db_connection() as db_conn:
+        with db_helper.get_db_connection() as db_conn:
             addon_model = CMSAddon(db_conn)
             plugin_addons = addon_model.get_addons_by_type('plugin')
             for addon in plugin_addons:
@@ -52,7 +55,7 @@ def services():
     username = check_user_authentication()
     if isinstance(username, str):
         shop_name = request.host.split('.')[0]
-        with get_db_connection() as db_conn:
+        with db_helper.get_db_connection() as db_conn:
             addon_model = CMSAddon(db_conn)
             service_addons = addon_model.get_addons_by_type('service')
             
@@ -82,7 +85,7 @@ def themes():
     username = check_user_authentication()
     if isinstance(username, str):
         shop_name = request.host.split('.')[0]
-        with get_db_connection() as db_conn:
+        with db_helper.get_db_connection() as db_conn:
             addon_model = CMSAddon(db_conn)
             theme_addons = addon_model.get_addons_by_type('theme')
             for addon in theme_addons:
@@ -104,7 +107,7 @@ def select_addon():
     shop_name = request.host.split('.')[0]
     addon_id = data.get('addon_id')
     addon_type = data.get('addon_type')
-    with get_db_connection() as db_conn:
+    with db_helper.get_db_connection() as db_conn:
         addon_model = CMSAddon(db_conn)
         
         # Assicurati di impostare "selected" per l'addon attuale e "deselected" per tutti gli altri dello stesso tipo
@@ -125,7 +128,7 @@ def purchase_addon():
     shop_name = request.host.split('.')[0]
     addon_id = data.get('addon_id')
     addon_type = data.get('addon_type')
-    with get_db_connection() as db_conn:
+    with db_helper.get_db_connection() as db_conn:
         addon_model = CMSAddon(db_conn)
         success = addon_model.update_shop_addon_status(shop_name, addon_id, addon_type, 'paid')
     if success:

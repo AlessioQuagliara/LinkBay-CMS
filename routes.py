@@ -1,6 +1,6 @@
 from flask import render_template
-from app import app, get_db_connection, get_auth_db_connection, check_user_authentication
-
+from app import app
+import os, base64, uuid
 
 # Gestione errore 404 - Pagina non trovata
 @app.errorhandler(404)
@@ -16,4 +16,3 @@ def internal_server_error(e):
 @app.errorhandler(403)
 def forbidden(e):
     return render_template('errors/403.html'), 403
-

@@ -1,5 +1,5 @@
 from flask import session
-from models import ShopList, WebSettings, Page
+from models import ShopList
 from db_helpers import DatabaseHelper
 
 # Inizializza il gestore del database

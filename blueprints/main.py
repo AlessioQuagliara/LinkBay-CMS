@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request
 from helpers import get_navbar_content, get_footer_content, get_web_settings, load_page_content, get_language
 from models.collections import Collections
 from models.page import Page
@@ -48,7 +48,7 @@ def render_dynamic_page(slug=None):
                                script=script_content,  
                                foot=foot_content)  
     else:
-        return render_template('404.html'), 404
+        return render_template('errors/404.html'), 404
 
 # Rotta per pagina Collezioni
 @main_bp.route('/collections/<slug>', methods=['GET'])
@@ -65,7 +65,7 @@ def render_collection(slug=None):
     if slug:
         collection = collection_model.get_collection_by_slug(slug)
         if not collection:
-            return render_template('404.html'), 404
+            return render_template('errors/404.html'), 404
         products_in_collection = collection_model.get_products_in_collection(collection['id'])
         product_images = product_model.get_images_for_products([p['id'] for p in products_in_collection])
     else:
@@ -146,4 +146,4 @@ def render_product(slug):
             foot=foot_content
         )
     else:
-        return render_template('404.html'), 404
+        return render_template('errors/404.html'), 404

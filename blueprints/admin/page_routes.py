@@ -3,7 +3,6 @@ from models.page import Page  # importo la classe database
 from models.shoplist import ShopList
 from models.cmsaddon import CMSAddon
 from models.products import Products
-from app import app 
 from config import Config
 import mysql.connector, datetime, os, uuid, re, base64
 from db_helpers import DatabaseHelper
@@ -273,14 +272,14 @@ def save_page():
         return jsonify({'success': False, 'error': str(e)})
 
 # Funzione per salvare un'immagine base64 generica ---------------------------------------------------------------
-def save_base64_image(base64_image):
+def save_base64_image(base64_image, upload_folder):
     try:
         header, encoded = base64_image.split(",", 1)
         binary_data = base64.b64decode(encoded)
 
         # Genera un nome file unico usando UUID
         unique_filename = f"{uuid.uuid4().hex}.png"
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+        file_path = os.path.join(upload_folder, unique_filename)
 
         # Salva il file sul server
         with open(file_path, "wb") as f:
@@ -300,7 +299,8 @@ def upload_image():
     if not base64_image:
         return jsonify({'error': 'No image provided'}), 400
 
-    image_url = save_base64_image(base64_image)
+    upload_folder = "static/uploads"
+    image_url = save_base64_image(base64_image, upload_folder)
     
     if image_url:
         return jsonify({'url': image_url}), 200
