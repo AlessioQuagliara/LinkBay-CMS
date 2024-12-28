@@ -192,7 +192,7 @@
                 animation: document.getElementById('animation').value,
             };
         
-            fetch('/admin/cms/function/cookie-policy', {
+            fetch("{{ url_for('cookiepolicy.cookie_setting') }}", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)

@@ -16,9 +16,8 @@ from .storepayments_routes import storepayments_bp
 #from .shoplist_routes import shoplist_bp
 #from .database_routes import database_bp
 from .customers_routes import customers_bp
-from .user_routes import user_bp
 from .ui_routes import ui_bp
-
+from .cookiepolicy_routes import cookiepolicy_bp
 
 
 
@@ -44,5 +43,5 @@ def register_admin_blueprints(app):
     #app.register_blueprint(shoplist_bp)
     #app.register_blueprint(database_bp)
     app.register_blueprint(customers_bp)
-    app.register_blueprint(user_bp)
     app.register_blueprint(ui_bp)
+    app.register_blueprint(cookiepolicy_bp)

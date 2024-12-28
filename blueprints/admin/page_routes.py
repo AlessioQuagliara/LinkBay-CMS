@@ -4,6 +4,7 @@ from models.shoplist import ShopList
 from models.cmsaddon import CMSAddon
 from models.products import Products
 from config import Config
+import datetime
 import mysql.connector, datetime, os, uuid, re, base64
 from db_helpers import DatabaseHelper
 db_helper = DatabaseHelper()
@@ -40,7 +41,7 @@ def online_content():
 
                     if page:
                         updated_at = page['updated_at']
-                        now = datetime.now()
+                        now = datetime.datetime.now()
                         minutes_ago = (now - updated_at).total_seconds() // 60  
                         return render_template(
                             'admin/cms/pages/content.html', 

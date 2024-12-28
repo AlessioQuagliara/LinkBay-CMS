@@ -11,15 +11,14 @@ app.secret_key = app.config['SECRET_KEY']
 db_helper = DatabaseHelper()
 
 # Registrazione Blueprint
+from blueprints.admin import register_admin_blueprints
+from blueprints.shop import register_user_blueprints
 from blueprints.main import main_bp
-from blueprints.admin.user_routes import user_bp
-from blueprints.admin.collections_routes import collections_bp
-from blueprints.admin.ui_routes import ui_bp
 
 app.register_blueprint(main_bp)
-app.register_blueprint(user_bp)
-app.register_blueprint(collections_bp)
-app.register_blueprint(ui_bp)
+register_admin_blueprints(app)
+register_user_blueprints(app)
+
 
 # Gestione della connessione al database globale
 @app.teardown_appcontext

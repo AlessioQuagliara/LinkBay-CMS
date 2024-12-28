@@ -540,7 +540,7 @@
             await Promise.all(uploadPromises);
 
             // Salva il contenuto nella tabella `pages`, identificando la lingua
-            fetch("{{ url_for('save_page') }}", {
+            fetch("{{ url_for('page.save_page') }}", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
