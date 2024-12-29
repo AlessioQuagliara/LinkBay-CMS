@@ -2,6 +2,11 @@ from flask import Blueprint, render_template, request, session, jsonify, redirec
 
 from models.payments import Payments  # Importa la classe Payments
 from models.products import Products  # Importa la classe Products
+from models.shippingmethods import ShippingMethods  # Importa la classe ShippingMethods
+
+from db_helpers import DatabaseHelper
+db_helper = DatabaseHelper()
+from helpers import check_user_authentication
 
 # Blueprint
 checkout_bp = Blueprint('checkout', __name__)
@@ -63,3 +68,27 @@ def complete_checkout():
                            title='Ordine Confermato', 
                            customer_data=customer_data, 
                            cart=cart)
+
+
+# Rotta per ricavare i metodi di spedizione
+
+@checkout_bp.route('/checkout/get_shipping_methods', methods=['GET'])
+def get_shipping_methods():
+    """
+    Ottiene i metodi di spedizione disponibili per il negozio.
+    """
+    shop_name = request.host.split('.')[0]  # Ottieni il nome del negozio dal sottodominio
+
+    try:
+        # Usa il db_helper per ottenere la connessione al database
+        with db_helper.get_db_connection() as db_conn:
+            # Passa la connessione al modello ShippingMethods
+            Shippingmethods_model = ShippingMethods(db_conn)
+
+            # Recupera i metodi di spedizione
+            shipping_methods = Shippingmethods_model.get_all_shipping_methods(shop_name)
+
+            return jsonify(shipping_methods), 200
+    except Exception as e:
+        print(f"Errore durante il recupero dei metodi di spedizione: {e}")
+        return jsonify({'error': 'Impossibile recuperare i metodi di spedizione'}), 500

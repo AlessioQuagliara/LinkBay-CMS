@@ -134,14 +134,14 @@
                           <!-- Aggiungi altre opzioni -->
                       </select>
                   </div>
-                  <div class="col-md-12">
-                      <label for="shipping_method" class="form-label">Metodo di Spedizione</label>
-                      <select class="form-select" id="shipping_method" name="shipping_method" required>
-                          <option value="">Seleziona un metodo</option>
-                          <option value="1">Standard - €5,00 (3-5 giorni)</option>
-                          <option value="2">Espresso - €10,00 (1-2 giorni)</option>
-                      </select>
-                  </div>
+                <!-- Metodi di spedizione -->
+                <div class="mb-3">
+                    <label for="shipping_method" class="form-label">Metodo di Spedizione</label>
+                    <select id="shipping_method" name="shipping_method" class="form-select" required>
+                        <option value="" disabled selected>Caricamento in corso...</option>
+                    </select>
+                </div>
+
               </div>
           </div>
 
@@ -216,27 +216,101 @@
           <ul class="list-group">
             <li class="list-group-item d-flex justify-content-between">
                 <span>Subtotale</span>
-                <strong>€{{ subtotal | round(2) }}</strong>
+                <strong id="subtotal">€{{ subtotal | round(2) }}</strong>
             </li>
             <li class="list-group-item d-flex justify-content-between">
                 <span>Spedizione</span>
-                <strong>€{{ shipping_cost | round(2) }}</strong>
+                <strong id="shipping_cost">€{{ shipping_cost | round(2) }}</strong>
             </li>
             {% if discount and discount > 0 %}
             <li class="list-group-item d-flex justify-content-between">
                 <span>Sconto</span>
-                <strong>-€{{ discount | round(2) }}</strong>
+                <strong id="discount">-€{{ discount | round(2) }}</strong>
             </li>
             {% endif %}
             <li class="list-group-item d-flex justify-content-between">
                 <span><strong>Totale</strong></span>
-                <strong>€{{ total | round(2) }}</strong>
+                <strong id="total_cost">€{{ total | round(2) }}</strong>
             </li>
         </ul>
+
       </div>
 
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Ottengo shippingmethods con AJAX -------------------------------------------------------------------------
+        document.addEventListener('DOMContentLoaded', function () {
+            const shippingSelect = document.getElementById('shipping_method');
+            const shippingCostElement = document.querySelector('#shipping_cost');
+
+            function loadShippingMethods() {
+                fetch('/checkout/get_shipping_methods')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Errore nella risposta dal server');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Svuota il contenitore del select
+                        shippingSelect.innerHTML = '';
+
+                        if (data.length > 0) {
+                            data.forEach(method => {
+                                const option = document.createElement('option');
+                                option.value = method.cost; // Usa il costo come valore
+                                option.textContent = `${method.name} - €${parseFloat(method.cost).toFixed(2)}`;
+                                shippingSelect.appendChild(option);
+                            });
+
+                            // Seleziona automaticamente il primo metodo e aggiorna il costo
+                            shippingSelect.value = data[0].cost;
+                            updateShippingCost(data[0].cost);
+                        } else {
+                            const defaultOption = document.createElement('option');
+                            defaultOption.value = '';
+                            defaultOption.textContent = 'Nessun metodo di spedizione disponibile';
+                            defaultOption.disabled = true;
+                            defaultOption.selected = true;
+                            shippingSelect.appendChild(defaultOption);
+
+                            // Imposta il costo di spedizione a 0
+                            updateShippingCost(0);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Errore durante il caricamento dei metodi di spedizione:', error);
+                        alert('Errore durante il caricamento dei metodi di spedizione. Riprova più tardi.');
+                    });
+            }
+
+            function updateShippingCost(cost) {
+                // Aggiorna il valore del costo di spedizione nel DOM
+                shippingCostElement.textContent = `€${parseFloat(cost).toFixed(2)}`;
+
+                // Aggiorna il totale
+                updateTotalCost();
+            }
+
+            function updateTotalCost() {
+                const subtotal = parseFloat(document.querySelector('#subtotal').textContent.replace('€', ''));
+                const discount = parseFloat(document.querySelector('#discount')?.textContent.replace('-€', '')) || 0;
+                const shippingCost = parseFloat(shippingCostElement.textContent.replace('€', ''));
+
+                const total = subtotal + shippingCost - discount;
+                document.querySelector('#total_cost').textContent = `€${total.toFixed(2)}`;
+            }
+
+            // Aggiungi evento di cambio al select
+            shippingSelect.addEventListener('change', function () {
+                updateShippingCost(this.value);
+            });
+
+            // Carica i metodi di spedizione al caricamento della pagina
+            loadShippingMethods();
+        });
+    </script>
 </body>
 </html> 

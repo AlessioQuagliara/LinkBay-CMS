@@ -127,7 +127,7 @@ def manage_collection_list(collection_id=None):
             for product in products_in_collection:
                 product_details = product_model.get_product_by_id(product['id'])  # Assicurati che esista un metodo `get_product_by_id`
                 if product_details:
-                    detailed_products.collections_bpend(product_details)
+                    detailed_products.append(product_details)
 
             # Ottieni il nome del negozio dal sottodominio
             shop_subdomain = request.host.split('.')[0]
