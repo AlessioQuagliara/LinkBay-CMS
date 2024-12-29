@@ -237,6 +237,11 @@
             </a>
         </li>
         <li>
+            <a href="{{ url_for('payments.payments') }}" class="nav-link {% if title == 'Payments' %}active{% endif %} text-white">
+                <i class="fa-solid fa-credit-card {% if title == 'Payments' %}fa-bounce{% endif %}"></i>&nbsp; Payments
+            </a>
+        </li>
+        <li>
             <a href="{{ url_for('shipping_methods.shipping_methods') }}" class="nav-link {% if title == 'Shipping Methods' %}active{% endif %} text-white">
                 <i class="fa-solid fa-truck {% if title == 'Shipping Methods' %}fa-bounce{% endif %}"></i>&nbsp; Shipping & Delivery
             </a>

@@ -80,110 +80,156 @@
         <div class="sidebar-left">
             <div style="height: calc(100% - 60px);">
 
-              <!-- CUSTOMER -->
-              <div class="mb-4">
-                <h4>Dati Utente</h4>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="first_name" class="form-label">Nome</label>
-                        <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Inserisci il tuo nome" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="last_name" class="form-label">Cognome</label>
-                        <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Inserisci il tuo cognome" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="phone" class="form-label">Telefono</label>
-                        <input type="tel" class="form-control" id="phone" name="phone" placeholder="Inserisci il tuo numero di telefono">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Customer e Shipping -->
-
-            <div class="mb-4">
-              <h4>Indirizzo di Spedizione</h4>
-              <div class="row g-3">
-                  <div class="col-md-12">
-                      <label for="address" class="form-label">Indirizzo</label>
-                      <input type="text" class="form-control" id="address" name="address" placeholder="Inserisci il tuo indirizzo" required>
-                  </div>
-                  <div class="col-md-6">
-                      <label for="city" class="form-label">Città</label>
-                      <input type="text" class="form-control" id="city" name="city" placeholder="Inserisci la città" required>
-                  </div>
-                  <div class="col-md-6">
-                      <label for="state" class="form-label">Provincia/Regione</label>
-                      <input type="text" class="form-control" id="state" name="state" placeholder="Inserisci la provincia o regione">
-                  </div>
-                  <div class="col-md-6">
-                      <label for="postal_code" class="form-label">CAP</label>
-                      <input type="text" class="form-control" id="postal_code" name="postal_code" placeholder="Inserisci il codice postale" required>
-                  </div>
-                  <div class="col-md-6">
-                      <label for="country" class="form-label">Paese</label>
-                      <select class="form-select" id="country" name="country" required>
-                          <option value="">Seleziona il tuo paese</option>
-                          <option value="Italia">Italia</option>
-                          <option value="Francia">Francia</option>
-                          <option value="Germania">Germania</option>
-                          <!-- Aggiungi altre opzioni -->
-                      </select>
-                  </div>
-                <!-- Metodi di spedizione -->
-                <div class="mb-3">
-                    <label for="shipping_method" class="form-label">Metodo di Spedizione</label>
-                    <select id="shipping_method" name="shipping_method" class="form-select" required>
-                        <option value="" disabled selected>Caricamento in corso...</option>
-                    </select>
-                </div>
-
-              </div>
-          </div>
-
-          <!-- Payments -->
-          <div class="mb-4">
-            <h4>Metodo di Pagamento</h4>
-            <div class="row g-3">
-                <div class="col-md-12">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="payment_method" id="credit_card" value="credit_card" checked>
-                        <label class="form-check-label" for="credit_card">Carta di Credito</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="payment_method" id="paypal" value="paypal">
-                        <label class="form-check-label" for="paypal">PayPal</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="payment_method" id="bank_transfer" value="bank_transfer">
-                        <label class="form-check-label" for="bank_transfer">Bonifico Bancario</label>
-                    </div>
-                </div>
-                <div id="credit_card_details" class="col-md-12">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="card_number" class="form-label">Numero Carta</label>
-                            <input type="text" class="form-control" id="card_number" name="card_number" placeholder="Inserisci il numero della carta">
+                <div class="accordion mb-4" id="accordionUserShipping">
+                    <!-- Accordion Item 1: Dati Utente -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingUser">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUser" aria-expanded="true" aria-controls="collapseUser">
+                                Dati Utente
+                            </button>
+                        </h2>
+                        <div id="collapseUser" class="accordion-collapse collapse show" aria-labelledby="headingUser" data-bs-parent="#accordionUserShipping">
+                            <div class="accordion-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="first_name" class="form-label">Nome</label>
+                                        <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Inserisci il tuo nome" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="last_name" class="form-label">Cognome</label>
+                                        <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Inserisci il tuo cognome" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="phone" class="form-label">Telefono</label>
+                                        <input type="tel" class="form-control" id="phone" name="phone" placeholder="Inserisci il tuo numero di telefono">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <label for="card_expiry" class="form-label">Data di Scadenza</label>
-                            <input type="text" class="form-control" id="card_expiry" name="card_expiry" placeholder="MM/AA">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="card_cvv" class="form-label">CVV</label>
-                            <input type="text" class="form-control" id="card_cvv" name="card_cvv" placeholder="123">
+                    </div>
+                    </div>
+
+                    <div class="accordion mb-4" id="accordionUserShippingMet">
+                    <!-- Accordion Item 2: Indirizzo di Spedizione -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingShipping">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseShipping" aria-expanded="true" aria-controls="collapseShipping">
+                                Indirizzo di Spedizione
+                            </button>
+                        </h2>
+                        <div id="collapseShipping" class="accordion-collapse collapse show" aria-labelledby="headingShipping" data-bs-parent="#accordionUserShipping">
+                            <div class="accordion-body">
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label for="address" class="form-label">Indirizzo</label>
+                                        <input type="text" class="form-control" id="address" name="address" placeholder="Inserisci il tuo indirizzo" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="city" class="form-label">Città</label>
+                                        <input type="text" class="form-control" id="city" name="city" placeholder="Inserisci la città" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="state" class="form-label">Provincia/Regione</label>
+                                        <input type="text" class="form-control" id="state" name="state" placeholder="Inserisci la provincia o regione">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="postal_code" class="form-label">CAP</label>
+                                        <input type="text" class="form-control" id="postal_code" name="postal_code" placeholder="Inserisci il codice postale" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="country" class="form-label">Paese</label>
+                                        <select class="form-select" id="country" name="country" required>
+                                            <option value="">Seleziona il tuo paese</option>
+                                            <option value="Italia">Italia</option>
+                                            <option value="Francia">Francia</option>
+                                            <option value="Germania">Germania</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="shipping_method" class="form-label">Metodo di Spedizione</label>
+                                        <select id="shipping_method" name="shipping_method" class="form-select" required>
+                                            <option value="" disabled selected>Caricamento in corso...</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+                
+                <div class="accordion mb-4" id="accordionPayment">
+                    <!-- Metodo di Pagamento: Carta di Credito -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingCreditCard">
+                            <input type="radio" class="form-check-input d-none" name="payment_method" id="credit_card" value="credit_card" checked>
+                            <label class="accordion-button" for="credit_card" data-bs-toggle="collapse" data-bs-target="#collapseCreditCard" aria-expanded="true" aria-controls="collapseCreditCard">
+                                Carta di Credito
+                            </label>
+                        </h2>
+                        <div id="collapseCreditCard" class="accordion-collapse collapse show" aria-labelledby="headingCreditCard" data-bs-parent="#accordionPayment">
+                            <div class="accordion-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="card_number" class="form-label">Numero Carta</label>
+                                        <input type="text" class="form-control" id="card_number" name="card_number" placeholder="Inserisci il numero della carta">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="card_expiry" class="form-label">Data di Scadenza</label>
+                                        <input type="text" class="form-control" id="card_expiry" name="card_expiry" placeholder="MM/AA">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="card_cvv" class="form-label">CVV</label>
+                                        <input type="text" class="form-control" id="card_cvv" name="card_cvv" placeholder="123">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- Metodo di Pagamento: PayPal -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingPayPal">
+                            <input type="radio" class="form-check-input d-none" name="payment_method" id="paypal" value="paypal">
+                            <label class="accordion-button collapsed" for="paypal" data-bs-toggle="collapse" data-bs-target="#collapsePayPal" aria-expanded="false" aria-controls="collapsePayPal">
+                                PayPal
+                            </label>
+                        </h2>
+                        <div id="collapsePayPal" class="accordion-collapse collapse" aria-labelledby="headingPayPal" data-bs-parent="#accordionPayment">
+                            <div class="accordion-body">
+                                <p>Effettua il pagamento con il tuo account PayPal. Verrai reindirizzato alla pagina di login PayPal.</p>
+                                <button class="btn btn-primary">Procedi con PayPal</button>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- Metodo di Pagamento: Bonifico Bancario -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingBankTransfer">
+                            <input type="radio" class="form-check-input d-none" name="payment_method" id="bank_transfer" value="bank_transfer">
+                            <label class="accordion-button collapsed" for="bank_transfer" data-bs-toggle="collapse" data-bs-target="#collapseBankTransfer" aria-expanded="false" aria-controls="collapseBankTransfer">
+                                Bonifico Bancario
+                            </label>
+                        </h2>
+                        <div id="collapseBankTransfer" class="accordion-collapse collapse" aria-labelledby="headingBankTransfer" data-bs-parent="#accordionPayment">
+                            <div class="accordion-body">
+                                <p>Effettua un bonifico bancario ai seguenti dettagli:</p>
+                                <ul>
+                                    <li><strong>IBAN:</strong> IT60X0542811101000000123456</li>
+                                    <li><strong>Intestatario:</strong> Nome Azienda</li>
+                                    <li><strong>Banca:</strong> Nome Banca</li>
+                                </ul>
+                                <p>Il tuo ordine sarà confermato dopo la ricezione del pagamento.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <button class="btn-proceed">Procedi con l'ordine</button>
             </div>
-            <button class="btn-proceed">Procedi con l'ordine</button>
         </div>
 
         <!-- Right Sidebar -->

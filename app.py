@@ -40,7 +40,6 @@ def set_language():
         return jsonify({"success": True, "message": f"Language set to {lang}"})
     return jsonify({"success": False, "message": "Invalid language"}), 400
 
-print(app.url_map)
 
 # Avvio dell'applicazione
 if __name__ == '__main__':
