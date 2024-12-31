@@ -1,35 +1,49 @@
 # METODI DI PAGAMENTO ---------------------------------------------------------------------------------------------------
 
 class PaymentMethods:
-    def __init__(self, db_conn):
-        self.conn = db_conn
+    def __init__(self, conn):
+        self.conn = conn
 
     def create_payment_method(self, data):
+        query = """
+            INSERT INTO payment_methods (shop_name, method_name, api_key, api_secret, extra_info)
+            VALUES (%s, %s, %s, %s, %s)
         """
-        Crea un nuovo metodo di pagamento per un negozio.
+        with self.conn.cursor() as cursor:
+            cursor.execute(query, (
+                data['shop_name'], 
+                data['method_name'], 
+                data['api_key'], 
+                data['api_secret'], 
+                data.get('extra_info')  # Usa None se extra_info non è presente
+            ))
+            self.conn.commit()
+            return cursor.lastrowid
+
+    def update_payment_method(self, method_id, data, shop_name):
+        query = """
+            UPDATE payment_methods
+            SET api_key = %s,
+                api_secret = %s,
+                extra_info = %s,
+                updated_at = NOW()
+            WHERE id = %s AND shop_name = %s
         """
         try:
             with self.conn.cursor() as cursor:
-                query = """
-                    INSERT INTO payment_methods (
-                        shop_name, method_name, api_key, api_secret, extra_info, 
-                        created_at, updated_at
-                    ) VALUES (%s, %s, %s, %s, %s, NOW(), NOW())
-                """
-                values = (
-                    data["shop_name"],
-                    data["method_name"],
-                    data.get("api_key"),
-                    data.get("api_secret"),
-                    data.get("extra_info")
-                )
-                cursor.execute(query, values)
+                cursor.execute(query, (
+                    data.get('api_key'),
+                    data.get('api_secret'),
+                    data.get('extra_info'),
+                    method_id,
+                    shop_name
+                ))
                 self.conn.commit()
-                return cursor.lastrowid
+                return cursor.rowcount > 0  # Restituisce True se una riga è stata aggiornata
         except Exception as e:
-            print(f"Error creating payment method: {e}")
+            print(f"Error updating payment method: {e}")
             self.conn.rollback()
-            return None
+            return False
 
     def get_all_payment_methods(self, shop_name):
         """
@@ -49,34 +63,6 @@ class PaymentMethods:
         except Exception as e:
             print(f"Error fetching payment methods: {e}")
             return []
-
-    def update_payment_method(self, method_id, data):
-        """
-        Aggiorna i dettagli di un metodo di pagamento.
-        """
-        try:
-            with self.conn.cursor() as cursor:
-                query = """
-                    UPDATE payment_methods
-                    SET method_name = %s, api_key = %s, api_secret = %s, 
-                        extra_info = %s, updated_at = NOW()
-                    WHERE id = %s AND shop_name = %s
-                """
-                values = (
-                    data["method_name"],
-                    data.get("api_key"),
-                    data.get("api_secret"),
-                    data.get("extra_info"),
-                    method_id,
-                    data["shop_name"]
-                )
-                cursor.execute(query, values)
-                self.conn.commit()
-                return cursor.rowcount > 0
-        except Exception as e:
-            print(f"Error updating payment method: {e}")
-            self.conn.rollback()
-            return False
 
     def delete_payment_method(self, method_id, shop_name):
         """
@@ -109,4 +95,22 @@ class PaymentMethods:
                 return cursor.fetchone()
         except Exception as e:
             print(f"Error retrieving payment method: {e}")
+            return None
+        
+    def get_payment_method(self, shop_name, method_name):
+        """
+        Ottiene i dettagli di un metodo di pagamento specifico per shop_name e method_name.
+        """
+        try:
+            with self.conn.cursor(dictionary=True) as cursor:
+                query = """
+                    SELECT id, shop_name, method_name, api_key, api_secret, extra_info, 
+                        created_at, updated_at
+                    FROM payment_methods
+                    WHERE shop_name = %s AND method_name = %s
+                """
+                cursor.execute(query, (shop_name, method_name))
+                return cursor.fetchone()  # Restituisce un singolo risultato
+        except Exception as e:
+            print(f"Error retrieving payment method for {method_name} in {shop_name}: {e}")
             return None

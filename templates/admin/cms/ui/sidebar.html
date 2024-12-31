@@ -160,6 +160,17 @@
                 <i class="fa-solid fa-clock-rotate-left"></i>&nbsp; View Order History 
             </a>
         </li>
+        {% elif title in ['Manage Payment']%}
+        <li class="nav-item mb-2">
+            <a href="{{ url_for('payments.payments') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
+                <i class="fa-solid fa-arrow-left"></i>&nbsp; Back to Payments
+            </a>
+        </li>
+        <li>
+            <a href="" class="nav-link text-white">
+                <i class="fa-solid fa-video"></i>&nbsp; See Tutorial
+            </a>
+        </li>
         {% elif title in ['Theme UI', 'Plugin', 'Services', 'Themes']%}
         <li class="nav-item mb-2">
             <a href="{{ url_for('page.online_content') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
@@ -255,7 +266,7 @@
     </ul>
     <hr>
     <div class="dropdown">
-    {% if title in ['Cookie Bar Settings', 'Third-Party Cookie Settings', 'Manage Product', 'Manage Collection', 'Manage Collection List', 'Manage Customer', 'Manage Order', 'Manage Order Items', 'Manage Shipping Method' ] %}
+    {% if title in ['Cookie Bar Settings', 'Third-Party Cookie Settings', 'Manage Product', 'Manage Collection', 'Manage Collection List', 'Manage Customer', 'Manage Order', 'Manage Order Items', 'Manage Shipping Method', 'Manage Payment' ] %}
         <button id="save-content" type="submit" class="btn btn-danger w-100">Save</button>
     {% else %}
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
