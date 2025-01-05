@@ -18,6 +18,7 @@ from .storepayments_routes import storepayments_bp
 from .customers_routes import customers_bp
 from .ui_routes import ui_bp
 from .cookiepolicy_routes import cookiepolicy_bp
+from .domain_routes import domain_bp
 
 
 
@@ -45,3 +46,4 @@ def register_admin_blueprints(app):
     app.register_blueprint(customers_bp)
     app.register_blueprint(ui_bp)
     app.register_blueprint(cookiepolicy_bp)
+    app.register_blueprint(domain_bp)

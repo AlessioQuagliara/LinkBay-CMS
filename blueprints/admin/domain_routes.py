@@ -1,10 +1,10 @@
-from flask import Blueprint, render_template, request, jsonify, session, url_for, redirect
-#from models.domain import Domain   importo la classe 
+from flask import Blueprint, request, jsonify, render_template, url_for
+from models.domain import Domain  # importo la classe database
+from config import Config
 from db_helpers import DatabaseHelper
+db_helper = DatabaseHelper()
 from db_helpers import DatabaseHelper
 from helpers import check_user_authentication
-
-db_helper = DatabaseHelper()
 
 # Blueprint
 domain_bp = Blueprint('domain', __name__)
@@ -17,3 +17,4 @@ def domain():
     if isinstance(username, str):
         return render_template('admin/cms/pages/domain.html', title='Domain', username=username)
     return username
+
