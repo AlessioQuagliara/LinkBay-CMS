@@ -16,4 +16,6 @@ from .shoplist import ShopList
 from .database import Database
 from .customers import Customers
 from .storepayment import StorePayment
+from .payment_methods import PaymentMethods
+from .domain import Domain
 

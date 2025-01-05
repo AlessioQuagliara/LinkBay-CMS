@@ -62,3 +62,5 @@ def subscription_success():
 @storepayments_bp.route('/subscription/cancel')
 def subscription_cancel():
     return render_template('admin/cms/pages/sub_cancel.html', title="Subscription Canceled")
+
+

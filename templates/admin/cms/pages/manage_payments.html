@@ -1,0 +1,96 @@
+{% extends "/admin/cms/interface/render.html" %}
+
+{% block content %}
+<div class="container my-4" data-aos="fade-up">
+
+    <!-- Payment Method Configuration -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark">
+            <h6 class="text-white mb-0">Payment Method Configuration</h6>
+        </div>
+        <div class="card-body">
+            <form id="payment-method-form">
+                <input type="hidden" id="shopName" name="shop_name" value="{{ shop_name }}">
+                <input type="hidden" id="methodName" name="method_name" value="{{ method.method_name }}">
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="apiKey" class="form-label">API Key</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="apiKey" 
+                            name="api_key" 
+                            value="{{ method.api_key }}" 
+                            required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="apiSecret" class="form-label">API Secret</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="apiSecret" 
+                            name="api_secret" 
+                            value="{{ method.api_secret }}" 
+                            required>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-3">
+                    <div class="col-md-12">
+                        <label for="extraInfo" class="form-label">Extra Info</label>
+                        <textarea 
+                            class="form-control" 
+                            id="extraInfo" 
+                            name="extra_info" 
+                            rows="5">{{ method.extra_info }}</textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Pulsante di salvataggio
+    const saveButton = document.getElementById('save-content');
+    saveButton.addEventListener('click', () => {
+        console.log("Save button clicked");
+
+        const paymentForm = document.getElementById('payment-method-form');
+        const formData = new FormData(paymentForm);
+
+        Swal.fire({
+            title: 'Saving...',
+            text: 'Please wait while your changes are being saved.',
+            icon: 'info',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        fetch('/admin/cms/pages/update_payment_method', {
+            method: 'POST',
+            body: formData,
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Response:", data);
+                if (data.success) {
+                    Swal.fire('Success', data.message || 'Payment method updated successfully.', 'success')
+                        .then(() => {
+                            window.location.href = '/admin/cms/pages/payments'; // Reindirizza alla lista dei metodi di pagamento
+                        });
+                } else {
+                    Swal.fire('Error', data.message || 'Failed to update the payment method.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire('Error', 'A network or server error occurred.', 'error');
+            });
+    });
+});
+</script>
+{% endblock %}

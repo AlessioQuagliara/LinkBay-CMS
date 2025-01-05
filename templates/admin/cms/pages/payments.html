@@ -1,0 +1,577 @@
+{% extends "/admin/cms/interface/render.html" %}
+
+{% block content %}
+<div class="container my-4">
+
+    <!-- Card per le funzioni della tabella -->
+    <div class="card shadow-sm mb-4" data-aos="fade-up">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div class="d-flex gap-3">
+                <a class="btn {% if title == 'Payments' %}btn-dark{% else %}btn-outline-dark{% endif %} btn-sm text-decoration-none ">
+                    <i class="fa-solid fa-credit-card"></i> Payments
+                </a>
+            </div>
+            <div>
+                <button class="btn btn-dark btn-sm mx-1" id="search-toggle-btn" title="Search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="search-input" class="form-control form-control-sm d-none" placeholder="Search..." style="max-width: 200px;">
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+<!-- Card per i metodi di pagamento -->
+<div class="row" data-aos="fade-up">
+
+    <!-- Skrill -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="fa-solid fa-wallet fa-3x mb-3"></i>
+                <h5 class="card-title">Skrill</h5>
+                <p class="card-text">Accept payments via Skrill.</p>
+                {% if active_methods.get('skrill') %}
+                    <!-- Metodo attivo -->
+                    <button class="btn btn-danger btn-sm" disabled>Activated</button>
+                    <a href="/admin/cms/pages/manage_payments/skrill" class="btn btn-dark btn-sm ms-2">Edit</a>
+                {% else %}
+                    <!-- Metodo non attivo -->
+                    <button 
+                        class="btn btn-dark btn-sm payment-button" 
+                        data-method="skrill" 
+                        id="configure-skrill">
+                        Configure Skrill
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Stripe -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="fa-brands fa-stripe fa-3x mb-3"></i>
+                <h5 class="card-title">Stripe</h5>
+                <p class="card-text">Accept payments via Stripe.</p>
+                {% if active_methods.get('stripe') %}
+                    <!-- Metodo attivo -->
+                    <button class="btn btn-danger btn-sm" disabled>Activated</button>
+                    <a href="/admin/cms/pages/manage_payments/stripe" class="btn btn-dark btn-sm ms-2">Edit</a>
+                {% else %}
+                    <!-- Metodo non attivo -->
+                    <button 
+                        class="btn btn-dark btn-sm payment-button" 
+                        data-method="stripe" 
+                        id="configure-stripe">
+                        Configure Stripe
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- PayPal -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="fa-brands fa-paypal fa-3x mb-3"></i>
+                <h5 class="card-title">PayPal</h5>
+                <p class="card-text">Accept payments via PayPal.</p>
+                {% if active_methods.get('paypal') %}
+                    <!-- Metodo attivo -->
+                    <button class="btn btn-danger btn-sm" disabled>Activated</button>
+                    <a href="/admin/cms/pages/manage_payments/paypal" class="btn btn-dark btn-sm ms-2">Edit</a>
+                {% else %}
+                    <!-- Metodo non attivo -->
+                    <button 
+                        class="btn btn-dark btn-sm payment-button" 
+                        data-method="paypal" 
+                        id="configure-paypal">
+                        Configure PayPal
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bank Transfer -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="fa-solid fa-university fa-3x mb-3"></i>
+                <h5 class="card-title">Bank Transfer</h5>
+                <p class="card-text">Accept payments via Bank Transfer.</p>
+                {% if active_methods.get('bank_transfer') %}
+                    <!-- Metodo attivo -->
+                    <button class="btn btn-danger btn-sm" disabled>Activated</button>
+                    <a href="/admin/cms/pages/manage_payments/bank_transfer" class="btn btn-dark btn-sm ms-2">Edit</a>
+                {% else %}
+                    <!-- Metodo non attivo -->
+                    <button 
+                        class="btn btn-dark btn-sm payment-button" 
+                        data-method="bank_transfer" 
+                        id="configure-bank-transfer">
+                        Configure Bank Transfer
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Pay -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="fa-brands fa-google fa-3x mb-3"></i>
+                <h5 class="card-title">Google Pay</h5>
+                <p class="card-text">Accept payments via Google Pay.</p>
+                {% if active_methods.get('google_pay') %}
+                    <!-- Metodo attivo -->
+                    <button class="btn btn-danger btn-sm" disabled>Activated</button>
+                    <a href="/admin/cms/pages/manage_payments/google_pay" class="btn btn-dark btn-sm ms-2">Edit</a>
+                {% else %}
+                    <!-- Metodo non attivo -->
+                    <button 
+                        class="btn btn-dark btn-sm payment-button" 
+                        data-method="google_pay" 
+                        id="configure-google-pay">
+                        Configure Google Pay
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Apple Pay -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="fa-brands fa-apple fa-3x mb-3"></i>
+                <h5 class="card-title">Apple Pay</h5>
+                <p class="card-text">Accept payments via Apple Pay.</p>
+                {% if active_methods.get('apple_pay') %}
+                    <!-- Metodo attivo -->
+                    <button class="btn btn-danger btn-sm" disabled>Activated</button>
+                    <a href="/admin/cms/pages/manage_payments/apple_pay" class="btn btn-dark btn-sm ms-2">Edit</a>
+                {% else %}
+                    <!-- Metodo non attivo -->
+                    <button 
+                        class="btn btn-dark btn-sm payment-button" 
+                        data-method="apple_pay" 
+                        id="configure-apple-pay">
+                        Configure Apple Pay
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Cryptocurrency -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="fa-solid fa-bitcoin-sign fa-3x mb-3"></i>
+                <h5 class="card-title">Cryptocurrency</h5>
+                <p class="card-text">Accept payments via popular cryptocurrencies.</p>
+                {% if active_methods.get('crypto') %}
+                    <!-- Metodo attivo -->
+                    <button class="btn btn-danger btn-sm" disabled>Activated</button>
+                    <a href="/admin/cms/pages/manage_payments/crypto" class="btn btn-dark btn-sm ms-2">Edit</a>
+                {% else %}
+                    <!-- Metodo non attivo -->
+                    <button 
+                        class="btn btn-dark btn-sm payment-button" 
+                        data-method="crypto" 
+                        id="configure-crypto">
+                        Configure Cryptocurrency
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Alipay -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="fa-brands fa-alipay fa-3x mb-3"></i>
+                <h5 class="card-title">Alipay</h5>
+                <p class="card-text">Accept payments via Alipay.</p>
+                {% if active_methods.get('alipay') %}
+                    <!-- Metodo attivo -->
+                    <button class="btn btn-danger btn-sm" disabled>Activated</button>
+                    <a href="/admin/cms/pages/manage_payments/alipay" class="btn btn-dark btn-sm ms-2">Edit</a>
+                {% else %}
+                    <!-- Metodo non attivo -->
+                    <button 
+                        class="btn btn-dark btn-sm payment-button" 
+                        data-method="alipay" 
+                        id="configure-alipay">
+                        Configure Alipay
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- WeChat Pay -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="fa-brands fa-weixin fa-3x mb-3"></i>
+                <h5 class="card-title">WeChat Pay</h5>
+                <p class="card-text">Accept payments via WeChat Pay.</p>
+                {% if active_methods.get('wechat_pay') %}
+                    <!-- Metodo attivo -->
+                    <button class="btn btn-danger btn-sm" disabled>Activated</button>
+                    <a href="/admin/cms/pages/manage_payments/wechat_pay" class="btn btn-dark btn-sm ms-2">Edit</a>
+                {% else %}
+                    <!-- Metodo non attivo -->
+                    <button 
+                        class="btn btn-dark btn-sm payment-button" 
+                        data-method="wechat_pay" 
+                        id="configure-wechat-pay">
+                        Configure WeChat Pay
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Square -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="fa-solid fa-square fa-3x mb-3"></i>
+                <h5 class="card-title">Square</h5>
+                <p class="card-text">Accept payments via Square.</p>
+                {% if active_methods.get('square') %}
+                    <!-- Metodo attivo -->
+                    <button class="btn btn-danger btn-sm" disabled>Activated</button>
+                    <a href="/admin/cms/pages/manage_payments/square" class="btn btn-dark btn-sm ms-2">Edit</a>
+                {% else %}
+                    <!-- Metodo non attivo -->
+                    <button 
+                        class="btn btn-dark btn-sm payment-button" 
+                        data-method="square" 
+                        id="configure-square">
+                        Configure Square
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Amazon Pay-->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="fa-brands fa-amazon fa-3x mb-3"></i>
+                <h5 class="card-title">Amazon Pay</h5>
+                <p class="card-text">Accept payments via Amazon Pay.</p>
+                {% if active_methods.get('amazon_pay') %}
+                    <!-- Metodo attivo -->
+                    <button class="btn btn-danger btn-sm" disabled>Activated</button>
+                    <a href="/admin/cms/pages/manage_payments/amazon_pay" class="btn btn-dark btn-sm ms-2">Edit</a>
+                {% else %}
+                    <!-- Metodo non attivo -->
+                    <button 
+                        class="btn btn-dark btn-sm payment-button" 
+                        data-method="amazon_pay" 
+                        id="configure-amazon-pay">
+                        Configure Amazon Pay
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Klarna -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="fa-solid fa-credit-card fa-3x mb-3"></i>
+                <h5 class="card-title">Klarna</h5>
+                <p class="card-text">Accept payments via Klarna.</p>
+                {% if active_methods.get('klarna') %}
+                    <!-- Metodo attivo -->
+                    <button class="btn btn-danger btn-sm" disabled>Activated</button>
+                    <a href="/admin/cms/pages/manage_payments/klarna" class="btn btn-dark btn-sm ms-2">Edit</a>
+                {% else %}
+                    <!-- Metodo non attivo -->
+                    <button 
+                        class="btn btn-dark btn-sm payment-button" 
+                        data-method="klarna" 
+                        id="configure-klarna">
+                        Configure Klarna
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Afterpay -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="fa-solid fa-wallet fa-3x mb-3"></i>
+                <h5 class="card-title">Afterpay</h5>
+                <p class="card-text">Accept payments via Afterpay.</p>
+                {% if active_methods.get('afterpay') %}
+                    <!-- Metodo attivo -->
+                    <button class="btn btn-danger btn-sm" disabled>Activated</button>
+                    <a href="/admin/cms/pages/manage_payments/afterpay" class="btn btn-dark btn-sm ms-2">Edit</a>
+                {% else %}
+                    <!-- Metodo non attivo -->
+                    <button 
+                        class="btn btn-dark btn-sm payment-button" 
+                        data-method="afterpay" 
+                        id="configure-afterpay">
+                        Configure Afterpay
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Venmo -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="fa-brands fa-venmo fa-3x mb-3"></i>
+                <h5 class="card-title">Venmo</h5>
+                <p class="card-text">Accept payments via Venmo.</p>
+                {% if active_methods.get('venmo') %}
+                    <!-- Metodo attivo -->
+                    <button class="btn btn-danger btn-sm" disabled>Activated</button>
+                    <a href="/admin/cms/pages/manage_payments/venmo" class="btn btn-dark btn-sm ms-2">Edit</a>
+                {% else %}
+                    <!-- Metodo non attivo -->
+                    <button 
+                        class="btn btn-dark btn-sm payment-button" 
+                        data-method="venmo" 
+                        id="configure-venmo">
+                        Configure Venmo
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Zelle -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="fa-solid fa-bank fa-3x mb-3"></i>
+                <h5 class="card-title">Zelle</h5>
+                <p class="card-text">Accept payments via Zelle.</p>
+                {% if active_methods.get('zelle') %}
+                    <!-- Metodo attivo -->
+                    <button class="btn btn-danger btn-sm" disabled>Activated</button>
+                    <a href="/admin/cms/pages/manage_payments/zelle" class="btn btn-dark btn-sm ms-2">Edit</a>
+                {% else %}
+                    <!-- Metodo non attivo -->
+                    <button 
+                        class="btn btn-dark btn-sm payment-button" 
+                        data-method="zelle" 
+                        id="configure-zelle">
+                        Configure Zelle
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Aggiungi un listener per i pulsanti di configurazione
+        document.querySelectorAll('.payment-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const methodName = button.dataset.method; // Ottieni il metodo dal pulsante
+                const shopName = "{{ shop_name }}"; // Ottieni il nome del negozio
+    
+                Swal.fire({
+                    title: 'Configuring...',
+                    text: `Please wait while we configure ${methodName}.`,
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => Swal.showLoading()
+                });
+    
+                // Effettua la chiamata AJAX
+                fetch('/admin/cms/pages/add_payment_method', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        shop_name: shopName,
+                        method_name: methodName,
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    Swal.close();
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Success',
+                            text: `${methodName} has been configured successfully.`,
+                            icon: 'success',
+                        }).then(() => {
+                            location.reload(); // Ricarica la pagina per aggiornare lo stato
+                        });
+                    } else {
+                        Swal.fire('Error', data.message || 'Failed to configure the payment method.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire('Error', 'A network or server error occurred.', 'error');
+                });
+            });
+        });
+    });
+    </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const paymentButtons = document.querySelectorAll('.payment-button');
+    
+        // Carica i metodi di pagamento attivi al caricamento della pagina
+        function loadActiveMethods() {
+            fetch('/admin/cms/pages/payments/get_active_methods')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const activeMethods = data.methods;
+    
+                        paymentButtons.forEach(button => {
+                            const methodName = button.dataset.method;
+                            const activeMethod = activeMethods.find(method => method.method_name === methodName);
+    
+                            if (activeMethod) {
+                                // Metodo attivo: aggiorna lo stato del pulsante
+                                button.textContent = 'Actived';
+                                button.classList.remove('btn-dark');
+                                button.classList.add('btn-success');
+                                button.disabled = true;
+    
+                                // Aggiungi il pulsante "Edit" per modificare il metodo
+                                let editButton = button.parentNode.querySelector('.btn-primary');
+                                if (!editButton) {
+                                    editButton = document.createElement('button');
+                                    editButton.classList.add('btn', 'btn-primary', 'btn-sm', 'ms-2');
+                                    editButton.textContent = 'Edit';
+                                    editButton.onclick = () => {
+                                        window.location.href = `/admin/cms/pages/manage_payments/${methodName}`;
+                                    };
+                                    button.parentNode.appendChild(editButton);
+                                }
+                            } else {
+                                // Metodo non attivo: ripristina il pulsante "Configure"
+                                button.textContent = 'Configure';
+                                button.classList.remove('btn-success');
+                                button.classList.add('btn-dark');
+                                button.disabled = false;
+    
+                                // Rimuovi il pulsante "Edit" se esistente
+                                const editButton = button.parentNode.querySelector('.btn-primary');
+                                if (editButton) {
+                                    editButton.remove();
+                                }
+                            }
+                        });
+                    } else {
+                        console.error('Error fetching active methods:', data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    
+        // Carica i metodi attivi inizialmente
+        loadActiveMethods();
+    });
+    </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchToggleBtn = document.getElementById('search-toggle-btn');
+        const searchInput = document.getElementById('search-input');
+        const tableRows = document.querySelectorAll('.table-row');
+
+        searchToggleBtn.addEventListener('click', function () {
+            searchInput.classList.toggle('d-none');
+            searchInput.focus();
+        });
+
+        searchInput.addEventListener('input', function () {
+            const query = searchInput.value.toLowerCase().trim();
+            tableRows.forEach(row => {
+                const rowText = row.innerText.toLowerCase();
+                if (rowText.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    .table-row:hover {
+        background-color: rgba(255, 14, 14, 0.1);
+        transition: background-color 0.2s ease-in-out;
+    }
+    .table-bordered {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .card {
+        border-radius: 10px;
+    }
+    .table-active {
+        background-color: rgba(40, 167, 69, 0.2);
+    }
+    .form-check-input:checked {
+        background-color: #db3545 !important;
+        border-color: #db3545 !important;
+    }
+    .fixed-on-bottom {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 1050;
+        background: #f8f9fa;
+        box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+    }
+    .fixed-on-bottom .btn {
+        border-radius: 50px;
+        transition: all 0.2s ease-in-out;
+    }
+    .fixed-on-bottom .btn:hover {
+        background-color: #343a40;
+        color: white;
+    }
+    .fixed-on-bottom i {
+        margin-right: 8px;
+    }
+    #search-input {
+        transition: all 1s ease;
+    }
+</style>
+
+{% endblock %}

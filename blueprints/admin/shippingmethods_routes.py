@@ -2,7 +2,6 @@ from flask import Blueprint, request, jsonify, session, render_template, redirec
 from models.shippingmethods import ShippingMethods  # importo la classe database
 from db_helpers import DatabaseHelper
 db_helper = DatabaseHelper()
-from db_helpers import DatabaseHelper
 from helpers import check_user_authentication
 
 # Blueprint
@@ -127,12 +126,14 @@ def update_shipping_method():
             # Ottieni i dati inviati dal form
             form_data = request.form
             shipping_id = form_data.get('id')
+            shop_name = request.host.split('.')[0]  # Ottieni il nome del negozio dal sottodominio
 
             if not shipping_id:
                 return jsonify({'success': False, 'message': 'Shipping ID is required.'}), 400
 
             # Costruisci i dati aggiornati
             updated_data = {
+                'shop_name': shop_name,
                 'name': form_data.get('name'),
                 'description': form_data.get('description'),
                 'country': form_data.get('country'),
