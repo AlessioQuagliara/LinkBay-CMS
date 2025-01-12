@@ -3,3 +3,4 @@ mysql.connector
 webdriver-manager
 Pillow
 Stripe
+gunicorn
