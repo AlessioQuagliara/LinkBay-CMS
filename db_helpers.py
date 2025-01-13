@@ -55,9 +55,11 @@ class DatabaseHelper:
         """
         conn = self.get_auth_db_connection() if use_auth else self.get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute(query, params if params else ())
-        result = cursor.fetchall()
-        cursor.close()
+        try:
+            cursor.execute(query, params if params else ())
+            result = cursor.fetchall()
+        finally:
+            cursor.close()
         return result
 
     def execute_commit(self, query, params=None, use_auth=False):
@@ -66,10 +68,12 @@ class DatabaseHelper:
         """
         conn = self.get_auth_db_connection() if use_auth else self.get_db_connection()
         cursor = conn.cursor()
-        cursor.execute(query, params if params else ())
-        conn.commit()
-        last_id = cursor.lastrowid
-        cursor.close()
+        try:
+            cursor.execute(query, params if params else ())
+            conn.commit()
+            last_id = cursor.lastrowid
+        finally:
+            cursor.close()
         return last_id
 
     def close(self):

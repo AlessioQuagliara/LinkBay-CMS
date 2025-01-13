@@ -22,17 +22,27 @@ class Database:
             self.conn = None
 
     def query(self, query, params=None):
+        """
+        Esegue una query SELECT e restituisce il risultato.
+        """
         cursor = self.conn.cursor(dictionary=True)
-        cursor.execute(query, params)
-        result = cursor.fetchall()
-        cursor.close()
+        try:
+            cursor.execute(query, params)
+            result = cursor.fetchall()
+        finally:
+            cursor.close()
         return result
 
     def execute(self, query, params=None):
+        """
+        Esegue una query (INSERT, UPDATE, DELETE) e restituisce l'ID dell'ultimo record inserito.
+        """
         cursor = self.conn.cursor()
-        cursor.execute(query, params)
-        self.conn.commit()
-        last_id = cursor.lastrowid
-        cursor.close()
+        try:
+            cursor.execute(query, params)
+            self.conn.commit()
+            last_id = cursor.lastrowid
+        finally:
+            cursor.close()
         return last_id
     
