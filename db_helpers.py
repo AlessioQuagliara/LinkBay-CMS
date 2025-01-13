@@ -24,7 +24,8 @@ class DatabaseHelper:
                 password="root",
                 host="127.0.0.1",
                 database="cms_def",
-                port=3306  # Usa la porta corretta per il database di produzione
+                port=3306,  # Usa la porta corretta per il database di produzione
+                auth_plugin='mysql_native_password'  # Specifica il plugin se necessario
             )
         return g.db
 
@@ -43,7 +44,8 @@ class DatabaseHelper:
                 password="root",
                 host="127.0.0.1",
                 database="cms_index",
-                port=3306  # Usa la porta corretta per il database di produzione
+                port=3306,  # Usa la porta corretta per il database di produzione
+                auth_plugin='mysql_native_password'  # Specifica il plugin se necessario
             )
         return g.auth_db
 
