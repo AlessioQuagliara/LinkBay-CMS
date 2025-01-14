@@ -9,9 +9,12 @@ class ShopList:
             FROM ShopList
             WHERE shop_name = %s
         """
-        with self.conn.cursor(dictionary=True) as cursor:
+        cursor = self.conn.cursor(dictionary=True)
+        try:
             cursor.execute(query, (shop_name,))
             shop = cursor.fetchone()
+        finally:
+            cursor.close()
         return shop
     
     def get_shop_by_name_or_domain(self, value):
@@ -20,26 +23,28 @@ class ShopList:
             FROM ShopList
             WHERE shop_name = %s OR domain = %s
         """
-        with self.conn.cursor(dictionary=True) as cursor:
+        cursor = self.conn.cursor(dictionary=True)
+        try:
             cursor.execute(query, (value, value))
             shop = cursor.fetchone()
+        finally:
+            cursor.close()
         return shop
     
     def update_shop_domain(self, shop_name, domain):
-        """
-        Aggiorna il dominio per un negozio specifico.
-        """
         query = """
             UPDATE ShopList
             SET domain = %s
             WHERE shop_name = %s
         """
+        cursor = self.conn.cursor()
         try:
-            with self.conn.cursor() as cursor:
-                cursor.execute(query, (domain, shop_name))
-                self.conn.commit()
-                return cursor.rowcount > 0  # Restituisce True se almeno una riga è stata aggiornata
+            cursor.execute(query, (domain, shop_name))
+            self.conn.commit()
+            return cursor.rowcount > 0  # Restituisce True se almeno una riga è stata aggiornata
         except Exception as e:
             print(f"Error updating shop domain: {e}")
             self.conn.rollback()
             return False
+        finally:
+            cursor.close()
