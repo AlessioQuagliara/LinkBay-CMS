@@ -5,11 +5,14 @@ from models.shoplist import ShopList
 from werkzeug.security import generate_password_hash, check_password_hash
 from db_helpers import DatabaseHelper
 from helpers import check_user_authentication
+import logging
 
 db_helper = DatabaseHelper()
 
 # Blueprint
 user_bp = Blueprint('user', __name__)
+
+logging.basicConfig(level=logging.INFO)
 
 # Rotte per la gestione
 
@@ -48,9 +51,10 @@ def signin():
 # Middleware per il debug delle sessioni
 @user_bp.before_request
 def log_session_info():
-    print(f"Request path: {request.path}")
-    print(f"Session data: {session}")
-    print(f"Cookies: {request.cookies}")
+    try:
+        logging.info(f"Request path: {request.path}")
+    except Exception as e:
+        logging.error(f"Errore durante il log: {e}")
 
 # Funzione di login -------------------------------------------------
 @user_bp.route('/admin/', methods=['GET', 'POST'])
