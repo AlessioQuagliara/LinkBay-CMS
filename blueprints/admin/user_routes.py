@@ -96,7 +96,7 @@ def login():
                 session['profile_photo'] = user['profilo_foto']
                 session['shop_id'] = shop_id  # Salva lo shop_id nella sessione
 
-                print(f"Session after login: {session}")
+                logging.info(f"Session after login: {session}")
 
                 # Controllo per 2FA
                 if user['is_2fa_enabled']:

@@ -6,6 +6,8 @@ from config import Config
 import stripe
 from db_helpers import DatabaseHelper
 from helpers import check_user_authentication
+import logging
+logging.basicConfig(level=logging.INFO)
 
 # Blueprint
 storepayments_bp = Blueprint('storepayments', __name__)
@@ -52,7 +54,7 @@ def create_checkout_session():
         return jsonify({'sessionId': session.id})
     
     except Exception as e:
-        print(f"Error creating checkout session: {e}")
+       logging.info(f"Error creating checkout session: {e}")
         return jsonify(error=str(e)), 500
     
 @storepayments_bp.route('/subscription/success')

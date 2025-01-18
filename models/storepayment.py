@@ -17,7 +17,7 @@ class StorePayment:
                 self.conn.commit()
                 return cursor.lastrowid
         except Exception as e:
-            print(f"Error creating payment record: {e}")
+           logging.info(f"Error creating payment record: {e}")
             self.conn.rollback()
             return None
 
@@ -33,7 +33,7 @@ class StorePayment:
                 self.conn.commit()
                 return True
         except Exception as e:
-            print(f"Error updating payment status: {e}")
+           logging.info(f"Error updating payment status: {e}")
             self.conn.rollback()
             return False
 
@@ -48,7 +48,7 @@ class StorePayment:
                 """, (shop_name,))
                 return cursor.fetchall()
         except Exception as e:
-            print(f"Error fetching payments for shop: {e}")
+           logging.info(f"Error fetching payments for shop: {e}")
             return []
 
     # Metodo per ottenere i dettagli di un pagamento specifico tramite ID di Stripe
@@ -61,7 +61,7 @@ class StorePayment:
                 """, (stripe_payment_id,))
                 return cursor.fetchone()    
         except Exception as e:
-            print(f"Error fetching payment by Stripe ID: {e}")
+           logging.info(f"Error fetching payment by Stripe ID: {e}")
             return None
 
     # Metodo per ottenere i pagamenti di tipo abbonamento
@@ -75,5 +75,5 @@ class StorePayment:
                 """, (shop_name,))
                 return cursor.fetchall()
         except Exception as e:
-            print(f"Error fetching subscription payments: {e}")
+           logging.info(f"Error fetching subscription payments: {e}")
             return []

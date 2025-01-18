@@ -11,7 +11,7 @@ class Collections:
                 cursor.execute(query, (shop_name,))
                 return cursor.fetchall()
             except Exception as e:
-                print(f"Error fetching collections: {e}")
+               logging.info(f"Error fetching collections: {e}")
                 return []
 
     def get_collection_by_id(self, collection_id):
@@ -21,7 +21,7 @@ class Collections:
                 cursor.execute(query, (collection_id,))
                 return cursor.fetchone()
             except Exception as e:
-                print(f"Error fetching collection by ID: {e}")
+               logging.info(f"Error fetching collection by ID: {e}")
                 return None
 
     def create_collection(self, data):
@@ -41,7 +41,7 @@ class Collections:
                 self.conn.commit()
                 return cursor.lastrowid
             except Exception as e:
-                print(f"Error creating collection: {e}")
+               logging.info(f"Error creating collection: {e}")
                 self.conn.rollback()
                 return None
 
@@ -61,7 +61,7 @@ class Collections:
                 self.conn.commit()
                 return True
             except Exception as e:
-                print(f"Database Error: {e}")
+               logging.info(f"Database Error: {e}")
                 self.conn.rollback()
                 return False
 
@@ -73,7 +73,7 @@ class Collections:
                 self.conn.commit()
                 return True
             except Exception as e:
-                print(f"Error deleting collection: {e}")
+               logging.info(f"Error deleting collection: {e}")
                 self.conn.rollback()
                 return False
 
@@ -88,7 +88,7 @@ class Collections:
                 self.conn.commit()
                 return cursor.lastrowid
             except Exception as e:
-                print(f"Error adding collection image: {e}")
+               logging.info(f"Error adding collection image: {e}")
                 self.conn.rollback()
                 return None
 
@@ -99,7 +99,7 @@ class Collections:
                 cursor.execute(query, (collection_id,))
                 return cursor.fetchall()
             except Exception as e:
-                print(f"Error fetching collection images: {e}")
+               logging.info(f"Error fetching collection images: {e}")
                 return []
 
     def get_collection_image_by_id(self, image_id):
@@ -109,7 +109,7 @@ class Collections:
                 cursor.execute(query, (image_id,))
                 return cursor.fetchone()
             except Exception as e:
-                print(f"Error fetching collection image by ID: {e}")
+               logging.info(f"Error fetching collection image by ID: {e}")
                 return None
 
     def get_collection_by_slug(self, slug):
@@ -119,7 +119,7 @@ class Collections:
                 cursor.execute(query, (slug,))
                 return cursor.fetchone()
             except Exception as e:
-                print(f"Error retrieving collection by slug: {e}")
+               logging.info(f"Error retrieving collection by slug: {e}")
                 return None
 
     def add_product_to_collection(self, collection_id, product_id):
@@ -133,7 +133,7 @@ class Collections:
                 self.conn.commit()
                 return True
             except Exception as e:
-                print(f"Error adding product to collection: {e}")
+               logging.info(f"Error adding product to collection: {e}")
                 self.conn.rollback()
                 return False
 
@@ -148,7 +148,7 @@ class Collections:
                 self.conn.commit()
                 return True
             except Exception as e:
-                print(f"Error removing product from collection: {e}")
+               logging.info(f"Error removing product from collection: {e}")
                 self.conn.rollback()
                 return False
 
@@ -164,7 +164,7 @@ class Collections:
                 cursor.execute(query, (collection_id,))
                 return cursor.fetchall()
             except Exception as e:
-                print(f"Error fetching products in collection: {e}")
+               logging.info(f"Error fetching products in collection: {e}")
                 return []
 
     def get_collections_for_product(self, product_id):
@@ -179,7 +179,7 @@ class Collections:
                 cursor.execute(query, (product_id,))
                 return cursor.fetchall()
             except Exception as e:
-                print(f"Error fetching collections for product: {e}")
+               logging.info(f"Error fetching collections for product: {e}")
                 return []
 
     def remove_all_products_from_collection(self, collection_id):
@@ -193,7 +193,7 @@ class Collections:
                 self.conn.commit()
                 return True
             except Exception as e:
-                print(f"Error removing all products from collection: {e}")
+               logging.info(f"Error removing all products from collection: {e}")
                 self.conn.rollback()
                 return False
 
@@ -209,7 +209,7 @@ class Collections:
                 self.conn.commit()
                 return True
             except Exception as e:
-                print(f"Error removing products from collection: {e}")
+               logging.info(f"Error removing products from collection: {e}")
                 self.conn.rollback()
                 return False
 
@@ -225,7 +225,7 @@ class Collections:
                 self.conn.commit()
                 return True
             except Exception as e:
-                print(f"Error adding products to collection: {e}")
+               logging.info(f"Error adding products to collection: {e}")
                 self.conn.rollback()
                 return False
 
@@ -241,5 +241,5 @@ class Collections:
                 cursor.execute(query, (shop_name,))
                 return cursor.fetchall()
             except Exception as e:
-                print(f"Error fetching collections: {e}")
+               logging.info(f"Error fetching collections: {e}")
                 return []

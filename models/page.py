@@ -32,7 +32,7 @@ class Page:
                 cursor.execute("SELECT * FROM pages WHERE slug = %s AND shop_name = %s", (slug, shop_name))
                 page = cursor.fetchone()
         except Exception as e:
-            print(f"Errore durante il recupero della pagina: {e}")
+           logging.info(f"Errore durante il recupero della pagina: {e}")
             page = None
         return page
 
@@ -50,7 +50,7 @@ class Page:
             return True
         except Exception as e:
             self.conn.rollback()
-            print(f"Error creating page: {e}")
+           logging.info(f"Error creating page: {e}")
             return False
 
     # Aggiorna il contenuto della pagina per un negozio specifico
@@ -67,7 +67,7 @@ class Page:
             return True
         except Exception as e:
             self.conn.rollback()
-            print(f"Error updating page content: {e}")
+           logging.info(f"Error updating page content: {e}")
             return False
 
     # Aggiorna i metadati SEO di una pagina per un negozio specifico
@@ -84,7 +84,7 @@ class Page:
             return True
         except Exception as e:
             self.conn.rollback()
-            print(f"Error updating page SEO: {e}")
+           logging.info(f"Error updating page SEO: {e}")
             return False
 
     # Elimina una pagina per un negozio specifico
@@ -96,7 +96,7 @@ class Page:
             return True
         except Exception as e:
             self.conn.rollback()
-            print(f"Error deleting page: {e}")
+           logging.info(f"Error deleting page: {e}")
             return False
         
     # Aggiorna il contenuto della pagina per slug e negozio
@@ -113,7 +113,7 @@ class Page:
             return True
         except Exception as e:
             self.conn.rollback()
-            print(f"Error updating page content: {e}")
+           logging.info(f"Error updating page content: {e}")
             return False
         
     # ottieni la pagina tradotta
@@ -124,7 +124,7 @@ class Page:
                             (slug, language, shop_name))
                 page = cursor.fetchone()
         except Exception as e:
-            print(f"Error fetching translated page: {e}")
+           logging.info(f"Error fetching translated page: {e}")
             page = None
         return page
     
@@ -157,7 +157,7 @@ class Page:
             return True
         except Exception as e:
             self.conn.rollback()
-            print(f"Error updating or creating page content: {e}")
+           logging.info(f"Error updating or creating page content: {e}")
             return False
 
     def get_product_references(self, page_id):
@@ -172,7 +172,7 @@ class Page:
                 results = cursor.fetchall()
             return [row['product_id'] for row in results]
         except Exception as e:
-            print(f"Errore durante il recupero dei riferimenti ai prodotti: {e}")
+           logging.info(f"Errore durante il recupero dei riferimenti ai prodotti: {e}")
             return []
 
     def get_products_by_ids(self, product_ids):
@@ -186,5 +186,5 @@ class Page:
                 cursor.execute(query, product_ids)
                 return cursor.fetchall()
         except Exception as e:
-            print(f"Error fetching products by IDs: {e}")
+           logging.info(f"Error fetching products by IDs: {e}")
             return []

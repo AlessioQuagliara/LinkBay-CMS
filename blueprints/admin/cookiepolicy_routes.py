@@ -3,6 +3,8 @@ from models.cookiepolicy import CookiePolicy  # importo la classe database
 from db_helpers import DatabaseHelper
 from db_helpers import DatabaseHelper
 from helpers import check_user_authentication
+import logging
+logging.basicConfig(level=logging.INFO)
 
 db_helper = DatabaseHelper()
 

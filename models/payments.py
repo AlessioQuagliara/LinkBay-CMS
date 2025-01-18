@@ -17,7 +17,7 @@ class Payments:
                 cursor.execute(query, (order_id,))
                 return cursor.fetchall()
         except Exception as e:
-            print(f"Error fetching payments: {e}")
+           logging.info(f"Error fetching payments: {e}")
             return []
 
     # Metodo per aggiungere un pagamento
@@ -40,6 +40,6 @@ class Payments:
                 self.conn.commit()
                 return cursor.lastrowid
         except Exception as e:
-            print(f"Error adding payment: {e}")
+           logging.info(f"Error adding payment: {e}")
             self.conn.rollback()
             return None

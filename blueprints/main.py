@@ -5,6 +5,8 @@ from models.page import Page
 from models.products import Products
 from helpers import get_navbar_content, get_footer_content, get_web_settings, load_page_content, get_language
 from db_helpers import DatabaseHelper
+import logging
+logging.basicConfig(level=logging.INFO)
 
 db_helper = DatabaseHelper()
 

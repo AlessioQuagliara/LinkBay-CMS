@@ -43,7 +43,7 @@ class ShopList:
             self.conn.commit()
             return cursor.rowcount > 0  # Restituisce True se almeno una riga è stata aggiornata
         except Exception as e:
-            print(f"Error updating shop domain: {e}")
+           logging.info(f"Error updating shop domain: {e}")
             self.conn.rollback()
             return False
         finally:

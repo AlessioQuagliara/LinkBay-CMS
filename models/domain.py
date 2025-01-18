@@ -11,5 +11,5 @@ class Domain:
                 cursor.execute(query, (shop_name,))
                 return cursor.fetchall()
             except Exception as e:
-                print(f"Error fetching categories: {e}")
+               logging.info(f"Error fetching categories: {e}")
                 return []

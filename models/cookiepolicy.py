@@ -31,7 +31,7 @@ class CookiePolicy:
                 self.conn.commit()
             return True
         except Exception as e:
-            print(f"Error updating internal cookie policy: {e}")
+           logging.info(f"Error updating internal cookie policy: {e}")
             self.conn.rollback()
             return False
 
@@ -52,7 +52,7 @@ class CookiePolicy:
                 self.conn.commit()
             return True
         except Exception as e:
-            print(f"Error creating internal cookie policy: {e}")
+           logging.info(f"Error creating internal cookie policy: {e}")
             self.conn.rollback()
             return False
 
@@ -74,7 +74,7 @@ class CookiePolicy:
                 self.conn.commit()
             return True
         except Exception as e:
-            print(f"Error updating third-party cookie policy: {e}")
+           logging.info(f"Error updating third-party cookie policy: {e}")
             self.conn.rollback()
             return False
 
@@ -93,6 +93,6 @@ class CookiePolicy:
                 self.conn.commit()
             return True
         except Exception as e:
-            print(f"Error creating third-party cookie policy: {e}")
+           logging.info(f"Error creating third-party cookie policy: {e}")
             self.conn.rollback()
             return False

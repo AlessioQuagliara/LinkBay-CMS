@@ -90,5 +90,5 @@ def get_shipping_methods():
 
             return jsonify(shipping_methods), 200
     except Exception as e:
-        print(f"Errore durante il recupero dei metodi di spedizione: {e}")
+       logging.info(f"Errore durante il recupero dei metodi di spedizione: {e}")
         return jsonify({'error': 'Impossibile recuperare i metodi di spedizione'}), 500

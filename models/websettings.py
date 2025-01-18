@@ -26,5 +26,5 @@ class WebSettings:
             return True
         except Exception as e:
             self.conn.rollback()
-            print(f"Error updating web settings: {e}")
+           logging.info(f"Error updating web settings: {e}")
             return False

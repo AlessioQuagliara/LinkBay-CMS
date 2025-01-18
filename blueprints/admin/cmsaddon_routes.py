@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, request, jsonify, session, url_for
 from models.cmsaddon import CMSAddon  # importo la classe database
 from db_helpers import DatabaseHelper
 from helpers import check_user_authentication
+import logging
+logging.basicConfig(level=logging.INFO)
 
 db_helper = DatabaseHelper()  # connessione al database
 

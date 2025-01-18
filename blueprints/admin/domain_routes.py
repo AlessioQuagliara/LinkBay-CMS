@@ -8,7 +8,8 @@ from db_helpers import DatabaseHelper
 db_helper = DatabaseHelper()
 from db_helpers import DatabaseHelper
 from helpers import check_user_authentication
-import re
+import logging, re
+logging.basicConfig(level=logging.INFO)
 
 # Blueprint
 domain_bp = Blueprint('domain', __name__)
@@ -35,7 +36,7 @@ def search_domain():
         result = godaddy.search_domain(domain_name)
 
         # Debug: stampa il risultato
-        print(f"Search result: {result}")
+       logging.info(f"Search result: {result}")
 
         if result.get('available'):
             return jsonify({
@@ -50,7 +51,7 @@ def search_domain():
         else:
             return jsonify({'success': True, 'domains': []})  # Nessun dominio disponibile
     except Exception as e:
-        print(f"Error in search_domain: {e}")
+       logging.info(f"Error in search_domain: {e}")
         return jsonify({'success': False, 'message': 'An error occurred while searching for the domain.'}), 500
     
 @domain_bp.route('/api/domains/purchase', methods=['POST'])
@@ -145,7 +146,7 @@ def purchase_domain():
 
     except Exception as e:
         import traceback
-        print(f"Error purchasing domain: {e}")
+       logging.info(f"Error purchasing domain: {e}")
         print(traceback.format_exc())
         return jsonify({'success': False, 'message': 'Internal server error.'}), 500
     

@@ -17,7 +17,7 @@ class Shipping:
                 cursor.execute(query, (order_id,))
                 return cursor.fetchone()
         except Exception as e:
-            print(f"Error fetching shipping details: {e}")
+           logging.info(f"Error fetching shipping details: {e}")
             return None
 
     def get_all_shippings(self, shop_name):
@@ -34,7 +34,7 @@ class Shipping:
                 cursor.execute(query, (shop_name,))
                 return cursor.fetchall()
         except Exception as e:
-            print(f"Error fetching shipping: {e}")
+           logging.info(f"Error fetching shipping: {e}")
             return []
 
     # Metodo per aggiungere o aggiornare i dettagli di spedizione
@@ -67,6 +67,6 @@ class Shipping:
                 self.conn.commit()
                 return cursor.lastrowid
         except Exception as e:
-            print(f"Error upserting shipping: {e}")
+           logging.info(f"Error upserting shipping: {e}")
             self.conn.rollback()
             return None

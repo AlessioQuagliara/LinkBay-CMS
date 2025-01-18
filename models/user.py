@@ -13,7 +13,7 @@ class User:
                 users = cursor.fetchall()
             return users
         except Exception as e:
-            print(f"Error fetching all users: {e}")
+           logging.info(f"Error fetching all users: {e}")
             return []
 
     def get_user_by_id(self, user_id):

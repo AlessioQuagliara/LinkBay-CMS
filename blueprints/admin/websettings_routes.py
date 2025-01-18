@@ -4,6 +4,8 @@ from db_helpers import DatabaseHelper
 db_helper = DatabaseHelper()
 from db_helpers import DatabaseHelper
 from helpers import check_user_authentication
+import logging
+logging.basicConfig(level=logging.INFO)
 
 # Blueprint
 websettings_bp = Blueprint('websettings', __name__)

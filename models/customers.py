@@ -30,7 +30,7 @@ class Customers:
                 self.conn.commit()
                 return cursor.lastrowid
         except Exception as e:
-            print(f"Error creating customer: {e}")
+           logging.info(f"Error creating customer: {e}")
             self.conn.rollback()
             return None
 
@@ -46,7 +46,7 @@ class Customers:
                 customers = cursor.fetchall()
                 return customers
         except Exception as e:
-            print(f"Error fetching customers: {e}")
+           logging.info(f"Error fetching customers: {e}")
             return []
 
     def update_customer(self, customer_id, data, shop_name):
@@ -84,7 +84,7 @@ class Customers:
                 self.conn.commit()
                 return cursor.rowcount > 0
         except Exception as e:
-            print(f"Error updating customer: {e}")
+           logging.info(f"Error updating customer: {e}")
             self.conn.rollback()
             return False
 
@@ -96,6 +96,6 @@ class Customers:
                 self.conn.commit()
                 return True
         except Exception as e:
-            print(f"Error deleting customer: {e}")
+           logging.info(f"Error deleting customer: {e}")
             self.conn.rollback()
             return False

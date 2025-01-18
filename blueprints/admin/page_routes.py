@@ -10,6 +10,8 @@ from db_helpers import DatabaseHelper
 db_helper = DatabaseHelper()
 from db_helpers import DatabaseHelper
 from helpers import check_user_authentication
+import logging
+logging.basicConfig(level=logging.INFO)
 
 
 # Blueprint
@@ -23,7 +25,7 @@ def online_content():
     
     if isinstance(username, str):
         shop_subdomain = request.host.split('.')[0]  
-        print(f"Subdomain: {shop_subdomain}")  # Log del subdominio
+       logging.info(f"Subdomain: {shop_subdomain}")  # Log del subdominio
 
         try:
             with db_helper.get_auth_db_connection() as auth_db_conn:
@@ -31,7 +33,7 @@ def online_content():
                 shop = shoplist_model.get_shop_by_name(shop_subdomain)
 
             if shop:
-                print(f"Shop trovato: {shop}")  # Log per il negozio
+               logging.info(f"Shop trovato: {shop}")  # Log per il negozio
 
                 with db_helper.get_db_connection() as db_conn:
                     page_model = Page(db_conn)
@@ -61,7 +63,7 @@ def online_content():
                 return redirect(url_for('homepage'))
 
         except mysql.connector.Error as e:
-            print(f"Errore nel database: {str(e)}")  # Log del messaggio di errore
+           logging.info(f"Errore nel database: {str(e)}")  # Log del messaggio di errore
             flash('Errore durante l\'accesso ai dati del negozio o della pagina.')
             return redirect(url_for('homepage'))
     
@@ -237,7 +239,7 @@ def save_image(base64_image, page_id, shop_subdomain):
 
         return f"/{upload_folder}/{image_name}"
     except Exception as e:
-        print(f"Error saving image: {str(e)}")
+       logging.info(f"Error saving image: {str(e)}")
         return None
 
 # Funzione per salvare il contenuto della pagina con gestione delle immagini ---------------------------------
@@ -250,7 +252,7 @@ def save_page():
         language = data.get('language')  # Aggiungiamo il parametro lingua
         shop_subdomain = request.host.split('.')[0]
 
-        print(f"Salvataggio pagina con ID: {page_id}, lingua: {language} per il negozio: {shop_subdomain}")
+       logging.info(f"Salvataggio pagina con ID: {page_id}, lingua: {language} per il negozio: {shop_subdomain}")
         
         db_conn = db_helper.get_db_connection()  
         page_model = Page(db_conn)  
@@ -269,7 +271,7 @@ def save_page():
         return jsonify({'success': success})
     
     except Exception as e:
-        print(f"Errore durante il salvataggio della pagina: {str(e)}")
+       logging.info(f"Errore durante il salvataggio della pagina: {str(e)}")
         return jsonify({'success': False, 'error': str(e)})
 
 # Funzione per salvare un'immagine base64 generica ---------------------------------------------------------------
@@ -288,7 +290,7 @@ def save_base64_image(base64_image, upload_folder):
 
         return f"/static/uploads/{unique_filename}"
     except Exception as e:
-        print(f"Errore durante il salvataggio dell'immagine: {str(e)}")
+       logging.info(f"Errore durante il salvataggio dell'immagine: {str(e)}")
         return None
 
 # Endpoint Flask per gestire l'upload delle immagini generiche -------------------------------------------------------

@@ -6,6 +6,8 @@ from db_helpers import DatabaseHelper
 db_helper = DatabaseHelper()
 from db_helpers import DatabaseHelper
 from helpers import check_user_authentication
+import logging
+logging.basicConfig(level=logging.INFO)
 
 # Blueprint
 products_bp = Blueprint('products', __name__)
@@ -54,7 +56,7 @@ def manage_product(product_id=None):
                     else:
                         return jsonify({'status': 'error', 'message': 'Failed to save the product.'})
                 except Exception as e:
-                    print(f"Error managing product: {e}")
+                   logging.info(f"Error managing product: {e}")
                     return jsonify({'status': 'error', 'message': 'An error occurred.'})
 
             # Per GET: Ottieni i dettagli del prodotto (se esiste)
@@ -114,7 +116,7 @@ def create_product():
             'product_id': new_product_id
         })
     except Exception as e:
-        print(f"Error creating product: {e}")
+       logging.info(f"Error creating product: {e}")
         return jsonify({'success': False, 'message': 'Failed to create product.'}), 500
     
 @products_bp.route('/admin/cms/delete_products', methods=['POST'])
@@ -135,7 +137,7 @@ def delete_products():
 
         return jsonify({'success': True, 'message': 'Selected products deleted successfully.'})
     except Exception as e:
-        print(f"Error deleting products: {e}")
+       logging.info(f"Error deleting products: {e}")
         return jsonify({'success': False, 'message': 'An error occurred during deletion.'}), 500
 
 @products_bp.route('/admin/cms/update_product', methods=['POST'])
@@ -157,7 +159,7 @@ def update_product():
         else:
             return jsonify({'success': False, 'message': 'Failed to update the product.'}), 500
     except Exception as e:
-        print(f"Error: {e}")
+       logging.info(f"Error: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500
     
 @products_bp.route('/admin/cms/upload_image_product', methods=['POST'])
@@ -188,7 +190,7 @@ def upload_image_product():
         else:
             return jsonify({'success': False, 'message': 'Failed to save image to database.'}), 500
     except Exception as e:
-        print(f"Error uploading image: {e}")
+       logging.info(f"Error uploading image: {e}")
         return jsonify({'success': False, 'message': 'An error occurred during upload.'}), 500
     
 @products_bp.route('/admin/cms/delete_image_product', methods=['POST'])
@@ -214,7 +216,7 @@ def delete_image_product():
 
         return jsonify({'success': True, 'message': 'Image deleted successfully.'})
     except Exception as e:
-        print(f"Error deleting image: {e}")
+       logging.info(f"Error deleting image: {e}")
         return jsonify({'success': False, 'message': 'An error occurred during deletion.'}), 500
     
 @products_bp.route('/admin/cms/export_products', methods=['GET'])
@@ -276,10 +278,10 @@ def export_products():
             headers={"Content-Disposition": "attachment;filename=products.csv"}
         )
     except mysql.connector.Error as e:
-        print(f"Database error: {e}")
+       logging.info(f"Database error: {e}")
         return jsonify({'success': False, 'message': 'Database error occurred.'}), 500
     except Exception as e:
-        print(f"Unexpected error: {e}")
+       logging.info(f"Unexpected error: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500
     
 # Funzione per salvare un'immagine base64 generica ---------------------------------------------------------------
@@ -298,5 +300,5 @@ def save_base64_image(base64_image, upload_folder):
 
         return f"/static/uploads/{unique_filename}"
     except Exception as e:
-        print(f"Errore durante il salvataggio dell'immagine: {str(e)}")
+       logging.info(f"Errore durante il salvataggio dell'immagine: {str(e)}")
         return None

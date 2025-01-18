@@ -3,6 +3,8 @@ from models.shippingmethods import ShippingMethods  # importo la classe database
 from db_helpers import DatabaseHelper
 db_helper = DatabaseHelper()
 from helpers import check_user_authentication
+import logging
+logging.basicConfig(level=logging.INFO)
 
 # Blueprint
 shipping_methods_bp = Blueprint('shipping_methods', __name__)
@@ -49,7 +51,7 @@ def create_shipping_method():
         else:
             return jsonify({'success': False, 'message': 'Failed to create shipping method.'})
     except Exception as e:
-        print(f"Error creating shipping method: {e}")
+       logging.info(f"Error creating shipping method: {e}")
         return jsonify({'success': False, 'message': 'An error occurred.'}), 500
     
 @shipping_methods_bp.route('/admin/cms/delete_shippings', methods=['POST'])
@@ -73,7 +75,7 @@ def delete_shippings():
 
         return jsonify({'success': True, 'message': 'Selected shipping methods deleted successfully.'})
     except Exception as e:
-        print(f"Error deleting shipping methods: {e}")
+       logging.info(f"Error deleting shipping methods: {e}")
         return jsonify({'success': False, 'message': 'An error occurred during deletion.'}), 500
     
 @shipping_methods_bp.route('/admin/cms/pages/shipping-method/<int:method_id>', methods=['GET', 'POST'])
@@ -99,15 +101,15 @@ def manage_shipping_method(method_id=None):
                     else:
                         return jsonify({'status': 'error', 'message': 'Failed to save the shipping method.'})
                 except Exception as e:
-                    print(f"Error managing shipping method: {e}")
+                   logging.info(f"Error managing shipping method: {e}")
                     return jsonify({'status': 'error', 'message': 'An error occurred.'})
 
             # Per GET: Ottieni i dettagli del metodo di spedizione (se esiste)
             shipping_method = shipping_model.get_shipping_method_by_id(method_id, shop_subdomain) if method_id else {}
 
             # Log di debug per verificare i dati passati
-            print(f"Shipping Method: {shipping_method}")
-            print(f"Shop Subdomain: {shop_subdomain}")
+           logging.info(f"Shipping Method: {shipping_method}")
+           logging.info(f"Shop Subdomain: {shop_subdomain}")
 
             return render_template(
                 'admin/cms/pages/manage_shipping.html',
@@ -152,7 +154,7 @@ def update_shipping_method():
             else:
                 return jsonify({'success': False, 'message': 'Failed to update the shipping method.'}), 500
         except Exception as e:
-            print(f"Error updating shipping method: {e}")
+           logging.info(f"Error updating shipping method: {e}")
             return jsonify({'success': False, 'message': 'An error occurred.'}), 500
     return username
 

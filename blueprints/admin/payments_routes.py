@@ -3,6 +3,8 @@ from models.payments import Payments # importo la classe database
 from models.payment_methods import PaymentMethods
 from db_helpers import DatabaseHelper
 from helpers import check_user_authentication
+import logging
+logging.basicConfig(level=logging.INFO)
 
 db_helper = DatabaseHelper()
 
@@ -34,7 +36,7 @@ def payments():
         )
 
     except Exception as e:
-        print(f"Error rendering payments page: {e}")
+       logging.info(f"Error rendering payments page: {e}")
         return render_template('admin/cms/pages/error.html', title='Error 500' ,message="Unable to load payment methods"), 500
 
 @payments_bp.route('/admin/cms/pages/manage_payments/<method_name>', methods=['GET'])
@@ -57,7 +59,7 @@ def configure_payment_method(method_name):
         )
 
     except Exception as e:
-        print(f"Error loading payment method configuration: {e}")
+       logging.info(f"Error loading payment method configuration: {e}")
         return render_template('admin/cms/pages/error.html', message="Unable to load payment method configuration"), 500
 
 @payments_bp.route('/admin/cms/pages/update_payment_method', methods=['POST'])
@@ -97,7 +99,7 @@ def update_payment_method():
             return jsonify({'success': False, 'message': 'Failed to update payment method.'}), 500
     except Exception as e:
         import traceback
-        print(f"Error updating payment method: {e}")
+       logging.info(f"Error updating payment method: {e}")
         print(traceback.format_exc())
         return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500
     
@@ -139,7 +141,7 @@ def get_active_payment_methods():
         return jsonify({'success': True, 'methods': methods_info}), 200
 
     except Exception as e:
-        print(f"Error fetching active payment methods: {e}")
+       logging.info(f"Error fetching active payment methods: {e}")
         return jsonify({'success': False, 'error': 'Errore interno del server'}), 500
     
 @payments_bp.route('/admin/cms/pages/add_payment_method', methods=['POST'])
@@ -172,6 +174,6 @@ def add_payment_method():
         return jsonify({'success': True, 'message': f'{method_name} configured successfully.'})
     except Exception as e:
         import traceback
-        print(f"Error adding payment method: {e}")
+       logging.info(f"Error adding payment method: {e}")
         print(traceback.format_exc())
         return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500

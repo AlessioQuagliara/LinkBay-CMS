@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify
 from models.categories import Categories  # importo la classe database
 from db_helpers import DatabaseHelper
 from helpers import check_user_authentication
+import logging
+logging.basicConfig(level=logging.INFO)
 
 db_helper = DatabaseHelper()
 
@@ -26,5 +28,5 @@ def create_category():
             else:
                 return jsonify({'success': False, 'message': 'Failed to create category.'}), 500
     except Exception as e:
-        print(f"Error creating category: {e}")
+        logging.info(f"Error creating category: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500
