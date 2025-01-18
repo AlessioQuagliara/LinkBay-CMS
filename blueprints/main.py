@@ -133,13 +133,25 @@ def render_product(slug):
         script_content = web_settings.get('script', '')
         foot_content = web_settings.get('foot', '')
 
+        # Sostituisci manualmente le variabili nel contenuto della pagina
+        page_content = page['content']
+        page_content = page_content.replace('{{ product.name }}', product['name'])
+        page_content = page_content.replace('{{ product.price }}', str(product['price']))
+        page_content = page_content.replace('{{ product.short_description }}', product['short_description'])
+        page_content = page_content.replace('{{ product.description }}', product['description'])
+        page_content = page_content.replace('{{ product.stock_quantity }}', str(product['stock_quantity']))
+        if product.get('discount_price'):
+            page_content = page_content.replace('{{ product.discount_price }}', str(product['discount_price']))
+        else:
+            page_content = page_content.replace('{{ product.discount_price }}', '')
+
         # Render della pagina
         return render_template(
             'product.html',
             title=product['name'],
             description=product['short_description'],
             product=product,
-            page=page['content'],
+            page=page_content,  # Passa il contenuto processato
             images=product_images,  # Passa le immagini al template
             navbar=navbar_content,
             footer=footer_content,

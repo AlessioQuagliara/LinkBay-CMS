@@ -15,17 +15,17 @@ class DatabaseHelper:
         """
         if 'db' not in g:
             g.db = mysql.connector.connect(
-                #host='127.0.0.1',  # Configurazione del database principale
-                #user='root',
-                #password='root',
-                #database='CMS_DEF',
-                #port=8889
-                user="root",
-                password="root",
-                host="127.0.0.1",
-                database="cms_def",
-                port=3306,  # Usa la porta corretta per il database di produzione
-                auth_plugin='mysql_native_password'  # Specifica il plugin se necessario
+                host='127.0.0.1',  # Configurazione del database principale
+                user='root',
+                password='root',
+                database='CMS_DEF',
+                port=8889
+                #user="root",
+                #password="root",
+                #host="127.0.0.1",
+                #database="cms_def",
+                #port=3306,  # Usa la porta corretta per il database di produzione
+                #auth_plugin='mysql_native_password'  # Specifica il plugin se necessario
             )
         return g.db
 
@@ -35,17 +35,17 @@ class DatabaseHelper:
         """
         if 'auth_db' not in g:
             g.auth_db = mysql.connector.connect(
-                #host='127.0.0.1',
-                #user='root',         # Usa l'utente corretto
-                #password='root',      # Usa la password corretta
-                #database='CMS_INDEX', # Nome del database
-                #port=8889             # Porta corretta
-                user="root",
-                password="root",
-                host="127.0.0.1",
-                database="cms_index",
-                port=3306,  # Usa la porta corretta per il database di produzione
-                auth_plugin='mysql_native_password'  # Specifica il plugin se necessario
+                host='127.0.0.1',
+                user='root',         # Usa l'utente corretto
+                password='root',      # Usa la password corretta
+                database='CMS_INDEX', # Nome del database
+                port=8889             # Porta corretta
+                #user="root",
+                #password="root",
+                #host="127.0.0.1",
+                #database="cms_index",
+                #port=3306,  # Usa la porta corretta per il database di produzione
+                #auth_plugin='mysql_native_password'  # Specifica il plugin se necessario
             )
         return g.auth_db
 

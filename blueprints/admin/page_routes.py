@@ -82,12 +82,13 @@ def edit_code_page(slug):
         
         pages = page_model.get_all_pages(shop_subdomain)  
         page = page_model.get_page_by_slug(slug, shop_subdomain) 
+
         
         if page:
             content = page.get('content', '')  
             return render_template('admin/cms/store_editor/code_editor.html', 
                                    title=page['title'], 
-                                   pages=pages, 
+                                   pages=pages,
                                    page=page, 
                                    slug=slug,  
                                    content=content, 

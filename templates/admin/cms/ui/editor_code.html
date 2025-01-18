@@ -1,3 +1,42 @@
+<!-- Commands Modal -->
+<div class="modal fade" id="commandsModal" tabindex="-999" aria-labelledby="commandsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="commandsModalLabel">
+                    <i class="fa-solid fa-terminal"></i>&nbsp; Commands
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <!-- Commands Content -->
+                <ul class="list-unstyled">
+                    <li><strong>Print Product Name:</strong> Displays the current product's name. Example: <code>product.name</code></li>
+                    <hr>
+                    <li><strong>Print Product Description:</strong> Displays the product description. Example: <code>product.description </code></li>
+                    <hr>
+                    <li><strong>Print Product Price:</strong> Displays the product price. Example: <code>product.price</code></li>
+                    <hr>
+                    <li><strong>Print Product Discount Price:</strong> Displays the discount price (if available). Example: <code>product.discount_price </code></li>
+                    <hr>
+                    <li><strong>Print Product Stock Quantity:</strong> Displays the quantity available in stock. Example: <code>product.stock_quantity </code></li>
+                    <hr>
+                    <li><strong>Print Product Keywords:</strong> Displays the list of keywords associated with the product. Example: <code>product.keywords | join(', ') </code></li>
+                    <hr>
+                    <li><strong>Print Product Image URL:</strong> Displays the URL of the product image. Example: <code>product.image_url </code></li>
+                    <hr>
+                    <li><strong>Check if Product is in Stock:</strong> Displays "In Stock" if the stock quantity is greater than 0. Example: 
+                        <code> if product.stock_quantity > 0 In Stock else Out of Stock endif</code>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="editor-bar" class="d-flex flex-column flex-shrink-0 sidebar collapse">
     <a href="#" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
         <img src="{{ url_for('static', filename='images/lb-logo-w.svg') }}" width="200px" alt="Logo">
@@ -37,6 +76,14 @@
         </li>
         {% endfor %}
     </ul>
+    
+    <!-- Navigation Item -->
+    <li class="nav-item">
+        <a href="#" class="nav-link text-white" data-bs-toggle="modal" data-bs-target="#commandsModal">
+            <i class="fa-solid fa-terminal"></i>&nbsp; Commands
+        </a>
+    </li>
+    
     <hr>
     <button type="button" id="external-save-button" class="btn btn-danger mt-2">Save Page</button>
 </div>
@@ -117,5 +164,6 @@
         </div>
     </div>
 </div>
+
 
 {% include 'admin/cms/footing/admin_footing.html' %}
