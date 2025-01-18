@@ -1,4 +1,6 @@
 # METODI DI SPEDIZIONE ---------------------------------------------------------------------------------------------------
+import logging
+logging.basicConfig(level=logging.INFO)
 
 class ShippingMethods:
     def __init__(self, db_conn):
@@ -27,7 +29,7 @@ class ShippingMethods:
                 self.conn.commit()
                 return cursor.lastrowid
         except Exception as e:
-           logging.info(f"Error creating shipping method: {e}")
+            logging.info(f"Error creating shipping method: {e}")
             self.conn.rollback()
             return None
 
@@ -42,7 +44,7 @@ class ShippingMethods:
                 cursor.execute(query, (shop_name,))
                 return cursor.fetchall()
         except Exception as e:
-           logging.info(f"Error fetching shipping methods: {e}")
+            logging.info(f"Error fetching shipping methods: {e}")
             return []
 
     def update_shipping_method(self, method_id, data):
@@ -69,7 +71,7 @@ class ShippingMethods:
                 self.conn.commit()
                 return cursor.rowcount > 0
         except Exception as e:
-           logging.info(f"Error updating shipping method: {e}")
+            logging.info(f"Error updating shipping method: {e}")
             self.conn.rollback()
             return False
 
@@ -81,7 +83,7 @@ class ShippingMethods:
                 self.conn.commit()
                 return cursor.rowcount > 0  # Ritorna True se è stata eliminata almeno una riga
         except Exception as e:
-           logging.info(f"Error deleting shipping method: {e}")
+            logging.info(f"Error deleting shipping method: {e}")
             self.conn.rollback()
             return False
 
@@ -97,5 +99,5 @@ class ShippingMethods:
                 cursor.execute(query, (shipping_id, shop_name))
                 return cursor.fetchone()  # Ritorna un dizionario con i dettagli del metodo di spedizione
         except Exception as e:
-           logging.info(f"Error retrieving shipping method: {e}")
+            logging.info(f"Error retrieving shipping method: {e}")
             return None

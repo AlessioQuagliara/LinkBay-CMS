@@ -1,4 +1,6 @@
 # METODI DI PAGAMENTO ---------------------------------------------------------------------------------------------------
+import logging
+logging.basicConfig(level=logging.INFO)
 
 class PaymentMethods:
     def __init__(self, conn):
@@ -41,7 +43,7 @@ class PaymentMethods:
                 self.conn.commit()
                 return cursor.rowcount > 0  # Restituisce True se una riga è stata aggiornata
         except Exception as e:
-           logging.info(f"Error updating payment method: {e}")
+            logging.info(f"Error updating payment method: {e}")
             self.conn.rollback()
             return False
 
@@ -61,7 +63,7 @@ class PaymentMethods:
                 cursor.execute(query, (shop_name,))
                 return cursor.fetchall()
         except Exception as e:
-           logging.info(f"Error fetching payment methods: {e}")
+            logging.info(f"Error fetching payment methods: {e}")
             return []
 
     def delete_payment_method(self, method_id, shop_name):
@@ -75,7 +77,7 @@ class PaymentMethods:
                 self.conn.commit()
                 return cursor.rowcount > 0
         except Exception as e:
-           logging.info(f"Error deleting payment method: {e}")
+            logging.info(f"Error deleting payment method: {e}")
             self.conn.rollback()
             return False
 
@@ -94,7 +96,7 @@ class PaymentMethods:
                 cursor.execute(query, (method_id, shop_name))
                 return cursor.fetchone()
         except Exception as e:
-           logging.info(f"Error retrieving payment method: {e}")
+            logging.info(f"Error retrieving payment method: {e}")
             return None
         
     def get_payment_method(self, shop_name, method_name):
@@ -112,5 +114,5 @@ class PaymentMethods:
                 cursor.execute(query, (shop_name, method_name))
                 return cursor.fetchone()  # Restituisce un singolo risultato
         except Exception as e:
-           logging.info(f"Error retrieving payment method for {method_name} in {shop_name}: {e}")
+            logging.info(f"Error retrieving payment method for {method_name} in {shop_name}: {e}")
             return None

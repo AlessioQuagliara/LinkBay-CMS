@@ -1,4 +1,6 @@
 # Classe per Cookie e Policy --------------------------------------------------------------------------------------------
+import logging
+logging.basicConfig(level=logging.INFO)
 
 class CookiePolicy:
     def __init__(self, db_conn):
@@ -31,7 +33,7 @@ class CookiePolicy:
                 self.conn.commit()
             return True
         except Exception as e:
-           logging.info(f"Error updating internal cookie policy: {e}")
+            logging.info(f"Error updating internal cookie policy: {e}")
             self.conn.rollback()
             return False
 
@@ -52,7 +54,7 @@ class CookiePolicy:
                 self.conn.commit()
             return True
         except Exception as e:
-           logging.info(f"Error creating internal cookie policy: {e}")
+            logging.info(f"Error creating internal cookie policy: {e}")
             self.conn.rollback()
             return False
 
@@ -74,7 +76,7 @@ class CookiePolicy:
                 self.conn.commit()
             return True
         except Exception as e:
-           logging.info(f"Error updating third-party cookie policy: {e}")
+            logging.info(f"Error updating third-party cookie policy: {e}")
             self.conn.rollback()
             return False
 
@@ -93,6 +95,6 @@ class CookiePolicy:
                 self.conn.commit()
             return True
         except Exception as e:
-           logging.info(f"Error creating third-party cookie policy: {e}")
+            logging.info(f"Error creating third-party cookie policy: {e}")
             self.conn.rollback()
             return False

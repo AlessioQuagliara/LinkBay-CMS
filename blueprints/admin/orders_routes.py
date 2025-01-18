@@ -88,7 +88,7 @@ def manage_order(order_id):
                     else:
                         return jsonify({'status': 'error', 'message': 'Failed to save the order.'})
                 except Exception as e:
-                   logging.info(f"Error managing order: {e}")
+                    logging.info(f"Error managing order: {e}")
                     return jsonify({'status': 'error', 'message': 'An error occurred.'})
 
             order = order_model.get_order_by_id(shop_subdomain, order_id) if order_id else {}
@@ -144,7 +144,7 @@ def manage_order_list(order_id=None):
                     else:
                         return jsonify({'status': 'error', 'message': 'Failed to save the order.'})
                 except Exception as e:
-                   logging.info(f"Error managing order: {e}")
+                    logging.info(f"Error managing order: {e}")
                     return jsonify({'status': 'error', 'message': 'An error occurred.'})
 
             # Dati ordine
@@ -208,7 +208,7 @@ def create_order():
             return jsonify({'success': False, 'message': 'Failed to create order.'}), 500
     except Exception as e:
         import traceback
-       logging.info(f"Error creating order: {e}")
+        logging.info(f"Error creating order: {e}")
         print(traceback.format_exc())  
         return jsonify({'success': False, 'message': f'An error occurred: {e}'}), 500
     
@@ -230,7 +230,7 @@ def delete_order():
 
         return jsonify({'success': True, 'message': 'Selected orders deleted successfully.'})
     except Exception as e:
-       logging.info(f"Error deleting orders: {e}")
+        logging.info(f"Error deleting orders: {e}")
         return jsonify({'success': False, 'message': 'An error occurred during deletion.'}), 500
     
 @orders_bp.route('/admin/cms/update_order', methods=['POST'])
@@ -261,7 +261,7 @@ def update_order():
                 return jsonify({'success': False, 'message': 'Failed to update the order.'}), 500
 
     except Exception as e:
-       logging.info(f"Error updating order: {e}")
+        logging.info(f"Error updating order: {e}")
         return jsonify({'success': False, 'message': 'An error occurred while updating the order.'}), 500
     
 @orders_bp.route('/admin/cms/customers', methods=['GET'])
@@ -274,7 +274,7 @@ def get_customers():
         
         return jsonify({'success': True, 'customers': customers})
     except Exception as e:
-       logging.info(f"Error fetching customers: {e}")
+        logging.info(f"Error fetching customers: {e}")
         return jsonify({'success': False, 'message': 'Failed to fetch customers.'}), 500
     
 
@@ -289,7 +289,7 @@ def get_customer_details(customer_id):
             else:
                 return jsonify({'success': False, 'message': 'Customer not found.'}), 404
     except Exception as e:
-       logging.info(f"Error fetching customer details: {e}")
+        logging.info(f"Error fetching customer details: {e}")
         return jsonify({'success': False, 'message': 'An error occurred while fetching customer details.'}), 500
 
 @orders_bp.route('/admin/cms/add_product_to_order', methods=['POST'])
@@ -310,7 +310,7 @@ def add_product_to_order():
         status_code = 200 if result['success'] else 400
         return jsonify(result), status_code
     except Exception as e:
-       logging.info(f"Error in add_product_to_order route: {e}")
+        logging.info(f"Error in add_product_to_order route: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500
     
 @orders_bp.route('/admin/cms/remove_products_from_order', methods=['POST'])
@@ -332,7 +332,7 @@ def remove_products_from_order():
             else:
                 return jsonify({'success': False, 'message': 'Failed to remove products.'})
     except Exception as e:
-       logging.info(f"Error removing products from order: {e}")
+        logging.info(f"Error removing products from order: {e}")
         return jsonify({'success': False, 'message': 'An error occurred.'}), 500
     
 @orders_bp.route('/admin/cms/get_products_by_ids', methods=['POST'])
@@ -353,7 +353,7 @@ def get_products_by_ids():
         else:
             return jsonify({'success': False, 'message': 'No products found.'}), 404
     except Exception as e:
-       logging.info(f"Error retrieving products by IDs: {e}")
+        logging.info(f"Error retrieving products by IDs: {e}")
         return jsonify({'success': False, 'message': 'An error occurred while fetching products.'}), 500
     
 @orders_bp.route('/admin/cms/add_products_to_order', methods=['POST'])
@@ -375,7 +375,7 @@ def add_products_to_order():
             else:
                 return jsonify({'success': False, 'message': 'Failed to add products to order.'})
     except Exception as e:
-       logging.info(f"Error adding products to order: {e}")
+        logging.info(f"Error adding products to order: {e}")
         return jsonify({'success': False, 'message': 'An error occurred.'}), 500
     
 @orders_bp.route('/admin/cms/update_order_quantities', methods=['POST'])
@@ -397,7 +397,7 @@ def update_order_quantities():
         else:
             return jsonify({'success': False, 'message': 'Failed to update quantities.'})
     except Exception as e:
-       logging.info(f"Error updating order quantities: {e}")
+        logging.info(f"Error updating order quantities: {e}")
         return jsonify({'success': False, 'message': 'An error occurred.'}), 500
     
 

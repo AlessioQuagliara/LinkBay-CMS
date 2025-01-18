@@ -1,4 +1,7 @@
 # Classe per ShopList ---------------------------------------------------------------------------------------------------
+import logging
+logging.basicConfig(level=logging.INFO)
+
 class ShopList:
     def __init__(self, db_conn):
         self.conn = db_conn
@@ -43,7 +46,7 @@ class ShopList:
             self.conn.commit()
             return cursor.rowcount > 0  # Restituisce True se almeno una riga è stata aggiornata
         except Exception as e:
-           logging.info(f"Error updating shop domain: {e}")
+            logging.info(f"Error updating shop domain: {e}")
             self.conn.rollback()
             return False
         finally:

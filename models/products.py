@@ -1,4 +1,6 @@
 # Classe per PRODOTTI --------------------------------------------------------------------------------------------
+import logging
+logging.basicConfig(level=logging.INFO)
 
 class Products:
     def __init__(self, db_conn):
@@ -36,7 +38,7 @@ class Products:
                 """, (shop_name,))
                 return cursor.fetchall()
             except Exception as e:
-               logging.info(f"Error fetching products for shop: {e}")
+                logging.info(f"Error fetching products for shop: {e}")
                 return []
 
     # Metodo per ottenere un prodotto per slug
@@ -46,7 +48,7 @@ class Products:
                 cursor.execute("SELECT * FROM products WHERE slug = %s AND shop_name = %s", (slug, shop_name))
                 return cursor.fetchone()
             except Exception as e:
-               logging.info(f"Error fetching product by slug: {e}")
+                logging.info(f"Error fetching product by slug: {e}")
                 return None
 
     # Metodo per gestire i prodotti
@@ -66,7 +68,7 @@ class Products:
                 self.conn.commit()
                 return True
             except Exception as e:
-               logging.info(f"Error creating product: {e}")
+                logging.info(f"Error creating product: {e}")
                 self.conn.rollback()
                 return False
 
@@ -91,7 +93,7 @@ class Products:
                 self.conn.commit()
                 return True
             except Exception as e:
-               logging.info(f"Database Error: {e}")
+                logging.info(f"Database Error: {e}")
                 self.conn.rollback()
                 return False
 
@@ -101,7 +103,7 @@ class Products:
                 cursor.execute("SELECT * FROM products WHERE id = %s", (product_id,))
                 return cursor.fetchone()
             except Exception as e:
-               logging.info(f"Error fetching product: {e}")
+                logging.info(f"Error fetching product: {e}")
                 return None
 
     def create_product(self, data):
@@ -125,7 +127,7 @@ class Products:
                 self.conn.commit()
                 return cursor.lastrowid
             except Exception as e:
-               logging.info(f"Error creating product: {e}")
+                logging.info(f"Error creating product: {e}")
                 self.conn.rollback()
                 return None
 
@@ -137,7 +139,7 @@ class Products:
                 self.conn.commit()
                 return True
             except Exception as e:
-               logging.info(f"Error deleting product: {e}")
+                logging.info(f"Error deleting product: {e}")
                 self.conn.rollback()
                 return False
 
@@ -148,7 +150,7 @@ class Products:
                 cursor.execute("SELECT * FROM products WHERE category_id = %s", (category_id,))
                 return cursor.fetchall()
             except Exception as e:
-               logging.info(f"Error fetching products by category: {e}")
+                logging.info(f"Error fetching products by category: {e}")
                 return []
 
     # Metodo per ottenere i prodotti per brand
@@ -158,7 +160,7 @@ class Products:
                 cursor.execute("SELECT * FROM products WHERE brand_id = %s", (brand_id,))
                 return cursor.fetchall()
             except Exception as e:
-               logging.info(f"Error fetching products by brand: {e}")
+                logging.info(f"Error fetching products by brand: {e}")
                 return []
 
     # Metodo per ottenere le categorie
@@ -168,7 +170,7 @@ class Products:
                 cursor.execute("SELECT * FROM categories WHERE shop_name = %s", (shop_name,))
                 return cursor.fetchall()
             except Exception as e:
-               logging.info(f"Error fetching categories: {e}")
+                logging.info(f"Error fetching categories: {e}")
                 return []
 
     # Metodo per ottenere gli attributi di un prodotto
@@ -178,7 +180,7 @@ class Products:
                 cursor.execute("SELECT * FROM product_attributes WHERE product_id = %s", (product_id,))
                 return cursor.fetchall()
             except Exception as e:
-               logging.info(f"Error fetching product attributes: {e}")
+                logging.info(f"Error fetching product attributes: {e}")
                 return []
 
     # Metodo per aggiungere un attributo a un prodotto
@@ -192,7 +194,7 @@ class Products:
                 self.conn.commit()
                 return True
             except Exception as e:
-               logging.info(f"Error adding product attribute: {e}")
+                logging.info(f"Error adding product attribute: {e}")
                 self.conn.rollback()
                 return False
 
@@ -203,7 +205,7 @@ class Products:
                 cursor.execute("SELECT * FROM product_images WHERE product_id = %s", (product_id,))
                 return cursor.fetchall()
             except Exception as e:
-               logging.info(f"Error fetching product images: {e}")
+                logging.info(f"Error fetching product images: {e}")
                 return []
 
     # Metodo per aggiungere un'immagine a un prodotto
@@ -217,7 +219,7 @@ class Products:
                 self.conn.commit()
                 return cursor.lastrowid  # Restituisci l'ID del record appena inserito
             except Exception as e:
-               logging.info(f"Error adding product image: {e}")
+                logging.info(f"Error adding product image: {e}")
                 self.conn.rollback()
                 return None
 
@@ -231,10 +233,10 @@ class Products:
                 """
                 cursor.execute(sql, ('%' + query + '%', shop_subdomain))
                 products = cursor.fetchall()
-               logging.info(f"SQL Result: {products}")  # Debug
+                logging.info(f"SQL Result: {products}")  # Debug
                 return products
             except Exception as e:
-               logging.info(f"Error in search_products: {e}")
+                logging.info(f"Error in search_products: {e}")
                 return []
 
     def get_products_by_ids(self, product_ids):
@@ -248,7 +250,7 @@ class Products:
                 )
                 return cursor.fetchall()
             except Exception as e:
-               logging.info(f"Error fetching products: {e}")
+                logging.info(f"Error fetching products: {e}")
                 return []
 
     def get_images_for_products(self, product_ids):
@@ -262,5 +264,5 @@ class Products:
                 cursor.execute(query, product_ids)
                 return cursor.fetchall()
             except Exception as e:
-               logging.info(f"Error retrieving product images: {e}")
+                logging.info(f"Error retrieving product images: {e}")
                 return []

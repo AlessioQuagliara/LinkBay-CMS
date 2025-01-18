@@ -1,4 +1,6 @@
 # CATEGORIE ---------------------------------------------------------------------------------------------------
+import logging
+logging.basicConfig(level=logging.INFO)
 
 class Categories:
     def __init__(self, db_conn):
@@ -11,7 +13,7 @@ class Categories:
                 cursor.execute(query, (shop_name,))
                 return cursor.fetchall()
             except Exception as e:
-               logging.info(f"Error fetching categories: {e}")
+                logging.info(f"Error fetching categories: {e}")
                 return []
 
     def get_category_by_id(self, category_id):
@@ -21,7 +23,7 @@ class Categories:
                 cursor.execute(query, (category_id,))
                 return cursor.fetchone()
             except Exception as e:
-               logging.info(f"Error fetching category by ID: {e}")
+                logging.info(f"Error fetching category by ID: {e}")
                 return None
 
     def create_category(self, shop_name, name, parent_id=None):
@@ -35,7 +37,7 @@ class Categories:
                 self.conn.commit()
                 return cursor.lastrowid
             except Exception as e:
-               logging.info(f"Error creating category: {e}")
+                logging.info(f"Error creating category: {e}")
                 self.conn.rollback()
                 return None
 
@@ -57,7 +59,7 @@ class Categories:
                 self.conn.commit()
                 return True
             except Exception as e:
-               logging.info(f"Error updating category: {e}")
+                logging.info(f"Error updating category: {e}")
                 self.conn.rollback()
                 return False
 
@@ -69,7 +71,7 @@ class Categories:
                 self.conn.commit()
                 return True
             except Exception as e:
-               logging.info(f"Error deleting category: {e}")
+                logging.info(f"Error deleting category: {e}")
                 self.conn.rollback()
                 return False
 
@@ -80,5 +82,5 @@ class Categories:
                 cursor.execute(query, (parent_id,))
                 return cursor.fetchall()
             except Exception as e:
-               logging.info(f"Error fetching subcategories: {e}")
+                logging.info(f"Error fetching subcategories: {e}")
                 return []

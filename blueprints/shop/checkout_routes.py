@@ -8,6 +8,10 @@ from db_helpers import DatabaseHelper
 db_helper = DatabaseHelper()
 from helpers import check_user_authentication
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
+
 # Blueprint
 checkout_bp = Blueprint('checkout', __name__)
 
@@ -90,5 +94,5 @@ def get_shipping_methods():
 
             return jsonify(shipping_methods), 200
     except Exception as e:
-       logging.info(f"Errore durante il recupero dei metodi di spedizione: {e}")
+        logging.info(f"Errore durante il recupero dei metodi di spedizione: {e}")
         return jsonify({'error': 'Impossibile recuperare i metodi di spedizione'}), 500

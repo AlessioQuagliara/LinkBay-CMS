@@ -1,4 +1,6 @@
 # CATEGORIE ---------------------------------------------------------------------------------------------------
+import logging
+logging.basicConfig(level=logging.INFO) 
 
 class Domain:
     def __init__(self, db_conn):
@@ -11,5 +13,5 @@ class Domain:
                 cursor.execute(query, (shop_name,))
                 return cursor.fetchall()
             except Exception as e:
-               logging.info(f"Error fetching categories: {e}")
+                logging.info(f"Error fetching categories: {e}")
                 return []

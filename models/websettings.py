@@ -1,4 +1,6 @@
 # Classe per Web_Settings --------------------------------------------------------------------------------------------
+import logging
+logging.basicConfig(level=logging.INFO)
 
 class WebSettings:
     def __init__(self, db_conn):
@@ -26,5 +28,5 @@ class WebSettings:
             return True
         except Exception as e:
             self.conn.rollback()
-           logging.info(f"Error updating web settings: {e}")
+            logging.info(f"Error updating web settings: {e}")
             return False

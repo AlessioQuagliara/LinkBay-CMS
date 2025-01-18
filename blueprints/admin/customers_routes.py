@@ -70,7 +70,7 @@ def create_customer():
             'customer_id': new_customer_id
         })
     except Exception as e:
-       logging.info(f"Error creating customer: {e}")
+        logging.info(f"Error creating customer: {e}")
         return jsonify({'success': False, 'message': 'Failed to create Customer.'}), 500
     
 @customers_bp.route('/admin/cms/pages/customer/<int:customer_id>', methods=['GET', 'POST'])
@@ -94,7 +94,7 @@ def manage_customer(customer_id=None):
                     else:
                         return jsonify({'status': 'error', 'message': 'Failed to save the customer.'})
                 except Exception as e:
-                   logging.info(f"Error managing customer: {e}")
+                    logging.info(f"Error managing customer: {e}")
                     return jsonify({'status': 'error', 'message': 'An error occurred.'})
 
             # Per GET: Ottieni i dettagli del prodotto (se esiste)
@@ -103,8 +103,8 @@ def manage_customer(customer_id=None):
             shop_subdomain = request.host.split('.')[0]  
 
             # Log di debug per verificare i dati passati
-           logging.info(f"Customer: {customer}")
-           logging.info(f"Shop Subdomain: {shop_subdomain}")
+            logging.info(f"Customer: {customer}")
+            logging.info(f"Shop Subdomain: {shop_subdomain}")
 
             return render_template(
                 'admin/cms/pages/manage_customer.html',
@@ -137,7 +137,7 @@ def update_customer():
             return jsonify({'success': False, 'message': 'Failed to update customer.'}), 500
     except Exception as e:
         import traceback
-       logging.info(f"Error: {e}")
+        logging.info(f"Error: {e}")
         print(traceback.format_exc())
         return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500
     
@@ -161,7 +161,7 @@ def delete_customers():
 
         return jsonify({'success': True, 'message': 'Selected customers deleted successfully.'})
     except Exception as e:
-       logging.info(f"Error deleting customers: {e}")
+        logging.info(f"Error deleting customers: {e}")
         return jsonify({'success': False, 'message': 'An error occurred during deletion.'}), 500
 
 @customers_bp.route('/admin/cms/pages/marketing')

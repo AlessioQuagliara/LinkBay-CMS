@@ -1,6 +1,8 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # CLASSE PER GESTIONE UTENTI ---------------------------------------------------------------------------------------------------
+import logging
+logging.basicConfig(level=logging.INFO)
 
 class User:
     def __init__(self, db_conn):
@@ -13,7 +15,7 @@ class User:
                 users = cursor.fetchall()
             return users
         except Exception as e:
-           logging.info(f"Error fetching all users: {e}")
+            logging.info(f"Error fetching all users: {e}")
             return []
 
     def get_user_by_id(self, user_id):

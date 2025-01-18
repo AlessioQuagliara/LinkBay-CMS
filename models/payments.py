@@ -1,4 +1,6 @@
 # PAGAMENTI ---------------------------------------------------------------------------------------------------
+import logging
+logging.basicConfig(level=logging.INFO)
 
 class Payments:
     def __init__(self, db_conn):
@@ -17,7 +19,7 @@ class Payments:
                 cursor.execute(query, (order_id,))
                 return cursor.fetchall()
         except Exception as e:
-           logging.info(f"Error fetching payments: {e}")
+            logging.info(f"Error fetching payments: {e}")
             return []
 
     # Metodo per aggiungere un pagamento
@@ -40,6 +42,6 @@ class Payments:
                 self.conn.commit()
                 return cursor.lastrowid
         except Exception as e:
-           logging.info(f"Error adding payment: {e}")
+            logging.info(f"Error adding payment: {e}")
             self.conn.rollback()
             return None

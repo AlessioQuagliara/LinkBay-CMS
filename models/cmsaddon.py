@@ -1,4 +1,6 @@
 # Classe per i PLUGINS e gli ADDONS --------------------------------------------------------------------------------------------
+import logging
+logging.basicConfig(level=logging.INFO)
 
 class CMSAddon:
     def __init__(self, db_conn):
@@ -11,7 +13,7 @@ class CMSAddon:
                 cursor.execute("SELECT * FROM cms_addons WHERE type = %s", (addon_type,))
                 return cursor.fetchall()
             except Exception as e:
-               logging.info(f"Error fetching addons by type: {e}")
+                logging.info(f"Error fetching addons by type: {e}")
                 return []
 
     # Metodo per selezionare un addon per uno specifico negozio, aggiornando il suo stato
@@ -27,7 +29,7 @@ class CMSAddon:
                 
                 if result and result['status'] == 'purchased':
                     # Se l'add-on è già acquistato, non modificarlo
-                   logging.info(f"Addon {addon_id} is already purchased and cannot be re-selected.")
+                    logging.info(f"Addon {addon_id} is already purchased and cannot be re-selected.")
                     return False
                 
                 # Deseleziona altri addon dello stesso tipo per il negozio, eccetto quelli "purchased"
@@ -46,7 +48,7 @@ class CMSAddon:
                 self.conn.commit()
                 return True
             except Exception as e:
-               logging.info(f"Error selecting addon for shop: {e}")
+                logging.info(f"Error selecting addon for shop: {e}")
                 self.conn.rollback()
                 return False
 
@@ -62,7 +64,7 @@ class CMSAddon:
                 self.conn.commit()
                 return True
             except Exception as e:
-               logging.info(f"Error purchasing addon for shop: {e}")
+                logging.info(f"Error purchasing addon for shop: {e}")
                 self.conn.rollback()
                 return False
 
@@ -77,7 +79,7 @@ class CMSAddon:
                 result = cursor.fetchone()
                 return result['status'] if result else None
             except Exception as e:
-               logging.info(f"Error fetching addon status: {e}")
+                logging.info(f"Error fetching addon status: {e}")
                 return None
 
     def update_shop_addon_status(self, shop_name, addon_id, addon_type, status):
@@ -94,7 +96,7 @@ class CMSAddon:
                 self.conn.commit()
                 return True
             except Exception as e:
-               logging.info(f"Error updating shop addon status: {e}")
+                logging.info(f"Error updating shop addon status: {e}")
                 self.conn.rollback()
                 return False
 
@@ -109,7 +111,7 @@ class CMSAddon:
                 """, (shop_name, addon_type, addon_id))
                 self.conn.commit()
             except Exception as e:
-               logging.info(f"Error deselecting other addons: {e}")
+                logging.info(f"Error deselecting other addons: {e}")
                 self.conn.rollback()
 
     # Metodo per ottenere l'addon di tipo specificato con status 'selected' per uno shop
@@ -125,5 +127,5 @@ class CMSAddon:
                 """, (shop_name, addon_type))
                 return cursor.fetchone()  # Restituisce l'addon selezionato con nome e altri dettagli, o None
             except Exception as e:
-               logging.info(f"Error fetching selected addon: {e}")
+                logging.info(f"Error fetching selected addon: {e}")
                 return None

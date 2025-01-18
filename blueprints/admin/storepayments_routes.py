@@ -54,7 +54,7 @@ def create_checkout_session():
         return jsonify({'sessionId': session.id})
     
     except Exception as e:
-       logging.info(f"Error creating checkout session: {e}")
+        logging.info(f"Error creating checkout session: {e}")
         return jsonify(error=str(e)), 500
     
 @storepayments_bp.route('/subscription/success')

@@ -57,7 +57,7 @@ def create_collection():
             'collection_id': new_collection_id
         })
     except Exception as e:
-       logging.info(f"Error creating collection: {e}")
+        logging.info(f"Error creating collection: {e}")
         return jsonify({'success': False, 'message': 'Failed to create Collection.'}), 500
     
 @collections_bp.route('/admin/cms/pages/collection/<int:collection_id>', methods=['GET', 'POST'])
@@ -81,7 +81,7 @@ def manage_collection(collection_id=None):
                     else:
                         return jsonify({'status': 'error', 'message': 'Failed to save the collection.'})
                 except Exception as e:
-                   logging.info(f"Error managing collection: {e}")
+                    logging.info(f"Error managing collection: {e}")
                     return jsonify({'status': 'error', 'message': 'An error occurred.'})
 
             # Per GET: Ottieni i dettagli del prodotto (se esiste)
@@ -93,8 +93,8 @@ def manage_collection(collection_id=None):
             shop_subdomain = request.host.split('.')[0]  
 
             # Log di debug per verificare i dati passati
-           logging.info(f"Collection: {collection}")
-           logging.info(f"Shop Subdomain: {shop_subdomain}")
+            logging.info(f"Collection: {collection}")
+            logging.info(f"Shop Subdomain: {shop_subdomain}")
 
             return render_template(
                 'admin/cms/pages/manage_collection.html',
@@ -163,7 +163,7 @@ def delete_products_from_collection():
         else:
             return jsonify({'success': False, 'message': 'Failed to remove products.'})
     except Exception as e:
-       logging.info(f"Error: {e}")
+        logging.info(f"Error: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500
     
 @collections_bp.route('/admin/cms/add_products_to_collection', methods=['POST'])
@@ -185,7 +185,7 @@ def add_products_to_collection():
         else:
             return jsonify({'success': False, 'message': 'Failed to add products.'})
     except Exception as e:
-       logging.info(f"Error: {e}")
+        logging.info(f"Error: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500
 
 @collections_bp.route('/admin/cms/search_products', methods=['GET'])
@@ -193,8 +193,8 @@ def search_products():
     query = request.args.get('query', '').strip()
     shop_subdomain = request.host.split('.')[0]
 
-   logging.info(f"Search query: {query}")
-   logging.info(f"Shop subdomain: {shop_subdomain}")
+    logging.info(f"Search query: {query}")
+    logging.info(f"Shop subdomain: {shop_subdomain}")
 
     if not query:
         return jsonify({'success': False, 'message': 'No search term provided.'}), 400
@@ -203,7 +203,7 @@ def search_products():
         product_model = Products(db_conn)
         products = product_model.search_products(query, shop_subdomain)
     
-   logging.info(f"Found products: {products}")
+    logging.info(f"Found products: {products}")
     return jsonify({'success': True, 'products': products})
 
 @collections_bp.route('/admin/cms/add_product_to_collection', methods=['POST'])
@@ -225,7 +225,7 @@ def add_product_to_collection():
         else:
             return jsonify({'success': False, 'message': 'Failed to add product.'})
     except Exception as e:
-       logging.info(f"Error adding product to collection: {e}")
+        logging.info(f"Error adding product to collection: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500
 
 
@@ -247,7 +247,7 @@ def delete_collection():
 
         return jsonify({'success': True, 'message': 'Selected collections deleted successfully.'})
     except Exception as e:
-       logging.info(f"Error deleting collections: {e}")
+        logging.info(f"Error deleting collections: {e}")
         return jsonify({'success': False, 'message': 'An error occurred during deletion.'}), 500
 
 @collections_bp.route('/admin/cms/update_collection', methods=['POST'])
@@ -277,7 +277,7 @@ def update_collection():
         else:
             return jsonify({'success': False, 'message': 'Failed to update the collection.'}), 500
     except Exception as e:
-       logging.info(f"Error: {e}")
+        logging.info(f"Error: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500
 
 @collections_bp.route('/admin/cms/upload_image_collection', methods=['POST'])
@@ -308,7 +308,7 @@ def upload_image_collection():
         else:
             return jsonify({'success': False, 'message': 'Failed to save image to database.'}), 500
     except Exception as e:
-       logging.info(f"Error uploading image: {e}")
+        logging.info(f"Error uploading image: {e}")
         return jsonify({'success': False, 'message': 'An error occurred during upload.'}), 500
 
 @collections_bp.route('/admin/cms/delete_image_collection', methods=['POST'])
@@ -334,7 +334,7 @@ def delete_image_collection():
 
         return jsonify({'success': True, 'message': 'Image deleted successfully.'})
     except Exception as e:
-       logging.info(f"Error deleting image: {e}")
+        logging.info(f"Error deleting image: {e}")
         return jsonify({'success': False, 'message': 'An error occurred during deletion.'}), 500
     
 @collections_bp.route('/api/collections', methods=['GET'])
@@ -350,6 +350,6 @@ def get_collections():
         collections = collection_model.get_collections_by_shop(shop_name)
         return jsonify({'success': True, 'collections': collections})
     except Exception as e:
-       logging.info(f"Error fetching collections: {e}")
+        logging.info(f"Error fetching collections: {e}")
         return jsonify({'success': False, 'message': 'An error occurred'}), 500
     

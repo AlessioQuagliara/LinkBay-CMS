@@ -1,4 +1,6 @@
 # CLASSE PER ORDINI ---------------------------------------------------------------------------------------------------
+import logging
+logging.basicConfig(level=logging.INFO)
 
 class Orders:
     def __init__(self, db_conn):
@@ -13,7 +15,7 @@ class Orders:
                 self.conn.commit()
                 return True
         except Exception as e:
-           logging.info(f"Error deleting order: {e}")
+            logging.info(f"Error deleting order: {e}")
             self.conn.rollback()
             return False
 
@@ -48,7 +50,7 @@ class Orders:
                 print("Order ID created:", order_id)  # Log dell'ID creato
                 return order_id
         except Exception as e:
-           logging.info(f"Error in create_order: {e}")  # Log dell'errore
+            logging.info(f"Error in create_order: {e}")  # Log dell'errore
             self.conn.rollback()
             return None
 
@@ -75,7 +77,7 @@ class Orders:
 
                 return order  # Ritorna i dati della tabella orders
         except Exception as e:
-           logging.info(f"Error fetching order: {e}")
+            logging.info(f"Error fetching order: {e}")
             return None
 
     # Metodo per aggiornare lo stato di un ordine
@@ -103,7 +105,7 @@ class Orders:
                 self.conn.commit()
                 return True
         except Exception as e:
-           logging.info(f"Error updating order: {e}")
+            logging.info(f"Error updating order: {e}")
             self.conn.rollback()
             return False
 
@@ -122,7 +124,7 @@ class Orders:
                 cursor.execute(query, (shop_name,))
                 return cursor.fetchall()
         except Exception as e:
-           logging.info(f"Error fetching orders: {e}")
+            logging.info(f"Error fetching orders: {e}")
             return []
 
     def get_order_items(self, order_id):
@@ -145,7 +147,7 @@ class Orders:
                 cursor.execute(query, (order_id,))
                 return cursor.fetchall()
         except Exception as e:
-           logging.info(f"Error retrieving order items: {e}")
+            logging.info(f"Error retrieving order items: {e}")
             return []
 
     # Metodo per aggiungere un prodotto a un ordine
@@ -172,7 +174,7 @@ class Orders:
 
                 return {'success': True, 'message': 'Product added successfully.'}
         except Exception as e:
-           logging.info(f"Error adding product to order: {e}")
+            logging.info(f"Error adding product to order: {e}")
             self.conn.rollback()
             return {'success': False, 'message': 'An error occurred while adding the product.'}
 
@@ -190,7 +192,7 @@ class Orders:
                 self.conn.commit()
                 return cursor.rowcount > 0  # True se almeno una riga è stata eliminata
         except Exception as e:
-           logging.info(f"Error removing order items: {e}")
+            logging.info(f"Error removing order items: {e}")
             self.conn.rollback()
             return False
 
@@ -209,7 +211,7 @@ class Orders:
                 self.conn.commit()
                 return True
         except Exception as e:
-           logging.info(f"Error adding multiple order items: {e}")
+            logging.info(f"Error adding multiple order items: {e}")
             self.conn.rollback()
             return False
 
@@ -227,6 +229,6 @@ class Orders:
                 self.conn.commit()
                 return True
         except Exception as e:
-           logging.info(f"Error updating order item quantities: {e}")
+            logging.info(f"Error updating order item quantities: {e}")
             self.conn.rollback()
             return False
