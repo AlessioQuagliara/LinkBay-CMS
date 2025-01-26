@@ -30,7 +30,7 @@ def edit_web_settings():
             )
         else:
             flash('Web settings not found for this shop.', 'danger')
-            return redirect(url_for('homepage'))
+            return redirect(url_for('ui.homepage'))
         
     return redirect(url_for('login'))  
 

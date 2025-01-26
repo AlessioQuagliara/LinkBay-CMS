@@ -14,10 +14,12 @@ db_helper = DatabaseHelper()
 from blueprints.admin import register_admin_blueprints
 from blueprints.shop import register_user_blueprints
 from blueprints.main import main_bp
+from errors import register_error_handlers 
 
 app.register_blueprint(main_bp)
 register_admin_blueprints(app)
 register_user_blueprints(app)
+register_error_handlers(app)
 
 
 # Gestione della connessione al database globale

@@ -54,18 +54,17 @@ def online_content():
                             minutes_ago=int(minutes_ago)  
                         )
                     else:
-                        flash('Contenuto della pagina non trovato.')
-                        return redirect(url_for('homepage'))
+                        return redirect(url_for('cmsaddon.theme_ui'))
 
             else:
                 print("Nessun negozio trovato.")  # Log per negozio non trovato
                 flash('Nessun negozio trovato per questo nome.')
-                return redirect(url_for('homepage'))
+                return redirect(url_for('ui.homepage'))
 
         except mysql.connector.Error as e:
             logging.info(f"Errore nel database: {str(e)}")  # Log del messaggio di errore
             flash('Errore durante l\'accesso ai dati del negozio o della pagina.')
-            return redirect(url_for('homepage'))
+            return redirect(url_for('ui.homepage'))
     
     return username
 
@@ -135,7 +134,7 @@ def editor_interface(slug=None):
 
         if not shop:
             flash('Nessun negozio selezionato o negozio non trovato.', 'danger')
-            return redirect(url_for('homepage'))
+            return redirect(url_for('ui.homepage'))
 
         page_model = Page(db_conn)
         pages = page_model.get_all_pages(shop_name=shop_subdomain)
@@ -177,7 +176,7 @@ def edit_page(slug):
 
         if not shop:
             flash('Nessun negozio selezionato o negozio non trovato.', 'danger')
-            return redirect(url_for('homepage'))
+            return redirect(url_for('ui.homepage'))
 
         # Recupera la lingua selezionata
         language = request.args.get('language', 'en')  # Default "en" se non è specificata
@@ -187,7 +186,7 @@ def edit_page(slug):
 
         if not page:
             flash('Pagina non trovata.', 'danger')
-            return redirect(url_for('homepage'))
+            return redirect(url_for('ui.homepage'))
 
         # Recupera il tema UI selezionato per lo shop
         addon_model = CMSAddon(db_conn)

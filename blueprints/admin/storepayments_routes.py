@@ -34,7 +34,9 @@ def subscription():
 @storepayments_bp.route('/subscription/checkout', methods=['POST'])
 def create_checkout_session():
     data = request.get_json()
-    plan_id = data.get('plan_id')  
+    plan_id = data.get('plan_id')
+
+    logging.info(f"Received plan_id: {plan_id}")  # Log per il debug
 
     if not plan_id:
         return jsonify(error="Invalid plan ID"), 400
@@ -47,14 +49,15 @@ def create_checkout_session():
                 'quantity': 1,
             }],
             mode='subscription',
-            success_url=url_for('subscription_success', _external=True) + '?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url=url_for('subscription_cancel', _external=True),
+            success_url=url_for('storepayments.subscription_success', _external=True) + '?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url=url_for('storepayments.subscription_cancel', _external=True),
         )
         
+        logging.info(f"Checkout session created: {session.id}")
         return jsonify({'sessionId': session.id})
     
     except Exception as e:
-        logging.info(f"Error creating checkout session: {e}")
+        logging.error(f"Error creating checkout session: {e}")
         return jsonify(error=str(e)), 500
     
 @storepayments_bp.route('/subscription/success')

@@ -19,8 +19,18 @@ domain_bp = Blueprint('domain', __name__)
 @domain_bp.route('/admin/cms/pages/domain')
 def domain():
     username = check_user_authentication()
+
+    shop_name = request.host.split('.')[0]
+
+    shoplist = ShopList(db_helper.get_auth_db_connection())
+    shop = shoplist.get_shop_by_name(shop_name)
+
     if isinstance(username, str):
-        return render_template('admin/cms/pages/domain.html', title='Domain', username=username)
+        return render_template('admin/cms/pages/domain.html',
+                                title='Domain',
+                                username=username,
+                                shop=shop
+                                )
     return username
 
 @domain_bp.route('/api/domains/search', methods=['POST'])
@@ -44,7 +54,7 @@ def search_domain():
                 'domains': [
                     {
                         'name': result['domain'],
-                        'price': f"${result['price'] / 1000000:.2f}"
+                        'price': result['price']
                     }
                 ]
             })

@@ -74,7 +74,7 @@ def login():
 
     if not shop:
         flash('Store not found for this domain or subdomain.', 'danger')
-        return redirect(url_for('login'))
+        return redirect(url_for('user.login'))
 
     shop_id = shop['id']  # Identifica lo store attuale per l'accesso
     shop_name = shop['shop_name']  # Per visualizzazione nel template
@@ -107,11 +107,11 @@ def login():
             else:
                 # Se l'utente non ha accesso a questo store
                 flash('Access denied for this store.', 'danger')
-                return redirect(url_for('login'))
+                return redirect(url_for('user.login'))
         else:
             # Se email o password non sono corretti
             flash('Login failed. Please check your email and password.', 'danger')
-            return redirect(url_for('login'))
+            return redirect(url_for('user.login'))
 
     # Passa shop_name al template per mostrare il nome dello store
     return render_template('admin/login.html', title='Login', shop_name=shop_name)
