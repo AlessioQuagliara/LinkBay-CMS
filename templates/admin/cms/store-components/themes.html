@@ -122,19 +122,20 @@
                             {% if addon.status == 'selected' %}
                                 <button class="btn btn-dark w-100" disabled>Selected</button>
                             {% elif addon.status == 'purchased' %}
-                                <button 
-                                    class="btn btn-danger w-100 confirm-purchase" 
-                                    data-addon-id="{{ addon.id }}" 
-                                    data-addon-type="{{ addon.type }}">
-                                    Buy for €{{ addon.price }}
-                                </button>
+                            <button 
+                                class="btn btn-outline-dark w-100 apply-theme" 
+                                data-theme-name="{{ addon.name }}" 
+                                data-addon-id="{{ addon.id }}" 
+                                data-addon-type="{{ addon.type }}">
+                                Download
+                            </button>
                             {% else %}
-                                <button 
-                                    class="btn btn-outline-dark w-100 confirm-select" 
-                                    data-addon-id="{{ addon.id }}" 
-                                    data-addon-type="{{ addon.type }}">
-                                    Select This
-                                </button>
+                            <button 
+                                class="btn btn-danger w-100 confirm-purchase" 
+                                data-addon-id="{{ addon.id }}" 
+                                data-addon-type="{{ addon.type }}">
+                                Buy for €{{ addon.price }}
+                            </button>
                             {% endif %}
                         </div>
                     </div>

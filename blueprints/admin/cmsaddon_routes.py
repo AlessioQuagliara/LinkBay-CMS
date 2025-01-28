@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify, session, url_for, redirect
 from models.cmsaddon import CMSAddon  # importo la classe database
+from models.page import Page  # importo la classe database
 from db_helpers import DatabaseHelper
 from helpers import check_user_authentication
 import logging
@@ -132,9 +133,28 @@ def purchase_addon():
     addon_type = data.get('addon_type')
     with db_helper.get_db_connection() as db_conn:
         addon_model = CMSAddon(db_conn)
-        success = addon_model.update_shop_addon_status(shop_name, addon_id, addon_type, 'paid')
+        success = addon_model.update_shop_addon_status(shop_name, addon_id, addon_type, 'purchased')
     if success:
         return jsonify({'status': 'success', 'message': 'Addon purchased successfully'})
     return jsonify({'status': 'error', 'message': 'Failed to purchase addon'}), 500
 
 
+@cmsaddon_bp.route('/api/apply-theme', methods=['POST'])
+def apply_theme():
+    data = request.get_json()
+    shop_name = request.host.split('.')[0]
+    theme_name = data.get('theme_name')
+
+    if not theme_name:
+        return jsonify({'status': 'error', 'message': 'Theme name is required'}), 400
+
+    try:
+        page_model = Page(db_helper.get_db_connection())
+        success = page_model.apply_theme(theme_name, shop_name)
+        if success:
+            return jsonify({'status': 'success', 'message': f"Theme '{theme_name}' applied successfully"})
+        else:
+            return jsonify({'status': 'error', 'message': 'Failed to apply theme'}), 500
+    except Exception as e:
+        logging.error(f"Error applying theme: {e}")
+        return jsonify({'status': 'error', 'message': 'Unexpected error occurred'}), 500

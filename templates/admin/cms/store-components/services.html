@@ -117,24 +117,22 @@
                             {% endif %}
                         </div>
                         <div class="card-footer bg-transparent border-0">
-                            {% if addon.status == 'purchased' %}
-                                <button class="btn btn-success w-100" disabled>Purchased</button>
-                            {% elif addon.status == 'selected' and addon.price > 0 %}
-                                <button 
-                                    class="btn btn-danger w-100 confirm-purchase" 
-                                    data-addon-id="{{ addon.id }}" 
-                                    data-addon-type="{{ addon.type }}">
-                                    Buy for €{{ addon.price }}
-                                </button>
-                            {% elif addon.status == 'selected' %}
+                            {% if addon.price == 'selected' %}
                                 <button class="btn btn-dark w-100" disabled>Selected</button>
-                            {% else %}
+                            {% elif addon.status == 'purchased' %}
                                 <button 
                                     class="btn btn-outline-dark w-100 confirm-select" 
                                     data-addon-id="{{ addon.id }}" 
                                     data-addon-type="{{ addon.type }}">
-                                    Select This
+                                    Apply This
                                 </button>
+                            {% else %}
+                            <button 
+                                class="btn btn-danger w-100 confirm-purchase" 
+                                data-addon-id="{{ addon.id }}" 
+                                data-addon-type="{{ addon.type }}">
+                                Buy for €{{ addon.price }}
+                            </button>
                             {% endif %}
                         </div>
                     </div>

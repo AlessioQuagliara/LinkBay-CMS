@@ -1,5 +1,5 @@
 # Classe per PAGES --------------------------------------------------------------------------------------------
-import logging
+import logging, os, json
 logging.basicConfig(level=logging.INFO)
 
 class Page:
@@ -190,3 +190,85 @@ class Page:
         except Exception as e:
             logging.info(f"Error fetching products by IDs: {e}")
             return []
+        
+    def apply_theme(self, theme_name, shop_name):
+        """
+        Applica un tema a un negozio: salva il nome del tema e importa le pagine associate
+        nella tabella `pages` e aggiorna la tabella `websettings` con i dati specifici del tema.
+        """
+        paid = 'Yes'
+        try:
+            # Percorso ai file predefiniti per i temi
+            theme_path = os.path.join('themes', f'{theme_name}.json')
+
+            # Leggi i dati del tema dal file JSON
+            with open(theme_path, 'r') as theme_file:
+                theme_data = json.load(theme_file)
+
+            # Estrai informazioni generali per `websettings`
+            head_content = theme_data.get('head', '')
+            foot_content = theme_data.get('foot', '')
+            script_content = theme_data.get('script', '')
+
+            with self.conn.cursor() as cursor:
+                # Inserisci o aggiorna i dati di `websettings`
+                cursor.execute(
+                    """INSERT INTO web_settings (shop_name, theme_name, google_analytics, facebook_pixel, tiktok_pixel, head, favicon, foot, script)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON DUPLICATE KEY UPDATE 
+                        theme_name = VALUES(theme_name),
+                        google_analytics = VALUES(google_analytics),
+                        facebook_pixel = VALUES(facebook_pixel),
+                        tiktok_pixel = VALUES(tiktok_pixel),
+                        head = VALUES(head),
+                        favicon = VALUES(favicon),
+                        foot = VALUES(foot),
+                        script = VALUES(script)""",
+                    (
+                        shop_name,
+                        theme_name,
+                        theme_data.get('google_analytics', ' '),  # Default value
+                        theme_data.get('facebook_pixel', ' '),    # Default value
+                        theme_data.get('tiktok_pixel', ' '),      # Default value
+                        head_content if head_content.strip() else ' ',  # Ensure non-empty
+                        theme_data.get('favicon', ' '),          # Default value
+                        foot_content if foot_content.strip() else ' ',  # Ensure non-empty
+                        script_content if script_content.strip() else ' ',  # Ensure non-empty
+                    )
+                )
+
+                # Inserisci o aggiorna le pagine nella tabella `pages`
+                for page in theme_data['pages']:
+                    if not all(key in page for key in ['title', 'slug', 'content']):
+                        logging.error(f"Missing required fields in page: {page}")
+                        continue
+
+                    logging.info(f"Inserting page: {page['title']} for shop: {shop_name}")
+
+                    cursor.execute(
+                        """INSERT INTO pages 
+                        (title, description, keywords, slug, content, theme_name, paid, language, published, shop_name, created_at, updated_at)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+                        ON DUPLICATE KEY UPDATE 
+                        content = VALUES(content), 
+                        updated_at = NOW()""",
+                        (
+                            page.get('title', ''),
+                            page.get('description', None),
+                            page.get('keywords', None),
+                            page.get('slug', ''),
+                            page.get('content', None),
+                            theme_name,
+                            paid,
+                            page.get('language', None),
+                            1 if page.get('published', True) else 0,
+                            shop_name,
+                        )
+                    )
+
+                self.conn.commit()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            logging.error(f"Error applying theme '{theme_name}' for shop '{shop_name}': {e}")
+            return False

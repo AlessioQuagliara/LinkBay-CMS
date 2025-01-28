@@ -79,3 +79,42 @@
         });
     });
 </script>
+
+<script>
+document.querySelectorAll('.apply-theme').forEach(button => {
+    button.addEventListener('click', function () {
+        const themeName = this.getAttribute('data-theme-name');
+        const addonId = this.getAttribute('data-addon-id');
+        const addonType = this.getAttribute('data-addon-type');
+
+        // Conferma dell'azione
+        Swal.fire({
+            title: 'Apply Theme',
+            text: `Are you sure you want to apply the theme "${themeName}"?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, apply it!'
+        }).then(result => {
+            if (result.isConfirmed) {
+                // Invio della richiesta al server
+                fetch('/api/apply-theme', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ theme_name: themeName, addon_id: addonId, addon_type: addonType })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        Swal.fire('Success', data.message, 'success').then(() => {
+                            location.reload(); // Ricarica la pagina
+                        });
+                    } else {
+                        Swal.fire('Error', data.message, 'error');
+                    }
+                })
+                .catch(err => Swal.fire('Error', 'Failed to apply theme', 'error'));
+            }
+        });
+    });
+});
+</script>
