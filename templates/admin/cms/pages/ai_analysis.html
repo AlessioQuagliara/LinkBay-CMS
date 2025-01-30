@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkBay AI Analysis</title>
+    {% include 'admin/cms/heading/admin_head.html' %}
+
+    <style>
+        body {
+            background-image: url('../../../static/images/background.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            color: black;
+            border-radius: 10px;
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        .btn-danger {
+            background-color: #ff5757;
+            border: none;
+        }
+        .typing {
+            border-right: 3px solid white;
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 2.5s steps(40, end), blink 0.7s infinite;
+        }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: block;
+        }
+        .loading-bar {
+            width: 100%;
+            height: 5px;
+            background: #ddd;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+            display: none;
+        }
+        .loading-bar::before {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 100%;
+            background: #ff5757;
+            animation: loading 3s linear infinite;
+        }
+        .progress, .progress-stacked {
+            --bs-progress-bar-bg: #ff5757 !important;
+        }
+        @keyframes loading {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        /* Fix per il testo che esce dalla card */
+        #ai-advice {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+            display: block;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <img class="mb-4" src="../../../static/images/lb-logo.svg" width="230px" alt="Logo LinkBay">
+        <h1 class="h3 mb-3">LinkBay AI Setup</h1>
+        <div class="progress mb-3">
+            <div class="progress-bar" id="progressBar" style="width: 33%;"></div>
+        </div>
+
+        <!-- STEP 1: IA Presentazione -->
+        <div class="step active" id="step-1">
+            <p class="typing">I am LinkBay AI, and I am here to help grow your business.</p>
+            <br><br>
+            <button class="btn btn-danger w-100" onclick="nextStep(2)">Next</button>
+        </div>
+
+        <!-- STEP 2: Analisi dello Store -->
+        <div class="step" id="step-2">
+            <h3>Store Analysis</h3>
+            <p><strong>Industry:</strong> {{ store_info.industry }}</p>
+            <p><strong>Description:</strong> {{ store_info.description }}</p>
+            <p><strong>Competitor:</strong> <a href="{{ store_info.website_url }}" target="_blank">{{ store_info.website_url }}</a></p>
+            <p id="ai-advice" class="typing">Analyzing store data...</p>
+            <div class="loading-bar" id="loadingBar"></div>
+            <button class="btn btn-danger w-100 mt-3" id="next-btn" onclick="nextStep(3)" disabled>Next</button>
+        </div>
+
+        <!-- STEP 3: Passaggio alla Scelta del Tema -->
+        <div class="step" id="step-3">
+            <h3>Customize Your Store</h3>
+            <p>Choose a theme that best represents your brand.</p>
+            <a href="{{ url_for('ui.theme_selection') }}" class="btn btn-danger w-100">Go to Theme Selection</a>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        function nextStep(step) {
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            document.getElementById(`step-${step}`).classList.add('active');
+            currentStep = step;
+            updateProgressBar();
+
+            // Se andiamo allo step 2, avviamo l'analisi AI
+            if (step === 2) {
+                document.getElementById('loadingBar').style.display = "block";
+                fetch('/api/analyze-store')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('loadingBar').style.display = "none";
+                        typeText("ai-advice", data.suggestion, () => {
+                            document.getElementById('next-btn').disabled = false;
+                        });
+                    });
+            }
+        }
+
+        function updateProgressBar() {
+            let progressPercentage = (currentStep - 1) * 50;
+            document.getElementById('progressBar').style.width = `${progressPercentage}%`;
+        }
+
+        function typeText(elementId, text, callback) {
+            let i = 0;
+            let speed = 30;
+            let elem = document.getElementById(elementId);
+            elem.innerHTML = "";
+            function type() {
+                if (i < text.length) {
+                    elem.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                } else if (callback) {
+                    callback();
+                }
+            }
+            type();
+        }
+    </script>
+</body>
+</html>

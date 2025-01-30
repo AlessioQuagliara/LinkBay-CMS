@@ -107,30 +107,58 @@
                     </div>
                   </div>
             </div>
-            <div class="col-md-6 mb-3">
 
-                <div class="card">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">An item</li>
-                        <li class="list-group-item">A second item</li>
-                        <li class="list-group-item">A third item</li>
-                        <li class="list-group-item">A fourth item</li>
-                    </ul>
-                </div>
-
-            </div>
-            <div class="col-md-6 mb-3">
-
-                <div class="card">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">An item</li>
-                        <li class="list-group-item">A second item</li>
-                        <li class="list-group-item">A third item</li>
-                        <li class="list-group-item">A fourth item</li>
-                    </ul>
-                </div>
-
-            </div>
+            <div class="container my-4">
+              <div id="assistant-container" class="card shadow rounded-3">
+                  <div class="card-body">
+                      <h5 class="card-title text-center mb-3">AI Assistant</h5>
+                      <div class="input-group mb-3">
+                          <input type="text" id="user-input" class="form-control" placeholder="Ask anything..." aria-label="User input">
+                          <button id="send-btn" class="btn btn-primary">Send</button>
+                      </div>
+                      <div id="response-container" class="mt-3">
+                          <h6>Response:</h6>
+                          <div id="response" class="alert alert-light border rounded p-2"></div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          
+          <script>
+              document.getElementById('send-btn').addEventListener('click', async () => {
+                  const query = document.getElementById('user-input').value;
+          
+                  if (!query.trim()) {
+                      alert("Please enter a valid query.");
+                      return;
+                  }
+          
+                  try {
+                      const response = await fetch('/assistant', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                              query: query,
+                              shop_data: "Dati dell'azienda o altri contesti"
+                          })
+                      });
+          
+                      const data = await response.json();
+          
+                      if (response.ok) {
+                          document.getElementById('response').innerText = data.response;
+                          document.getElementById('response').classList.replace('alert-danger', 'alert-light');
+                      } else {
+                          document.getElementById('response').innerText = data.error || "Error processing your request.";
+                          document.getElementById('response').classList.replace('alert-light', 'alert-danger');
+                      }
+                  } catch (error) {
+                      console.error("Error:", error);
+                      document.getElementById('response').innerText = "An unexpected error occurred.";
+                      document.getElementById('response').classList.replace('alert-light', 'alert-danger');
+                  }
+              });
+          </script>
 
         </div>
         <br><br><br><br><br>

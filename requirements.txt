@@ -4,3 +4,4 @@ webdriver-manager
 Pillow
 Stripe
 gunicorn
+openai

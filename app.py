@@ -1,11 +1,13 @@
 from flask import Flask, g, session, jsonify, request
 from config import Config
 from db_helpers import DatabaseHelper
+import openai
 
 # Configurazione dell'app Flask
 app = Flask(__name__)
 app.config.from_object(Config)
 app.secret_key = app.config['SECRET_KEY']
+openai.api_key = app.config['OPENAI_API_KEY']
 
 # Inizializza il gestore del database
 db_helper = DatabaseHelper()

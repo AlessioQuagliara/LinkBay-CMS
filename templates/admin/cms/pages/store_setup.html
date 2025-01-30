@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Setup</title>
+    {% include 'admin/cms/heading/admin_head.html' %}
+    
+    <style>
+        body {
+            background-image: url('../../../static/images/background.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .form-step {
+            display: none;
+        }
+        .form-step.active {
+            display: block;
+        }
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+        }
+        .progress {
+            height: 5px;
+            background-color: #ddd;
+            border-radius: 3px;
+            margin-bottom: 20px;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 33%;
+            background-color: #ff5757;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card" data-aos="fade-up">
+        <main class="form-setup">
+            <form method="POST" action="{{ url_for('ui.setup_store') }}">
+                <img class="mb-4" src="../../../static/images/lb-logo.svg" width="230px" alt="Logo LinkBay">
+                <h1 class="h3 mb-3 fw-normal">Store Setup</h1>
+                <p>Complete your store setup to continue</p>
+
+                <div class="progress">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+
+                <!-- STEP 1: Store Information -->
+                <div class="form-step active" id="step-1">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="owner_name" name="owner_name" placeholder="Owner Name" required>
+                        <label for="owner_name">Owner Name</label>
+                    </div>
+                    <div class="form-floating">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Email for Customers" required>
+                        <label for="email">Email for Customers</label>
+                    </div>
+                    <div class="btn-group mt-3">
+                        <button type="button" class="btn btn-danger w-100" onclick="nextStep(2)">Next</button>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Business Details -->
+                <div class="form-step" id="step-2">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="phone" name="phone" placeholder="Phone Number for Customers">
+                        <label for="phone">Phone Number for Customers</label>
+                    </div>
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="industry" name="industry" placeholder="Industry">
+                        <label for="industry">Industry</label>
+                    </div>
+                    <div class="form-floating">
+                        <textarea class="form-control" id="description" name="description" placeholder="Be as descriptive as possible, these data will be analyzed to propose growth plans"></textarea>
+                        <label for="description">Store Description</label>
+                        <p class="lead">Be as descriptive as possible, these data will be analyzed to propose growth plans</p>
+                    </div>
+                    <div class="btn-group mt-3">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep(1)">Back</button>
+                        <button type="button" class="btn btn-danger" onclick="nextStep(3)">Next</button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Financial Info -->
+                <div class="form-step" id="step-3">
+                    <div class="form-floating">
+                        <input type="url" class="form-control" id="website_url" name="website_url" placeholder="Website URL">
+                        <label for="website_url">Competitor's Website URL</label>
+                    </div>
+                    <div class="form-floating">
+                        <input type="number" class="form-control" id="revenue" name="revenue" placeholder="Estimated Revenue" step="0.01">
+                        <label for="revenue">Estimated Revenue</label>
+                    </div>
+                    <div class="btn-group mt-3">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep(2)">Back</button>
+                        <button type="submit" class="btn btn-success">Go to Next Setup</button>
+                    </div>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    {% include 'admin/cms/footing/admin_footing.html' %}
+
+    <script>
+        let currentStep = 1;
+        function nextStep(step) {
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            document.getElementById(`step-${step}`).classList.add('active');
+            currentStep = step;
+            updateProgressBar();
+        }
+
+        function prevStep(step) {
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            document.getElementById(`step-${step}`).classList.add('active');
+            currentStep = step;
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            let progressPercentage = (currentStep - 1) * 50; // 3 step (0%, 50%, 100%)
+            document.getElementById('progressBar').style.width = `${progressPercentage}%`;
+        }
+    </script>
+</body>
+</html>
