@@ -15,9 +15,12 @@
     <nav>
         {{ navbar | safe }}  <!-- Stampa il contenuto della navbar -->
     </nav>
-
+    
     <!-- Contenuto della pagina -->
     {{ content | safe }}
+    
+    <!-- Carica cookie personalizzati -->
+    {{ cookie_policy_banner | safe }}  <!-- Questo carica i cookie personalizzati -->
 
     <!-- Include il footer -->
     <footer>

@@ -34,3 +34,26 @@
             });
         });
     </script>
+    <script>
+        // Sessione scaduta
+        document.addEventListener("DOMContentLoaded", function () {
+            // Intercetta tutte le fetch per gestire sessione scaduta
+            const originalFetch = window.fetch;
+            window.fetch = async (...args) => {
+                const response = await originalFetch(...args);
+                if (response.status === 401) {
+                    const data = await response.json();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Session Expired',
+                        text: 'Your session has expired. Please log in again.',
+                        confirmButtonText: 'Go to Login',
+                        allowOutsideClick: false
+                    }).then(() => {
+                        window.location.href = data.redirect;
+                    });
+                }
+                return response;
+            };
+        });
+    </script>

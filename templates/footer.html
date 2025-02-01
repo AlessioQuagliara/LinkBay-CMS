@@ -26,6 +26,18 @@
     </div>
 
     <style>
+        #cookie-bar {
+            position: fixed;
+            bottom: 20px; /* Staccato dal bordo inferiore */
+            left: 50%;
+            transform: translateX(-50%);
+            width: auto;
+            max-width: 90%;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Effetto sollevato */
+            z-index: 1050; /* Sopra gli altri elementi */
+        }
         #addToCartButton.btn-success {
             background-color: #28a745;
             border-color: #28a745;
@@ -74,6 +86,25 @@
             border-top: 1px solid #ddd;
         }
     </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Apri il carrello
+            document.getElementById("cart")?.addEventListener("click", function () {
+                toggleCartSidebar();
+            });
+
+            // Vai alla pagina account
+            document.getElementById("account")?.addEventListener("click", function () {
+                window.location.href = "/account";
+            });
+
+            // Attiva la ricerca
+            document.getElementById("search")?.addEventListener("click", function () {
+                document.getElementById("searchInput").focus();
+            });
+        });
+    </script>
 
     <script>
         /* Funzione per aprire/chiudere la sidebar */
@@ -217,4 +248,41 @@
         });
     </script>
 
+<script>
+    // Cookie Banner ---------------------------------------------------------------------------------------------------
+        document.addEventListener("DOMContentLoaded", function () {
+            const cookieBar = document.getElementById("cookie-bar");
+            const acceptBtn = document.getElementById("accept-cookies");
+            const rejectBtn = document.getElementById("reject-cookies");
+
+            // Controllo se l'utente ha già accettato/rifiutato i cookie
+            if (!localStorage.getItem("cookiesAccepted")) {
+                cookieBar.classList.remove("d-none");
+            }
+
+            // Accettazione cookie
+            acceptBtn.addEventListener("click", function () {
+                localStorage.setItem("cookiesAccepted", "true");
+                cookieBar.classList.add("d-none");
+            });
+
+            // Rifiuto cookie
+            rejectBtn.addEventListener("click", function () {
+                localStorage.setItem("cookiesAccepted", "false");
+                cookieBar.classList.add("d-none");
+            });
+        });
+</script>
     
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch("/api/track-visit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ page_url: window.location.pathname })
+        })
+        .then(response => response.json())
+        .then(data => console.log("📊 Analytics:", data))
+        .catch(error => console.error("Error tracking visit:", error));
+    });
+    </script>

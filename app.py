@@ -1,7 +1,8 @@
-from flask import Flask, g, session, jsonify, request
+from flask import Flask, g, session, jsonify, request, redirect, url_for
 from config import Config
 from db_helpers import DatabaseHelper
 import openai
+from functools import wraps
 
 # Configurazione dell'app Flask
 app = Flask(__name__)
@@ -43,7 +44,6 @@ def set_language():
         session['language'] = lang
         return jsonify({"success": True, "message": f"Language set to {lang}"})
     return jsonify({"success": False, "message": "Invalid language"}), 400
-
 
 # Avvio dell'applicazione
 if __name__ == "__main__":

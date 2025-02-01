@@ -82,17 +82,30 @@
     </div>
 </div>
 
-<!-- Cards esistenti -->
+<!-- Cards esistenti 
 <h5 class="mt-4 text-center" data-aos="fade-up">More Options</h5>
 
 <div class="row row-cols-1 row-cols-md-3 g-4" data-aos="fade-up">
-    <!-- Le altre card rimangono invariate -->
     <div class="col">
         <div class="theme-card card" style="background-image: url(https://via.placeholder.com/300x200); background-size: cover;">
             <div class="card-body mt-4">
                 <h5 class="card-title">More Tool</h5>
                 <p class="card-text">Select other tools, differentiate your brand or improve you're performance.</p>
                 <a href="/store-components/theme-ui" class="btn btn-danger btn-small">View available tools</a>
+            </div>
+        </div>
+    </div>
+-->
+
+<h5 class="mt-4 text-center" data-aos="fade-up">More Options</h5>
+
+<div class="row row-cols-1 row-cols-md-3 g-4" data-aos="fade-up">
+    <div class="col">
+        <div class="theme-card card text-white" style="background-image: url(../../../../static/images/navlink.png); background-size: cover;">
+            <div class="card-body mt-4">
+                <h5 class="card-title">Customize Navigation Menu</h5>
+                <p class="card-text">Customize Navigation Menu, Organize and edit your store’s main menu items</p>
+                <a href="{{ url_for('page.navbar_settings') }}" class="btn btn-danger btn-small">Edit Nav</a>
             </div>
         </div>
     </div>

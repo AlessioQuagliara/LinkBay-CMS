@@ -33,6 +33,17 @@
                 <i class="fa-solid fa-clipboard-list {% if title == 'Third-Party Cookie Settings' %}fa-bounce{% endif %}"></i>&nbsp; Integrations
             </a>
         </li>
+        {% elif title in ['Navbar Settings']%}
+        <li class="nav-item mb-2">
+            <a href="{{ url_for('page.online_content') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
+                <i class="fa-solid fa-arrow-left"></i>&nbsp; Back to Content
+            </a>
+        </li>
+        <li>
+            <a href="" class="nav-link {% if title == 'Navbar Settings' %}active{% endif %} text-white">
+                <i class="fa-solid fa-compass {% if title == 'Navbar Settings' %}fa-bounce{% endif %}"></i>&nbsp; Navigation Bar
+            </a>
+        </li>
         {% elif title in ['Manage Shipping Method']%}
         <li class="nav-item mb-2">
             <a href="/admin/cms/pages/shipping-methods" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
@@ -232,11 +243,12 @@
                 <i class="fa-solid fa-user-group {% if title == 'Customers' %}fa-bounce{% endif %}"></i>&nbsp; Customers
             </a>
         </li>
+        <!--
         <li>
             <a href="" class="nav-link {% if title == 'Marketing' %}active{% endif %} text-white">
                 <i class="fa-solid fa-chart-pie {% if title == 'Marketing' %}fa-bounce{% endif %}"></i>&nbsp; Marketing
             </a>
-        </li>
+        </li>-->
         <li>
             <a href="{{ url_for('page.online_content') }}" class="nav-link {% if title == 'Online Content' %}active{% endif %} text-white">
                 <i class="fa-solid fa-store {% if title == 'Online Content' %}fa-bounce{% endif %}"></i>&nbsp; Online Content
@@ -266,7 +278,7 @@
     </ul>
     <hr>
     <div class="dropdown">
-    {% if title in ['Cookie Bar Settings', 'Third-Party Cookie Settings', 'Manage Product', 'Manage Collection', 'Manage Collection List', 'Manage Customer', 'Manage Order', 'Manage Order Items', 'Manage Shipping Method', 'Manage Payment' ] %}
+    {% if title in ['Cookie Bar Settings', 'Third-Party Cookie Settings', 'Manage Product', 'Manage Collection', 'Manage Collection List', 'Manage Customer', 'Manage Order', 'Manage Order Items', 'Manage Shipping Method', 'Manage Payment', 'Navbar Settings' ] %}
         <button id="save-content" type="submit" class="btn btn-danger w-100">Save</button>
     {% else %}
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">

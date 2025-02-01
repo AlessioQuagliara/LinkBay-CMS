@@ -19,4 +19,5 @@ from .storepayment import StorePayment
 from .payment_methods import PaymentMethods
 from .domain import Domain
 from .stores_info import StoreInfo
+from .navbar import Navbar
 

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkBay - {{ title }}</title>
+    {% include 'admin/cms/heading/admin_head.html' %}
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <style>
+        /* Stili generali */
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #343a40;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            padding: 15px;
+        }
+        .content-container {
+            margin-left: 250px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column; /* Cambiato da row a column */
+            gap: 20px; /* Aggiunto un gap tra i contenitori */
+            height: auto; /* Altezza dinamica in base al contenuto */
+        }
+    </style>
+</head>
+<body>
+<!---------------------------- Sidebar ---------------------------->
+{% include 'admin/cms/ui/sidebar.html' %}
+
+<!--------------------- Container principale --------------------->
+<div class="content-container" data-aos="fade-up">
+    <!-- Toolbar sopra la tabella -->
+    <div class="container mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <a class="btn {% if title == 'Navbar Settings' %}btn-dark{% else %}btn-outline-dark{% endif %} btn-sm text-decoration-none ">
+                        <i class="fa-solid fa-box"></i> Navbar Links
+                    </a>
+                </div>
+                <button class="btn btn-dark btn-sm mx-1" title="Add Product" id="add-link">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <button class="btn btn-dark btn-sm mx-1" id="delete-selected" title="Delete">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!---------------------- Tabella Navbar ---------------------->
+    <div class="container">
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle text-center" style="border-radius: 10px;">
+                <thead class="table-dark">
+                    <tr>
+                        <th><input type="checkbox" id="select-all"></th>
+                        <th>Label</th>
+                        <th>URL</th>
+                        <th>Type</th>
+                        <th>Parent ID</th>
+                        <th>Position</th>
+                    </tr>
+                </thead>
+                <tbody id="navbar-links">
+                    {% for link in navbar_links %}
+                    <tr data-id="{{ link.id }}">
+                        <td><input type="checkbox" class="select-link"></td>
+                        <td><input type="text" class="form-control" value="{{ link.link_text }}"></td>
+                        <td><input type="text" class="form-control url-input" data-bs-toggle="modal" data-bs-target="#urlSelectorModal" value="{{ link.link_url }}" readonly></td>
+                        <td>
+                            <select class="form-select">
+                                <option value="standard" {% if link.link_type == 'standard' %}selected{% endif %}>Standard</option>
+                                <option value="dropdown" {% if link.link_type == 'dropdown' %}selected{% endif %}>Dropdown</option>
+                                <option value="external" {% if link.link_type == 'external' %}selected{% endif %}>External</option>
+                                <option value="external" {% if link.link_type == 'action' %}selected{% endif %}>Action</option>
+                            </select>
+                        </td>
+                        <td><input type="number" class="form-control" value="{{ link.parent_id }}"></td>
+                        <td class="position">{{ link.position }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+ <!--------------------------------------------- Modal per la selezione dell'URL ------------------------------------------>
+<div class="modal fade" id="urlSelectorModal" tabindex="-1" aria-labelledby="urlSelectorLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="urlSelectorLabel">Select Options</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" id="urlTab" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" id="pages-tab" data-bs-toggle="tab" data-bs-target="#pages" type="button" role="tab">📄 Pages</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="commands-tab" data-bs-toggle="tab" data-bs-target="#commands" type="button" role="tab">⚙️ Command</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="shop-actions-tab" data-bs-toggle="tab" data-bs-target="#shop-actions" type="button" role="tab">🏪 Actions</button>
+                    </li>
+                </ul>
+                <div class="tab-content mt-3">
+                    <!-- Sezione Pagine -->
+                    <div class="tab-pane fade show active" id="pages" role="tabpanel">
+                        <ul id="pages-list" class="list-group"></ul>
+                    </div>
+                    <!-- Sezione Comandi -->
+                    <div class="tab-pane fade" id="commands" role="tabpanel">
+                        <ul class="list-group">
+                            <li class="list-group-item select-url" data-url="show_collections">📂 Show Collections</li>
+                        <!--<li class="list-group-item select-url" data-url="show_brands">🏷️ Show Brands</li>-->
+                        </ul>
+                    </div>
+                    <!-- Sezione Azioni Shop -->
+                    <div class="tab-pane fade" id="shop-actions" role="tabpanel">
+                        <ul class="list-group">
+                            <li class="list-group-item select-url" data-url="cart">🛒 Cart</li>
+                            <li class="list-group-item select-url" data-url="account">👤 Account</li>
+                            <li class="list-group-item select-url" data-url="search">🔍 Search</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-------------------------------- Gestione di SortableJS e aggiornamento delle posizioni -------------------------------->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Abilita il drag-and-drop con SortableJS
+        new Sortable(document.getElementById('navbar-links'), {
+            animation: 150,
+            onEnd: function () {
+                updatePositions();
+            }
+        });
+
+        // Funzione per aggiornare le posizioni nella colonna "Position"
+        function updatePositions() {
+            document.querySelectorAll("#navbar-links tr").forEach((row, index) => {
+                row.querySelector(".position").textContent = index + 1;
+            });
+        }
+    });
+</script>
+
+<!------------------------------------- Gestione dei pulsanti: selezione e aggiunta ------------------------------------->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Seleziona o deseleziona tutti i checkbox
+        document.getElementById("select-all").addEventListener("change", function () {
+            document.querySelectorAll(".select-link").forEach(el => el.checked = this.checked);
+        });
+
+        // Aggiunge un nuovo link con valori predefiniti
+        document.getElementById("add-link").addEventListener("click", function () {
+            Swal.fire({
+                title: 'Adding link...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            fetch("/api/add-navbar-link", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    link_text: "New Link",
+                    link_url: "/link",
+                    link_type: "standard",
+                    parent_id: null,
+                    position: document.querySelectorAll("#navbar-links tr").length + 1
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Link Added!',
+                        text: 'A new link has been successfully added.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => location.reload());
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: data.error || 'Failed to add the link.',
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'An error occurred while adding the link.',
+                });
+                console.error("Error:", error);
+            });
+        });
+    });
+</script>
+
+<!--------------------------------------- Gestione Modale e Popolamento --------------------------------------->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let selectedUrlInput = null;
+    
+        // Apri il modale e salva il riferimento all'input cliccato
+        document.querySelectorAll(".url-input").forEach(input => {
+            input.addEventListener("click", function () {
+                selectedUrlInput = this;
+                loadPages();
+            });
+        });
+    
+        // Quando si seleziona un URL, lo imposta nell'input e chiude il modale
+        document.querySelectorAll(".select-url").forEach(item => {
+            item.addEventListener("click", function () {
+                if (selectedUrlInput) {
+                    selectedUrlInput.value = this.dataset.url;
+                    let modal = bootstrap.Modal.getInstance(document.getElementById('urlSelectorModal'));
+                    modal.hide();
+                }
+            });
+        });
+    
+        // Funzione per caricare le pagine pubblicate con AJAX
+        function loadPages() {
+            fetch("/api/get-pages")
+                .then(response => response.json())
+                .then(data => {
+                    let list = document.getElementById("pages-list");
+                    list.innerHTML = "";
+                    if (data.success) {
+                        data.pages.forEach(page => {
+                            let li = document.createElement("li");
+                            li.className = "list-group-item select-url";
+                            li.dataset.url = "/" + page.slug;
+                            li.textContent = "📄 " + page.slug;
+                            li.addEventListener("click", function () {
+                                if (selectedUrlInput) {
+                                    selectedUrlInput.value = this.dataset.url;
+                                    let modal = bootstrap.Modal.getInstance(document.getElementById('urlSelectorModal'));
+                                    modal.hide();
+                                }
+                            });
+                            list.appendChild(li);
+                        });
+                    }
+                });
+        }
+    });
+</script>
+<!--------------------------------------- Gestione di eliminazione e salvataggio --------------------------------------->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Elimina i link selezionati
+        document.getElementById("delete-selected").addEventListener("click", function () {
+            let selectedIds = Array.from(document.querySelectorAll(".select-link:checked"))
+                .map(el => el.closest("tr").dataset.id);
+
+            if (selectedIds.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No Selection',
+                    text: 'Please select at least one link to delete.',
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This action cannot be undone!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete them!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Deleting links...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
+                    fetch("/api/delete-navbar-links", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ ids: selectedIds })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: 'The selected links have been deleted.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => location.reload());
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: data.error || 'Failed to delete the links.',
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'An error occurred while deleting the links.',
+                        });
+                        console.error("Error:", error);
+                    });
+                }
+            });
+        });
+
+        // Salvataggio modifiche
+        document.getElementById("save-content").addEventListener("click", function () {
+            let navbarLinks = Array.from(document.querySelectorAll("#navbar-links tr")).map((row, index) => ({
+                id: row.dataset.id || null,
+                link_text: row.cells[1]?.querySelector("input")?.value.trim() || "", // Ora prende correttamente Link Text
+                link_url: row.cells[2]?.querySelector("input")?.value.trim() || "",  // Ora prende correttamente URL
+                link_type: row.cells[3]?.querySelector("select")?.value || "standard", // Tipo
+                parent_id: row.cells[4]?.querySelector("input")?.value || null, // Parent ID
+                position: index + 1 // Posizione
+            }));
+
+            // Mostra il loader con Swal2
+            Swal.fire({
+                title: 'Saving changes...',
+                text: 'Please wait while your changes are being saved.',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            // Effettua la richiesta fetch per salvare i dati
+            fetch("/api/save-navbar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ navbar_links: navbarLinks })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Saved!',
+                        text: 'Your changes have been successfully saved.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => location.reload());
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: data.error || 'Failed to save the changes.',
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'An error occurred while saving the changes.',
+                });
+                console.error("Error:", error);
+            });
+        });
+    });
+</script>
+
+{% include 'admin/cms/footing/admin_footing.html' %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        new Sortable(document.getElementById('navbar-links'), {
+            animation: 150,
+            onEnd: function () {
+                updatePositions();
+            }
+        });
+    });
+</script>
+</body>
+</html>

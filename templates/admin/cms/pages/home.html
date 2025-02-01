@@ -1,11 +1,103 @@
 {% extends "/admin/cms/interface/render.html" %}
 
 {% block content %}
-   
+<div class="row" data-aos="fade-up"></div>
+        <div id="assistant-container" class="rounded-3 mb-3">
+          <div class="card-body">
+              <img class="mb-4" src="../../../static/images/lb-logo.svg" width="130px" alt="Logo LinkBay">
+              <span class="card-title text-center mb-3">AI Assistant</span>
+              
+              <!-- Chat Box -->
+              <div id="chat-box" class="border rounded p-3 mb-3" style="height: 300px; overflow-y: auto; background: #f8f9fa;">
+                  <!-- Messaggi della chat verranno aggiunti qui -->
+              </div>
 
-        <div class="row" data-aos="fade-up">
+              <!-- Input Box -->
+              <div class="input-group">
+                  <input type="text" id="user-input" class="form-control" placeholder="Ask anything..." aria-label="User input">
+                  <button id="send-btn" class="btn btn-danger">Send</button>
+              </div>
+          </div>
+        </div>
+
+        <script>
+          document.getElementById('send-btn').addEventListener('click', async () => {
+              const userInput = document.getElementById('user-input').value.trim();
+              if (!userInput) {
+                  alert("Please enter a valid query.");
+                  return;
+              }
+          
+              const chatBox = document.getElementById('chat-box');
+          
+              // Aggiunge il messaggio utente alla chat
+              const userMessage = document.createElement("div");
+              userMessage.classList.add("alert", "alert-primary", "p-2");
+              userMessage.innerHTML = `<strong>You:</strong> ${userInput}`;
+              chatBox.appendChild(userMessage);
+              chatBox.scrollTop = chatBox.scrollHeight;  // Scroll automatico
+          
+              // Mostra il messaggio "Typing..." prima della risposta dell'IA
+              const botMessage = document.createElement("div");
+              botMessage.classList.add("alert", "alert-secondary", "p-2");
+              const typingSpan = document.createElement("span");
+              typingSpan.id = "typing";
+              botMessage.innerHTML = `<strong>LinkBay AI:</strong> `;
+              botMessage.appendChild(typingSpan);
+              chatBox.appendChild(botMessage);
+              chatBox.scrollTop = chatBox.scrollHeight;
+          
+              document.getElementById('user-input').value = "";  // Resetta il campo input
+          
+              try {
+                  const response = await fetch('/assistant', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ query: userInput })
+                  });
+          
+                  const data = await response.json();
+          
+                  if (response.ok) {
+                      // Animazione "typing" con delay realistico
+                      typeText(typingSpan, data.response, () => {
+                          botMessage.innerHTML = `<strong>AI:</strong> ${data.response}`;
+                          chatBox.scrollTop = chatBox.scrollHeight;  // Scroll automatico dopo risposta
+                      });
+                  } else {
+                      botMessage.innerHTML = `<strong>AI:</strong> <span class="text-danger">Error processing your request.</span>`;
+                  }
+              } catch (error) {
+                  console.error("Error:", error);
+                  botMessage.innerHTML = `<strong>AI:</strong> <span class="text-danger">An unexpected error occurred.</span>`;
+              }
+          
+              chatBox.scrollTop = chatBox.scrollHeight;  // Scroll automatico
+          });
+          
+          // Funzione per animare il typing
+          function typeText(element, text, callback) {
+              let i = 0;
+              element.innerHTML = "";  // Resetta il testo
+          
+              function type() {
+                  if (i < text.length) {
+                      element.innerHTML += text.charAt(i);
+                      i++;
+                      setTimeout(type, 30);  // Velocità di digitazione (30ms per carattere)
+                  } else if (callback) {
+                      callback();
+                  }
+              }
+          
+              type();
+          }
+          </script>
+
+
+        
             <div class="col-12 mb-3 ">
-                <button type="button" class="btn btn-dark btn-sm"><i class="fa-solid fa-inbox"></i> Orders to be Processed <span class="badge text-bg-secondary">4</span></button>
+                <button type="button" class="btn btn-dark btn-sm"><i class="fa-solid fa-inbox"></i> Orders to be Processed <span class="badge text-bg-secondary">0</span></button>
                 <button type="button" class="btn btn-dark btn-sm">Orders to Ship</button>
             </div>
             <div class="col-md-12 mb-3">
@@ -46,19 +138,43 @@
                 </style>
                 <div class="card text-bg-dark">
                   <img src="{{ url_for('static', filename='images/store_image.webp') }}" 
-                  width="899px" 
-                  height="198px" 
-                  class="card-img" 
-                  alt="..."
-                  style="object-fit: cover; object-position: center;">
+                      width="899px" 
+                      height="198px" 
+                      class="card-img" 
+                      alt="..."
+                      style="object-fit: cover; object-position: center;">
                   <div class="card-img-overlay">
                       <h5 class="card-title">Your Online Store</h5>
-                      <p class="card-text"><i class="fa-regular fa-circle-dot text-danger"></i> <strong>12</strong> Visitors Now</p>
-                      <p class="card-text"><small>Last updated 3 mins ago</small></p>
+                      <p class="card-text">
+                          <i class="fa-regular fa-circle-dot text-danger"></i> 
+                          <strong id="active-visitors">Loading...</strong> Visitors Now
+                      </p>
+                      <p class="card-text"><small id="last-update">Last updated just now</small></p>
                       <a href="../../../" target="_blank" class="btn btn-light btn-small">View Online Store</a>
                       <a href=" " class="btn btn-danger btn-small">Edit Store</a>
                   </div>
                 </div>
+
+                <script>
+                  document.addEventListener("DOMContentLoaded", function () {
+                      function updateVisitors() {
+                          fetch("/api/get-active-visitors")
+                              .then(response => response.json())
+                              .then(data => {
+                                  if (data.success) {
+                                      document.getElementById("active-visitors").textContent = data.active_visitors;
+                                      document.getElementById("last-update").textContent = "Last updated " + new Date().toLocaleTimeString();
+                                  } else {
+                                      console.error("Error:", data.error);
+                                  }
+                              })
+                              .catch(error => console.error("Error fetching visitor data:", error));
+                      }
+                  
+                      updateVisitors();  // Aggiorna subito alla pagina load
+                      setInterval(updateVisitors, 10000);  // Aggiorna ogni 10 secondi
+                  });
+                  </script>
 
             </div>
             <div class="col-12 mb-3">
@@ -107,60 +223,8 @@
                     </div>
                   </div>
             </div>
-
-            <div class="container my-4">
-              <div id="assistant-container" class="card shadow rounded-3">
-                  <div class="card-body">
-                      <h5 class="card-title text-center mb-3">AI Assistant</h5>
-                      <div class="input-group mb-3">
-                          <input type="text" id="user-input" class="form-control" placeholder="Ask anything..." aria-label="User input">
-                          <button id="send-btn" class="btn btn-primary">Send</button>
-                      </div>
-                      <div id="response-container" class="mt-3">
-                          <h6>Response:</h6>
-                          <div id="response" class="alert alert-light border rounded p-2"></div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-          
-          <script>
-              document.getElementById('send-btn').addEventListener('click', async () => {
-                  const query = document.getElementById('user-input').value;
-          
-                  if (!query.trim()) {
-                      alert("Please enter a valid query.");
-                      return;
-                  }
-          
-                  try {
-                      const response = await fetch('/assistant', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                              query: query,
-                              shop_data: "Dati dell'azienda o altri contesti"
-                          })
-                      });
-          
-                      const data = await response.json();
-          
-                      if (response.ok) {
-                          document.getElementById('response').innerText = data.response;
-                          document.getElementById('response').classList.replace('alert-danger', 'alert-light');
-                      } else {
-                          document.getElementById('response').innerText = data.error || "Error processing your request.";
-                          document.getElementById('response').classList.replace('alert-light', 'alert-danger');
-                      }
-                  } catch (error) {
-                      console.error("Error:", error);
-                      document.getElementById('response').innerText = "An unexpected error occurred.";
-                      document.getElementById('response').classList.replace('alert-light', 'alert-danger');
-                  }
-              });
-          </script>
-
         </div>
+  
         <br><br><br><br><br>
 
 

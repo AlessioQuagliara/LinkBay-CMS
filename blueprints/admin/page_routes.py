@@ -3,8 +3,9 @@ from models.page import Page  # importo la classe database
 from models.shoplist import ShopList
 from models.cmsaddon import CMSAddon
 from models.products import Products
+from models.navbar import Navbar
 from config import Config
-import datetime
+from datetime import datetime, timedelta
 import mysql.connector, datetime, os, uuid, re, base64
 from db_helpers import DatabaseHelper
 db_helper = DatabaseHelper()
@@ -378,5 +379,158 @@ def delete_page():
         return jsonify({'success': False, 'message': f"Errore durante la cancellazione: {str(e)}"})
 
 
+# ----------------------------------------------
+# 📌 ROUTE: NAVBAR SETTINGS (Visualizza Impostazioni Navbar)
+# ----------------------------------------------
 
+@page_bp.route('/admin/cms/function/navbar-settings')
+def navbar_settings():
+    shop_name = request.host.split('.')[0]
+    with db_helper.get_db_connection() as db_conn:
+        navbar_model = Navbar(db_conn)
+        pages_model = Page(db_conn)
+        navbar_links = navbar_model.get_navbar_links(shop_name)
+        pages = pages_model.get_published_pages(shop_name)
+    return render_template(
+        'admin/cms/function/navigation.html',
+        title="Navbar Settings",
+        navbar_links=navbar_links,
+        pages=pages
+    )
 
+@page_bp.route('/api/get-navbar-links', methods=['GET'])
+def get_navbar_links():
+    shop_name = request.host.split('.')[0]
+    with db_helper.get_db_connection() as db_conn:
+        navbar_model = Navbar(db_conn)
+        navbar_links = navbar_model.get_navbar_links(shop_name)
+    return jsonify({'success': True, 'navbar_links': navbar_links})
+
+@page_bp.route('/api/add-navbar-link', methods=['POST'])
+def add_navbar_link():
+    try:
+        data = request.get_json()
+        shop_name = request.host.split('.')[0]
+
+        new_link = {
+            'link_text': data.get('link_text', 'New Link'),
+            'link_url': data.get('link_url', '/link'),
+            'link_type': data.get('link_type', 'standard'),
+            'parent_id': data.get('parent_id', None),
+            'position': data.get('position', 1)
+        }
+
+        with db_helper.get_db_connection() as db_conn:
+            navbar_model = Navbar(db_conn)
+            navbar_model.create_navbar_link(shop_name, **new_link)
+
+        return jsonify({'success': True, 'message': 'Link aggiunto con successo'})
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@page_bp.route('/api/delete-navbar-links', methods=['POST'])
+def delete_navbar_links():
+    data = request.get_json()
+    shop_name = request.host.split('.')[0]
+    link_ids = data.get('ids', [])
+    with db_helper.get_db_connection() as db_conn:
+        navbar_model = Navbar(db_conn)
+        for link_id in link_ids:
+            navbar_model.delete_navbar_link(link_id, shop_name)
+    return jsonify({'success': True, 'message': 'Link eliminati con successo'})
+
+@page_bp.route('/api/save-navbar', methods=['POST'])
+def save_navbar():
+    try:
+        data = request.get_json()
+        navbar_links = data.get("navbar_links", [])
+        shop_name = request.host.split('.')[0]
+
+        if not navbar_links:
+            return jsonify({'success': False, 'error': 'Nessun link ricevuto'}), 400
+
+        with db_helper.get_db_connection() as db_conn:
+            navbar_model = Navbar(db_conn)
+            navbar_model.delete_all_navbar_links(shop_name)  # Cancella i link esistenti
+            
+            # Salva i nuovi link
+            for link in navbar_links:
+                navbar_model.create_navbar_link(
+                    shop_name=shop_name,
+                    link_text=link.get("link_text"),
+                    link_url=link.get("link_url"),
+                    link_type=link.get("link_type"),
+                    parent_id=link.get("parent_id"),
+                    position=link.get("position")
+                )
+
+        return jsonify({'success': True, 'message': 'Navbar salvata con successo!'})
+
+    except Exception as e:
+        logging.error(f"Errore nel salvataggio della navbar: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@page_bp.route('/api/get-pages', methods=['GET'])
+def get_pages():
+    """ Recupera le pagine pubblicate per il negozio corrente """
+    try:
+        shop_name = request.host.split('.')[0]
+        with db_helper.get_db_connection() as db_conn:
+            pages_model = Page(db_conn)
+            pages = pages_model.get_published_pages(shop_name)
+
+        if pages:
+            return jsonify({'success': True, 'pages': pages})
+        else:
+            return jsonify({'success': False, 'message': 'Nessuna pagina pubblicata trovata'}), 404
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@page_bp.route('/api/get-site-visits', methods=['GET'])
+def get_site_visits():
+    """
+    API per recuperare le visite del negozio corrente.
+    """
+    try:
+        shop_name = request.host.split('.')[0]  # Ottieni il nome del negozio
+
+        with db_helper.get_db_connection() as conn:
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("""
+                SELECT ip_address, referrer, page_url, visit_time 
+                FROM site_visits 
+                WHERE shop_name = %s 
+                ORDER BY visit_time DESC
+                LIMIT 100
+            """, (shop_name,))
+            visits = cursor.fetchall()
+
+        return jsonify({'success': True, 'visits': visits})
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+    
+@page_bp.route('/api/get-active-visitors', methods=['GET'])
+def get_active_visitors():
+    """
+    API per ottenere il numero di visitatori attivi nelle ultime 1 minuti.
+    """
+    try:
+        shop_name = request.host.split('.')[0]  # Ottieni il nome del negozio
+        ten_minutes_ago = datetime.utcnow() - timedelta(minutes=1)
+
+        with db_helper.get_db_connection() as conn:
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("""
+                SELECT COUNT(DISTINCT ip_address) AS active_visitors
+                FROM site_visits
+                WHERE shop_name = %s AND visit_time >= %s
+            """, (shop_name, ten_minutes_ago))
+            result = cursor.fetchone()
+
+        return jsonify({'success': True, 'active_visitors': result["active_visitors"]})
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500

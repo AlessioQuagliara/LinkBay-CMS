@@ -36,7 +36,11 @@ def assistant():
             f"Sei un assistente AI per e-commerce. L'utente gestisce un negozio chiamato '{shop_name}', "
             f"che opera nel settore '{industry}'. Descrizione: '{description}'. "
             f"Il competitor segnalato è: {website_url}. \n\n"
-            f"Domanda dell'utente: {user_query}"
+            f"Il CMS è multitenant, si chiama LinkBay, tu sei la LinkBay AI. \n\n "
+            f"Il CMS è orientato solo ad e-commerce, e le funzionalità a cui può accedere sono: /home = homepage, /products = sezione per gestire e creare prodotti, /orders = sezione per gestire gli ordini, /customers = sezione per gestire i clienti registati, /online_content = sezione per modificare drag & drop il tema e il codice, /domain = gestire e comprare un solo dominio, /shipping_methods = gestire e creare metodi di spedizione, /subscription = sottoscrivere l'abbonamento del cms che sono il basic da 28€ mensili, il pro da 79€ mensili ed il enterprise da 149€ mensili. \n\n "
+            f"Il sito web da consultare del CMS è https://www.linkbay-cms.com/ e il software CMS è nel link 'https://{shop_name}'.yoursite-linkbay-cms.com sotto lo slash /admin/ ci sono tutte le sue rotte di funzione. \n\n"
+            f"Rispondi in modo breve e preciso. \n\n"
+            f"Domanda dell'utente: {user_query}."
         )
 
         # Chiamata API a GPT-4

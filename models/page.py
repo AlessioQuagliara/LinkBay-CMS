@@ -272,3 +272,23 @@ class Page:
             self.conn.rollback()
             logging.error(f"Error applying theme '{theme_name}' for shop '{shop_name}': {e}")
             return False
+        
+    def get_published_pages(self, shop_name):
+            """
+            Recupera solo le pagine pubblicate di un negozio, escludendo 'navbar' e 'footer'.
+            """
+            with self.conn.cursor(dictionary=True) as cursor:
+                try:
+                    cursor.execute("""
+                        SELECT id, title, slug
+                        FROM pages
+                        WHERE shop_name = %s 
+                        AND published = 1 
+                        AND slug NOT IN ('navbar', 'footer')
+                        ORDER BY created_at DESC
+                    """, (shop_name,))
+                    pages = cursor.fetchall()
+                    return pages
+                except Exception as e:
+                    logging.error(f"Errore nel recupero delle pagine pubblicate: {e}")
+                    return []                                                               

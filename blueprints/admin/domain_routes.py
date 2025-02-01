@@ -159,4 +159,3 @@ def purchase_domain():
         logging.info(f"Error purchasing domain: {e}")
         print(traceback.format_exc())
         return jsonify({'success': False, 'message': 'Internal server error.'}), 500
-    

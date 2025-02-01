@@ -98,3 +98,19 @@ class CookiePolicy:
             logging.info(f"Error creating third-party cookie policy: {e}")
             self.conn.rollback()
             return False
+        
+    def get_cookie_policy(self, shop_name):
+        """
+        Recupera i dati della cookie policy per il negozio specifico.
+        """
+        query = """
+        SELECT title, text_content, button_text, background_color, button_color, 
+            button_text_color, text_color, entry_animation, use_third_party 
+        FROM cookie_policy 
+        WHERE shop_name = %s
+        """
+        with self.conn.cursor(dictionary=True) as cursor:
+            cursor.execute(query, (shop_name,))
+            result = cursor.fetchone()
+        
+        return result

@@ -3,7 +3,8 @@ from helpers import get_navbar_content, get_footer_content, get_web_settings, lo
 from models.collections import Collections
 from models.page import Page
 from models.products import Products
-from helpers import get_navbar_content, get_footer_content, get_web_settings, load_page_content, get_language
+from models.cookiepolicy import CookiePolicy
+from helpers import get_navbar_content, get_footer_content, get_web_settings, load_page_content, get_language, get_cookie_policy_content
 from db_helpers import DatabaseHelper
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -20,18 +21,21 @@ def render_dynamic_page(slug=None):
     # ri-ottengo il sottodominio per problemi
     shop_subdomain = request.host.split('.')[0]
 
+    cookie_policy_banner = get_cookie_policy_content(shop_subdomain)
+
+    print("DEBUG - Cookie Banner HTML:\n", cookie_policy_banner)  # 🔍 Stampa il codice
+
     page = load_page_content(slug, shop_subdomain)
 
     if page:
         # lingua corrente
         language = get_language()
 
-        # navbar e il footer specifici 
+        # navbar e il footer specifici e le impostazioni web
         navbar_content = get_navbar_content(shop_subdomain)
         footer_content = get_footer_content(shop_subdomain)
-
-        # dati da web_settings
         web_settings = get_web_settings(shop_subdomain)
+        cookie_policy_banner = get_cookie_policy_content(shop_subdomain)
 
         # 'head', 'script', e 'foot' da web_settings
         head_content = web_settings.get('head', '')
@@ -44,7 +48,8 @@ def render_dynamic_page(slug=None):
                                keywords=page['keywords'], 
                                content=page['content'], 
                                navbar=navbar_content,  
-                               footer=footer_content,  
+                               footer=footer_content, 
+                               cookie_policy_banner=cookie_policy_banner, 
                                language=language,
                                head=head_content,  
                                script=script_content,  
