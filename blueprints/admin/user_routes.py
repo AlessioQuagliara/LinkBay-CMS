@@ -5,7 +5,10 @@ from models.shoplist import ShopList
 from werkzeug.security import generate_password_hash, check_password_hash
 from db_helpers import DatabaseHelper
 from helpers import check_user_authentication
-import logging
+import logging, jwt
+from config import Config
+
+SECRET_KEY = Config.SECRET_KEY  # Ora funziona correttamente
 
 db_helper = DatabaseHelper()
 
@@ -63,58 +66,74 @@ def login():
     auth_db_conn = db_helper.get_auth_db_connection()  
     user_model = User(auth_db_conn)  
     access_model = UserStoreAccess(auth_db_conn)  
-    shop_list_model = ShopList(auth_db_conn)  # Modello per ottenere i dettagli dello store
+    shop_list_model = ShopList(auth_db_conn)
 
-    # Rileva il sottodominio o il dominio principale
-    domain_parts = request.host.split('.')
-    subdomain_or_domain = domain_parts[0] if len(domain_parts) > 1 else request.host
+    # **1️⃣ Controlla se il Token è presente nella richiesta**
+    token = request.args.get('token')
 
-    # Ottieni lo shop basato su `shop_name` o `domain`
-    shop = shop_list_model.get_shop_by_name_or_domain(subdomain_or_domain)
+    if token:
+        try:
+            decoded_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            user_id = decoded_token.get('user_id')
 
-    if not shop:
-        flash('Store not found for this domain or subdomain.', 'danger')
-        return redirect(url_for('user.login'))
+            if user_id:
+                user = user_model.get_user_by_id(user_id)
 
-    shop_id = shop['id']  # Identifica lo store attuale per l'accesso
-    shop_name = shop['shop_name']  # Per visualizzazione nel template
+                if user:
+                    # **Verifica accesso allo store**
+                    domain_parts = request.host.split('.')
+                    subdomain_or_domain = domain_parts[0] if len(domain_parts) > 1 else request.host
+                    shop = shop_list_model.get_shop_by_name_or_domain(subdomain_or_domain)
 
+                    if shop and access_model.has_access(user_id, shop['id']):
+                        session['user_id'] = user['id']
+                        session['username'] = user['nome']
+                        session['surname'] = user['cognome']
+                        session['email'] = user['email']
+                        session['phone'] = user['telefono']
+                        session['profile_photo'] = user['profilo_foto']
+                        session['shop_id'] = shop['id']
+
+                        return redirect(url_for('ui.homepage'))
+                    else:
+                        flash('Accesso negato a questo store.', 'danger')
+                        return redirect(url_for('user.login'))
+        except jwt.ExpiredSignatureError:
+            flash('Sessione scaduta. Effettua nuovamente il login.', 'danger')
+        except jwt.InvalidTokenError:
+            flash('Token non valido.', 'danger')
+
+    # **2️⃣ Se non c'è token, gestisce il login classico con email e password**
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        email = request.form.get('email')
+        password = request.form.get('password')
         user = user_model.get_user_by_email(email)
 
         if user and check_password_hash(user['password'], password):
-            # Verifica se l'utente ha accesso a questo specifico store
-            if access_model.has_access(user['id'], shop_id):
-                # Se ha accesso, imposta la sessione
+            # **Verifica accesso allo store**
+            domain_parts = request.host.split('.')
+            subdomain_or_domain = domain_parts[0] if len(domain_parts) > 1 else request.host
+            shop = shop_list_model.get_shop_by_name_or_domain(subdomain_or_domain)
+
+            if shop and access_model.has_access(user['id'], shop['id']):
                 session['user_id'] = user['id']
                 session['username'] = user['nome']
                 session['surname'] = user['cognome']
                 session['email'] = user['email']
                 session['phone'] = user['telefono']
                 session['profile_photo'] = user['profilo_foto']
-                session['shop_id'] = shop_id  # Salva lo shop_id nella sessione
+                session['shop_id'] = shop['id']
 
-                logging.info(f"Session after login: {session}")
-
-                # Controllo per 2FA
-                if user['is_2fa_enabled']:
-                    session['otp_secret'] = user['otp_secret']
-                    return redirect(url_for('verify_otp'))
-                else:
-                    return redirect(url_for('ui.homepage'))
+                return redirect(url_for('ui.homepage'))
             else:
-                # Se l'utente non ha accesso a questo store
-                flash('Access denied for this store.', 'danger')
+                flash('Accesso negato a questo store.', 'danger')
                 return redirect(url_for('user.login'))
         else:
-            # Se email o password non sono corretti
-            flash('Login failed. Please check your email and password.', 'danger')
+            flash('Credenziali non valide.', 'danger')
             return redirect(url_for('user.login'))
 
-    # Passa shop_name al template per mostrare il nome dello store
-    return render_template('admin/login.html', title='Login', shop_name=shop_name)
+    # **3️⃣ Se è solo GET, mostra la pagina di login**
+    return render_template('admin/login.html', title='Login')
 
 @user_bp.route('/admin/logout')
 def logout():

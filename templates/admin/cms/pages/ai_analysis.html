@@ -28,6 +28,19 @@
             max-width: 600px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             text-align: center;
+            max-height: 80vh; /* Limita l'altezza per evitare che il tasto sparisca */
+            overflow-y: auto; /* Aggiunge la barra di scorrimento */
+        }
+
+        #ai-advice {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+            display: block;
+            text-align: left;
+            max-height: 150px; /* Imposta un limite all'altezza */
+            overflow-y: auto; /* Aggiunge la scrollbar se il testo è lungo */
         }
         .btn-danger {
             background-color: #ff5757;
@@ -77,19 +90,10 @@
             from { width: 0; }
             to { width: 100%; }
         }
-        /* Fix per il testo che esce dalla card */
-        #ai-advice {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            max-width: 100%;
-            display: block;
-            text-align: left;
-        }
     </style>
 </head>
 <body>
-    <div class="card">
+    <div class="card" style="overflow-y: auto;">
         <img class="mb-4" src="../../../static/images/lb-logo.svg" width="230px" alt="Logo LinkBay">
         <h1 class="h3 mb-3">LinkBay AI Setup</h1>
         <div class="progress mb-3">

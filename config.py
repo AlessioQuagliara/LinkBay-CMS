@@ -1,7 +1,10 @@
+import os
+from environment import environment
+
 class Config:
     LANGUAGES = ['en', 'it', 'es', 'fr', 'de']
     DEFAULT_LANGUAGE = 'en'
-    SECRET_KEY = 'cxzw5H23390@sall13&'
+    SECRET_KEY = 'SpotexSrl@2024'
     
     # Configurazioni del Database dell'app (CMS_DEF)
     DB_HOST = '127.0.0.1'

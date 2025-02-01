@@ -28,7 +28,7 @@
     {% if selected_theme_ui %}
         {% include 'admin/cms/themes/' ~ selected_theme_ui.name ~ '.html' %}
     {% else %}
-        <p>No theme selected for this store.</p>
+        {% include 'admin/cms/themes/Norman.html' %}
     {% endif %}
 </body>
 </html>

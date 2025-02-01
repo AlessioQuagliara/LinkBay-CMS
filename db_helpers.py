@@ -1,9 +1,10 @@
 from flask import g
 import mysql.connector
+from environment import environment  # Importa l'ambiente (development/production)
 
 class DatabaseHelper:
     """
-    Classe per gestire le connessioni al database.
+    Classe per gestire le connessioni al database in base all'ambiente.
     """
     def __init__(self):
         self.conn = None
@@ -11,42 +12,50 @@ class DatabaseHelper:
 
     def get_db_connection(self):
         """
-        Ottiene la connessione al database principale (CMS_DEF) e la salva in 'g'.
+        Ottiene la connessione al database CMS_DEF in base all'ambiente.
         """
         if 'db' not in g:
-            g.db = mysql.connector.connect(
-                #host='127.0.0.1',  # Configurazione del database principale
-                #user='root',
-                #password='root',
-                #database='CMS_DEF',
-                #port=8889
-                user="root",
-                password="root",
-                host="127.0.0.1",
-                database="cms_def",
-                port=3306,  # Usa la porta corretta per il database di produzione
-                auth_plugin='mysql_native_password'  # Specifica il plugin se necessario
-            )
+            if environment == 'development':
+                g.db = mysql.connector.connect(
+                    host='127.0.0.1',
+                    user='root',
+                    password='root',
+                    database='CMS_DEF',
+                    port=8889
+                )
+            else:  # Se è 'production'
+                g.db = mysql.connector.connect(
+                    host='127.0.0.1',
+                    user='root',
+                    password='root',
+                    database='cms_def',
+                    port=3306,
+                    auth_plugin='mysql_native_password'
+                )
         return g.db
 
     def get_auth_db_connection(self):
         """
-        Ottiene la connessione al database CMS_INDEX e la salva in 'g'.
+        Ottiene la connessione al database CMS_INDEX in base all'ambiente.
         """
         if 'auth_db' not in g:
-            g.auth_db = mysql.connector.connect(
-                #host='127.0.0.1',
-                #user='root',         # Usa l'utente corretto
-                #password='root',      # Usa la password corretta
-                #database='CMS_INDEX', # Nome del database
-                #port=8889             # Porta corretta
-                user="root",
-                password="root",
-                host="127.0.0.1",
-                database="cms_index",
-                port=3306,  # Usa la porta corretta per il database di produzione
-                auth_plugin='mysql_native_password'  # Specifica il plugin se necessario
-            )
+            if environment == 'development':
+                g.auth_db = mysql.connector.connect(
+                    host='127.0.0.1',
+                    user='root',
+                    password='root',
+                    database='CMS_INDEX',
+                    port=8889
+                )
+            else:  # Se è 'production'
+                g.auth_db = mysql.connector.connect(
+                    host='127.0.0.1',
+                    user='root',
+                    password='root',
+                    database='cms_index',
+                    port=3306,
+                    auth_plugin='mysql_native_password'
+                )
         return g.auth_db
 
     def execute_query(self, query, params=None, use_auth=False):

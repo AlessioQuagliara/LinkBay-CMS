@@ -23,8 +23,6 @@ def render_dynamic_page(slug=None):
 
     cookie_policy_banner = get_cookie_policy_content(shop_subdomain)
 
-    print("DEBUG - Cookie Banner HTML:\n", cookie_policy_banner)  # 🔍 Stampa il codice
-
     page = load_page_content(slug, shop_subdomain)
 
     if page:
