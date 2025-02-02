@@ -98,16 +98,16 @@ def get_navbar_content(shop_subdomain):
     for link in top_level_links:
         # **Dropdown automatico per le collezioni**
         if link['link_url'] == "show_collections":
-            nav_items_html += '''
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="dropdown-collections" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            nav_items_html += """""
+                <li class='nav-item dropdown'>
+                    <a class='nav-link dropdown-toggle' href='#' id="dropdown-collections' role='button' data-bs-toggle='dropdown' aria-expanded='false'>
                         Collections
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="dropdown-collections">
-            '''
+                    <ul class='dropdown-menu' aria-labelledby='dropdown-collections'>
+            """
             for collection in collections:
-                nav_items_html += f'<li><a class="dropdown-item" href="/collections/{collection["slug"]}">{collection["name"]}</a></li>'
-            nav_items_html += '</ul></li>'
+                nav_items_html += f"<li><a class='dropdown-item' href='/collections/{collection['slug']}'>{collection['name']}</a></li>"
+            nav_items_html += "</ul></li>"
 
         # **Dropdown personalizzati**
         elif link['id'] in dropdown_links:
@@ -119,12 +119,12 @@ def get_navbar_content(shop_subdomain):
                     <ul class="dropdown-menu" aria-labelledby="dropdown-{link['id']}">
             '''
             for sub_link in dropdown_links[link['id']]:
-                nav_items_html += f'<li><a class="dropdown-item" href="{sub_link["link_url"]}">{sub_link["link_text"]}</a></li>'
-            nav_items_html += '</ul></li>'
+                nav_items_html += f"<li><a class='dropdown-item' href='{sub_link['link_url']}'>{sub_link['link_text']}</a></li>"
+            nav_items_html += "</ul></li>"
 
         # **Azioni speciali senza link ma con ID**
         elif link['link_url'] in ["cart", "account", "search"]:
-            nav_items_html += f'<li class="nav-item"><a class="nav-link" id="{link["link_url"]}">{link["link_text"]}</a></li>'
+            nav_items_html += f"<li class='nav-item'><a class='nav-link' id='{link['link_url']}'>{link['link_text']}</a></li>"
 
         # **Link standard**
         else:
