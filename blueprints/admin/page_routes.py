@@ -5,8 +5,9 @@ from models.cmsaddon import CMSAddon
 from models.products import Products
 from models.navbar import Navbar
 from config import Config
+import datetime
 from datetime import datetime, timedelta
-import mysql.connector, datetime, os, uuid, re, base64
+import mysql.connector, os, uuid, re, base64
 from db_helpers import DatabaseHelper
 db_helper = DatabaseHelper()
 from db_helpers import DatabaseHelper
@@ -515,10 +516,13 @@ def get_site_visits():
 @page_bp.route('/api/get-active-visitors', methods=['GET'])
 def get_active_visitors():
     """
-    API per ottenere il numero di visitatori attivi nelle ultime 1 minuti.
+    API per ottenere il numero di visitatori attivi negli ultimi 1 minuti.
     """
     try:
         shop_name = request.host.split('.')[0]  # Ottieni il nome del negozio
+        if not shop_name:
+            return jsonify({'success': False, 'error': 'Shop name could not be determined'}), 400
+
         ten_minutes_ago = datetime.utcnow() - timedelta(minutes=1)
 
         with db_helper.get_db_connection() as conn:
@@ -530,7 +534,12 @@ def get_active_visitors():
             """, (shop_name, ten_minutes_ago))
             result = cursor.fetchone()
 
-        return jsonify({'success': True, 'active_visitors': result["active_visitors"]})
+        # Verifica il risultato della query
+        active_visitors = result["active_visitors"] if result and result["active_visitors"] is not None else 0
+
+        return jsonify({'success': True, 'active_visitors': active_visitors})
 
     except Exception as e:
+        import traceback
+        traceback.print_exc()  # Debug completo per log
         return jsonify({'success': False, 'error': str(e)}), 500

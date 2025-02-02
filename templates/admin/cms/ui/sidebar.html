@@ -285,7 +285,7 @@
         {% if not session['profile_photo'] or session['profile_photo'] == ' ' %}
             <img src="../../../../static/images/male_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
         {% else %}
-            <img src="https://www.linkbay-cms.com/static/uploads/profile_pictures/{{ session['profile_photo'] }}" alt="" width="32" height="32" class="rounded-circle me-2">
+            <img src="https://www.linkbay-cms.com{{ session['profile_photo'] }}" alt="" width="32" height="32" class="rounded-circle me-2">
         {% endif %}
             <strong>{{ session['username'] }} {{ session['surname'] }}</strong>
         </a>

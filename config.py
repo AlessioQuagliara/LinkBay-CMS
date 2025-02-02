@@ -31,6 +31,9 @@ class Config:
         GODADDY_API_URL = 'https://api.ote-godaddy.com/v1/'
         GODADDY_API_KEY = '3mM44WkB29Cg9H_GRJds69oVsyQQrUYFoeTyh'
         GODADDY_API_SECRET = '42FBcBbn8SZFWuGGsetaDF'
+        # Configurazioni Stripe interne
+        STRIPE_SECRET_KEY='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'
+        STRIPE_PUBLISHABLE_KEY='pk_live_51MijPqDLzaeBHrX0rui4jtJnGx1kTSKVNbVy6hbQQYUfoMhVTMVEFoN6U7jfYh2tyRgLhvSgOSM5wpSmi55nS3PH00XUmvoSY0'
     else:
         SESSION_COOKIE_SECURE = True  # PER CHI MODIFICA = Sicuro solo su HTTPS, disabilitato in locale
         SESSION_PERMANENT = True  # PER CHI MODIFICA = Non mantenere la sessione dopo la chiusura del browser
