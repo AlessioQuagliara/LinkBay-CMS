@@ -522,7 +522,7 @@ def get_active_visitors():
         if not shop_name:
             return jsonify({'success': False, 'error': 'Shop name could not be determined'}), 400
 
-        ten_minutes_ago = datetime.utcnow() - timedelta(minutes=1)
+        ten_minutes_ago = datetime.datetime.now() - timedelta(minutes=1)
 
         with db_helper.get_db_connection() as conn:
             cursor = conn.cursor(dictionary=True)
