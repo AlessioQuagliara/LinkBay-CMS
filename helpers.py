@@ -1,8 +1,12 @@
 from flask import session, request
 from models import ShopList
 from models.cookiepolicy import CookiePolicy
+from models.websettings import WebSettings
 from db_helpers import DatabaseHelper
 import re
+from jinja2 import Template
+import logging
+logging.basicConfig(level=logging.INFO)
 
 # Inizializza il gestore del database
 db_helper = DatabaseHelper()
@@ -46,26 +50,211 @@ def load_page_content(slug, shop_subdomain):
         return result[0] if result else None
     return None
 
+def render_theme_styles(shop_subdomain):
+    """
+    Recupera le impostazioni web per lo shop e, in base al valore di 'theme_name',
+    restituisce uno style block con stili personalizzati.
+    """
+    # Recupera le impostazioni web dallo shop (funzione già definita)
+    settings = get_web_settings(shop_subdomain)
+    # Estrai il nome del tema; se non esiste, usa 'default'
+    theme_name = settings.get('theme_name', 'Norman').lower()
+    
+    # Definisci dei template CSS per i vari temi
+    if theme_name == 'norman':
+        style_template = """
+        <style>
+        /* Stile per .navbar-nav dentro una navbar scura */
+            .navbar-nav {
+                margin-left: auto; /* Spinge i link a destra */
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
 
-import re
-from flask import request
-from db_helpers import DatabaseHelper
+            /* Stile per i link nella navbar */
+            .navbar-nav .nav-link {
+                color: #f8f9fa; /* Bianco Bootstrap */
+                font-weight: 500;
+                padding: 10px 15px;
+                border-radius: 5px;
+                transition: background 0.3s ease, color 0.3s ease;
+            }
 
-db_helper = DatabaseHelper()
+            /* Effetto hover per i link */
+            .navbar-nav .nav-link:hover {
+                background: rgba(255, 255, 255, 0.1);
+                color: #ffffff;
+            }
+
+            /* Stile per la dropdown */
+            .navbar-nav .dropdown-menu {
+                background-color: #343a40; /* Dark grey */
+                border: none;
+                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            /* Stile per gli elementi della dropdown */
+            .navbar-nav .dropdown-item {
+                color: #f8f9fa;
+                transition: background 0.3s ease, color 0.3s ease;
+            }
+
+            /* Effetto hover sulla dropdown */
+            .navbar-nav .dropdown-item:hover {
+                background-color: #495057;
+                color: #ffffff;
+            }
+
+            /* Stile per la navbar toggler (mobile) */
+            .navbar-toggler {
+                border: none;
+            }
+
+            /* Icona toggler bianca */
+            .navbar-toggler-icon {
+                filter: invert(100%);
+            }
+        </style>
+        """
+    elif theme_name == 'motion':
+        style_template = """
+        <style>
+            /* Stile per .navbar-nav dentro una navbar blu */
+            .navbar-nav {
+                margin-left: auto; /* Spinge i link a destra */
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            /* Stile per i link nella navbar */
+            .navbar-nav .nav-link {
+                color: #ffffff; /* Testo bianco per contrasto */
+                font-weight: 500;
+                padding: 10px 15px;
+                border-radius: 5px;
+                transition: background 0.3s ease, color 0.3s ease;
+            }
+
+            /* Effetto hover per i link */
+            .navbar-nav .nav-link:hover {
+                background: rgba(255, 255, 255, 0.2);
+                color: #ffffff;
+            }
+
+            /* Stile per la dropdown */
+            .navbar-nav .dropdown-menu {
+                background-color: #002244; /* Blu più scuro */
+                border: none;
+                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            /* Stile per gli elementi della dropdown */
+            .navbar-nav .dropdown-item {
+                color: #ffffff;
+                transition: background 0.3s ease, color 0.3s ease;
+            }
+
+            /* Effetto hover sulla dropdown */
+            .navbar-nav .dropdown-item:hover {
+                background-color: #004080;
+                color: #ffffff;
+            }
+
+            /* Stile per la navbar toggler (mobile) */
+            .navbar-toggler {
+                border: none;
+            }
+
+            /* Icona toggler bianca */
+            .navbar-toggler-icon {
+                filter: invert(100%);
+            }
+        </style>
+        """
+    else:
+        # Default theme: stili base
+        style_template = """
+        <style>
+        </style>
+        """
+    
+    # Usa Jinja2 per renderizzare il template (qui è statico, ma potresti aggiungere variabili dinamiche se serve)
+    try:
+        template = Template(style_template)
+        rendered_style = template.render()
+    except Exception as e:
+        logging.error("Errore nel rendering del tema: " + str(e))
+        rendered_style = style_template  # Fallback: usa il template statico
+    return rendered_style
+
+def render_navbar_template(navbar_html, nav_links_html):
+    try:
+        template = Template(navbar_html)
+        # Il dizionario 'context' contiene le variabili da iniettare nel template
+        context = {'navbar_links': nav_links_html}
+        return template.render(**context)
+    except Exception as e:
+        logging.error("Errore nel rendering del template navbar: " + str(e))
+        return navbar_html  # Fallback: restituisce l'HTML originale
+    
+def build_nav_items(top_links, dropdown_links, collections):
+    nav_items_html = ""
+    
+    # Mappa per associare link_url a classi di icone
+    icon_mapping = {
+        "cart": "fa-solid fa-cart-shopping",
+        "account": "fa-solid fa-user",
+        "search": "fa-solid fa-magnifying-glass"
+    }
+
+    for link in top_links:
+        if link['link_url'] == "show_collections":
+            nav_items_html += f"""
+                <li class='nav-item dropdown'>
+                    <a class='nav-link dropdown-toggle' href='#' id='dropdown-collections' role='button' data-bs-toggle='dropdown' aria-expanded='false'>
+                        {link['link_text']}
+                    </a>
+                    <ul class='dropdown-menu' aria-labelledby='dropdown-collections'>
+            """
+            for collection in collections:
+                nav_items_html += f"<li><a class='dropdown-item' href='/collections/{collection['slug']}'>{collection['name']}</a></li>"
+            nav_items_html += "</ul></li>"
+        elif link['id'] in dropdown_links:
+            nav_items_html += f"""
+                <li class='nav-item dropdown'>
+                    <a class='nav-link dropdown-toggle' href='#' id='dropdown-{link['id']}' role='button' data-bs-toggle='dropdown' aria-expanded='false'>
+                        {link['link_text']}
+                    </a>
+                    <ul class='dropdown-menu' aria-labelledby='dropdown-{link['id']}'>
+            """
+            for sub_link in dropdown_links[link['id']]:
+                nav_items_html += f"<li><a class='dropdown-item' href='{sub_link['link_url']}'>{sub_link['link_text']}</a></li>"
+            nav_items_html += "</ul></li>"
+        elif link['link_url'] in ["cart", "account", "search"]:
+            # Recupera la classe icona dalla mappa; se non presente, usa una stringa vuota
+            icon_class = icon_mapping.get(link['link_url'], "")
+            # Genera l'HTML con l'icona; in questo esempio, aggiungo anche l'href uguale al link_url per eventuale navigazione
+            nav_items_html += f"<li class='nav-item'><a class='nav-link' id='{link['link_url']}'><i class='{icon_class}'></i></a></li>"
+        else:
+            nav_items_html += f'<li class="nav-item"><a class="nav-link" href="{link["link_url"]}">{link["link_text"]}</a></li>'
+    return nav_items_html
+
 
 def get_navbar_content(shop_subdomain):
     """
-    Recupera l'HTML della navbar da `pages.content` e inserisce dinamicamente i link, comandi speciali e azioni.
+    Recupera l'HTML della navbar dal database e sostituisce dinamicamente il placeholder con i link generati.
     """
     conn = db_helper.get_db_connection()
     shop_name = shop_subdomain.split('.')[0]
 
-    # Recupera l'HTML della navbar dalla tabella `pages`
+    # Recupera il template della navbar dalla tabella 'pages'
     query_navbar = "SELECT content FROM pages WHERE slug = 'navbar' AND shop_name = %s"
     result = db_helper.execute_query(query_navbar, (shop_name,))
     navbar_html = result[0]['content'] if result else ''
 
-    # Recupera i link della navbar dalla tabella `navbar_links`
+    # Recupera i link della navbar dalla tabella 'navbar_links'
     query_links = """
         SELECT id, link_text, link_url, link_type, parent_id, position 
         FROM navbar_links 
@@ -73,9 +262,6 @@ def get_navbar_content(shop_subdomain):
         ORDER BY position ASC
     """
     links = db_helper.execute_query(query_links, (shop_name,))
-    
-    if not links or not navbar_html:
-        return navbar_html  # Se non ci sono link o navbar, restituiamo l'HTML originale
 
     # Recupera le collezioni attive per il dropdown
     query_collections = """
@@ -84,56 +270,29 @@ def get_navbar_content(shop_subdomain):
     """
     collections = db_helper.execute_query(query_collections, (shop_name,))
 
-    # Organizzazione dei link per dropdown
+    if not links or not navbar_html:
+        return navbar_html  # Se non ci sono dati dinamici, ritorna l'HTML originale
+
+    # Organizza i link per dropdown
     top_level_links = [link for link in links if link['parent_id'] is None]
     dropdown_links = {link['parent_id']: [] for link in links if link['parent_id']}
-
     for link in links:
         if link['parent_id']:
             dropdown_links[link['parent_id']].append(link)
 
-    # **Generazione dell'HTML della navbar**
-    nav_items_html = ""
+    # Costruisci il markup dinamico per i link
+    nav_items_html = build_nav_items(top_level_links, dropdown_links, collections)
 
-    for link in top_level_links:
-        # **Dropdown automatico per le collezioni**
-        if link['link_url'] == "show_collections":
-            nav_items_html += """""
-                <li class='nav-item dropdown'>
-                    <a class='nav-link dropdown-toggle' href='#' id="dropdown-collections' role='button' data-bs-toggle='dropdown' aria-expanded='false'>
-                        Collections
-                    </a>
-                    <ul class='dropdown-menu' aria-labelledby='dropdown-collections'>
-            """
-            for collection in collections:
-                nav_items_html += f"<li><a class='dropdown-item' href='/collections/{collection['slug']}'>{collection['name']}</a></li>"
-            nav_items_html += "</ul></li>"
+    # Renderizza il template della navbar usando Jinja2 e il contesto dinamico
+    from jinja2 import Template
+    try:
+        template = Template(navbar_html)
+        rendered_navbar = template.render(navbar_links=nav_items_html)
+    except Exception as e:
+        logging.error("Errore nel rendering del template navbar: " + str(e))
+        rendered_navbar = navbar_html
 
-        # **Dropdown personalizzati**
-        elif link['id'] in dropdown_links:
-            nav_items_html += f'''
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="dropdown-{link['id']}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        {link['link_text']}
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="dropdown-{link['id']}">
-            '''
-            for sub_link in dropdown_links[link['id']]:
-                nav_items_html += f"<li><a class='dropdown-item' href='{sub_link['link_url']}'>{sub_link['link_text']}</a></li>"
-            nav_items_html += "</ul></li>"
-
-        # **Azioni speciali senza link ma con ID**
-        elif link['link_url'] in ["cart", "account", "search"]:
-            nav_items_html += f"<li class='nav-item'><a class='nav-link' id='{link['link_url']}'>{link['link_text']}</a></li>"
-
-        # **Link standard**
-        else:
-            nav_items_html += f'<li class="nav-item"><a class="nav-link" href="{link["link_url"]}">{link["link_text"]}</a></li>'
-
-    # **Sostituzione dinamica dell'HTML nella navbar**
-    navbar_html = re.sub(r"<ul class=\"navbar-nav.*?</ul>", f"<ul class='navbar-nav ms-auto'>{nav_items_html}</ul>", navbar_html, flags=re.DOTALL)
-
-    return navbar_html
+    return rendered_navbar
 
 
 def get_footer_content(shop_subdomain):

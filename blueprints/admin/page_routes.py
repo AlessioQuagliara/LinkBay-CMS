@@ -4,13 +4,14 @@ from models.shoplist import ShopList
 from models.cmsaddon import CMSAddon
 from models.products import Products
 from models.navbar import Navbar
+from models.site_visits import SiteVisits 
 from config import Config
 from datetime import datetime, timedelta
 import mysql.connector, os, uuid, re, base64, datetime
 from db_helpers import DatabaseHelper
 db_helper = DatabaseHelper()
 from db_helpers import DatabaseHelper
-from helpers import check_user_authentication
+from helpers import check_user_authentication, get_navbar_content 
 import logging
 logging.basicConfig(level=logging.INFO)
 
@@ -155,7 +156,7 @@ def editor_interface(slug=None):
         return render_template('admin/cms/store_editor/editor_interface.html', 
                                title=page_title, 
                                pages=pages, 
-                               page=page, 
+                               page=page,
                                slug=slug,  
                                current_url=current_url, 
                                username=username,
@@ -179,8 +180,8 @@ def edit_page(slug):
             flash('Nessun negozio selezionato o negozio non trovato.', 'danger')
             return redirect(url_for('ui.homepage'))
 
-        # Recupera la lingua selezionata
-        language = request.args.get('language', 'en')  # Default "en" se non è specificata
+        # Recupera la lingua selezionata (default "en")
+        language = request.args.get('language', 'en')
 
         page_model = Page(db_conn)
         page = page_model.get_page_by_slug_and_language(slug, language, shop_subdomain)  
@@ -195,7 +196,7 @@ def edit_page(slug):
 
         # Recupera i dettagli del prodotto se la pagina contiene riferimenti a prodotti
         product_model = Products(db_conn)
-        product_references = page_model.get_product_references(page['id'])  # Supponendo esista un metodo per i riferimenti ai prodotti
+        product_references = page_model.get_product_references(page['id'])
         products = []
         for product_id in product_references:
             product = product_model.get_product_by_id(product_id)
@@ -203,13 +204,17 @@ def edit_page(slug):
                 product['images'] = product_model.get_product_images(product['id'])
                 products.append(product)
 
+        # Recupera il contenuto dinamico della navbar usando il modello e gli helper
+        navbar_content = get_navbar_content(shop_subdomain)
+
         return render_template(
             'admin/cms/function/edit.html', 
             title='Edit Page', 
             page=page, 
             username=username, 
             selected_theme_ui=selected_theme_ui,
-            products=products  # Passa i dati del prodotto al template
+            products=products,
+            navbar=navbar_content  # Passa il contenuto della navbar al template
         )
     
     return username
@@ -494,51 +499,19 @@ def get_site_visits():
     API per recuperare le visite del negozio corrente.
     """
     try:
-        shop_name = request.host.split('.')[0]  # Ottieni il nome del negozio
+        shop_name = request.host.split('.')[0] if request.host else None
 
+        if not shop_name:
+            return jsonify({'success': False, 'error': 'Invalid shop name'}), 400
+
+        # Connessione al database
         with db_helper.get_db_connection() as conn:
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute("""
-                SELECT ip_address, referrer, page_url, visit_time 
-                FROM site_visits 
-                WHERE shop_name = %s 
-                ORDER BY visit_time DESC
-                LIMIT 100
-            """, (shop_name,))
-            visits = cursor.fetchall()
+            site_visits = SiteVisits(conn)
+            visits = site_visits.get_recent_visits(shop_name, limit=100)
 
         return jsonify({'success': True, 'visits': visits})
 
     except Exception as e:
+        logging.error(f"Errore in get_site_visits: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
     
-@page_bp.route('/api/get-active-visitors', methods=['GET'])
-def get_active_visitors():
-    """
-    API per ottenere il numero di visitatori attivi negli ultimi 1 minuti.
-    """
-    try:
-        shop_name = request.host.split('.')[0]  # Ottieni il nome del negozio
-        if not shop_name:
-            return jsonify({'success': False, 'error': 'Shop name could not be determined'}), 400
-
-        ten_minutes_ago = datetime.datetime.now() - timedelta(minutes=1)
-
-        with db_helper.get_db_connection() as conn:
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute("""
-                SELECT COUNT(DISTINCT ip_address) AS active_visitors
-                FROM site_visits
-                WHERE shop_name = %s AND visit_time >= %s
-            """, (shop_name, ten_minutes_ago))
-            result = cursor.fetchone()
-
-        # Verifica il risultato della query
-        active_visitors = result["active_visitors"] if result and result["active_visitors"] is not None else 0
-
-        return jsonify({'success': True, 'active_visitors': active_visitors})
-
-    except Exception as e:
-        import traceback
-        traceback.print_exc()  # Debug completo per log
-        return jsonify({'success': False, 'error': str(e)}), 500

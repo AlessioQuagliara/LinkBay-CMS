@@ -4,7 +4,7 @@ from models.collections import Collections
 from models.page import Page
 from models.products import Products
 from models.cookiepolicy import CookiePolicy
-from helpers import get_navbar_content, get_footer_content, get_web_settings, load_page_content, get_language, get_cookie_policy_content
+from helpers import get_navbar_content, get_footer_content, get_web_settings, load_page_content, get_language, get_cookie_policy_content, render_theme_styles
 from db_helpers import DatabaseHelper
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -33,6 +33,7 @@ def render_dynamic_page(slug=None):
         navbar_content = get_navbar_content(shop_subdomain)
         footer_content = get_footer_content(shop_subdomain)
         web_settings = get_web_settings(shop_subdomain)
+        render_theme = render_theme_styles(shop_subdomain)
         cookie_policy_banner = get_cookie_policy_content(shop_subdomain)
 
         # 'head', 'script', e 'foot' da web_settings
@@ -47,6 +48,7 @@ def render_dynamic_page(slug=None):
                                content=page['content'], 
                                navbar=navbar_content,  
                                footer=footer_content, 
+                               render_theme = render_theme,
                                cookie_policy_banner=cookie_policy_banner, 
                                language=language,
                                head=head_content,  
@@ -75,7 +77,7 @@ def render_collection(slug=None):
         product_images = product_model.get_images_for_products([p['id'] for p in products_in_collection])
     else:
         collection = None
-        products_in_collection = product_model.get_all_products()
+        products_in_collection = product_model.get_all_products(shop_subdomain)
         product_images = product_model.get_images_for_products([p['id'] for p in products_in_collection])
 
     # Aggiungi immagini ai prodotti
@@ -87,6 +89,7 @@ def render_collection(slug=None):
     # Carica contenuti navbar e footer
     navbar_content = get_navbar_content(shop_subdomain)
     footer_content = get_footer_content(shop_subdomain)
+    render_theme = render_theme_styles(shop_subdomain)
 
     # Impostazioni web del negozio
     web_settings = get_web_settings(shop_subdomain)
@@ -102,6 +105,7 @@ def render_collection(slug=None):
         collection=collection,
         products=products_in_collection,
         navbar=navbar_content,
+        render_theme = render_theme,
         footer=footer_content,
         head=head_content,
         script=script_content,
@@ -129,6 +133,7 @@ def render_product(slug):
         # Carica contenuti navbar e footer
         navbar_content = get_navbar_content(shop_subdomain)
         footer_content = get_footer_content(shop_subdomain)
+        render_theme = render_theme_styles(shop_subdomain)
 
         # Impostazioni web del negozio
         web_settings = get_web_settings(shop_subdomain)
@@ -136,17 +141,23 @@ def render_product(slug):
         script_content = web_settings.get('script', '')
         foot_content = web_settings.get('foot', '')
 
-        # Sostituisci manualmente le variabili nel contenuto della pagina
-        page_content = page['content']
-        page_content = page_content.replace('{{ product.name }}', product['name'])
-        page_content = page_content.replace('{{ product.price }}', str(product['price']))
-        page_content = page_content.replace('{{ product.short_description }}', product['short_description'])
-        page_content = page_content.replace('{{ product.description }}', product['description'])
-        page_content = page_content.replace('{{ product.stock_quantity }}', str(product['stock_quantity']))
-        if product.get('discount_price'):
-            page_content = page_content.replace('{{ product.discount_price }}', str(product['discount_price']))
+        # Verifica se la pagina è stata trovata e assegna un valore di fallback se necessario
+        if page and 'content' in page:
+            page_content = page['content']
         else:
-            page_content = page_content.replace('{{ product.discount_price }}', '')
+            page_content = ""  # Valore di fallback
+
+        # Se è presente del contenuto, sostituisci le variabili
+        if page_content:
+            page_content = page_content.replace('{{ product.name }}', product['name'])
+            page_content = page_content.replace('{{ product.price }}', str(product['price']))
+            page_content = page_content.replace('{{ product.short_description }}', product['short_description'])
+            page_content = page_content.replace('{{ product.description }}', product['description'])
+            page_content = page_content.replace('{{ product.stock_quantity }}', str(product['stock_quantity']))
+            if product.get('discount_price'):
+                page_content = page_content.replace('{{ product.discount_price }}', str(product['discount_price']))
+            else:
+                page_content = page_content.replace('{{ product.discount_price }}', '')
 
         # Render della pagina
         return render_template(
@@ -154,9 +165,10 @@ def render_product(slug):
             title=product['name'],
             description=product['short_description'],
             product=product,
-            page=page_content,  # Passa il contenuto processato
+            page=page_content,  # Passa il contenuto processato (anche vuoto se la pagina non è stata trovata)
             images=product_images,  # Passa le immagini al template
             navbar=navbar_content,
+            render_theme = render_theme,
             footer=footer_content,
             head=head_content,
             script=script_content,

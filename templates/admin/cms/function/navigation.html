@@ -28,6 +28,15 @@
             gap: 20px; /* Aggiunto un gap tra i contenitori */
             height: auto; /* Altezza dinamica in base al contenuto */
         }
+        .hidden-col {
+            display: none;
+        }
+        .table {
+            border-collapse: separate !important; /* Disattiva il comportamento predefinito */
+            border-spacing: 0; /* Evita spazi tra le celle */
+            border-radius: 10px !important;
+            overflow: hidden; /* Assicura che il border-radius venga applicato */
+        }
     </style>
 </head>
 <body>
@@ -36,55 +45,65 @@
 
 <!--------------------- Container principale --------------------->
 <div class="content-container" data-aos="fade-up">
-    <!-- Toolbar sopra la tabella -->
-    <div class="container mb-3">
-        <div class="card shadow-sm">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <div>
-                    <a class="btn {% if title == 'Navbar Settings' %}btn-dark{% else %}btn-outline-dark{% endif %} btn-sm text-decoration-none ">
-                        <i class="fa-solid fa-box"></i> Navbar Links
-                    </a>
-                </div>
-                <button class="btn btn-dark btn-sm mx-1" title="Add Product" id="add-link">
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-                <button class="btn btn-dark btn-sm mx-1" id="delete-selected" title="Delete">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
-            </div>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toolbar.css') }}">
+
+<!-- Card per la gestione della Navbar -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body d-flex justify-content-between align-items-center">
+        <div class="d-flex gap-3">
+            <a href="/admin/cms/pages/navbar" class="btn {% if title == 'Navbar Settings' %}btn-dark{% else %}btn-outline-dark{% endif %} btn-sm text-decoration-none">
+                <i class="fa-solid fa-box"></i> Navbar Links
+            </a>
+        </div>
+        <div class="custom-toolbar">
+
+            <!-- Aggiungi nuovo link -->
+            <button class="custom-btn" id="add-link" title="Add Link">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+
+            <!-- Elimina selezionati -->
+            <button class="custom-btn delete-selected" id="delete-selected" title="Delete">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+
         </div>
     </div>
+</div>
 
     <!---------------------- Tabella Navbar ---------------------->
-    <div class="container">
+    <div>
         <div class="table-responsive">
-            <table class="table table-hover table-bordered align-middle text-center" style="border-radius: 10px;">
+            <table class="table table-hover table-bordered align-middle text-center" style="border-radius: 10px !important;">
+                <!-- Nella sezione <thead> -->
                 <thead class="table-dark">
                     <tr>
                         <th><input type="checkbox" id="select-all"></th>
                         <th>Label</th>
                         <th>URL</th>
-                        <th>Type</th>
-                        <th>Parent ID</th>
-                        <th>Position</th>
+                        <th class="hidden-col">Type</th>
+                        <th class="hidden-col">Parent ID</th>
+                        <th class="hidden-col">Position</th>
                     </tr>
                 </thead>
+                <!-- E nel <tbody> ogni cella per link_type e parent_id con la classe "hidden-col" -->
                 <tbody id="navbar-links">
                     {% for link in navbar_links %}
                     <tr data-id="{{ link.id }}">
                         <td><input type="checkbox" class="select-link"></td>
                         <td><input type="text" class="form-control" value="{{ link.link_text }}"></td>
                         <td><input type="text" class="form-control url-input" data-bs-toggle="modal" data-bs-target="#urlSelectorModal" value="{{ link.link_url }}" readonly></td>
-                        <td>
+                        <td class="hidden-col">
                             <select class="form-select">
                                 <option value="standard" {% if link.link_type == 'standard' %}selected{% endif %}>Standard</option>
                                 <option value="dropdown" {% if link.link_type == 'dropdown' %}selected{% endif %}>Dropdown</option>
                                 <option value="external" {% if link.link_type == 'external' %}selected{% endif %}>External</option>
-                                <option value="external" {% if link.link_type == 'action' %}selected{% endif %}>Action</option>
+                                <option value="action" {% if link.link_type == 'action' %}selected{% endif %}>Action</option>
                             </select>
                         </td>
-                        <td><input type="number" class="form-control" value="{{ link.parent_id }}"></td>
-                        <td class="position">{{ link.position }}</td>
+                        <td class="hidden-col"><input type="number" class="form-control" value="{{ link.parent_id }}"></td>
+                        <td class="position hidden-col">{{ link.position }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -393,13 +412,40 @@
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        new Sortable(document.getElementById('navbar-links'), {
+        let navbarList = document.getElementById('navbar-links');
+    
+        new Sortable(navbarList, {
             animation: 150,
+            group: 'nested',
+            fallbackOnBody: true,
+            swapThreshold: 0.65,
             onEnd: function () {
-                updatePositions();
+                updateLinkHierarchy();
             }
         });
+    
+        function updateLinkHierarchy() {
+            document.querySelectorAll("#navbar-links tr").forEach((row, index) => {
+                let parentRow = row.closest('tbody').closest('tr'); // Trova se ha un genitore
+                let parentIdInput = row.querySelector("td:nth-child(5) input"); // Input nascosto parent_id
+                let linkTypeSelect = row.querySelector("td:nth-child(4) select"); // Select per il tipo di link
+    
+                row.dataset.position = index + 1; // Aggiorna posizione
+    
+                if (parentRow) {
+                    // Se ha un genitore, aggiorna parent_id e imposta il genitore come dropdown
+                    parentIdInput.value = parentRow.dataset.id;
+                    parentRow.querySelector("td:nth-child(4) select").value = "dropdown";
+                } else {
+                    // Se è un link principale, resetta parent_id e torna standard
+                    parentIdInput.value = "";
+                    if (linkTypeSelect.value === "dropdown") {
+                        linkTypeSelect.value = "standard";
+                    }
+                }
+            });
+        }
     });
-</script>
+    </script>
 </body>
 </html>

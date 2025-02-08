@@ -3,6 +3,8 @@
 {% block content %}
 <div class="container my-4">
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toolbar.css') }}">
+
     <!-- Card per le funzioni della tabella -->
     <div class="card shadow-sm mb-4" data-aos="fade-up">
         <div class="card-body d-flex justify-content-between align-items-center">
@@ -11,30 +13,30 @@
                     <i class="fa-solid fa-box"></i> Shippings
                 </a>
             </div>
-            <div>
-                <button class="btn btn-dark btn-sm mx-1" id="search-toggle-btn" title="Search">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="search-input" class="form-control form-control-sm d-none" placeholder="Search..." style="max-width: 200px;">
+            <div class="custom-toolbar">
+                <button class="custom-btn" id="search-toggle-btn" title="Search">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  <input type="text" id="search-input" class="custom-input d-none" placeholder="Search..." style="max-width: 200px;">
                 </button>
                 
-                <button class="btn btn-dark btn-sm mx-1" title="Add shipping" id="add-shipping-btn">
-                    <i class="fa-solid fa-plus"></i>
+                <button class="custom-btn" title="Add shipping" id="add-shipping-btn">
+                  <i class="fa-solid fa-plus"></i>
                 </button>
-
-                <button class="btn btn-dark btn-sm mx-1 select-all" title="Select All">
-                    <i class="fa-solid fa-check"></i>
+              
+                <button class="custom-btn select-all" title="Select All">
+                  <i class="fa-solid fa-check"></i>
                 </button>
-
-                <button class="btn btn-dark btn-sm mx-1 delete-selected" title="Delete">
-                    <i class="fa-solid fa-trash"></i>
+              
+                <button class="custom-btn delete-selected" title="Delete">
+                  <i class="fa-solid fa-trash"></i>
                 </button>
-
-                <button class="btn btn-dark btn-sm mx-1" title="Export" id="export-shippings-btn">
-                    <i class="fa-solid fa-file-excel"></i>
+              
+                <button class="custom-btn" title="Export" id="export-shippings-btn">
+                  <i class="fa-solid fa-file-excel"></i>
                 </button>
-
-                <button class="btn btn-dark btn-sm mx-1" data-bs-toggle="modal" data-bs-target="#customizationModal" id="customize-columns" title="Customize Columns">
-                    <i class="fa-solid fa-cog"></i>
+              
+                <button class="custom-btn" data-bs-toggle="modal" data-bs-target="#customizationModal" id="customize-columns" title="Customize Columns">
+                  <i class="fa-solid fa-cog"></i>
                 </button>
             </div>
         </div>

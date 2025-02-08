@@ -28,10 +28,9 @@
             max-width: 600px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             text-align: center;
-            max-height: 80vh; /* Limita l'altezza per evitare che il tasto sparisca */
-            overflow-y: auto; /* Aggiunge la barra di scorrimento */
+            max-height: 80vh;
+            overflow-y: auto;
         }
-
         #ai-advice {
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -39,8 +38,8 @@
             max-width: 100%;
             display: block;
             text-align: left;
-            max-height: 150px; /* Imposta un limite all'altezza */
-            overflow-y: auto; /* Aggiunge la scrollbar se il testo è lungo */
+            max-height: 150px;
+            overflow-y: auto;
         }
         .btn-danger {
             background-color: #ff5757;
@@ -60,12 +59,29 @@
         @keyframes blink {
             50% { border-color: transparent; }
         }
+        /* Aggiungo un effetto fade per la transizione degli step */
         .step {
             display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
         }
         .step.active {
             display: block;
+            opacity: 1;
         }
+        /* Progress Bar con transizione fluida */
+        .progress {
+            height: 8px;
+            background: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .progress-bar {
+            background-color: #ff5757;
+            transition: width 0.5s ease;
+        }
+        /* Loading Bar dinamica */
         .loading-bar {
             width: 100%;
             height: 5px;
@@ -78,22 +94,21 @@
         .loading-bar::before {
             content: "";
             position: absolute;
-            width: 0;
             height: 100%;
-            background: #ff5757;
-            animation: loading 3s linear infinite;
+            background: linear-gradient(90deg, rgba(255,87,87,0) 0%, rgba(255,87,87,0.8) 50%, rgba(255,87,87,0) 100%);
+            width: 50%;
+            left: -50%;
+            animation: sweep 2s ease-in-out infinite;
         }
-        .progress, .progress-stacked {
-            --bs-progress-bar-bg: #ff5757 !important;
-        }
-        @keyframes loading {
-            from { width: 0; }
-            to { width: 100%; }
+        @keyframes sweep {
+            0%   { left: -50%; }
+            50%  { left: 50%; }
+            100% { left: 100%; }
         }
     </style>
 </head>
 <body>
-    <div class="card" style="overflow-y: auto;">
+    <div class="card">
         <img class="mb-4" src="../../../static/images/lb-logo.svg" width="230px" alt="Logo LinkBay">
         <h1 class="h3 mb-3">LinkBay AI Setup</h1>
         <div class="progress mb-3">
@@ -109,10 +124,7 @@
 
         <!-- STEP 2: Analisi dello Store -->
         <div class="step" id="step-2">
-            <h3>Store Analysis</h3>
-            <p><strong>Industry:</strong> {{ store_info.industry }}</p>
-            <p><strong>Description:</strong> {{ store_info.description }}</p>
-            <p><strong>Competitor:</strong> <a href="{{ store_info.website_url }}" target="_blank">{{ store_info.website_url }}</a></p>
+            <h6>Store Analysis</h6>
             <p id="ai-advice" class="typing">Analyzing store data...</p>
             <div class="loading-bar" id="loadingBar"></div>
             <button class="btn btn-danger w-100 mt-3" id="next-btn" onclick="nextStep(3)" disabled>Next</button>
@@ -129,12 +141,13 @@
     <script>
         let currentStep = 1;
         function nextStep(step) {
+            // Aggiunge una transizione fluida rimuovendo e aggiungendo la classe active
             document.getElementById(`step-${currentStep}`).classList.remove('active');
             document.getElementById(`step-${step}`).classList.add('active');
             currentStep = step;
             updateProgressBar();
 
-            // Se andiamo allo step 2, avviamo l'analisi AI
+            // Se si passa allo step 2, avvia l'analisi AI con loading bar dinamica
             if (step === 2) {
                 document.getElementById('loadingBar').style.display = "block";
                 fetch('/api/analyze-store')
@@ -149,6 +162,7 @@
         }
 
         function updateProgressBar() {
+            // Calcola la percentuale in base allo step corrente
             let progressPercentage = (currentStep - 1) * 50;
             document.getElementById('progressBar').style.width = `${progressPercentage}%`;
         }

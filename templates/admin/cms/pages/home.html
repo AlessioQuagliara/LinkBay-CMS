@@ -9,7 +9,7 @@
               
               <!-- Chat Box -->
               <div id="chat-box" class="border rounded p-3 mb-3" style="height: 300px; overflow-y: auto; background: #f8f9fa;">
-                  <!-- Messaggi della chat verranno aggiunti qui -->
+                  <!-- I messaggi della chat verranno aggiunti qui -->
               </div>
 
               <!-- Input Box -->
@@ -21,65 +21,116 @@
         </div>
 
         <script>
-          document.getElementById('send-btn').addEventListener('click', async () => {
-              const userInput = document.getElementById('user-input').value.trim();
+          // Carica la chat salvata da localStorage al caricamento della pagina
+          document.addEventListener("DOMContentLoaded", function() {
+              loadChatHistory();
+          });
+
+          // Funzione per salvare la chat corrente in localStorage
+          function saveChatHistory() {
+              const chatBox = document.getElementById("chat-box");
+              localStorage.setItem("chatHistory", chatBox.innerHTML);
+          }
+
+          // Funzione per caricare la chat da localStorage
+          function loadChatHistory() {
+              const chatBox = document.getElementById("chat-box");
+              const savedChat = localStorage.getItem("chatHistory");
+              if (savedChat) {
+                  chatBox.innerHTML = savedChat;
+                  chatBox.scrollTop = chatBox.scrollHeight;
+              }
+          }
+
+          // Funzione che esegue l'invio del messaggio
+          async function sendMessage() {
+              const userInputField = document.getElementById('user-input');
+              const userInput = userInputField.value.trim();
               if (!userInput) {
                   alert("Please enter a valid query.");
                   return;
               }
-          
+              
               const chatBox = document.getElementById('chat-box');
-          
+
               // Aggiunge il messaggio utente alla chat
               const userMessage = document.createElement("div");
-              userMessage.classList.add("alert", "alert-primary", "p-2");
+              userMessage.classList.add("alert", "alert-danger", "p-2");
               userMessage.innerHTML = `<strong>You:</strong> ${userInput}`;
               chatBox.appendChild(userMessage);
               chatBox.scrollTop = chatBox.scrollHeight;  // Scroll automatico
-          
-              // Mostra il messaggio "Typing..." prima della risposta dell'IA
+              saveChatHistory();
+
+              // Prepara il messaggio del bot con il container per l'animazione
               const botMessage = document.createElement("div");
               botMessage.classList.add("alert", "alert-secondary", "p-2");
               const typingSpan = document.createElement("span");
-              typingSpan.id = "typing";
               botMessage.innerHTML = `<strong>LinkBay AI:</strong> `;
               botMessage.appendChild(typingSpan);
               chatBox.appendChild(botMessage);
               chatBox.scrollTop = chatBox.scrollHeight;
-          
-              document.getElementById('user-input').value = "";  // Resetta il campo input
-          
+              saveChatHistory();
+
+              // Resetta il campo input
+              userInputField.value = "";
+
+              // Avvia l'animazione dei tre puntini (simile a WhatsApp)
+              let dotInterval = setInterval(() => {
+                  if (typingSpan.innerHTML.length < 3) {
+                      typingSpan.innerHTML += '.';
+                  } else {
+                      typingSpan.innerHTML = '';
+                  }
+              }, 500);
+
               try {
                   const response = await fetch('/assistant', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ query: userInput })
                   });
-          
+                  
                   const data = await response.json();
-          
+                  
+                  // Ferma l'animazione dei puntini
+                  clearInterval(dotInterval);
+                  
                   if (response.ok) {
-                      // Animazione "typing" con delay realistico
+                      // Anima la scrittura della risposta lettera per lettera
                       typeText(typingSpan, data.response, () => {
-                          botMessage.innerHTML = `<strong>AI:</strong> ${data.response}`;
+                          botMessage.innerHTML = `<strong>LinkBay AI:</strong> ${data.response}`;
                           chatBox.scrollTop = chatBox.scrollHeight;  // Scroll automatico dopo risposta
+                          saveChatHistory();
                       });
                   } else {
-                      botMessage.innerHTML = `<strong>AI:</strong> <span class="text-danger">Error processing your request.</span>`;
+                      botMessage.innerHTML = `<strong>LinkBay AI:</strong> <span class="text-danger">Error processing your request.</span>`;
+                      saveChatHistory();
                   }
               } catch (error) {
                   console.error("Error:", error);
-                  botMessage.innerHTML = `<strong>AI:</strong> <span class="text-danger">An unexpected error occurred.</span>`;
+                  botMessage.innerHTML = `<strong>LinkBay AI:</strong> <span class="text-danger">An unexpected error occurred.</span>`;
+                  saveChatHistory();
               }
-          
+              
               chatBox.scrollTop = chatBox.scrollHeight;  // Scroll automatico
+          }
+
+          // Collega il tasto send al click
+          document.getElementById('send-btn').addEventListener('click', sendMessage);
+
+          // Collega l'evento "Enter" sul campo input
+          document.getElementById('user-input').addEventListener('keydown', function(event) {
+              if (event.key === 'Enter') {
+                  event.preventDefault();
+                  sendMessage();
+              }
           });
-          
-          // Funzione per animare il typing
+
+          // Funzione per animare il typing (digitazione lettera per lettera)
           function typeText(element, text, callback) {
               let i = 0;
               element.innerHTML = "";  // Resetta il testo
-          
+              
               function type() {
                   if (i < text.length) {
                       element.innerHTML += text.charAt(i);
@@ -89,10 +140,9 @@
                       callback();
                   }
               }
-          
               type();
           }
-          </script>
+        </script>
 
 
         
@@ -102,81 +152,105 @@
             </div>
             <div class="col-md-12 mb-3">
               <style>
-                .card {
-                    position: relative;
-                    height: 200px; /* Altezza ridotta */
-                    overflow: hidden;
-                }
-                .card-img {
-                    height: 100%;
-                    object-fit: cover;
-                    filter: brightness(40%); /* Velo opaco */
-                }
-                .card-img-overlay {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    color: white;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: flex-start; /* Allinea il contenuto a sinistra */
-                }
-                .card-title, .card-text {
-                    margin-bottom: 0.5rem;
-                }
-                .btn-small {
-                    padding: 0.25rem 0.5rem; /* Dimensioni ridotte del bottone */
-                    font-size: 0.875rem; /* Font piccolo */
-                }
-                .form-check-input:checked {
-                  background-color: #ff5757 !important;
-                  border-color: #ff5757 !important;
-                }
-                </style>
-                <div class="card text-bg-dark">
+                  .store-card {
+                      position: relative;
+                      height: 180px; /* Altezza ridotta per maggiore compattezza */
+                      overflow: hidden;
+                      border-radius: 10px; /* Bordi arrotondati */
+                  }
+                  .store-card .card-img {
+                      height: 100%;
+                      object-fit: cover;
+                      filter: brightness(45%); /* Effetto opaco */
+                  }
+                  .store-card .card-img-overlay {
+                      position: absolute;
+                      top: 0;
+                      left: 0;
+                      width: 100%;
+                      height: 100%;
+                      color: white;
+                      display: flex;
+                      flex-direction: column;
+                      justify-content: center;
+                      align-items: flex-start; /* Allinea il contenuto a sinistra */
+                      padding: 15px;
+                  }
+                  .store-card .card-title {
+                      font-size: 1.3rem;
+                      font-weight: bold;
+                  }
+                  .store-card .card-text {
+                      font-size: 0.95rem;
+                      margin-bottom: 0.5rem;
+                  }
+                  .store-card .btn-small {
+                      padding: 0.35rem 0.75rem;
+                      font-size: 0.85rem;
+                      border-radius: 5px;
+                  }
+                  .store-card .form-check-input:checked {
+                      background-color: #ff5757 !important;
+                      border-color: #ff5757 !important;
+                  }
+              </style>
+          
+              <div class="card store-card text-bg-dark shadow">
                   <img src="{{ url_for('static', filename='images/store_image.webp') }}" 
-                      width="899px" 
-                      height="198px" 
                       class="card-img" 
-                      alt="..."
-                      style="object-fit: cover; object-position: center;">
+                      alt="Store Image">
                   <div class="card-img-overlay">
                       <h5 class="card-title">Your Online Store</h5>
                       <p class="card-text">
                           <i class="fa-regular fa-circle-dot text-danger"></i> 
-                          <strong id="active-visitors">Loading...</strong> Visitors Now
+                          <strong id="active-visitors">0</strong> Visitors Today
                       </p>
-                      <p class="card-text"><small id="last-update">Last updated just now</small></p>
-                      <a href="../../../" target="_blank" class="btn btn-light btn-small">View Online Store</a>
-                      <a href=" " class="btn btn-danger btn-small">Edit Store</a>
+                      <p class="card-text"><small id="last-update">Waiting for update...</small></p>
+                      <div class="d-flex gap-2">
+                          <a href="../../../" target="_blank" class="btn btn-light btn-small">View Online Store</a>
+                          <a href="{{ url_for('page.editor_interface') }}" class="btn btn-danger btn-small">Edit Store</a>
+                      </div>
                   </div>
-                </div>
-
-                <script>
-                  document.addEventListener("DOMContentLoaded", function () {
-                      function updateVisitors() {
-                          fetch("/api/get-active-visitors")
-                              .then(response => response.json())
-                              .then(data => {
-                                  if (data.success) {
-                                      document.getElementById("active-visitors").textContent = data.active_visitors;
-                                      document.getElementById("last-update").textContent = "Last updated " + new Date().toLocaleTimeString();
-                                  } else {
-                                      console.error("Error:", data.error);
-                                  }
-                              })
-                              .catch(error => console.error("Error fetching visitor data:", error));
-                      }
-                  
-                      updateVisitors();  // Aggiorna subito alla pagina load
-                      setInterval(updateVisitors, 10000);  // Aggiorna ogni 10 secondi
-                  });
-                  </script>
-
-            </div>
+              </div>
+          
+              <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    function updateVisitors() {
+                        fetch("/api/get-site-visits")
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    const visitorsCount = data.visits.length;
+                                    document.getElementById("active-visitors").textContent = visitorsCount;
+                                    document.getElementById("last-update").textContent = "Last updated " + new Date().toLocaleTimeString();
+            
+                                    // Aggiorna la lista delle visite recenti
+                                    const visitsList = document.getElementById("visitors-list");
+                                    if (visitsList) {
+                                        visitsList.innerHTML = ""; // Svuota la lista prima di aggiornare
+                                        data.visits.forEach(visit => {
+                                            const visitElement = document.createElement("li");
+                                            visitElement.classList.add("list-group-item");
+                                            visitElement.innerHTML = `
+                                                <strong>${visit.ip_address}</strong> 
+                                                - <small>${visit.page_url}</small> 
+                                                <span class="text-muted">(${new Date(visit.visit_time).toLocaleTimeString()})</span>
+                                            `;
+                                            visitsList.appendChild(visitElement);
+                                        });
+                                    }
+                                } else {
+                                    console.error("Error:", data.error);
+                                }
+                            })
+                            .catch(error => console.error("Error fetching visitor data:", error));
+                    }
+            
+                    updateVisitors();  // Aggiorna subito alla pagina load
+                    setInterval(updateVisitors, 10000);  // Aggiorna ogni 10 secondi
+                });
+            </script>
+          </div>
             <div class="col-12 mb-3">
                 <div class="accordion" id="accordionPanelsStayOpenExample">
                     <div class="accordion-item">
