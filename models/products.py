@@ -266,3 +266,28 @@ class Products:
             except Exception as e:
                 logging.info(f"Error retrieving product images: {e}")
                 return []
+
+    def get_first_product_by_shop(self, shop_name):
+        """
+        Recupera il primo prodotto disponibile associato allo shop.
+        
+        :param shop_name: Nome del negozio
+        :return: Dizionario con i dati del primo prodotto o None se non ci sono prodotti
+        """
+        try:
+            with self.conn.cursor(dictionary=True) as cursor:
+                cursor.execute("""
+                    SELECT id, name, description, short_description, price, discount_price, 
+                        stock_quantity, sku, image_url, slug
+                    FROM products 
+                    WHERE shop_name = %s 
+                    ORDER BY id ASC 
+                    LIMIT 1
+                """, (shop_name,))
+                product = cursor.fetchone()
+
+            return product if product else None  # Restituisce il primo prodotto o None
+
+        except Exception as e:
+            logging.error(f"Errore nel recupero del primo prodotto per {shop_name}: {e}")
+            return None
