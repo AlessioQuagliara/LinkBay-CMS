@@ -6,25 +6,25 @@
     <title>LinkBay - {{ title }}</title>
     {% include 'admin/cms/heading/admin_head.html' %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/editor.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/grapesjs/0.21.12/css/grapes.min.css">
-    <script src="https://unpkg.com/grapesjs-preset-webpage@0.1.18/dist/grapesjs-preset-webpage.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/grapesjs@0.22.5/dist/grapes.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/grapesjs@0.22.5/dist/css/grapes.min.css" rel="stylesheet">    
 </head>
 <body>
     <nav class="navbar navbar-dark d-md-none" style="background-color: #343a40;">
-        <img src="{{ url_for('static', filename='images/lb-logo-w.svg') }}" width="200px" alt="Logo">
+        <img src="https://www.linkbay.it/static/image/lb-logo-w.svg" width="200px" alt="Logo">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
     </nav>
     <main class="d-flex">
         {% include 'admin/cms/ui/editor_bar.html' %}
-        <div class="content" style="padding: 0 !important;">
+        <div class="content" style="padding: 0 5% 0 5% !important;">
             {% include 'admin/cms/pages/editor_tutorial.html' %}
             <div id="editor" style="height: 100vh;">{{ page.content | safe }}</div>
         </div>
     </main>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/grapesjs/0.21.12/grapes.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pica@8.0.1/dist/pica.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     {% include 'admin/cms/footing/admin_footing.html' %}
 </body>
 </html>

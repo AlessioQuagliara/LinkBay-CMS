@@ -1,6 +1,6 @@
 <div id="sidebar" class="d-flex flex-column flex-shrink-0 sidebar collapse">
     <a href="#" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-        <img src="{{ url_for('static', filename='images/lb-logo-w.svg') }}" width="200px" alt="Logo">
+        <img src="https://www.linkbay.it/static/image/lb-logo-w.svg" width="200px" alt="Logo">
     </a>
     <style>
         .nav-link {
@@ -283,7 +283,7 @@
     {% else %}
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
         {% if not session['profile_photo'] or session['profile_photo'] == ' ' %}
-            <img src="../../../../static/images/male_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
+            <img src="https://www.linkbay.it/static/image/male_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
         {% else %}
             <img src="https://www.linkbay-cms.com{{ session['profile_photo'] }}" alt="" width="32" height="32" class="rounded-circle me-2">
         {% endif %}
