@@ -1,10 +1,14 @@
 import os
-from environment import environment
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY", "SpotexSrl@2024")
 
 class Config:
     LANGUAGES = ['en', 'it', 'es', 'fr', 'de']
     DEFAULT_LANGUAGE = 'en'
-    SECRET_KEY = 'SpotexSrl@2024'
+    SECRET_KEY = os.getenv("SECRET_KEY", "SpotexSrl@2024")
     
     # Configurazioni del Database dell'app (CMS_DEF)
     DB_HOST = '127.0.0.1'
@@ -23,8 +27,8 @@ class Config:
     # OpenAI API Key
     OPENAI_API_KEY = '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'
     
-    if environment == 'development':
-    # Altre configurazioni 
+    if os.getenv('ENVIRONMENT') == 'development':
+        # Altre configurazioni 
         SESSION_COOKIE_SECURE = False  # PER CHI MODIFICA = Sicuro solo su HTTPS, disabilitato in locale
         SESSION_PERMANENT = False  # PER CHI MODIFICA = Non mantenere la sessione dopo la chiusura del browser
         # Configurazioni GoDaddy API TEST

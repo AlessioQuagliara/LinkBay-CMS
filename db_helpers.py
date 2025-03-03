@@ -1,6 +1,10 @@
 from flask import g
+from dotenv import load_dotenv
+import os
 import mysql.connector
-from environment import environment  # Importa l'ambiente (development/production)
+load_dotenv()
+environment = os.getenv('ENVIRONMENT')
+
 
 class DatabaseHelper:
     """

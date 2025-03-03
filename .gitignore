@@ -1,3 +1,4 @@
 # Ignore Python virtual environments
 LinkBay/
 environments.py
+.env
