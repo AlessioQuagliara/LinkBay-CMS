@@ -1,8 +1,16 @@
 Flask
-mysql.connector
+SQLAlchemy
+psycopg2
+Flask-Migrate
 webdriver-manager
 Pillow
 Stripe
 gunicorn
 openai
 PyJWT
+python-dotenv
+Flask-Session
+Jinja2
+requests
+Werkzeug
+psycopg2-binary

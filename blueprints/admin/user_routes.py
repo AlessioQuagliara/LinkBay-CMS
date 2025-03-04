@@ -1,74 +1,74 @@
 from flask import Blueprint, request, session, redirect, url_for, render_template, flash
-from models.user import User # importo la classe database
+from models.database import db
+from models.user import User
 from models.userstoreaccess import UserStoreAccess
 from models.shoplist import ShopList
 from werkzeug.security import generate_password_hash, check_password_hash
-from db_helpers import DatabaseHelper
-from helpers import check_user_authentication
 import logging, jwt
 from config import Config
 
-SECRET_KEY = Config.SECRET_KEY  # Ora funziona correttamente
+SECRET_KEY = Config.SECRET_KEY  # Segreto JWT per l'autenticazione sicura
 
-db_helper = DatabaseHelper()
-
-# Blueprint
+# 📌 Blueprint per la gestione degli utenti
 user_bp = Blueprint('user', __name__)
 
 logging.basicConfig(level=logging.INFO)
 
-# Rotte per la gestione
-
-# Funzione per controllare se l'utente è autenticato -----------------------------------
+# 🔹 **Middleware per controllare se l'utente è autenticato**
 def check_user_authentication():
     if 'user_id' not in session:
         flash('You need to log in first.', 'danger')
-        return redirect(url_for('login'))
+        return redirect(url_for('user.login'))
     return session['username']
 
-# Admin Routes -------------------------------------------------------------------------
+# 🔹 **Rotta per la registrazione di un nuovo utente**
 @user_bp.route('/admin/sign-in', methods=['GET', 'POST'])
 def signin():
-    db_conn = db_helper.get_db_connection()  
-    user_model = User(db_conn)  
-
     if request.method == 'POST':
-        name = request.form.get('name')
-        surname = request.form.get('surname')
-        store_name = request.form.get('store_name')
-        email = request.form.get('email')
-        password = request.form.get('password')
+        try:
+            name = request.form.get('name')
+            surname = request.form.get('surname')
+            email = request.form.get('email')
+            password = request.form.get('password')
 
+            # Verifica se l'utente esiste già
+            existing_user = User.query.filter_by(email=email).first()
+            if existing_user:
+                flash('Email already exists', 'danger')
+                return redirect(url_for('user.signin'))
 
-        existing_user = user_model.get_user_by_email(email)
-        if existing_user:
-            flash('Email address already exists')
-            return redirect(url_for('signin'))
+            # Creazione nuovo utente
+            new_user = User(
+                nome=name,
+                cognome=surname,
+                email=email,
+                password=generate_password_hash(password, method='pbkdf2:sha256')
+            )
 
-        user_model.create_user(name, surname, email, password)
-        flash('Registration successful! You can now log in.')
-        return redirect(url_for('login'))
+            db.session.add(new_user)
+            db.session.commit()
+
+            flash('Registration successful! You can now log in.', 'success')
+            return redirect(url_for('user.login'))
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Error signing up user: {str(e)}")
+            flash('An error occurred. Please try again.', 'danger')
 
     return render_template('/admin/sign-in.html', title='LinkBay - Sign-in')
 
-# Middleware per il debug delle sessioni
+# 🔹 **Middleware per il debug delle sessioni**
 @user_bp.before_request
 def log_session_info():
     try:
-        logging.info(f"Request path: {request.path}")
+        logging.info(f"📌 Request path: {request.path}, Session: {session}")
     except Exception as e:
-        logging.error(f"Errore durante il log: {e}")
+        logging.error(f"❌ Error logging session info: {e}")
 
-# Funzione di login -------------------------------------------------
+# 🔹 **Rotta per il login**
 @user_bp.route('/admin/', methods=['GET', 'POST'])
 @user_bp.route('/admin/login', methods=['GET', 'POST'])
 def login():
-    auth_db_conn = db_helper.get_auth_db_connection()  
-    user_model = User(auth_db_conn)  
-    access_model = UserStoreAccess(auth_db_conn)  
-    shop_list_model = ShopList(auth_db_conn)
-
-    # **1️⃣ Controlla se il Token è presente nella richiesta**
     token = request.args.get('token')
 
     if token:
@@ -77,72 +77,68 @@ def login():
             user_id = decoded_token.get('user_id')
 
             if user_id:
-                user = user_model.get_user_by_id(user_id)
+                user = User.query.get(user_id)
 
                 if user:
-                    # **Verifica accesso allo store**
-                    domain_parts = request.host.split('.')
-                    subdomain_or_domain = domain_parts[0] if len(domain_parts) > 1 else request.host
-                    shop = shop_list_model.get_shop_by_name_or_domain(subdomain_or_domain)
+                    shop_name = request.host.split('.')[0]
+                    shop = ShopList.query.filter_by(shop_name=shop_name).first()
 
-                    if shop and access_model.has_access(user_id, shop['id']):
-                        session['user_id'] = user['id']
-                        session['username'] = user['nome']
-                        session['surname'] = user['cognome']
-                        session['email'] = user['email']
-                        session['phone'] = user['telefono']
-                        session['profile_photo'] = user['profilo_foto']
-                        session['shop_id'] = shop['id']
-
+                    if shop and UserStoreAccess.query.filter_by(user_id=user_id, shop_id=shop.id).first():
+                        session.update({
+                            'user_id': user.id,
+                            'username': user.nome,
+                            'surname': user.cognome,
+                            'email': user.email,
+                            'phone': user.telefono,
+                            'profile_photo': user.profilo_foto,
+                            'shop_id': shop.id
+                        })
                         return redirect(url_for('ui.homepage'))
                     else:
-                        flash('Accesso negato a questo store.', 'danger')
+                        flash('Access denied for this store.', 'danger')
                         return redirect(url_for('user.login'))
-        except jwt.ExpiredSignatureError:
-            flash('Sessione scaduta. Effettua nuovamente il login.', 'danger')
-        except jwt.InvalidTokenError:
-            flash('Token non valido.', 'danger')
 
-    # **2️⃣ Se non c'è token, gestisce il login classico con email e password**
+        except jwt.ExpiredSignatureError:
+            flash('Session expired. Please log in again.', 'danger')
+        except jwt.InvalidTokenError:
+            flash('Invalid token.', 'danger')
+
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
-        user = user_model.get_user_by_email(email)
 
-        if user and check_password_hash(user['password'], password):
-            # **Verifica accesso allo store**
-            domain_parts = request.host.split('.')
-            subdomain_or_domain = domain_parts[0] if len(domain_parts) > 1 else request.host
-            shop = shop_list_model.get_shop_by_name_or_domain(subdomain_or_domain)
+        user = User.query.filter_by(email=email).first()
 
-            if shop and access_model.has_access(user['id'], shop['id']):
-                session['user_id'] = user['id']
-                session['username'] = user['nome']
-                session['surname'] = user['cognome']
-                session['email'] = user['email']
-                session['phone'] = user['telefono']
-                session['profile_photo'] = user['profilo_foto']
-                session['shop_id'] = shop['id']
+        if user and check_password_hash(user.password, password):
+            shop_name = request.host.split('.')[0]
+            shop = ShopList.query.filter_by(shop_name=shop_name).first()
 
+            if shop and UserStoreAccess.query.filter_by(user_id=user.id, shop_id=shop.id).first():
+                session.update({
+                    'user_id': user.id,
+                    'username': user.nome,
+                    'surname': user.cognome,
+                    'email': user.email,
+                    'phone': user.telefono,
+                    'profile_photo': user.profilo_foto,
+                    'shop_id': shop.id
+                })
                 return redirect(url_for('ui.homepage'))
             else:
-                flash('Accesso negato a questo store.', 'danger')
+                flash('Access denied for this store.', 'danger')
                 return redirect(url_for('user.login'))
         else:
-            flash('Credenziali non valide.', 'danger')
-            return redirect(url_for('user.login'))
+            flash('Invalid credentials.', 'danger')
 
-    # **3️⃣ Se è solo GET, mostra la pagina di login**
     return render_template('admin/login.html', title='Login')
 
+# 🔹 **Rotta per il logout**
 @user_bp.route('/admin/logout')
 def logout():
-    session.pop('user_id', None)
-    session.pop('username', None)
-    return render_template('admin/logout.html', title='Logout')
+    session.clear()
+    return redirect(url_for('user.login'))
 
+# 🔹 **Rotta per il ripristino della password**
 @user_bp.route('/admin/restore')
 def restore():
     return render_template('/admin/restore.html', title='LinkBay - Restore')
-
-

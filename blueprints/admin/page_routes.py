@@ -1,224 +1,302 @@
 from flask import Blueprint, request, jsonify, session, render_template, redirect, url_for, flash
-from models.page import Page  # importo la classe database
+from models.page import Page
 from models.shoplist import ShopList
 from models.cmsaddon import CMSAddon
-from models.products import Products
-from models.navbar import Navbar
-from models.site_visits import SiteVisits 
+from models.products import Product
+from models.navbar import NavbarLink
+from models.site_visits import SiteVisit
 from config import Config
 from datetime import datetime, timedelta
-import mysql.connector, os, uuid, re, base64, datetime
-from db_helpers import DatabaseHelper
-db_helper = DatabaseHelper()
-from db_helpers import DatabaseHelper
-from helpers import check_user_authentication, get_navbar_content 
-import logging
-logging.basicConfig(level=logging.INFO)
+import os, uuid, re, base64, logging
+from sqlalchemy.exc import SQLAlchemyError
+from helpers import check_user_authentication, get_navbar_content
+from models.database import db  # Importa il database SQLAlchemy
 
+logging.basicConfig(level=logging.INFO)
 
 # Blueprint
 page_bp = Blueprint('page', __name__)
 
-# Rotte per la gestione
+# Rotte per la gestione delle pagine
 
 @page_bp.route('/admin/cms/pages/online-content')
 def online_content():
     username = check_user_authentication()
     
-    if isinstance(username, str):
-        shop_subdomain = request.host.split('.')[0]  
-        logging.info(f"Subdomain: {shop_subdomain}")  # Log del subdominio
+    if not isinstance(username, str):
+        return username
 
-        try:
-            with db_helper.get_auth_db_connection() as auth_db_conn:
-                shoplist_model = ShopList(auth_db_conn)
-                shop = shoplist_model.get_shop_by_name(shop_subdomain)
+    shop_subdomain = request.host.split('.')[0]
+    logging.info(f"📢 Accesso al contenuto online per: {shop_subdomain} da {request.remote_addr}")
 
-            if shop:
-                logging.info(f"Shop trovato: {shop}")  # Log per il negozio
+    try:
+        shop = db.session.query(ShopList).filter_by(shop_name=shop_subdomain).first()
 
-                with db_helper.get_db_connection() as db_conn:
-                    page_model = Page(db_conn)
-                    page_slug = 'home'
-                    # Esegui la query e leggi il risultato
-                    page = page_model.get_page_by_slug(page_slug, shop_subdomain)
-
-                    if page:
-                        updated_at = page['updated_at']
-                        now = datetime.datetime.now()
-                        minutes_ago = (now - updated_at).total_seconds() // 60  
-                        return render_template(
-                            'admin/cms/pages/content.html', 
-                            title='Online Content', 
-                            username=username, 
-                            page=page,
-                            shop=shop,
-                            minutes_ago=int(minutes_ago)  
-                        )
-                    else:
-                        return redirect(url_for('cmsaddon.theme_ui'))
-
-            else:
-                print("Nessun negozio trovato.")  # Log per negozio non trovato
-                flash('Nessun negozio trovato per questo nome.')
-                return redirect(url_for('ui.homepage'))
-
-        except mysql.connector.Error as e:
-            logging.info(f"Errore nel database: {str(e)}")  # Log del messaggio di errore
-            flash('Errore durante l\'accesso ai dati del negozio o della pagina.')
+        if not shop:
+            flash('Nessun negozio trovato per questo nome.', 'warning')
             return redirect(url_for('ui.homepage'))
-    
-    return username
+
+        # Recupera la pagina "home"
+        page = db.session.query(Page).filter_by(slug='home', shop_name=shop_subdomain).first()
+
+        if page:
+            minutes_ago = (datetime.utcnow() - page.updated_at).total_seconds() // 60
+            return render_template('admin/cms/pages/content.html', 
+                                   title='Online Content', 
+                                   username=username, 
+                                   page=page,
+                                   shop=shop,
+                                   minutes_ago=int(minutes_ago))
+        else:
+            return redirect(url_for('cmsaddon.theme_ui'))
+
+    except SQLAlchemyError as e:
+        logging.error(f"❌ Errore nel database: {str(e)}")
+        flash('Errore durante l\'accesso ai dati del negozio o della pagina.', 'danger')
+        return redirect(url_for('ui.homepage'))
+
 
 @page_bp.route('/admin/cms/function/edit-code/<slug>')
 def edit_code_page(slug):
     username = check_user_authentication()
     
-    if isinstance(username, str):
-        db_conn = db_helper.get_db_connection() 
+    if not isinstance(username, str):
+        return username
 
-        shop_subdomain = request.host.split('.')[0]  
-        
-        page_model = Page(db_conn)
-        
-        pages = page_model.get_all_pages(shop_subdomain)  
-        page = page_model.get_page_by_slug(slug, shop_subdomain) 
+    shop_subdomain = request.host.split('.')[0]
+    
+    page = db.session.query(Page).filter_by(slug=slug, shop_name=shop_subdomain).first()
+    pages = db.session.query(Page).filter_by(shop_name=shop_subdomain).all()
 
-        
-        if page:
-            content = page.get('content', '')  
-            return render_template('admin/cms/store_editor/code_editor.html', 
-                                   title=page['title'], 
-                                   pages=pages,
-                                   page=page, 
-                                   slug=slug,  
-                                   content=content, 
-                                   username=username)
+    if page:
+        return render_template('admin/cms/store_editor/code_editor.html', 
+                               title=page.title, 
+                               pages=pages,
+                               page=page, 
+                               slug=slug,  
+                               content=page.content, 
+                               username=username)
     
     return username
 
-# Funzione per salvare il codice modificato
+
 @page_bp.route('/admin/cms/function/save_code', methods=['POST'])
 def save_code_page():
     try:
-        data = request.get_json()  
+        data = request.get_json()
         content = data.get('content')
         slug = data.get('slug')
 
         if not content or not slug:
             return jsonify({'success': False, 'error': 'Missing content or slug'}), 400
 
-        db_conn = db_helper.get_db_connection()
-        
-        shop_subdomain = request.host.split('.')[0]  
-        
-        page_model = Page(db_conn)
+        shop_subdomain = request.host.split('.')[0]
+        page = db.session.query(Page).filter_by(slug=slug, shop_name=shop_subdomain).first()
 
-        success = page_model.update_page_content_by_slug(slug, content, shop_subdomain)
+        if page:
+            page.content = content
+            db.session.commit()
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Page not found'}), 404
 
-        return jsonify({'success': success})
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logging.error(f"Errore nel salvataggio del codice: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
 
 @page_bp.route('/admin/cms/store_editor/editor_interface', defaults={'slug': None})
 @page_bp.route('/admin/cms/store_editor/editor_interface/<slug>')
 def editor_interface(slug=None):
     username = check_user_authentication()
     
-    if isinstance(username, str):
-        db_conn = db_helper.get_db_connection()  
-        shop_subdomain = request.host.split('.')[0]
+    if not isinstance(username, str):
+        return username
 
-        with db_helper.get_auth_db_connection() as auth_db_conn:
-            shoplist_model = ShopList(auth_db_conn)
-            shop = shoplist_model.get_shop_by_name(shop_subdomain)
+    shop_subdomain = request.host.split('.')[0]
+    shop = db.session.query(ShopList).filter_by(shop_name=shop_subdomain).first()
 
-        if not shop:
-            flash('Nessun negozio selezionato o negozio non trovato.', 'danger')
-            return redirect(url_for('ui.homepage'))
+    if not shop:
+        flash('Nessun negozio selezionato o negozio non trovato.', 'danger')
+        return redirect(url_for('ui.homepage'))
 
-        page_model = Page(db_conn)
-        pages = page_model.get_all_pages(shop_name=shop_subdomain)
-        page = None
-        page_title = 'CMS Interface'
-        
-        if slug:
-            page = page_model.get_page_by_slug(slug, shop_subdomain)
-            if page:
-                page_title = page['title']
+    pages = db.session.query(Page).filter_by(shop_name=shop_subdomain).all()
+    page = db.session.query(Page).filter_by(slug=slug, shop_name=shop_subdomain).first() if slug else None
+    page_title = page.title if page else 'CMS Interface'
 
-        # Ottenere l'addon di tipo 'theme_ui' con status 'selected' per il negozio attuale
-        addon_model = CMSAddon(db_conn)
-        selected_theme_ui = addon_model.get_selected_addon_for_shop(shop_subdomain, 'theme_ui')
+    # Recupera il tema UI selezionato
+    selected_theme_ui = db.session.query(CMSAddon).filter_by(shop_name=shop_subdomain, type='theme_ui').first()
 
-        current_url = request.path
-        return render_template('admin/cms/store_editor/editor_interface.html', 
-                               title=page_title, 
-                               pages=pages, 
-                               page=page,
-                               slug=slug,  
-                               current_url=current_url, 
-                               username=username,
-                               selected_theme_ui=selected_theme_ui)
-    return username  
+    return render_template('admin/cms/store_editor/editor_interface.html', 
+                           title=page_title, 
+                           pages=pages, 
+                           page=page,
+                           slug=slug,  
+                           current_url=request.path, 
+                           username=username,
+                           selected_theme_ui=selected_theme_ui)
 
 
 @page_bp.route('/admin/cms/function/edit/<slug>')
 def edit_page(slug):
     username = check_user_authentication()
     
-    if isinstance(username, str):
-        db_conn = db_helper.get_db_connection()  
+    if not isinstance(username, str):
+        return username
+
+    shop_subdomain = request.host.split('.')[0]
+    shop = db.session.query(ShopList).filter_by(shop_name=shop_subdomain).first()
+
+    if not shop:
+        flash('Nessun negozio selezionato o negozio non trovato.', 'danger')
+        return redirect(url_for('ui.homepage'))
+
+    # Recupera la lingua selezionata (default "en")
+    language = request.args.get('language', 'en')
+
+    page = db.session.query(Page).filter_by(slug=slug, language=language, shop_name=shop_subdomain).first()
+
+    if not page:
+        flash('Pagina non trovata.', 'danger')
+        return redirect(url_for('ui.homepage'))
+
+    selected_theme_ui = db.session.query(CMSAddon).filter_by(shop_name=shop_subdomain, type='theme_ui').first()
+    
+    product_references = page.get_product_references()
+    products = [db.session.query(Product).get(product_id) for product_id in product_references]
+
+    navbar_content = get_navbar_content(shop_subdomain)
+
+    return render_template('admin/cms/function/edit.html', 
+                           title='Edit Page', 
+                           page=page, 
+                           username=username, 
+                           selected_theme_ui=selected_theme_ui,
+                           products=products,
+                           navbar=navbar_content)
+
+
+# 🔹 **Salvataggio della pagina con gestione immagini**
+@page_bp.route('/admin/cms/function/save', methods=['POST'])
+def save_page():
+    try:
+        data = request.get_json()
+        page_id = data.get('id')
+        content = data.get('content')
+        language = data.get('language')  
+        shop_subdomain = request.host.split('.')[0]
+
+        logging.info(f"📢 Salvataggio pagina con ID: {page_id}, lingua: {language} per il negozio: {shop_subdomain}")
+        
+        page = db.session.query(Page).filter_by(id=page_id, shop_name=shop_subdomain).first()
+        
+        if page:
+            # Cerca e salva immagini base64 nel contenuto
+            img_tags = re.findall(r'<img.*?src=["\'](data:image/[^"\']+)["\']', content)
+            for base64_img in img_tags:
+                image_url = save_image(base64_img, page_id, shop_subdomain)
+                if image_url:
+                    content = content.replace(base64_img, image_url)
+
+            page.content = content
+            page.updated_at = db.func.now()
+            db.session.commit()
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Pagina non trovata'}), 404
+    
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nel salvataggio della pagina: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# 🔹 **Salvataggio SEO della pagina**
+@page_bp.route('/admin/cms/function/save-seo', methods=['POST'])
+def save_seo_page():
+    try:
+        data = request.get_json()
+        page_id = data.get('id')
+        title = data.get('title')
+        description = data.get('description')
+        keywords = data.get('keywords')
+        slug = data.get('slug')
+
         shop_subdomain = request.host.split('.')[0]  
 
-        with db_helper.get_auth_db_connection() as auth_db_conn:
-            shoplist_model = ShopList(auth_db_conn)
-            shop = shoplist_model.get_shop_by_name(shop_subdomain)
+        page = db.session.query(Page).filter_by(id=page_id, shop_name=shop_subdomain).first()
+        
+        if page:
+            page.title = title
+            page.description = description
+            page.keywords = keywords
+            page.slug = slug
+            db.session.commit()
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Pagina non trovata'}), 404
 
-        if not shop:
-            flash('Nessun negozio selezionato o negozio non trovato.', 'danger')
-            return redirect(url_for('ui.homepage'))
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nel salvataggio SEO: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
-        # Recupera la lingua selezionata (default "en")
-        language = request.args.get('language', 'en')
+# 🔹 **Creazione di una nuova pagina**
+@page_bp.route('/admin/cms/function/create', methods=['POST'])
+def create_page():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Devi effettuare il login'})
 
-        page_model = Page(db_conn)
-        page = page_model.get_page_by_slug_and_language(slug, language, shop_subdomain)  
+    try:
+        data = request.get_json()
+        shop_subdomain = request.host.split('.')[0]
 
-        if not page:
-            flash('Pagina non trovata.', 'danger')
-            return redirect(url_for('ui.homepage'))
-
-        # Recupera il tema UI selezionato per lo shop
-        addon_model = CMSAddon(db_conn)
-        selected_theme_ui = addon_model.get_selected_addon_for_shop(shop_subdomain, 'theme_ui')
-
-        # Recupera i dettagli del prodotto se la pagina contiene riferimenti a prodotti
-        product_model = Products(db_conn)
-        product_references = page_model.get_product_references(page['id'])
-        products = []
-        for product_id in product_references:
-            product = product_model.get_product_by_id(product_id)
-            if product:
-                product['images'] = product_model.get_product_images(product['id'])
-                products.append(product)
-
-        # Recupera il contenuto dinamico della navbar usando il modello e gli helper
-        navbar_content = get_navbar_content(shop_subdomain)
-
-        return render_template(
-            'admin/cms/function/edit.html', 
-            title='Edit Page', 
-            page=page, 
-            username=username, 
-            selected_theme_ui=selected_theme_ui,
-            products=products,
-            navbar=navbar_content  # Passa il contenuto della navbar al template
+        new_page = Page(
+            title=data.get('title'),
+            description=data.get('description'),
+            keywords=data.get('keywords'),
+            slug=data.get('slug'),
+            content=data.get('content'),
+            theme_name=data.get('theme_name'),
+            paid=data.get('paid'),
+            language=data.get('language'),
+            published=data.get('published'),
+            shop_name=shop_subdomain
         )
-    
-    return username
 
+        db.session.add(new_page)
+        db.session.commit()
+
+        return jsonify({'success': True})
+    
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nella creazione della pagina: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# 🔹 **Eliminazione di una pagina**
+@page_bp.route('/admin/cms/function/delete', methods=['POST'])
+def delete_page():
+    try:
+        data = request.get_json()
+        page_id = data.get('id')  
+        shop_subdomain = request.host.split('.')[0]  
+
+        page = db.session.query(Page).filter_by(id=page_id, shop_name=shop_subdomain).first()
+
+        if page:
+            db.session.delete(page)
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Pagina eliminata'})
+        else:
+            return jsonify({'success': False, 'message': 'Pagina non trovata'}), 404
+    
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nell'eliminazione della pagina: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+    
 # SALVATAGGIO PAGINA CON CARICAMENTO IMMAGINI ----------------------------------------------------------------------------------------
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -247,39 +325,7 @@ def save_image(base64_image, page_id, shop_subdomain):
     except Exception as e:
         logging.info(f"Error saving image: {str(e)}")
         return None
-
-# Funzione per salvare il contenuto della pagina con gestione delle immagini ---------------------------------
-@page_bp.route('/admin/cms/function/save', methods=['POST'])
-def save_page():
-    try:
-        data = request.get_json()
-        page_id = data.get('id')
-        content = data.get('content')
-        language = data.get('language')  # Aggiungiamo il parametro lingua
-        shop_subdomain = request.host.split('.')[0]
-
-        logging.info(f"Salvataggio pagina con ID: {page_id}, lingua: {language} per il negozio: {shop_subdomain}")
-        
-        db_conn = db_helper.get_db_connection()  
-        page_model = Page(db_conn)  
-        
-        # Cerca immagini base64 nel contenuto
-        img_tags = re.findall(r'<img.*?src=["\'](data:image/[^"\']+)["\']', content)
-        for base64_img in img_tags:
-            # Salva l'immagine base64
-            image_url = save_image(base64_img, page_id, shop_subdomain)
-            if image_url:
-                # Sostituisci l'immagine base64 con l'URL dell'immagine salvata
-                content = content.replace(base64_img, image_url)
-        
-        # Aggiorna il contenuto della pagina nel database con la lingua specifica
-        success = page_model.update_or_create_page_content(page_id, content, language, shop_subdomain)
-        return jsonify({'success': success})
     
-    except Exception as e:
-        logging.info(f"Errore durante il salvataggio della pagina: {str(e)}")
-        return jsonify({'success': False, 'error': str(e)})
-
 # Funzione per salvare un'immagine base64 generica ---------------------------------------------------------------
 def save_base64_image(base64_image, upload_folder):
     try:
@@ -298,104 +344,15 @@ def save_base64_image(base64_image, upload_folder):
     except Exception as e:
         logging.info(f"Errore durante il salvataggio dell'immagine: {str(e)}")
         return None
-
-# Endpoint Flask per gestire l'upload delle immagini generiche -------------------------------------------------------
-@page_bp.route('/upload-image', methods=['POST'])
-def upload_image():
-    data = request.get_json()
-    base64_image = data.get('image')
-
-    if not base64_image:
-        return jsonify({'error': 'No image provided'}), 400
-
-    upload_folder = "static/uploads"
-    image_url = save_base64_image(base64_image, upload_folder)
     
-    if image_url:
-        return jsonify({'url': image_url}), 200
-    else:
-        return jsonify({'error': 'Failed to upload image'}), 500
-    
-# Upload SEO -------------------------------------------------------
-
-# Funzione per salvare i dati SEO della pagina
-@page_bp.route('/admin/cms/function/save-seo', methods=['POST'])
-def save_seo_page():
-    data = request.get_json()
-    page_id = data.get('id')
-    title = data.get('title')
-    description = data.get('description')
-    keywords = data.get('keywords')
-    slug = data.get('slug')
-
-    shop_subdomain = request.host.split('.')[0]  
-
-    db_conn = db_helper.get_db_connection()  
-    page_model = Page(db_conn)  
-
-    success = page_model.update_page_seo(page_id, title, description, keywords, slug, shop_name=shop_subdomain)
-
-    return jsonify({'success': success})
-
-
-# Funzione per creare una nuova pagina per un negozio specifico
-@page_bp.route('/admin/cms/function/create', methods=['POST'])
-def create_page():
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'You need to log in first.'})
-
-    if request.method == 'POST':
-        data = request.get_json()
-        title = data.get('title')
-        description = data.get('description')
-        keywords = data.get('keywords')
-        slug = data.get('slug')
-        content = data.get('content')
-        theme_name = data.get('theme_name')
-        paid = data.get('paid')
-        language = data.get('language')
-        published = data.get('published')
-
-        shop_subdomain = request.host.split('.')[0]  
-
-        db_conn = db_helper.get_db_connection()
-        page_model = Page(db_conn)  
-
-        success = page_model.create_page(title, description, keywords, slug, content, theme_name, paid, language, published, shop_name=shop_subdomain)
-
-        return jsonify({'success': success})
-    
-
-# Funzione per eliminare una pagina di un negozio specifico
-@page_bp.route('/admin/cms/function/delete', methods=['POST'])
-def delete_page():
-    data = request.get_json()
-    page_id = data.get('id')  
-
-    if not page_id:
-        return jsonify({'success': False, 'message': 'ID pagina mancante.'})
-    shop_subdomain = request.host.split('.')[0]  
-
-    page_model = Page(db_helper.get_db_connection())  
-    try:
-        page_model.delete_page(page_id, shop_name=shop_subdomain)  
-        return jsonify({'success': True, 'message': 'Pagina cancellata con successo.'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': f"Errore durante la cancellazione: {str(e)}"})
-
-
-# ----------------------------------------------
-# 📌 ROUTE: NAVBAR SETTINGS (Visualizza Impostazioni Navbar)
-# ----------------------------------------------
-
+# 🔹 **Visualizzazione delle impostazioni Navbar**
 @page_bp.route('/admin/cms/function/navbar-settings')
 def navbar_settings():
     shop_name = request.host.split('.')[0]
-    with db_helper.get_db_connection() as db_conn:
-        navbar_model = Navbar(db_conn)
-        pages_model = Page(db_conn)
-        navbar_links = navbar_model.get_navbar_links(shop_name)
-        pages = pages_model.get_published_pages(shop_name)
+
+    navbar_links = db.session.query(NavbarLink).filter_by(shop_name=shop_name).all()
+    pages = db.session.query(Page).filter_by(shop_name=shop_name, published=True).all()
+
     return render_template(
         'admin/cms/function/navigation.html',
         title="Navbar Settings",
@@ -403,48 +360,63 @@ def navbar_settings():
         pages=pages
     )
 
+# 🔹 **API per ottenere i link della navbar**
 @page_bp.route('/api/get-navbar-links', methods=['GET'])
 def get_navbar_links():
-    shop_name = request.host.split('.')[0]
-    with db_helper.get_db_connection() as db_conn:
-        navbar_model = Navbar(db_conn)
-        navbar_links = navbar_model.get_navbar_links(shop_name)
-    return jsonify({'success': True, 'navbar_links': navbar_links})
+    try:
+        shop_name = request.host.split('.')[0]
+        navbar_links = db.session.query(NavbarLink).filter_by(shop_name=shop_name).all()
 
+        return jsonify({'success': True, 'navbar_links': [link.to_dict() for link in navbar_links]})
+    except SQLAlchemyError as e:
+        logging.error(f"❌ Errore nel recupero della navbar: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# 🔹 **Aggiunta di un nuovo link alla navbar**
 @page_bp.route('/api/add-navbar-link', methods=['POST'])
 def add_navbar_link():
     try:
         data = request.get_json()
         shop_name = request.host.split('.')[0]
 
-        new_link = {
-            'link_text': data.get('link_text', 'New Link'),
-            'link_url': data.get('link_url', '/link'),
-            'link_type': data.get('link_type', 'standard'),
-            'parent_id': data.get('parent_id', None),
-            'position': data.get('position', 1)
-        }
+        new_link = NavbarLink(
+            shop_name=shop_name,
+            link_text=data.get('link_text', 'New Link'),
+            link_url=data.get('link_url', '/link'),
+            link_type=data.get('link_type', 'standard'),
+            parent_id=data.get('parent_id'),
+            position=data.get('position', 1)
+        )
 
-        with db_helper.get_db_connection() as db_conn:
-            navbar_model = Navbar(db_conn)
-            navbar_model.create_navbar_link(shop_name, **new_link)
+        db.session.add(new_link)
+        db.session.commit()
 
         return jsonify({'success': True, 'message': 'Link aggiunto con successo'})
 
-    except Exception as e:
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nell'aggiunta del link navbar: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+# 🔹 **Eliminazione di più link della navbar**
 @page_bp.route('/api/delete-navbar-links', methods=['POST'])
 def delete_navbar_links():
-    data = request.get_json()
-    shop_name = request.host.split('.')[0]
-    link_ids = data.get('ids', [])
-    with db_helper.get_db_connection() as db_conn:
-        navbar_model = Navbar(db_conn)
-        for link_id in link_ids:
-            navbar_model.delete_navbar_link(link_id, shop_name)
-    return jsonify({'success': True, 'message': 'Link eliminati con successo'})
+    try:
+        data = request.get_json()
+        shop_name = request.host.split('.')[0]
+        link_ids = data.get('ids', [])
 
+        db.session.query(NavbarLink).filter(NavbarLink.id.in_(link_ids), NavbarLink.shop_name == shop_name).delete(synchronize_session=False)
+        db.session.commit()
+
+        return jsonify({'success': True, 'message': 'Link eliminati con successo'})
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nell'eliminazione dei link navbar: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# 🔹 **Salvataggio della navbar aggiornata**
 @page_bp.route('/api/save-navbar', methods=['POST'])
 def save_navbar():
     try:
@@ -455,63 +427,49 @@ def save_navbar():
         if not navbar_links:
             return jsonify({'success': False, 'error': 'Nessun link ricevuto'}), 400
 
-        with db_helper.get_db_connection() as db_conn:
-            navbar_model = Navbar(db_conn)
-            navbar_model.delete_all_navbar_links(shop_name)  # Cancella i link esistenti
-            
-            # Salva i nuovi link
-            for link in navbar_links:
-                navbar_model.create_navbar_link(
-                    shop_name=shop_name,
-                    link_text=link.get("link_text"),
-                    link_url=link.get("link_url"),
-                    link_type=link.get("link_type"),
-                    parent_id=link.get("parent_id"),
-                    position=link.get("position")
-                )
+        # Elimina tutti i link esistenti
+        db.session.query(NavbarLink).filter_by(shop_name=shop_name).delete()
 
+        # Salva i nuovi link
+        for link in navbar_links:
+            new_link = NavbarLink(
+                shop_name=shop_name,
+                link_text=link.get("link_text"),
+                link_url=link.get("link_url"),
+                link_type=link.get("link_type"),
+                parent_id=link.get("parent_id"),
+                position=link.get("position")
+            )
+            db.session.add(new_link)
+
+        db.session.commit()
         return jsonify({'success': True, 'message': 'Navbar salvata con successo!'})
 
-    except Exception as e:
-        logging.error(f"Errore nel salvataggio della navbar: {str(e)}")
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nel salvataggio della navbar: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+# 🔹 **API per ottenere le pagine pubblicate**
 @page_bp.route('/api/get-pages', methods=['GET'])
 def get_pages():
-    """ Recupera le pagine pubblicate per il negozio corrente """
     try:
         shop_name = request.host.split('.')[0]
-        with db_helper.get_db_connection() as db_conn:
-            pages_model = Page(db_conn)
-            pages = pages_model.get_published_pages(shop_name)
+        pages = db.session.query(Page).filter_by(shop_name=shop_name, published=True).all()
 
-        if pages:
-            return jsonify({'success': True, 'pages': pages})
-        else:
-            return jsonify({'success': False, 'message': 'Nessuna pagina pubblicata trovata'}), 404
-
-    except Exception as e:
+        return jsonify({'success': True, 'pages': [page.to_dict() for page in pages]})
+    except SQLAlchemyError as e:
+        logging.error(f"❌ Errore nel recupero delle pagine: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+# 🔹 **API per ottenere le visite al sito**
 @page_bp.route('/api/get-site-visits', methods=['GET'])
 def get_site_visits():
-    """
-    API per recuperare le visite del negozio corrente.
-    """
     try:
-        shop_name = request.host.split('.')[0] if request.host else None
+        shop_name = request.host.split('.')[0]
+        visits = db.session.query(SiteVisit).filter_by(shop_name=shop_name).order_by(SiteVisit.timestamp.desc()).limit(100).all()
 
-        if not shop_name:
-            return jsonify({'success': False, 'error': 'Invalid shop name'}), 400
-
-        # Connessione al database
-        with db_helper.get_db_connection() as conn:
-            site_visits = SiteVisits(conn)
-            visits = site_visits.get_recent_visits(shop_name, limit=100)
-
-        return jsonify({'success': True, 'visits': visits})
-
-    except Exception as e:
-        logging.error(f"Errore in get_site_visits: {str(e)}")
+        return jsonify({'success': True, 'visits': [visit.to_dict() for visit in visits]})
+    except SQLAlchemyError as e:
+        logging.error(f"❌ Errore nel recupero delle visite al sito: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
-    

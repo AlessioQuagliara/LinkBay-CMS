@@ -1,116 +1,166 @@
-# Classe per Cookie e Policy --------------------------------------------------------------------------------------------
+from models.database import db
 import logging
+from datetime import datetime
+
+# 📌 Inizializza il database SQLAlchemy
 logging.basicConfig(level=logging.INFO)
 
-class CookiePolicy:
-    def __init__(self, db_conn):
-        self.conn = db_conn
+# 🔹 **Modello per la Cookie Policy**
+class CookiePolicy(db.Model):
+    __tablename__ = "cookie_policy"
 
-    # Metodo per ottenere le impostazioni del banner dei cookie per uno specifico negozio
-    def get_policy_by_shop(self, shop_name):
-        with self.conn.cursor(dictionary=True) as cursor:
-            cursor.execute("SELECT * FROM cookie_policy WHERE shop_name = %s", (shop_name,))
-            policy = cursor.fetchone()
-        return policy
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 🔑 ID univoco
+    shop_name = db.Column(db.String(255), unique=True, nullable=False)  # 🏪 Nome del negozio
+    title = db.Column(db.String(255), nullable=False)  # 🏷️ Titolo del banner
+    text_content = db.Column(db.String(1024), nullable=False)  # 📝 Testo del banner
+    button_text = db.Column(db.String(255), nullable=False)  # 🔘 Testo del pulsante
+    background_color = db.Column(db.String(50), nullable=False)  # 🎨 Colore di sfondo
+    button_color = db.Column(db.String(50), nullable=False)  # 🎨 Colore pulsante
+    button_text_color = db.Column(db.String(50), nullable=False)  # 🎨 Colore testo pulsante
+    text_color = db.Column(db.String(50), nullable=False)  # 🎨 Colore del testo
+    entry_animation = db.Column(db.String(100), nullable=False)  # 🎬 Animazione d'entrata
+    use_third_party = db.Column(db.Boolean, default=False)  # 🔄 Uso di servizi di terze parti
+    third_party_cookie = db.Column(db.String(255), nullable=True)  # 🍪 Cookie di terze parti
+    third_party_privacy = db.Column(db.String(255), nullable=True)  # 🔒 Privacy policy di terzi
+    third_party_terms = db.Column(db.String(255), nullable=True)  # 📜 Termini di terzi
+    third_party_consent = db.Column(db.String(255), nullable=True)  # ✅ Consenso ai cookie di terze parti
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 🕒 Data di creazione
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 🔄 Data di aggiornamento
 
-    # ----------------- Metodi per le politiche dei cookie interne -----------------
+    def __repr__(self):
+        return f"<CookiePolicy {self.shop_name}>"
 
-    # Metodo per aggiornare le impostazioni interne del banner dei cookie
-    def update_internal_policy(self, shop_name, title, text_content, button_text, 
-                               background_color, button_color, button_text_color, 
-                               text_color, entry_animation):
-        try:
-            with self.conn.cursor() as cursor:
-                cursor.execute("""
-                    UPDATE cookie_policy
-                    SET title = %s, text_content = %s, button_text = %s, 
-                        background_color = %s, button_color = %s, button_text_color = %s, 
-                        text_color = %s, entry_animation = %s, use_third_party = 0,
-                        updated_at = NOW()
-                    WHERE shop_name = %s
-                """, (title, text_content, button_text, background_color, button_color, 
-                      button_text_color, text_color, entry_animation, shop_name))
-                self.conn.commit()
-            return True
-        except Exception as e:
-            logging.info(f"Error updating internal cookie policy: {e}")
-            self.conn.rollback()
+# 🔍 **Recupera le impostazioni della cookie policy per un negozio**
+def get_policy_by_shop(shop_name):
+    try:
+        policy = CookiePolicy.query.filter_by(shop_name=shop_name).first()
+        return policy_to_dict(policy) if policy else None
+    except Exception as e:
+        logging.error(f"❌ Errore nel recupero della Cookie Policy per {shop_name}: {e}")
+        return None
+
+# ✅ **Aggiorna la cookie policy interna**
+def update_internal_policy(shop_name, title, text_content, button_text, background_color, 
+                           button_color, button_text_color, text_color, entry_animation):
+    try:
+        policy = CookiePolicy.query.filter_by(shop_name=shop_name).first()
+        if not policy:
             return False
 
-    # Metodo per creare una nuova impostazione interna del banner dei cookie
-    def create_internal_policy(self, shop_name, title, text_content, button_text, 
-                               background_color, button_color, button_text_color, 
-                               text_color, entry_animation):
-        try:
-            with self.conn.cursor() as cursor:
-                cursor.execute("""
-                    INSERT INTO cookie_policy 
-                    (shop_name, title, text_content, button_text, background_color, button_color, 
-                     button_text_color, text_color, entry_animation, use_third_party, 
-                     created_at, updated_at)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 0, NOW(), NOW())
-                """, (shop_name, title, text_content, button_text, background_color, button_color, 
-                      button_text_color, text_color, entry_animation))
-                self.conn.commit()
-            return True
-        except Exception as e:
-            logging.info(f"Error creating internal cookie policy: {e}")
-            self.conn.rollback()
+        # Aggiorna i dati della policy
+        policy.title = title
+        policy.text_content = text_content
+        policy.button_text = button_text
+        policy.background_color = background_color
+        policy.button_color = button_color
+        policy.button_text_color = button_text_color
+        policy.text_color = text_color
+        policy.entry_animation = entry_animation
+        policy.use_third_party = False
+
+        db.session.commit()
+        logging.info(f"✅ Cookie Policy interna aggiornata per {shop_name}")
+        return True
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nell'aggiornamento della Cookie Policy: {e}")
+        return False
+
+# ✏️ **Crea una nuova impostazione interna del banner dei cookie**
+def create_internal_policy(shop_name, title, text_content, button_text, background_color, 
+                           button_color, button_text_color, text_color, entry_animation):
+    try:
+        new_policy = CookiePolicy(
+            shop_name=shop_name,
+            title=title,
+            text_content=text_content,
+            button_text=button_text,
+            background_color=background_color,
+            button_color=button_color,
+            button_text_color=button_text_color,
+            text_color=text_color,
+            entry_animation=entry_animation,
+            use_third_party=False,
+        )
+        db.session.add(new_policy)
+        db.session.commit()
+        logging.info(f"✅ Cookie Policy interna creata per {shop_name}")
+        return new_policy.id
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nella creazione della Cookie Policy: {e}")
+        return None
+
+# 🔄 **Aggiorna le impostazioni per l'uso di terze parti**
+def update_third_party_policy(shop_name, use_third_party, third_party_cookie, third_party_privacy, 
+                              third_party_terms, third_party_consent):
+    try:
+        policy = CookiePolicy.query.filter_by(shop_name=shop_name).first()
+        if not policy:
             return False
 
-    # ----------------- Metodi per le politiche dei cookie di terze parti -----------------
+        policy.use_third_party = use_third_party
+        policy.third_party_cookie = third_party_cookie
+        policy.third_party_privacy = third_party_privacy
+        policy.third_party_terms = third_party_terms
+        policy.third_party_consent = third_party_consent
 
-    # Metodo per aggiornare le impostazioni del banner dei cookie di terze parti
-    def update_third_party_policy(self, shop_name, use_third_party, third_party_cookie, third_party_privacy, 
-                                third_party_terms, third_party_consent):
-        try:
-            with self.conn.cursor() as cursor:
-                cursor.execute("""
-                    UPDATE cookie_policy
-                    SET use_third_party = %s, third_party_cookie = %s, 
-                        third_party_privacy = %s, third_party_terms = %s, 
-                        third_party_consent = %s, updated_at = NOW()
-                    WHERE shop_name = %s
-                """, (use_third_party, third_party_cookie, third_party_privacy, third_party_terms, 
-                    third_party_consent, shop_name))
-                self.conn.commit()
-            return True
-        except Exception as e:
-            logging.info(f"Error updating third-party cookie policy: {e}")
-            self.conn.rollback()
-            return False
+        db.session.commit()
+        logging.info(f"✅ Cookie Policy di terze parti aggiornata per {shop_name}")
+        return True
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nell'aggiornamento della Cookie Policy di terze parti: {e}")
+        return False
 
-    # Metodo per creare una nuova impostazione del banner dei cookie di terze parti
-    def create_third_party_policy(self, shop_name, use_third_party, third_party_cookie, third_party_privacy, 
-                                third_party_terms, third_party_consent):
-        try:
-            with self.conn.cursor() as cursor:
-                cursor.execute("""
-                    INSERT INTO cookie_policy 
-                    (shop_name, use_third_party, third_party_cookie, third_party_privacy, 
-                    third_party_terms, third_party_consent, created_at, updated_at)
-                    VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW())
-                """, (shop_name, use_third_party, third_party_cookie, third_party_privacy, 
-                    third_party_terms, third_party_consent))
-                self.conn.commit()
-            return True
-        except Exception as e:
-            logging.info(f"Error creating third-party cookie policy: {e}")
-            self.conn.rollback()
-            return False
-        
-    def get_cookie_policy(self, shop_name):
-        """
-        Recupera i dati della cookie policy per il negozio specifico.
-        """
-        query = """
-        SELECT title, text_content, button_text, background_color, button_color, 
-            button_text_color, text_color, entry_animation, use_third_party 
-        FROM cookie_policy 
-        WHERE shop_name = %s
-        """
-        with self.conn.cursor(dictionary=True) as cursor:
-            cursor.execute(query, (shop_name,))
-            result = cursor.fetchone()
-        
-        return result
+# ✅ **Crea una nuova impostazione per il banner dei cookie di terze parti**
+def create_third_party_policy(shop_name, use_third_party, third_party_cookie, third_party_privacy, 
+                              third_party_terms, third_party_consent):
+    try:
+        new_policy = CookiePolicy(
+            shop_name=shop_name,
+            use_third_party=use_third_party,
+            third_party_cookie=third_party_cookie,
+            third_party_privacy=third_party_privacy,
+            third_party_terms=third_party_terms,
+            third_party_consent=third_party_consent,
+        )
+        db.session.add(new_policy)
+        db.session.commit()
+        logging.info(f"✅ Cookie Policy di terze parti creata per {shop_name}")
+        return new_policy.id
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nella creazione della Cookie Policy di terze parti: {e}")
+        return None
+
+# 🔍 **Recupera i dati della cookie policy per un negozio**
+def get_cookie_policy(shop_name):
+    try:
+        policy = CookiePolicy.query.filter_by(shop_name=shop_name).first()
+        return policy_to_dict(policy) if policy else None
+    except Exception as e:
+        logging.error(f"❌ Errore nel recupero della Cookie Policy: {e}")
+        return None
+
+# 📌 **Helper per convertire una CookiePolicy in dizionario**
+def policy_to_dict(policy):
+    return {
+        "id": policy.id,
+        "shop_name": policy.shop_name,
+        "title": policy.title,
+        "text_content": policy.text_content,
+        "button_text": policy.button_text,
+        "background_color": policy.background_color,
+        "button_color": policy.button_color,
+        "button_text_color": policy.button_text_color,
+        "text_color": policy.text_color,
+        "entry_animation": policy.entry_animation,
+        "use_third_party": policy.use_third_party,
+        "third_party_cookie": policy.third_party_cookie,
+        "third_party_privacy": policy.third_party_privacy,
+        "third_party_terms": policy.third_party_terms,
+        "third_party_consent": policy.third_party_consent,
+        "created_at": policy.created_at,
+        "updated_at": policy.updated_at,
+    }

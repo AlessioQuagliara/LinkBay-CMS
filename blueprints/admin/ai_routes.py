@@ -1,131 +1,120 @@
 from flask import Blueprint, request, jsonify
+from models.database import db
 from models.stores_info import StoreInfo
-from db_helpers import DatabaseHelper
-from helpers import check_user_authentication
-import logging, traceback, openai
+import logging
+import traceback
+import openai
+from config import Config 
+
+# 📌 Configurazione logging
 logging.basicConfig(level=logging.INFO)
 
-db_helper = DatabaseHelper()
-
+# 📌 Inizializza il Blueprint
 ai_bp = Blueprint('ai', __name__)
-    
 
+# 📌 Configura OpenAI con la chiave API
+client = openai.OpenAI(api_key=Config.OPENAI_API_KEY)
 
+# 🚀 **API /assistant - Risponde alle domande degli utenti**
 @ai_bp.route('/assistant', methods=['POST'])
 def assistant():
+    """
+    API che utilizza OpenAI per rispondere alle domande dell'utente sul CMS LinkBay.
+    """
     try:
-        # Leggi i dati inviati dal client
-        data = request.json
-        user_query = data.get('query', '').strip()
-        shop_name = request.host.split('.')[0]
+        # 📌 Ottieni il nome del negozio dal sottodominio
+        shop_name = request.host.split('.')[0] if request.host else None
+        if not shop_name:
+            return jsonify({"error": "Invalid shop name"}), 400
 
+        # 📌 Ottieni la query dell'utente
+        data = request.json
+        user_query = data.get("query", "").strip()
         if not user_query:
             return jsonify({"error": "No query provided"}), 400
 
-        with db_helper.get_db_connection() as db_conn:
-            store_info_model = StoreInfo(db_conn)
-            store_info = store_info_model.get_store_by_shop_name(shop_name)
+        # 📌 Recupera le informazioni del negozio dal database
+        store_info = StoreInfo.query.filter_by(shop_name=shop_name).first()
 
-        # Prepara le informazioni di contesto
-        industry = store_info['industry'] if store_info else "Unknown"
-        description = store_info['description'] if store_info else "No description available"
-        website_url = store_info['website_url'] if store_info else "No competitor provided"
+        # 📌 Estrai le informazioni del negozio o imposta valori di default
+        industry = store_info.industry if store_info else "Unknown"
+        description = store_info.description if store_info else "No description available"
+        website_url = store_info.website_url if store_info else "No competitor provided"
 
-        # Prompt migliorato per GPT-4 con maggiori dettagli sul CMS
+        # 📌 Costruzione del prompt AI per GPT-4
         prompt = (
-            f"Sei un assistente AI per e-commerce specializzato nel CMS LinkBay. L'utente gestisce un negozio chiamato '{shop_name}', "
-            f"che opera nel settore '{industry}'. Descrizione: '{description}'. Il competitor segnalato è: {website_url}.\n\n"
-            f"Il CMS LinkBay è un sistema multitenant dedicato esclusivamente ad e-commerce, con un'ampia gamma di funzionalità, "
-            f"tra cui:\n"
-            f"  • /home: Homepage del sito.\n"
-            f"  • /products: Sezione per creare, gestire e modificare prodotti, con supporto per caricare immagini, specificare prezzi, "
-            f"categorie, tag e altre informazioni rilevanti.\n"
-            f"  • /orders: Gestione completa degli ordini, incluso il tracking delle spedizioni e l'integrazione con sistemi di pagamento.\n"
-            f"  • /customers: Gestione dei clienti registrati, con informazioni sugli acquisti, preferenze e storico ordini.\n"
-            f"  • /online_content: Modifica drag & drop del tema e del codice, per personalizzare l'interfaccia utente senza conoscenze tecniche avanzate.\n"
-            f"  • /domain: Gestione e acquisto di un dominio, garantendo un indirizzo univoco e personalizzato per il negozio.\n"
-            f"  • /shipping_methods: Creazione e gestione dei metodi di spedizione, per definire tariffe, aree di consegna e tempi di spedizione.\n"
-            f"  • /subscription: Gestione degli abbonamenti, con diverse opzioni (Basic da 28€ mensili, Pro da 79€ mensili, Enterprise da 149€ mensili).\n\n"
-            f"In aggiunta, il CMS offre funzionalità avanzate come reportistica, analisi delle performance, integrazione con API di pagamenti e "
-            f"spedizioni e strumenti di marketing per ottimizzare le vendite.\n\n"
-            f"Il servizio clienti è contattabile dal numero +39 389 965 7115, dalle 9 alle 17 dal lunedì al venerdì, in alternativa si può inviare una email a info@linkbay.it, tuttavia si consiglia nel pannello admin di associare ad una agenzia marketing in negozio per un supporto più preciso ed efficace.\n\n"
-            f"Il sito ufficiale del CMS è https://www.linkbay-cms.com/ e il pannello di amministrazione si trova su "
-            f"'https://{shop_name}.yoursite-linkbay-cms.com/admin/'.\n\n"
-            f"Rispondi in modo breve, preciso e pratico, fornendo informazioni specifiche che aiutino l'utente a sfruttare al meglio il CMS.\n\n"
+            f"Sei un assistente AI specializzato nel CMS LinkBay. Il negozio '{shop_name}' opera nel settore '{industry}'.\n"
+            f"Descrizione: '{description}'. Il competitor segnalato è: {website_url}.\n\n"
+            f"LinkBay è un CMS multitenant per e-commerce, con funzionalità avanzate:\n"
+            f"  • /products: Gestione prodotti, immagini, prezzi, categorie, tag.\n"
+            f"  • /orders: Gestione ordini, tracking spedizioni, pagamenti.\n"
+            f"  • /customers: Analisi clienti, storico acquisti, preferenze.\n"
+            f"  • /online_content: Personalizzazione interfaccia con drag & drop.\n"
+            f"  • /domain: Gestione e acquisto domini personalizzati.\n"
+            f"  • /subscription: Abbonamenti mensili (Basic, Pro, Enterprise).\n\n"
+            f"Fornisci risposte chiare, pratiche e mirate alle domande dell'utente.\n\n"
             f"Domanda dell'utente: {user_query}."
         )
 
-        # Chiamata API a GPT-4
-        response = openai.ChatCompletion.create(
+        # 📌 Chiamata API a OpenAI (GPT-4)
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "Sei un assistente esperto di e-commerce e strategie di business, con una profonda conoscenza del CMS LinkBay."},
+                {"role": "system", "content": "Sei un esperto di strategia e-commerce."},
                 {"role": "user", "content": prompt}
             ]
         )
 
-        # Estrai la risposta generata
-        ai_response = response['choices'][0]['message']['content']
+        # 📌 Estrai la risposta generata
+        if not response.choices:
+            raise ValueError("Risposta AI non valida.")
+
+        ai_response = response.choices[0].message.content
 
         return jsonify({"response": ai_response}), 200
 
     except Exception as e:
-        logging.error("Errore durante la richiesta a GPT-4:")
+        logging.error(f"❌ Errore durante la richiesta a GPT-4: {e}")
         logging.error(traceback.format_exc())
-        return jsonify({"error": "Errore interno al server."}), 500
+        return jsonify({"error": "Errore interno al server. Riprova più tardi."}), 500
     
+
+
 @ai_bp.route('/api/analyze-store', methods=['GET'])
 def analyze_store():
     try:
-        shop_name = request.host.split('.')[0]
+        shop_name = request.host.split('.')[0] if request.host else None
+        if not shop_name:
+            return jsonify({"error": "Invalid shop name"}), 400
 
-        with db_helper.get_db_connection() as db_conn:
-            store_info_model = StoreInfo(db_conn)
-            store_info = store_info_model.get_store_by_shop_name(shop_name)
-
+        store_info = StoreInfo.query.filter_by(shop_name=shop_name).first()
         if not store_info:
-            return jsonify({'suggestion': 'No data available for analysis.'}), 400
+            return jsonify({'error': 'No store data available for analysis.'}), 400
 
-        industry = store_info.get('industry', 'Unknown')
-        description = store_info.get('description', 'No description available')
-        website_url = store_info.get('website_url', 'No competitor provided')
+        industry = store_info.industry or "Unknown"
+        description = store_info.description or "No description available"
+        website_url = store_info.website_url or "No competitor provided"
 
-        # Prompt potenziato per addestrare meglio l'AI
-        prompt = (
-            f"Negozio: '{shop_name}'\n"
-            f"Settore: '{industry}'\n"
-            f"Descrizione: '{description}'\n"
-            f"Competitor: {website_url}\n\n"
-            f"Il negozio utilizza il CMS LinkBay, una piattaforma multitenant per e-commerce che offre funzionalità avanzate quali:\n"
-            f"  • Gestione e creazione prodotti, con supporto per immagini, prezzi, categorie e tag.\n"
-            f"  • Gestione degli ordini, inclusi tracking, integrazione con sistemi di pagamento e spedizioni.\n"
-            f"  • Gestione dei clienti, con storico degli acquisti e analisi delle preferenze.\n"
-            f"  • Personalizzazione del sito tramite drag & drop per modificare tema e codice.\n"
-            f"  • Gestione dominio personalizzato.\n"
-            f"  • Creazione e gestione dei metodi di spedizione.\n"
-            f"  • Gestione degli abbonamenti (Basic, Pro, Enterprise) e reportistica avanzata.\n\n"
-            f"Fornisci questi elementi in breve: una rassicurazione, una brevissima analisi sul suo competitors e in breve come riuscirà a raggiungerlo sfruttando LinkBay CMS "
-            f"fornisci poi l'ultima tendenza e un prodotto di punta del settore, concludi dicendo di continuare la configurazione e dicendo che sei qui per aiutarlo."
-        )
+        prompt = f"Analizza il negozio '{shop_name}' nel settore '{industry}', lo store ha come descrizione '{description}',  il competitors è '{website_url}' e fornisci sicurezza e spiega cos'è l'ecommerce e la vendita online nel suo settore, fornisci un testo di massimo 4 righe."
 
-        response = openai.ChatCompletion.create(
+        # **Aggiungi la chiave API direttamente al client**
+        client = openai.OpenAI(api_key=Config.OPENAI_API_KEY)
+
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[
-                {
-                    "role": "system", 
-                    "content": (
-                        "Sei un esperto di e-commerce e un consulente strategico per l'ottimizzazione dei negozi online, con una profonda conoscenza "
-                        "del CMS LinkBay e delle sue funzionalità. Fornisci consigli pratici e mirati per migliorare le performance e l'efficacia del business."
-                    )
-                },
+                {"role": "system", "content": "Sei un esperto di e-commerce."},
                 {"role": "user", "content": prompt}
             ]
         )
 
-        suggestion = response['choices'][0]['message']['content']
+        if not response.choices:
+            raise ValueError("Risposta AI non valida.")
+
+        suggestion = response.choices[0].message.content
 
         return jsonify({'suggestion': suggestion}), 200
 
     except Exception as e:
-        logging.error(f"Errore nell'analisi AI dello store '{shop_name}': {e}")
-        return jsonify({'error': 'Errore interno al server.'}), 500
+        logging.error(f"❌ Errore nell'analisi AI dello store '{shop_name}': {e}")
+        return jsonify({'error': 'Errore interno al server. Riprova più tardi.'}), 500

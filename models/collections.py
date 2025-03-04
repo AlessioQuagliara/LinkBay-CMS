@@ -1,247 +1,208 @@
-# COLLEZIONI ---------------------------------------------------------------------------------------------------
+from models.database import db
 import logging
+from datetime import datetime
+
+# 📌 Inizializza il database SQLAlchemy
 logging.basicConfig(level=logging.INFO)
 
-class Collections:
-    def __init__(self, db_conn):
-        self.conn = db_conn
+# 🔹 **Modello per le Collezioni**
+class Collection(db.Model):
+    __tablename__ = "collections"
 
-    def get_all_collections(self, shop_name):
-        with self.conn.cursor(dictionary=True) as cursor:
-            try:
-                query = "SELECT * FROM collections WHERE shop_name = %s"
-                cursor.execute(query, (shop_name,))
-                return cursor.fetchall()
-            except Exception as e:
-                logging.info(f"Error fetching collections: {e}")
-                return []
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 🔑 ID univoco della collezione
+    shop_name = db.Column(db.String(255), nullable=False)  # 🏪 Nome dello shop
+    name = db.Column(db.String(255), nullable=False)  # 📛 Nome della collezione
+    slug = db.Column(db.String(255), unique=True, nullable=False)  # 🔗 Slug URL
+    description = db.Column(db.String(1024), nullable=True)  # 📜 Descrizione
+    image_url = db.Column(db.String(512), nullable=True)  # 🖼️ URL immagine
+    is_active = db.Column(db.Boolean, default=True)  # ✅ Stato della collezione
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 🕒 Data di creazione
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 🔄 Ultimo aggiornamento
 
-    def get_collection_by_id(self, collection_id):
-        with self.conn.cursor(dictionary=True) as cursor:
-            try:
-                query = "SELECT * FROM collections WHERE id = %s"
-                cursor.execute(query, (collection_id,))
-                return cursor.fetchone()
-            except Exception as e:
-                logging.info(f"Error fetching collection by ID: {e}")
-                return None
+    images = db.relationship("CollectionImage", backref="collection", cascade="all, delete-orphan")
+    products = db.relationship("CollectionProduct", backref="collection", cascade="all, delete-orphan")
 
-    def create_collection(self, data):
-        with self.conn.cursor() as cursor:
-            try:
-                query = """
-                    INSERT INTO collections (
-                        name, slug, description, image_url,
-                        is_active, shop_name, created_at, updated_at
-                    ) VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW())
-                """
-                values = (
-                    data["name"], data["slug"], data["description"], data["image_url"], data["is_active"],
-                    data["shop_name"]
-                )
-                cursor.execute(query, values)
-                self.conn.commit()
-                return cursor.lastrowid
-            except Exception as e:
-                logging.info(f"Error creating collection: {e}")
-                self.conn.rollback()
-                return None
+    def __repr__(self):
+        return f"<Collection {self.name} (ID: {self.id})>"
 
-    def update_collection(self, collection_id, data):
-        with self.conn.cursor() as cursor:
-            try:
-                query = """
-                    UPDATE collections
-                    SET name = %s, slug = %s, description = %s, image_url = %s, is_active = %s, updated_at = NOW()
-                    WHERE id = %s
-                """
-                values = (
-                    data.get('name'), data.get('slug'), data.get('description'), data.get('image_url'),
-                    data.get('is_active'), collection_id
-                )
-                cursor.execute(query, values)
-                self.conn.commit()
-                return True
-            except Exception as e:
-                logging.info(f"Database Error: {e}")
-                self.conn.rollback()
-                return False
 
-    def delete_collection(self, collection_id):
-        with self.conn.cursor() as cursor:
-            try:
-                query = "DELETE FROM collections WHERE id = %s"
-                cursor.execute(query, (collection_id,))
-                self.conn.commit()
-                return True
-            except Exception as e:
-                logging.info(f"Error deleting collection: {e}")
-                self.conn.rollback()
-                return False
+# 📸 **Modello per le Immagini delle Collezioni**
+class CollectionImage(db.Model):
+    __tablename__ = "collection_images"
 
-    def add_collection_image(self, collection_id, image_url, is_main=False):
-        with self.conn.cursor() as cursor:
-            try:
-                query = """
-                    INSERT INTO collection_images (collection_id, image_url, is_main)
-                    VALUES (%s, %s, %s)
-                """
-                cursor.execute(query, (collection_id, image_url, is_main))
-                self.conn.commit()
-                return cursor.lastrowid
-            except Exception as e:
-                logging.info(f"Error adding collection image: {e}")
-                self.conn.rollback()
-                return None
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 🔑 ID univoco immagine
+    collection_id = db.Column(db.Integer, db.ForeignKey("collections.id"), nullable=False)  # 🔗 Collegamento a Collection
+    image_url = db.Column(db.String(512), nullable=False)  # 🖼️ URL immagine
+    is_main = db.Column(db.Boolean, default=False)  # ⭐ Immagine principale
 
-    def get_collection_images(self, collection_id):
-        with self.conn.cursor(dictionary=True) as cursor:
-            try:
-                query = "SELECT * FROM collection_images WHERE collection_id = %s"
-                cursor.execute(query, (collection_id,))
-                return cursor.fetchall()
-            except Exception as e:
-                logging.info(f"Error fetching collection images: {e}")
-                return []
+    def __repr__(self):
+        return f"<CollectionImage {self.image_url} (Collection ID: {self.collection_id})>"
 
-    def get_collection_image_by_id(self, image_id):
-        with self.conn.cursor(dictionary=True) as cursor:
-            try:
-                query = "SELECT * FROM collection_images WHERE id = %s"
-                cursor.execute(query, (image_id,))
-                return cursor.fetchone()
-            except Exception as e:
-                logging.info(f"Error fetching collection image by ID: {e}")
-                return None
 
-    def get_collection_by_slug(self, slug):
-        with self.conn.cursor(dictionary=True) as cursor:
-            try:
-                query = "SELECT * FROM collections WHERE slug = %s"
-                cursor.execute(query, (slug,))
-                return cursor.fetchone()
-            except Exception as e:
-                logging.info(f"Error retrieving collection by slug: {e}")
-                return None
+# 🛒 **Modello per i Prodotti nelle Collezioni**
+class CollectionProduct(db.Model):
+    __tablename__ = "collection_products"
 
-    def add_product_to_collection(self, collection_id, product_id):
-        with self.conn.cursor() as cursor:
-            try:
-                query = """
-                    INSERT INTO collection_products (collection_id, product_id)
-                    VALUES (%s, %s)
-                """
-                cursor.execute(query, (collection_id, product_id))
-                self.conn.commit()
-                return True
-            except Exception as e:
-                logging.info(f"Error adding product to collection: {e}")
-                self.conn.rollback()
-                return False
+    collection_id = db.Column(db.Integer, db.ForeignKey("collections.id"), primary_key=True)  # 🔗 Collezione
+    product_id = db.Column(db.Integer, db.ForeignKey("products.id"), primary_key=True)  # 🔗 Prodotto
 
-    def remove_product_from_collection(self, collection_id, product_id):
-        with self.conn.cursor() as cursor:
-            try:
-                query = """
-                    DELETE FROM collection_products
-                    WHERE collection_id = %s AND product_id = %s
-                """
-                cursor.execute(query, (collection_id, product_id))
-                self.conn.commit()
-                return True
-            except Exception as e:
-                logging.info(f"Error removing product from collection: {e}")
-                self.conn.rollback()
-                return False
+    def __repr__(self):
+        return f"<CollectionProduct Collection ID: {self.collection_id}, Product ID: {self.product_id}>"
 
-    def get_products_in_collection(self, collection_id):
-        with self.conn.cursor(dictionary=True) as cursor:
-            try:
-                query = """
-                    SELECT p.*
-                    FROM products p
-                    JOIN collection_products cp ON p.id = cp.product_id
-                    WHERE cp.collection_id = %s
-                """
-                cursor.execute(query, (collection_id,))
-                return cursor.fetchall()
-            except Exception as e:
-                logging.info(f"Error fetching products in collection: {e}")
-                return []
 
-    def get_collections_for_product(self, product_id):
-        with self.conn.cursor(dictionary=True) as cursor:
-            try:
-                query = """
-                    SELECT c.*
-                    FROM collections c
-                    JOIN collection_products cp ON c.id = cp.collection_id
-                    WHERE cp.product_id = %s
-                """
-                cursor.execute(query, (product_id,))
-                return cursor.fetchall()
-            except Exception as e:
-                logging.info(f"Error fetching collections for product: {e}")
-                return []
+# ✅ **Crea una nuova collezione**
+def create_collection(shop_name, name, slug, description=None, image_url=None, is_active=True):
+    try:
+        new_collection = Collection(
+            shop_name=shop_name,
+            name=name,
+            slug=slug,
+            description=description,
+            image_url=image_url,
+            is_active=is_active
+        )
+        db.session.add(new_collection)
+        db.session.commit()
+        logging.info(f"✅ Collezione '{name}' creata con successo")
+        return new_collection.id
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nella creazione della collezione '{name}': {e}")
+        return None
 
-    def remove_all_products_from_collection(self, collection_id):
-        with self.conn.cursor() as cursor:
-            try:
-                query = """
-                    DELETE FROM collection_products
-                    WHERE collection_id = %s
-                """
-                cursor.execute(query, (collection_id,))
-                self.conn.commit()
-                return True
-            except Exception as e:
-                logging.info(f"Error removing all products from collection: {e}")
-                self.conn.rollback()
-                return False
 
-    def remove_products_from_collection(self, collection_id, product_ids):
-        with self.conn.cursor() as cursor:
-            try:
-                query = """
-                    DELETE FROM collection_products 
-                    WHERE collection_id = %s AND product_id IN (%s)
-                """
-                formatted_query = query % (collection_id, ', '.join(['%s'] * len(product_ids)))
-                cursor.execute(formatted_query, product_ids)
-                self.conn.commit()
-                return True
-            except Exception as e:
-                logging.info(f"Error removing products from collection: {e}")
-                self.conn.rollback()
-                return False
+# 🔍 **Recupera tutte le collezioni per uno shop**
+def get_all_collections(shop_name):
+    try:
+        collections = Collection.query.filter_by(shop_name=shop_name).all()
+        return [collection_to_dict(col) for col in collections]
+    except Exception as e:
+        logging.error(f"❌ Errore nel recupero delle collezioni per lo shop '{shop_name}': {e}")
+        return []
 
-    def add_products_to_collection(self, collection_id, product_ids):
-        with self.conn.cursor() as cursor:
-            try:
-                query = """
-                    INSERT INTO collection_products (collection_id, product_id) 
-                    VALUES (%s, %s)
-                """
-                values = [(collection_id, product_id) for product_id in product_ids]
-                cursor.executemany(query, values)
-                self.conn.commit()
-                return True
-            except Exception as e:
-                logging.info(f"Error adding products to collection: {e}")
-                self.conn.rollback()
-                return False
 
-    def get_collections_by_shop(self, shop_name):
-        with self.conn.cursor(dictionary=True) as cursor:
-            try:
-                query = """
-                    SELECT * 
-                    FROM collections 
-                    WHERE shop_name = %s AND is_active = 1
-                    ORDER BY name
-                """
-                cursor.execute(query, (shop_name,))
-                return cursor.fetchall()
-            except Exception as e:
-                logging.info(f"Error fetching collections: {e}")
-                return []
+# 🔄 **Aggiorna una collezione**
+def update_collection(collection_id, data):
+    try:
+        collection = Collection.query.get(collection_id)
+        if not collection:
+            return False
+
+        for key, value in data.items():
+            setattr(collection, key, value)
+
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nell'aggiornamento della collezione {collection_id}: {e}")
+        return False
+
+
+# ❌ **Elimina una collezione**
+def delete_collection(collection_id):
+    try:
+        collection = Collection.query.get(collection_id)
+        if not collection:
+            return False
+
+        db.session.delete(collection)
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nell'eliminazione della collezione {collection_id}: {e}")
+        return False
+
+
+# 📸 **Aggiunge un'immagine a una collezione**
+def add_collection_image(collection_id, image_url, is_main=False):
+    try:
+        new_image = CollectionImage(collection_id=collection_id, image_url=image_url, is_main=is_main)
+        db.session.add(new_image)
+        db.session.commit()
+        return new_image.id
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nell'aggiunta dell'immagine alla collezione {collection_id}: {e}")
+        return None
+
+
+# 📸 **Recupera tutte le immagini di una collezione**
+def get_collection_images(collection_id):
+    try:
+        images = CollectionImage.query.filter_by(collection_id=collection_id).all()
+        return [image_to_dict(img) for img in images]
+    except Exception as e:
+        logging.error(f"❌ Errore nel recupero delle immagini per la collezione {collection_id}: {e}")
+        return []
+
+
+# 🛒 **Aggiunge un prodotto a una collezione**
+def add_product_to_collection(collection_id, product_id):
+    try:
+        new_relation = CollectionProduct(collection_id=collection_id, product_id=product_id)
+        db.session.add(new_relation)
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nell'aggiunta del prodotto {product_id} alla collezione {collection_id}: {e}")
+        return False
+
+
+# ❌ **Rimuove un prodotto da una collezione**
+def remove_product_from_collection(collection_id, product_id):
+    try:
+        CollectionProduct.query.filter_by(collection_id=collection_id, product_id=product_id).delete()
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nella rimozione del prodotto {product_id} dalla collezione {collection_id}: {e}")
+        return False
+
+
+# 🔍 **Recupera i prodotti di una collezione**
+def get_products_in_collection(collection_id):
+    try:
+        products = db.session.query(CollectionProduct.product_id).filter_by(collection_id=collection_id).all()
+        return [p.product_id for p in products]
+    except Exception as e:
+        logging.error(f"❌ Errore nel recupero dei prodotti della collezione {collection_id}: {e}")
+        return []
+
+
+# 🔍 **Recupera tutte le collezioni attive per uno shop**
+def get_collections_by_shop(shop_name):
+    try:
+        collections = Collection.query.filter_by(shop_name=shop_name, is_active=True).order_by(Collection.name).all()
+        return [collection_to_dict(col) for col in collections]
+    except Exception as e:
+        logging.error(f"❌ Errore nel recupero delle collezioni attive per lo shop '{shop_name}': {e}")
+        return []
+
+
+# 📌 **Helper per convertire una collezione in dizionario**
+def collection_to_dict(collection):
+    return {
+        "id": collection.id,
+        "shop_name": collection.shop_name,
+        "name": collection.name,
+        "slug": collection.slug,
+        "description": collection.description,
+        "image_url": collection.image_url,
+        "is_active": collection.is_active,
+        "created_at": collection.created_at,
+        "updated_at": collection.updated_at,
+    }
+
+
+# 📸 **Helper per convertire un'immagine in dizionario**
+def image_to_dict(image):
+    return {
+        "id": image.id,
+        "collection_id": image.collection_id,
+        "image_url": image.image_url,
+        "is_main": image.is_main,
+    }

@@ -1,102 +1,88 @@
 from flask import g
 from dotenv import load_dotenv
 import os
-import mysql.connector
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
+
+# Carica le variabili d'ambiente dal file .env
 load_dotenv()
 environment = os.getenv('ENVIRONMENT')
 
-
 class DatabaseHelper:
     """
-    Classe per gestire le connessioni al database in base all'ambiente.
+    Classe per la gestione della connessione al database PostgreSQL (CMS_DEF).
     """
+
     def __init__(self):
-        self.conn = None
-        self.auth_conn = None
+        """
+        Inizializza la connessione al database CMS_DEF.
+        """
+        self.db_engine = None
+        self.db_session = None
+        self.init_connection()
 
-    def get_db_connection(self):
+    def init_connection(self):
         """
-        Ottiene la connessione al database CMS_DEF in base all'ambiente.
+        Inizializza l'engine e la sessione per il database CMS_DEF.
         """
-        if 'db' not in g:
-            if environment == 'development':
-                g.db = mysql.connector.connect(
-                    host='127.0.0.1',
-                    user='root',
-                    password='root',
-                    database='CMS_DEF',
-                    port=8889
-                )
-            else:  # Se è 'production'
-                g.db = mysql.connector.connect(
-                    host='127.0.0.1',
-                    user='root',
-                    password='root',
-                    database='cms_def',
-                    port=3306,
-                    auth_plugin='mysql_native_password'
-                )
-        return g.db
+        # Costruisce la stringa di connessione usando le variabili d'ambiente
+        self.db_engine = create_engine(
+            f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@"
+            f"{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+        )
 
-    def get_auth_db_connection(self):
-        """
-        Ottiene la connessione al database CMS_INDEX in base all'ambiente.
-        """
-        if 'auth_db' not in g:
-            if environment == 'development':
-                g.auth_db = mysql.connector.connect(
-                    host='127.0.0.1',
-                    user='root',
-                    password='root',
-                    database='CMS_INDEX',
-                    port=8889
-                )
-            else:  # Se è 'production'
-                g.auth_db = mysql.connector.connect(
-                    host='127.0.0.1',
-                    user='root',
-                    password='root',
-                    database='cms_index',
-                    port=3306,
-                    auth_plugin='mysql_native_password'
-                )
-        return g.auth_db
+        # Crea una sessione per gestire le query con SQLAlchemy
+        self.db_session = scoped_session(sessionmaker(bind=self.db_engine))
 
-    def execute_query(self, query, params=None, use_auth=False):
+    def get_db_session(self):
         """
-        Esegue una query SELECT su uno dei database.
+        Ottiene la sessione per il database CMS_DEF. Se non esiste nel contesto Flask, la crea.
+
+        :return: Oggetto sessione SQLAlchemy
         """
-        conn = self.get_auth_db_connection() if use_auth else self.get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+        if 'db_session' not in g:
+            g.db_session = self.db_session()
+        return g.db_session
+
+    def execute_query(self, query, params=None):
+        """
+        Esegue una query SELECT sul database e restituisce il risultato come lista di dizionari.
+
+        :param query: Query SQL da eseguire
+        :param params: Parametri della query (default: None)
+        :return: Lista di risultati come dizionari o lista vuota in caso di errore
+        """
+        session = self.get_db_session()
         try:
-            cursor.execute(query, params if params else ())
-            result = cursor.fetchall()
-        finally:
-            cursor.close()
-        return result
+            result = session.execute(query, params if params else {}).fetchall()
+            return [dict(row._mapping) for row in result]  # Converte in lista di dizionari
+        except Exception as e:
+            session.rollback()
+            print(f"❌ Errore durante l'esecuzione della query: {e}")
+            return []
 
-    def execute_commit(self, query, params=None, use_auth=False):
+    def execute_commit(self, query, params=None):
         """
-        Esegue una query che richiede un commit (INSERT, UPDATE, DELETE).
+        Esegue una query di tipo INSERT, UPDATE o DELETE e committa la transazione.
+
+        :param query: Query SQL da eseguire
+        :param params: Parametri della query (default: None)
+        :return: ID della riga inserita o None in caso di errore
         """
-        conn = self.get_auth_db_connection() if use_auth else self.get_db_connection()
-        cursor = conn.cursor()
+        session = self.get_db_session()
         try:
-            cursor.execute(query, params if params else ())
-            conn.commit()
-            last_id = cursor.lastrowid
-        finally:
-            cursor.close()
-        return last_id
+            result = session.execute(query, params if params else {})
+            session.commit()
+            return result.inserted_primary_key if result else None  # Restituisce l'ID dell'ultima inserzione
+        except Exception as e:
+            session.rollback()
+            print(f"❌ Errore durante l'esecuzione della query di commit: {e}")
+            return None
 
     def close(self):
         """
-        Chiude tutte le connessioni aperte.
+        Chiude la sessione aperta nel contesto Flask.
         """
-        db = g.pop('db', None)
-        if db:
-            db.close()
-
-        auth_db = g.pop('auth_db', None)
-        if auth_db:
-            auth_db.close()
+        db_session = g.pop('db_session', None)
+        if db_session:
+            db_session.close()

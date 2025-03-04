@@ -1,127 +1,117 @@
-from flask import Blueprint, request, jsonify, render_template, flash, redirect, url_for
-from models.cookiepolicy import CookiePolicy  # importo la classe database
-from db_helpers import DatabaseHelper
-from db_helpers import DatabaseHelper
+from flask import Blueprint, render_template, request, jsonify
+from models.database import db
+from models.cookiepolicy import CookiePolicy
 from helpers import check_user_authentication
 import logging
+
 logging.basicConfig(level=logging.INFO)
 
-db_helper = DatabaseHelper()
+# Creazione del Blueprint per la gestione delle cookie policy
+cookiepolicy_bp = Blueprint('cookiepolicy' , __name__)
 
-# Blueprint
-cookiepolicy_bp = Blueprint('cookiepolicy', __name__)
-
-# Rotte per la gestione
-
+# 📌 Route per gestire la cookie policy interna
 @cookiepolicy_bp.route('/admin/cms/function/cookie-policy', methods=['GET', 'POST'])
 def cookie_setting():
+    """
+    Gestisce la configurazione della barra cookie del negozio.
+    """
     username = check_user_authentication()
     if not isinstance(username, str):
         return username
 
     shop_name = request.host.split('.')[0]
 
-    with db_helper.get_db_connection() as db_conn:
-        cookie_model = CookiePolicy(db_conn)
+    if request.method == 'POST':
+        try:
+            data = request.get_json()
+            if not data:
+                return jsonify({'success': False, 'error': 'Invalid JSON data'}), 400
 
-        if request.method == 'POST':
-            # Verifica se la richiesta è di tipo JSON
-            if request.is_json:
-                # Ottieni i dati dalla richiesta JSON
-                data = request.json
-                title = data.get('title')
-                text_content = data.get('text_content')
-                button_text = data.get('button_text')
-                background_color = data.get('background_color')
-                button_color = data.get('button_color')
-                button_text_color = data.get('button_text_color')
-                text_color = data.get('text_color')
-                entry_animation = data.get('animation')
+            # Recupera o crea la configurazione della cookie policy per il negozio
+            cookie_settings = CookiePolicy.query.filter_by(shop_name=shop_name).first()
 
-                # Controlla se esiste già una configurazione per questo negozio
-                existing_setting = cookie_model.get_policy_by_shop(shop_name)
+            if not cookie_settings:
+                cookie_settings = CookiePolicy(shop_name=shop_name)
 
-                # Aggiorna o crea la configurazione interna
-                if existing_setting:
-                    success = cookie_model.update_internal_policy(
-                        shop_name, title, text_content, button_text,
-                        background_color, button_color, button_text_color,
-                        text_color, entry_animation
-                    )
-                else:
-                    success = cookie_model.create_internal_policy(
-                        shop_name, title, text_content, button_text,
-                        background_color, button_color, button_text_color,
-                        text_color, entry_animation
-                    )
+            # Aggiorna i valori della policy
+            cookie_settings.title = data.get('title', 'Cookie Policy')
+            cookie_settings.text_content = data.get('text_content', 'This site uses cookies.')
+            cookie_settings.button_text = data.get('button_text', 'Accept')
+            cookie_settings.background_color = data.get('background_color', '#ffffff')
+            cookie_settings.button_color = data.get('button_color', '#28a745')
+            cookie_settings.button_text_color = data.get('button_text_color', '#ffffff')
+            cookie_settings.text_color = data.get('text_color', '#000000')
+            cookie_settings.animation = data.get('animation', 'fade')
 
-                # Ritorna il risultato come JSON per il feedback AJAX
-                return jsonify({'success': success})
+            # Salva nel database
+            db.session.add(cookie_settings)
+            db.session.commit()
 
-            # Ritorna errore se la richiesta non è JSON
-            return jsonify({'success': False, 'error': 'Invalid request format'})
+            return jsonify({'success': True, 'message': 'Cookie settings updated successfully'})
 
-        else:
-            # Recupera le impostazioni esistenti, se presenti
-            cookie_settings = cookie_model.get_policy_by_shop(shop_name)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error updating cookie policy: {e}")
+            return jsonify({'success': False, 'message': 'An error occurred'}), 500
 
-            return render_template(
-                'admin/cms/function/cookie-policy.html',
-                title='Cookie Bar Settings',
-                username=username,
-                cookie_settings=cookie_settings
-            )
+    # Recupera le impostazioni attuali
+    cookie_settings = CookiePolicy.query.filter_by(shop_name=shop_name).first()
 
+    return render_template(
+        'admin/cms/function/cookie-policy.html',
+        title='Cookie Bar Settings',
+        username=username,
+        cookie_settings=cookie_settings
+    )
 
+# 📌 Route per gestire la cookie policy di terze parti
 @cookiepolicy_bp.route('/admin/cms/function/cookie-policy-third-party', methods=['GET', 'POST'])
 def cookie_setting_third_party():
+    """
+    Gestisce le impostazioni della cookie policy di terze parti per il negozio.
+    """
     username = check_user_authentication()
     if not isinstance(username, str):
         return username
 
     shop_name = request.host.split('.')[0]
 
-    with db_helper.get_db_connection() as db_conn:
-        cookie_model = CookiePolicy(db_conn)
-
-        if request.method == 'POST':
-            data = request.get_json()  # Modifica per accettare JSON
+    if request.method == 'POST':
+        try:
+            data = request.get_json()
             if not data:
                 return jsonify({'status': 'error', 'message': 'Invalid JSON data.'}), 400
 
-            # Dati dal JSON per la configurazione di terze parti
-            use_third_party = data.get('use_third_party', False)
-            third_party_cookie = data.get('third_party_cookie', '')
-            third_party_privacy = data.get('third_party_privacy', '')
-            third_party_terms = data.get('third_party_terms', '')
-            third_party_consent = data.get('third_party_consent', '')
+            # Recupera o crea la configurazione della cookie policy per il negozio
+            cookie_settings = CookiePolicy.query.filter_by(shop_name=shop_name).first()
 
-            # Aggiorna o crea la configurazione di terze parti
-            existing_setting = cookie_model.get_policy_by_shop(shop_name)
-            if existing_setting:
-                success = cookie_model.update_third_party_policy(
-                    shop_name, use_third_party, third_party_cookie, 
-                    third_party_privacy, third_party_terms, third_party_consent
-                )
-            else:
-                success = cookie_model.create_third_party_policy(
-                    shop_name, use_third_party, third_party_cookie, 
-                    third_party_privacy, third_party_terms, third_party_consent
-                )
+            if not cookie_settings:
+                cookie_settings = CookiePolicy(shop_name=shop_name)
 
-            # Risposte JSON per richiesta AJAX
-            if success:
-                return jsonify({'status': 'success', 'message': 'Third-party cookie settings updated successfully!'})
-            else:
-                return jsonify({'status': 'error', 'message': 'Error updating third-party cookie settings.'}), 500
+            # Aggiorna i valori per i cookie di terze parti
+            cookie_settings.use_third_party = data.get('use_third_party', False)
+            cookie_settings.third_party_cookie = data.get('third_party_cookie', '')
+            cookie_settings.third_party_privacy = data.get('third_party_privacy', '')
+            cookie_settings.third_party_terms = data.get('third_party_terms', '')
+            cookie_settings.third_party_consent = data.get('third_party_consent', '')
 
-        # Recupera le impostazioni esistenti, se presenti
-        cookie_settings = cookie_model.get_policy_by_shop(shop_name)
+            # Salva nel database
+            db.session.add(cookie_settings)
+            db.session.commit()
 
-        return render_template(
-            'admin/cms/function/cookie-policy-third-party.html',
-            title='Third-Party Cookie Settings',
-            username=username,
-            cookie_settings=cookie_settings
-        )
-    
+            return jsonify({'status': 'success', 'message': 'Third-party cookie settings updated successfully!'})
+
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error updating third-party cookie policy: {e}")
+            return jsonify({'status': 'error', 'message': 'An error occurred'}), 500
+
+    # Recupera le impostazioni attuali
+    cookie_settings = CookiePolicy.query.filter_by(shop_name=shop_name).first()
+
+    return render_template(
+        'admin/cms/function/cookie-policy-third-party.html',
+        title='Third-Party Cookie Settings',
+        username=username,
+        cookie_settings=cookie_settings
+    )

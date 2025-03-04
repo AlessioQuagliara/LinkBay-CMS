@@ -1,178 +1,163 @@
-from flask import Blueprint, render_template, request
-from helpers import get_navbar_content, get_footer_content, get_web_settings, load_page_content, get_language
-from models.collections import Collections
+from flask import Blueprint, render_template, request, jsonify
+from models.database import db
+from models.collections import Collection
 from models.page import Page
-from models.products import Products
+from models.products import Product, ProductImage
 from models.cookiepolicy import CookiePolicy
-from helpers import get_navbar_content, get_footer_content, get_web_settings, load_page_content, get_language, get_cookie_policy_content, render_theme_styles
-from db_helpers import DatabaseHelper
+from helpers import (
+    get_navbar_content, get_footer_content, get_web_settings, 
+    load_page_content, get_language, get_cookie_policy_content, 
+    render_theme_styles
+)
 import logging
+
+# 📌 Configurazione del logger
 logging.basicConfig(level=logging.INFO)
 
-db_helper = DatabaseHelper()
-
-# Crea il Blueprint per le rotte principali
+# 📌 Blueprint per le rotte principali
 main_bp = Blueprint('main', __name__)
 
-# Rotta principale --- Per pagine standard
+# 🔹 **Rotta principale per pagine standard**
 @main_bp.route('/', defaults={'slug': 'home'})
 @main_bp.route('/<slug>')
 def render_dynamic_page(slug=None):
-    # ri-ottengo il sottodominio per problemi
+    """
+    Renderizza una pagina dinamica basata sullo slug.
+    """
     shop_subdomain = request.host.split('.')[0]
 
-    cookie_policy_banner = get_cookie_policy_content(shop_subdomain)
-
+    # Carica i contenuti della pagina
     page = load_page_content(slug, shop_subdomain)
 
     if page:
-        # lingua corrente
+        # Recupera impostazioni e contenuti del negozio
         language = get_language()
-
-        # navbar e il footer specifici e le impostazioni web
         navbar_content = get_navbar_content(shop_subdomain)
         footer_content = get_footer_content(shop_subdomain)
         web_settings = get_web_settings(shop_subdomain)
         render_theme = render_theme_styles(shop_subdomain)
         cookie_policy_banner = get_cookie_policy_content(shop_subdomain)
 
-        # 'head', 'script', e 'foot' da web_settings
+        # Impostazioni SEO e script
         head_content = web_settings.get('head', '')
         script_content = web_settings.get('script', '')
         foot_content = web_settings.get('foot', '')
 
-        return render_template('index.html',
-                               title=page['title'], 
-                               description=page['description'], 
-                               keywords=page['keywords'], 
-                               content=page['content'], 
-                               navbar=navbar_content,  
-                               footer=footer_content, 
-                               render_theme = render_theme,
-                               cookie_policy_banner=cookie_policy_banner, 
-                               language=language,
-                               head=head_content,  
-                               script=script_content,  
-                               foot=foot_content)  
-    else:
-        return render_template('errors/404.html'), 404
-
-# Rotta per pagina Collezioni
-@main_bp.route('/collections/<slug>', methods=['GET'])
-@main_bp.route('/collections', defaults={'slug': None}, methods=['GET'])
-def render_collection(slug=None):
-    shop_subdomain = request.host.split('.')[0]  # Ottieni il sottodominio
-    conn = db_helper.get_db_connection()
-
-    # Inizializza i modelli
-    collection_model = Collections(conn)
-    product_model = Products(conn)
-
-    # Carica i dettagli della collezione specifica o tutte le collezioni
-    if slug:
-        collection = collection_model.get_collection_by_slug(slug)
-        if not collection:
-            return render_template('errors/404.html'), 404
-        products_in_collection = collection_model.get_products_in_collection(collection['id'])
-        product_images = product_model.get_images_for_products([p['id'] for p in products_in_collection])
-    else:
-        collection = None
-        products_in_collection = product_model.get_all_products(shop_subdomain)
-        product_images = product_model.get_images_for_products([p['id'] for p in products_in_collection])
-
-    # Aggiungi immagini ai prodotti
-    for product in products_in_collection:
-        product['images'] = [
-            img for img in product_images if img['product_id'] == product['id']
-        ]
-
-    # Carica contenuti navbar e footer
-    navbar_content = get_navbar_content(shop_subdomain)
-    footer_content = get_footer_content(shop_subdomain)
-    render_theme = render_theme_styles(shop_subdomain)
-
-    # Impostazioni web del negozio
-    web_settings = get_web_settings(shop_subdomain)
-    head_content = web_settings.get('head', '')
-    script_content = web_settings.get('script', '')
-    foot_content = web_settings.get('foot', '')
-
-    # Render della pagina
-    return render_template(
-        'collection.html',
-        title=collection['name'] if collection else 'All Collections',
-        description=collection['description'] if collection else 'Browse our collections and products.',
-        collection=collection,
-        products=products_in_collection,
-        navbar=navbar_content,
-        render_theme = render_theme,
-        footer=footer_content,
-        head=head_content,
-        script=script_content,
-        foot=foot_content
-    )
-    
-# Rotta per pagina Prodotti
-@main_bp.route('/products/<slug>', methods=['GET'])
-def render_product(slug):
-    shop_subdomain = request.host.split('.')[0]  # Ottieni il sottodominio
-    conn = db_helper.get_db_connection()
-
-    # Carica i dettagli del prodotto
-    product_model = Products(conn)
-    product = product_model.get_product_by_slug(slug, shop_subdomain)
-
-    # Carica i dettagli della pagina
-    page_model = Page(conn)
-    page = page_model.get_page_by_slug('products', shop_subdomain)
-
-    if product:
-        # Recupera le immagini del prodotto
-        product_images = product_model.get_product_images(product['id'])
-
-        # Carica contenuti navbar e footer
-        navbar_content = get_navbar_content(shop_subdomain)
-        footer_content = get_footer_content(shop_subdomain)
-        render_theme = render_theme_styles(shop_subdomain)
-
-        # Impostazioni web del negozio
-        web_settings = get_web_settings(shop_subdomain)
-        head_content = web_settings.get('head', '')
-        script_content = web_settings.get('script', '')
-        foot_content = web_settings.get('foot', '')
-
-        # Verifica se la pagina è stata trovata e assegna un valore di fallback se necessario
-        if page and 'content' in page:
-            page_content = page['content']
-        else:
-            page_content = ""  # Valore di fallback
-
-        # Se è presente del contenuto, sostituisci le variabili
-        if page_content:
-            page_content = page_content.replace('{{ product.name }}', product['name'])
-            page_content = page_content.replace('{{ product.price }}', str(product['price']))
-            page_content = page_content.replace('{{ product.short_description }}', product['short_description'])
-            page_content = page_content.replace('{{ product.description }}', product['description'])
-            page_content = page_content.replace('{{ product.stock_quantity }}', str(product['stock_quantity']))
-            if product.get('discount_price'):
-                page_content = page_content.replace('{{ product.discount_price }}', str(product['discount_price']))
-            else:
-                page_content = page_content.replace('{{ product.discount_price }}', '')
-
-        # Render della pagina
         return render_template(
-            'product.html',
-            title=product['name'],
-            description=product['short_description'],
-            product=product,
-            page=page_content,  # Passa il contenuto processato (anche vuoto se la pagina non è stata trovata)
-            images=product_images,  # Passa le immagini al template
+            'index.html',
+            title=page['title'],
+            description=page['description'],
+            keywords=page['keywords'],
+            content=page['content'],
             navbar=navbar_content,
-            render_theme = render_theme,
             footer=footer_content,
+            render_theme=render_theme,
+            cookie_policy_banner=cookie_policy_banner,
+            language=language,
             head=head_content,
             script=script_content,
             foot=foot_content
         )
+    
+    return render_template('errors/404.html'), 404
+
+# 🔹 **Rotta per le collezioni**
+@main_bp.route('/collections/<slug>', methods=['GET'])
+@main_bp.route('/collections', defaults={'slug': None}, methods=['GET'])
+def render_collection(slug=None):
+    """
+    Renderizza la pagina di una collezione o la lista di tutte le collezioni.
+    """
+    shop_subdomain = request.host.split('.')[0]
+
+    if slug:
+        collection = Collection.query.filter_by(slug=slug, shop_name=shop_subdomain).first()
+        if not collection:
+            return render_template('errors/404.html'), 404
+
+        products_in_collection = Product.query.filter(Product.collections.any(id=collection.id)).all()
     else:
+        collection = None
+        products_in_collection = Product.query.filter_by(shop_name=shop_subdomain).all()
+
+    # Recupera immagini dei prodotti
+    product_ids = [product.id for product in products_in_collection]
+    product_images = ProductImage.query.filter(ProductImage.product_id.in_(product_ids)).all()
+
+    # Assegna immagini ai prodotti
+    product_image_map = {img.product_id: img.image_url for img in product_images}
+    for product in products_in_collection:
+        product.image_url = product_image_map.get(product.id, None)
+
+    # Recupera i contenuti del negozio
+    navbar_content = get_navbar_content(shop_subdomain)
+    footer_content = get_footer_content(shop_subdomain)
+    render_theme = render_theme_styles(shop_subdomain)
+    web_settings = get_web_settings(shop_subdomain)
+
+    return render_template(
+        'collection.html',
+        title=collection.name if collection else 'All Collections',
+        description=collection.description if collection else 'Browse our collections and products.',
+        collection=collection,
+        products=products_in_collection,
+        navbar=navbar_content,
+        render_theme=render_theme,
+        footer=footer_content,
+        head=web_settings.get('head', ''),
+        script=web_settings.get('script', ''),
+        foot=web_settings.get('foot', '')
+    )
+
+# 🔹 **Rotta per la pagina di un singolo prodotto**
+@main_bp.route('/products/<slug>', methods=['GET'])
+def render_product(slug):
+    """
+    Renderizza la pagina di un singolo prodotto basandosi sullo slug.
+    """
+    shop_subdomain = request.host.split('.')[0]
+
+    # Recupera il prodotto
+    product = Product.query.filter_by(slug=slug, shop_name=shop_subdomain).first()
+
+    if not product:
         return render_template('errors/404.html'), 404
+
+    # Recupera le immagini associate al prodotto
+    product_images = ProductImage.query.filter_by(product_id=product.id).all()
+
+    # Recupera i contenuti della pagina 'products'
+    page = Page.query.filter_by(slug='products', shop_name=shop_subdomain).first()
+
+    # Recupera i contenuti del negozio
+    navbar_content = get_navbar_content(shop_subdomain)
+    footer_content = get_footer_content(shop_subdomain)
+    render_theme = render_theme_styles(shop_subdomain)
+    web_settings = get_web_settings(shop_subdomain)
+
+    # Verifica il contenuto della pagina, se esiste
+    page_content = page.content if page else ""
+
+    # Sostituzione dinamica dei placeholder
+    if page_content:
+        page_content = page_content.replace('{{ product.name }}', product.name)
+        page_content = page_content.replace('{{ product.price }}', str(product.price))
+        page_content = page_content.replace('{{ product.short_description }}', product.short_description or "")
+        page_content = page_content.replace('{{ product.description }}', product.description or "")
+        page_content = page_content.replace('{{ product.stock_quantity }}', str(product.stock_quantity))
+        page_content = page_content.replace('{{ product.discount_price }}', str(product.discount_price) if product.discount_price else '')
+
+    return render_template(
+        'product.html',
+        title=product.name,
+        description=product.short_description,
+        product=product,
+        page=page_content,  
+        images=product_images,
+        navbar=navbar_content,
+        render_theme=render_theme,
+        footer=footer_content,
+        head=web_settings.get('head', ''),
+        script=web_settings.get('script', ''),
+        foot=web_settings.get('foot', '')
+    )

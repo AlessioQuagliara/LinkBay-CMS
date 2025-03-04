@@ -1,234 +1,190 @@
-# CLASSE PER ORDINI ---------------------------------------------------------------------------------------------------
+from models.database import db
+from datetime import datetime
 import logging
+
+# 📌 Inizializza il database SQLAlchemy
 logging.basicConfig(level=logging.INFO)
 
-class Orders:
-    def __init__(self, db_conn):
-        self.conn = db_conn
+# 🔹 **Modello per gli Ordini**
+class Order(db.Model):
+    __tablename__ = "orders"
 
-    # Metodo per cancellare un ordine
-    def delete_order(self, order_id):
-        try:
-            with self.conn.cursor() as cursor:
-                query = "DELETE FROM orders WHERE id = %s"
-                cursor.execute(query, (order_id,))
-                self.conn.commit()
-                return True
-        except Exception as e:
-            logging.info(f"Error deleting order: {e}")
-            self.conn.rollback()
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 🔑 ID univoco
+    shop_name = db.Column(db.String(255), nullable=False)  # 🏪 Nome del negozio
+    order_number = db.Column(db.String(255), unique=True, nullable=False)  # 📌 Numero dell'ordine
+    customer_id = db.Column(db.Integer, db.ForeignKey("customers.id"), nullable=True)  # 👤 Cliente che ha effettuato l'ordine
+    total_amount = db.Column(db.Float, nullable=False, default=0.0)  # 💰 Totale dell'ordine
+    status = db.Column(db.String(50), nullable=False, default="Draft")  # 🔄 Stato dell'ordine
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 🕒 Data di creazione
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 🔄 Ultimo aggiornamento
+
+    def __repr__(self):
+        return f"<Order {self.order_number} - {self.status}>"
+
+# 🔹 **Modello per gli Articoli dell'Ordine**
+class OrderItem(db.Model):
+    __tablename__ = "order_items"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 🔑 ID univoco
+    order_id = db.Column(db.Integer, db.ForeignKey("orders.id"), nullable=False)  # 🛒 Ordine associato
+    product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)  # 🏷️ Prodotto
+    quantity = db.Column(db.Integer, nullable=False, default=1)  # 🔢 Quantità acquistata
+    price = db.Column(db.Float, nullable=False)  # 💰 Prezzo unitario
+    subtotal = db.Column(db.Float, nullable=False)  # 💰 Totale parziale
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 🕒 Data di aggiunta
+
+    def __repr__(self):
+        return f"<OrderItem {self.order_id} - {self.product_id}>"
+
+# 🔍 **Recupera un ordine per ID**
+def get_order_by_id(order_id):
+    try:
+        order = Order.query.get(order_id)
+        return order_to_dict(order) if order else None
+    except Exception as e:
+        logging.error(f"❌ Errore nel recupero dell'ordine {order_id}: {e}")
+        return None
+
+# ✅ **Crea un nuovo ordine**
+def create_order(data):
+    try:
+        new_order = Order(
+            shop_name=data["shop_name"],
+            order_number=data["order_number"],
+            customer_id=data.get("customer_id"),
+            total_amount=data.get("total_amount", 0.0),
+            status=data.get("status", "Draft"),
+        )
+        db.session.add(new_order)
+        db.session.commit()
+        logging.info(f"✅ Ordine '{new_order.order_number}' creato con successo")
+        return new_order.id
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nella creazione dell'ordine: {e}")
+        return None
+
+# 🔄 **Aggiorna lo stato di un ordine**
+def update_order(order_id, status, total_amount):
+    try:
+        order = Order.query.get(order_id)
+        if not order:
             return False
 
-    # Metodo per creare un ordine
-    def create_order(self, data):
-        try:
-            with self.conn.cursor() as cursor:
-                print("Data received by create_order:", data)  # Log dei dati ricevuti
+        order.status = status
+        order.total_amount = total_amount
+        order.updated_at = datetime.utcnow()
+        db.session.commit()
+        logging.info(f"✅ Stato ordine {order_id} aggiornato a {status}")
+        return True
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nell'aggiornamento dello stato dell'ordine {order_id}: {e}")
+        return False
 
-                # Query per inserire l'ordine
-                query = """
-                    INSERT INTO orders (
-                        shop_name, order_number, customer_id, total_amount, status, created_at, updated_at
-                    ) VALUES (%s, %s, %s, %s, %s, NOW(), NOW())
-                """
-                # Prepara i valori
-                values = (
-                    data.get("shop_name"),
-                    data.get("order_number"),
-                    data.get("customer_id", None),
-                    data.get("total_amount", 0.0),
-                    data.get("status", "Draft")
-                )
-                print("Query values:", values)  # Log dei valori preparati
-
-                # Esegui la query
-                cursor.execute(query, values)
-                self.conn.commit()
-
-                # Ritorna l'ID dell'ordine creato
-                order_id = cursor.lastrowid
-                print("Order ID created:", order_id)  # Log dell'ID creato
-                return order_id
-        except Exception as e:
-            logging.info(f"Error in create_order: {e}")  # Log dell'errore
-            self.conn.rollback()
-            return None
-
-    # Metodo per ottenere i dati dell'ordine dalla tabella "orders"
-    def get_order_by_id(self, shop_name, order_id):
-        try:
-            with self.conn.cursor(dictionary=True) as cursor:
-                # Query per ottenere i dettagli dell'ordine
-                order_query = """
-                    SELECT 
-                        id AS order_id, 
-                        shop_name, 
-                        order_number, 
-                        customer_id, 
-                        total_amount, 
-                        status, 
-                        created_at, 
-                        updated_at
-                    FROM orders
-                    WHERE id = %s AND shop_name = %s
-                """
-                cursor.execute(order_query, (order_id, shop_name))
-                order = cursor.fetchone()  # Restituisce solo i dati dalla tabella "orders"
-
-                return order  # Ritorna i dati della tabella orders
-        except Exception as e:
-            logging.info(f"Error fetching order: {e}")
-            return None
-
-    # Metodo per aggiornare lo stato di un ordine
-    def update_order(self, shop_name, order_id, customer_id, status, total_amount):
-        try:
-            with self.conn.cursor() as cursor:
-                # Query di aggiornamento
-                query = """
-                    UPDATE orders
-                    SET 
-                        status = %s,
-                        updated_at = NOW(),
-                        total_amount = %s,
-                        customer_id = %s
-                    WHERE id = %s AND shop_name = %s
-                """
-                values = (
-                    status,
-                    total_amount,
-                    customer_id,
-                    order_id,
-                    shop_name
-                )
-                cursor.execute(query, values)
-                self.conn.commit()
-                return True
-        except Exception as e:
-            logging.info(f"Error updating order: {e}")
-            self.conn.rollback()
+# ❌ **Elimina un ordine**
+def delete_order(order_id):
+    try:
+        order = Order.query.get(order_id)
+        if not order:
             return False
 
-    # Metodo per ottenere tutti gli ordini per uno shop
-    def get_all_orders(self, shop_name):
-        try:
-            with self.conn.cursor(dictionary=True) as cursor:
-                query = """
-                    SELECT o.id, o.order_number, o.total_amount, o.created_at, o.status,
-                        c.first_name, c.last_name
-                    FROM orders o
-                    LEFT JOIN customers c ON o.customer_id = c.id
-                    WHERE o.shop_name = %s
-                    ORDER BY o.created_at DESC
-                """
-                cursor.execute(query, (shop_name,))
-                return cursor.fetchall()
-        except Exception as e:
-            logging.info(f"Error fetching orders: {e}")
-            return []
+        db.session.delete(order)
+        db.session.commit()
+        logging.info(f"✅ Ordine {order_id} eliminato con successo")
+        return True
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nell'eliminazione dell'ordine {order_id}: {e}")
+        return False
 
-    def get_order_items(self, order_id):
-        try:
-            with self.conn.cursor(dictionary=True) as cursor:
-                query = """
-                    SELECT 
-                        order_items.id,
-                        order_items.order_id,
-                        order_items.product_id,
-                        order_items.quantity,
-                        order_items.price,
-                        order_items.subtotal,
-                        products.name AS product_name,
-                        products.image_url AS product_image
-                    FROM order_items
-                    LEFT JOIN products ON order_items.product_id = products.id
-                    WHERE order_items.order_id = %s
-                """
-                cursor.execute(query, (order_id,))
-                return cursor.fetchall()
-        except Exception as e:
-            logging.info(f"Error retrieving order items: {e}")
-            return []
+# 📦 **Recupera tutti gli ordini per uno shop**
+def get_all_orders(shop_name):
+    try:
+        orders = Order.query.filter_by(shop_name=shop_name).order_by(Order.created_at.desc()).all()
+        return [order_to_dict(o) for o in orders]
+    except Exception as e:
+        logging.error(f"❌ Errore nel recupero degli ordini per {shop_name}: {e}")
+        return []
 
-    # Metodo per aggiungere un prodotto a un ordine
-    def add_product_to_order(self, order_id, product_id, quantity=1):
-        try:
-            with self.conn.cursor(dictionary=True) as cursor:
-                # Recupera il prezzo del prodotto
-                query_get_price = "SELECT price FROM products WHERE id = %s"
-                cursor.execute(query_get_price, (product_id,))
-                product = cursor.fetchone()
+# 🛒 **Recupera i prodotti di un ordine**
+def get_order_items(order_id):
+    try:
+        items = OrderItem.query.filter_by(order_id=order_id).all()
+        return [order_item_to_dict(i) for i in items]
+    except Exception as e:
+        logging.error(f"❌ Errore nel recupero degli articoli per l'ordine {order_id}: {e}")
+        return []
 
-                if not product:
-                    return {'success': False, 'message': 'Product not found.'}
+# 🛍️ **Aggiungi un prodotto a un ordine**
+def add_product_to_order(order_id, product_id, quantity=1, price=0):
+    try:
+        subtotal = price * quantity
+        new_item = OrderItem(
+            order_id=order_id,
+            product_id=product_id,
+            quantity=quantity,
+            price=price,
+            subtotal=subtotal,
+        )
+        db.session.add(new_item)
+        db.session.commit()
+        logging.info(f"✅ Prodotto {product_id} aggiunto all'ordine {order_id}")
+        return True
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nell'aggiunta del prodotto {product_id} all'ordine {order_id}: {e}")
+        return False
 
-                price = product['price']
+# ❌ **Rimuove prodotti da un ordine**
+def remove_order_items(order_id, product_ids):
+    try:
+        OrderItem.query.filter(OrderItem.order_id == order_id, OrderItem.product_id.in_(product_ids)).delete()
+        db.session.commit()
+        logging.info(f"✅ Prodotti {product_ids} rimossi dall'ordine {order_id}")
+        return True
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nella rimozione dei prodotti da ordine {order_id}: {e}")
+        return False
 
-                # Inserisce il prodotto nella tabella order_items
-                query_insert_item = """
-                    INSERT INTO order_items (order_id, product_id, quantity, price, created_at)
-                    VALUES (%s, %s, %s, %s, NOW())
-                """
-                cursor.execute(query_insert_item, (order_id, product_id, quantity, price))
-                self.conn.commit()
+# 🔄 **Aggiorna le quantità degli articoli in un ordine**
+def update_order_items_quantities(order_id, items):
+    try:
+        for item in items:
+            order_item = OrderItem.query.filter_by(order_id=order_id, product_id=item["product_id"]).first()
+            if order_item:
+                order_item.quantity = item["quantity"]
+                order_item.subtotal = item["quantity"] * order_item.price
+        db.session.commit()
+        logging.info(f"✅ Quantità aggiornate per l'ordine {order_id}")
+        return True
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nell'aggiornamento delle quantità per l'ordine {order_id}: {e}")
+        return False
 
-                return {'success': True, 'message': 'Product added successfully.'}
-        except Exception as e:
-            logging.info(f"Error adding product to order: {e}")
-            self.conn.rollback()
-            return {'success': False, 'message': 'An error occurred while adding the product.'}
+# 📌 **Helper per convertire un ordine in dizionario**
+def order_to_dict(order):
+    return {
+        "id": order.id,
+        "shop_name": order.shop_name,
+        "order_number": order.order_number,
+        "customer_id": order.customer_id,
+        "total_amount": order.total_amount,
+        "status": order.status,
+        "created_at": order.created_at,
+        "updated_at": order.updated_at,
+    }
 
-    def remove_order_items(self, order_id, product_ids):
-        try:
-            with self.conn.cursor() as cursor:
-                # Crea una clausola IN dinamica
-                placeholders = ', '.join(['%s'] * len(product_ids))
-                query = f"""
-                    DELETE FROM order_items 
-                    WHERE order_id = %s AND product_id IN ({placeholders})
-                """
-                # Passa l'ordine e i prodotti come parametri
-                cursor.execute(query, [order_id] + product_ids)
-                self.conn.commit()
-                return cursor.rowcount > 0  # True se almeno una riga è stata eliminata
-        except Exception as e:
-            logging.info(f"Error removing order items: {e}")
-            self.conn.rollback()
-            return False
-
-    def add_multiple_order_items(self, order_id, products):
-        try:
-            with self.conn.cursor() as cursor:
-                query = """
-                    INSERT INTO order_items (order_id, product_id, quantity, price, created_at)
-                    VALUES (%s, %s, %s, %s, NOW())
-                """
-                values = [
-                    (order_id, product['id'], 1, product['price'])
-                    for product in products
-                ]
-                cursor.executemany(query, values)
-                self.conn.commit()
-                return True
-        except Exception as e:
-            logging.info(f"Error adding multiple order items: {e}")
-            self.conn.rollback()
-            return False
-
-    def update_order_items_quantities(self, order_id, items):
-        try:
-            with self.conn.cursor() as cursor:
-                # Aggiorna le quantità per ogni articolo
-                query = """
-                    UPDATE order_items
-                    SET quantity = %s
-                    WHERE order_id = %s AND product_id = %s
-                """
-                for item in items:
-                    cursor.execute(query, (item['quantity'], order_id, item['product_id']))
-                self.conn.commit()
-                return True
-        except Exception as e:
-            logging.info(f"Error updating order item quantities: {e}")
-            self.conn.rollback()
-            return False
+# 📌 **Helper per convertire un articolo dell'ordine in dizionario**
+def order_item_to_dict(item):
+    return {
+        "id": item.id,
+        "order_id": item.order_id,
+        "product_id": item.product_id,
+        "quantity": item.quantity,
+        "price": item.price,
+        "subtotal": item.subtotal,
+        "created_at": item.created_at,
+    }
