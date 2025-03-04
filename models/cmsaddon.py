@@ -1,131 +1,185 @@
-# Classe per i PLUGINS e gli ADDONS --------------------------------------------------------------------------------------------
+from models.database import db
 import logging
+from datetime import datetime
+
+# 📌 Inizializza il database SQLAlchemy
 logging.basicConfig(level=logging.INFO)
 
-class CMSAddon:
-    def __init__(self, db_conn):
-        self.conn = db_conn
+# 🔹 **Modello per gli Addon**
+class CMSAddon(db.Model):
+    __tablename__ = "cms_addons"
 
-    # Metodo per ottenere tutti gli addon di un certo tipo dalla tabella cms_addons
-    def get_addons_by_type(self, addon_type):
-        with self.conn.cursor(dictionary=True) as cursor:
-            try:
-                cursor.execute("SELECT * FROM cms_addons WHERE type = %s", (addon_type,))
-                return cursor.fetchall()
-            except Exception as e:
-                logging.info(f"Error fetching addons by type: {e}")
-                return []
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 🔑 ID univoco dell'addon
+    name = db.Column(db.String(255), nullable=False)  # 📛 Nome dell'addon
+    description = db.Column(db.String(255), nullable=True)  # 📜 Descrizione
+    price = db.Column(db.Float, nullable=False)  # 💰 Prezzo
+    addon_type = db.Column(db.String(255), nullable=False)  # 📌 Tipo di addon
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 🕒 Data di creazione
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 🔄 Ultimo aggiornamento
 
-    # Metodo per selezionare un addon per uno specifico negozio, aggiornando il suo stato
-    def select_addon(self, shop_name, addon_id, addon_type):
-        with self.conn.cursor() as cursor:
-            try:
-                # Verifica se l'addon è già stato acquistato
-                cursor.execute("""
-                    SELECT status FROM shop_addons 
-                    WHERE shop_name = %s AND addon_id = %s
-                """, (shop_name, addon_id))
-                result = cursor.fetchone()
-                
-                if result and result['status'] == 'purchased':
-                    # Se l'add-on è già acquistato, non modificarlo
-                    logging.info(f"Addon {addon_id} is already purchased and cannot be re-selected.")
-                    return False
-                
-                # Deseleziona altri addon dello stesso tipo per il negozio, eccetto quelli "purchased"
-                cursor.execute("""
-                    UPDATE shop_addons
-                    SET status = 'deselected'
-                    WHERE shop_name = %s AND addon_type = %s AND status = 'selected'
-                """, (shop_name, addon_type))
-                
-                # Inserisce o aggiorna l'addon selezionato come 'selected'
-                cursor.execute("""
-                    INSERT INTO shop_addons (shop_name, addon_id, addon_type, status, updated_at)
-                    VALUES (%s, %s, %s, 'selected', NOW())
-                    ON DUPLICATE KEY UPDATE status = 'selected', updated_at = NOW()
-                """, (shop_name, addon_id, addon_type))
-                self.conn.commit()
-                return True
-            except Exception as e:
-                logging.info(f"Error selecting addon for shop: {e}")
-                self.conn.rollback()
-                return False
+    def __repr__(self):
+        return f"<CMSAddon {self.name} (ID: {self.id})>"
 
-    # Metodo per acquistare un addon per uno specifico negozio, impostando lo stato su 'purchased'
-    def purchase_addon(self, shop_name, addon_id, addon_type):
-        with self.conn.cursor() as cursor:
-            try:
-                cursor.execute("""
-                    INSERT INTO shop_addons (shop_name, addon_id, addon_type, status, updated_at)
-                    VALUES (%s, %s, %s, 'purchased', NOW())
-                    ON DUPLICATE KEY UPDATE status = 'purchased', updated_at = NOW()
-                """, (shop_name, addon_id, addon_type))
-                self.conn.commit()
-                return True
-            except Exception as e:
-                logging.info(f"Error purchasing addon for shop: {e}")
-                self.conn.rollback()
-                return False
 
-    # Metodo per ottenere lo stato di un addon specifico per un negozio
-    def get_addon_status(self, shop_name, addon_id):
-        with self.conn.cursor(dictionary=True) as cursor:
-            try:
-                cursor.execute("""
-                    SELECT status FROM shop_addons 
-                    WHERE shop_name = %s AND addon_id = %s
-                """, (shop_name, addon_id))
-                result = cursor.fetchone()
-                return result['status'] if result else None
-            except Exception as e:
-                logging.info(f"Error fetching addon status: {e}")
-                return None
+# 🔹 **Modello per gli Addon associati ai negozi**
+class ShopAddon(db.Model):
+    __tablename__ = "shop_addons"
 
-    def update_shop_addon_status(self, shop_name, addon_id, addon_type, status):
-        with self.conn.cursor() as cursor:
-            try:
-                # Usa ON DUPLICATE KEY UPDATE per eseguire un upsert
-                cursor.execute("""
-                    INSERT INTO shop_addons (shop_name, addon_id, addon_type, status, updated_at)
-                    VALUES (%s, %s, %s, %s, NOW())
-                    ON DUPLICATE KEY UPDATE 
-                        status = VALUES(status), 
-                        updated_at = NOW()
-                """, (shop_name, addon_id, addon_type, status))
-                self.conn.commit()
-                return True
-            except Exception as e:
-                logging.info(f"Error updating shop addon status: {e}")
-                self.conn.rollback()
-                return False
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 🔑 ID univoco della relazione
+    shop_name = db.Column(db.String(255), nullable=False)  # 🏪 Nome dello shop
+    addon_id = db.Column(db.Integer, db.ForeignKey("cms_addons.id"), nullable=False)  # 🔗 Collegamento con CMSAddon
+    addon_type = db.Column(db.String(255), nullable=False)  # 📌 Tipo di addon
+    status = db.Column(db.String(50), nullable=False)  # 🟢 Stato dell'addon (selected, deselected, purchased)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 🔄 Ultimo aggiornamento
 
-    # Metodo per deselezionare altri addon dello stesso tipo, eccetto quelli "purchased"
-    def deselect_other_addons(self, shop_name, addon_id, addon_type):
-        with self.conn.cursor() as cursor:
-            try:
-                cursor.execute("""
-                    UPDATE shop_addons
-                    SET status = 'deselected'
-                    WHERE shop_name = %s AND addon_type = %s AND addon_id != %s AND status != 'purchased'
-                """, (shop_name, addon_type, addon_id))
-                self.conn.commit()
-            except Exception as e:
-                logging.info(f"Error deselecting other addons: {e}")
-                self.conn.rollback()
+    def __repr__(self):
+        return f"<ShopAddon Shop: {self.shop_name}, Addon ID: {self.addon_id}, Status: {self.status}>"
 
-    # Metodo per ottenere l'addon di tipo specificato con status 'selected' per uno shop
-    def get_selected_addon_for_shop(self, shop_name, addon_type):
-        with self.conn.cursor(dictionary=True) as cursor:
-            try:
-                cursor.execute("""
-                    SELECT cms_addons.name, cms_addons.description, cms_addons.price, cms_addons.type
-                    FROM shop_addons
-                    JOIN cms_addons ON shop_addons.addon_id = cms_addons.id
-                    WHERE shop_addons.shop_name = %s AND shop_addons.addon_type = %s AND shop_addons.status = 'selected'
-                    LIMIT 1
-                """, (shop_name, addon_type))
-                return cursor.fetchone()  # Restituisce l'addon selezionato con nome e altri dettagli, o None
-            except Exception as e:
-                logging.info(f"Error fetching selected addon: {e}")
-                return None
+# ✅ **Crea un nuovo addon**
+def create_addon(name, description, price, addon_type):
+    try:
+        new_addon = CMSAddon(name=name, description=description, price=price, type=addon_type)
+        db.session.add(new_addon)
+        db.session.commit()
+        logging.info(f"✅ Addon '{name}' creato con successo")
+        return new_addon.id
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nella creazione dell'addon '{name}': {e}")
+        return None
+
+# 🔍 **Recupera tutti gli addon di un certo tipo**
+def get_addons_by_type(addon_type):
+    try:
+        addons = CMSAddon.query.filter_by(type=addon_type).all()
+        return [addon_to_dict(addon) for addon in addons]
+    except Exception as e:
+        logging.error(f"❌ Errore nel recupero degli addon di tipo '{addon_type}': {e}")
+        return []
+
+# ✅ **Seleziona un addon per uno shop**
+def select_addon(shop_name, addon_id, addon_type):
+    try:
+        # Controlla se l'addon è già acquistato
+        existing_addon = ShopAddon.query.filter_by(shop_name=shop_name, addon_id=addon_id).first()
+
+        if existing_addon and existing_addon.status == "purchased":
+            return False  # 🛑 L'addon è già acquistato
+
+        # Deseleziona altri addon dello stesso tipo per il negozio (eccetto quelli "purchased")
+        ShopAddon.query.filter(
+            ShopAddon.shop_name == shop_name,
+            ShopAddon.addon_type == addon_type,
+            ShopAddon.status == "selected"
+        ).update({"status": "deselected", "updated_at": datetime.utcnow()})
+
+        # Seleziona l'addon
+        if existing_addon:
+            existing_addon.status = "selected"
+            existing_addon.updated_at = datetime.utcnow()
+        else:
+            new_selection = ShopAddon(
+                shop_name=shop_name, addon_id=addon_id, addon_type=addon_type, status="selected"
+            )
+            db.session.add(new_selection)
+
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nella selezione dell'addon {addon_id} per lo shop {shop_name}: {e}")
+        return False
+
+# 💳 **Acquista un addon per uno shop**
+def purchase_addon(shop_name, addon_id, addon_type):
+    try:
+        existing_addon = ShopAddon.query.filter_by(shop_name=shop_name, addon_id=addon_id).first()
+
+        if existing_addon:
+            existing_addon.status = "purchased"
+            existing_addon.updated_at = datetime.utcnow()
+        else:
+            new_purchase = ShopAddon(
+                shop_name=shop_name, addon_id=addon_id, addon_type=addon_type, status="purchased"
+            )
+            db.session.add(new_purchase)
+
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nell'acquisto dell'addon {addon_id} per lo shop {shop_name}: {e}")
+        return False
+
+# 🔍 **Ottieni lo stato di un addon specifico per uno shop**
+def get_addon_status(shop_name, addon_id):
+    try:
+        addon = ShopAddon.query.filter_by(shop_name=shop_name, addon_id=addon_id).first()
+        return addon.status if addon else None
+    except Exception as e:
+        logging.error(f"❌ Errore nel recupero dello stato dell'addon {addon_id} per lo shop {shop_name}: {e}")
+        return None
+
+# 🔄 **Aggiorna lo stato di un addon per uno shop**
+def update_shop_addon_status(shop_name, addon_id, addon_type, status):
+    try:
+        existing_addon = ShopAddon.query.filter_by(shop_name=shop_name, addon_id=addon_id).first()
+
+        if existing_addon:
+            existing_addon.status = status
+            existing_addon.updated_at = datetime.utcnow()
+        else:
+            new_status = ShopAddon(
+                shop_name=shop_name, addon_id=addon_id, addon_type=addon_type, status=status
+            )
+            db.session.add(new_status)
+
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nell'aggiornamento dello stato dell'addon {addon_id} per lo shop {shop_name}: {e}")
+        return False
+
+# ❌ **Deseleziona altri addon dello stesso tipo (eccetto quelli "purchased")**
+def deselect_other_addons(shop_name, addon_id, addon_type):
+    try:
+        ShopAddon.query.filter(
+            ShopAddon.shop_name == shop_name,
+            ShopAddon.addon_type == addon_type,
+            ShopAddon.addon_id != addon_id,
+            ShopAddon.status != "purchased"
+        ).update({"status": "deselected", "updated_at": datetime.utcnow()})
+
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nella deselezione degli altri addon per lo shop {shop_name}: {e}")
+
+# 🔍 **Ottieni l'addon selezionato per uno shop**
+def get_selected_addon_for_shop(shop_name, addon_type):
+    try:
+        addon = db.session.query(CMSAddon.name, CMSAddon.description, CMSAddon.price, CMSAddon.type).join(
+            ShopAddon, ShopAddon.addon_id == CMSAddon.id
+        ).filter(
+            ShopAddon.shop_name == shop_name,
+            ShopAddon.addon_type == addon_type,
+            ShopAddon.status == "selected"
+        ).first()
+
+        return addon._asdict() if addon else None
+    except Exception as e:
+        logging.error(f"❌ Errore nel recupero dell'addon selezionato per lo shop {shop_name}: {e}")
+        return None
+
+# 📌 **Funzione per convertire un oggetto CMSAddon in un dizionario**
+def addon_to_dict(addon):
+    return {
+        "id": addon.id,
+        "name": addon.name,
+        "description": addon.description,
+        "price": addon.price,
+        "type": addon.type,
+        "created_at": addon.created_at,
+        "updated_at": addon.updated_at,
+    }

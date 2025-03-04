@@ -1,86 +1,126 @@
-# CATEGORIE ---------------------------------------------------------------------------------------------------
+from models.database import db
 import logging
+
+# 📌 Inizializza il database SQLAlchemy
 logging.basicConfig(level=logging.INFO)
 
-class Categories:
-    def __init__(self, db_conn):
-        self.conn = db_conn
+# 🔹 **Modello per le Categorie**
+class Category(db.Model):
+    __tablename__ = "categories"
 
-    def get_all_categories(self, shop_name):
-        with self.conn.cursor(dictionary=True) as cursor:
-            try:
-                query = "SELECT * FROM categories WHERE shop_name = %s"
-                cursor.execute(query, (shop_name,))
-                return cursor.fetchall()
-            except Exception as e:
-                logging.info(f"Error fetching categories: {e}")
-                return []
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 🔑 ID univoco della categoria
+    shop_name = db.Column(db.String(255), nullable=False)  # 🏪 Nome dello shop
+    name = db.Column(db.String(255), nullable=False)  # 🏷️ Nome della categoria
+    parent_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=True)  # 🔗 ID della categoria padre
 
-    def get_category_by_id(self, category_id):
-        with self.conn.cursor(dictionary=True) as cursor:
-            try:
-                query = "SELECT * FROM categories WHERE id = %s"
-                cursor.execute(query, (category_id,))
-                return cursor.fetchone()
-            except Exception as e:
-                logging.info(f"Error fetching category by ID: {e}")
-                return None
+    # Relazione per le sotto-categorie
+    subcategories = db.relationship("Category", backref=db.backref("parent", remote_side=[id]), lazy=True)
 
-    def create_category(self, shop_name, name, parent_id=None):
-        with self.conn.cursor() as cursor:
-            try:
-                query = """
-                    INSERT INTO categories (shop_name, name, parent_id)
-                    VALUES (%s, %s, %s)
-                """
-                cursor.execute(query, (shop_name, name, parent_id))
-                self.conn.commit()
-                return cursor.lastrowid
-            except Exception as e:
-                logging.info(f"Error creating category: {e}")
-                self.conn.rollback()
-                return None
+    def __repr__(self):
+        return f"<Category {self.name} (ID: {self.id})>"
 
-    def update_category(self, category_id, name=None, parent_id=None):
-        with self.conn.cursor() as cursor:
-            try:
-                fields = []
-                values = []
-                if name:
-                    fields.append("name = %s")
-                    values.append(name)
-                if parent_id is not None:
-                    fields.append("parent_id = %s")
-                    values.append(parent_id)
+# ✅ **Crea una nuova categoria**
+def create_category(shop_name, name, parent_id=None):
+    """
+    Crea una nuova categoria per uno shop.
+    """
+    try:
+        new_category = Category(shop_name=shop_name, name=name, parent_id=parent_id)
+        db.session.add(new_category)
+        db.session.commit()
+        logging.info(f"✅ Categoria '{name}' creata con successo per lo shop '{shop_name}'")
+        return new_category.id
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nella creazione della categoria '{name}': {e}")
+        return None
 
-                values.append(category_id)
-                query = f"UPDATE categories SET {', '.join(fields)} WHERE id = %s"
-                cursor.execute(query, tuple(values))
-                self.conn.commit()
-                return True
-            except Exception as e:
-                logging.info(f"Error updating category: {e}")
-                self.conn.rollback()
-                return False
+# 🔍 **Recupera tutte le categorie di uno shop**
+def get_all_categories(shop_name):
+    """
+    Restituisce tutte le categorie di un determinato shop.
+    """
+    try:
+        categories = Category.query.filter_by(shop_name=shop_name).all()
+        return [category_to_dict(cat) for cat in categories]
+    except Exception as e:
+        logging.error(f"❌ Errore nel recupero delle categorie per lo shop '{shop_name}': {e}")
+        return []
 
-    def delete_category(self, category_id):
-        with self.conn.cursor() as cursor:
-            try:
-                query = "DELETE FROM categories WHERE id = %s"
-                cursor.execute(query, (category_id,))
-                self.conn.commit()
-                return True
-            except Exception as e:
-                logging.info(f"Error deleting category: {e}")
-                self.conn.rollback()
-                return False
+# 🔍 **Recupera una categoria tramite ID**
+def get_category_by_id(category_id):
+    """
+    Restituisce una singola categoria tramite ID.
+    """
+    try:
+        category = Category.query.get(category_id)
+        return category_to_dict(category) if category else None
+    except Exception as e:
+        logging.error(f"❌ Errore nel recupero della categoria con ID {category_id}: {e}")
+        return None
 
-    def get_subcategories(self, parent_id):
-        with self.conn.cursor(dictionary=True) as cursor:
-            try:
-                query = "SELECT * FROM categories WHERE parent_id = %s"
-                cursor.execute(query, (parent_id,))
-                return cursor.fetchall()
-            except Exception as e:
-                logging.info(f"Error fetching subcategories: {e}")
-                return []
+# 🔄 **Aggiorna una categoria esistente**
+def update_category(category_id, name=None, parent_id=None):
+    """
+    Aggiorna una categoria esistente nel database.
+    """
+    try:
+        category = Category.query.get(category_id)
+        if not category:
+            return False
+
+        if name:
+            category.name = name
+        if parent_id is not None:
+            category.parent_id = parent_id
+
+        db.session.commit()
+        logging.info(f"✅ Categoria con ID {category_id} aggiornata con successo")
+        return True
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nell'aggiornamento della categoria {category_id}: {e}")
+        return False
+
+# 🗑️ **Elimina una categoria**
+def delete_category(category_id):
+    """
+    Elimina una categoria dal database.
+    """
+    try:
+        category = Category.query.get(category_id)
+        if not category:
+            return False
+
+        db.session.delete(category)
+        db.session.commit()
+        logging.info(f"🗑️ Categoria con ID {category_id} eliminata con successo")
+        return True
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nell'eliminazione della categoria {category_id}: {e}")
+        return False
+
+# 🔍 **Recupera tutte le sotto-categorie di una categoria padre**
+def get_subcategories(parent_id):
+    """
+    Restituisce tutte le sotto-categorie di una categoria padre.
+    """
+    try:
+        subcategories = Category.query.filter_by(parent_id=parent_id).all()
+        return [category_to_dict(cat) for cat in subcategories]
+    except Exception as e:
+        logging.error(f"❌ Errore nel recupero delle sotto-categorie per la categoria padre {parent_id}: {e}")
+        return []
+
+# 📌 **Funzione per convertire un oggetto Category in un dizionario**
+def category_to_dict(category):
+    """
+    Converte un oggetto Category in un dizionario.
+    """
+    return {
+        "id": category.id,
+        "shop_name": category.shop_name,
+        "name": category.name,
+        "parent_id": category.parent_id
+    }

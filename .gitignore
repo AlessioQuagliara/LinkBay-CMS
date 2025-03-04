@@ -2,3 +2,4 @@
 LinkBay/
 environments.py
 .env
+**/__pycache__/

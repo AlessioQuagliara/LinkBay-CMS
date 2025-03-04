@@ -1,40 +1,44 @@
 from flask import Blueprint, request, jsonify, render_template, flash, redirect, url_for
-from models.websettings import WebSettings  # importo la classe database
-from db_helpers import DatabaseHelper
-db_helper = DatabaseHelper()
-from db_helpers import DatabaseHelper
+from models.database import db
+from models.websettings import WebSettings  # Importiamo la classe del database
 from helpers import check_user_authentication
 import logging
+
+# 📌 Configurazione del logger
 logging.basicConfig(level=logging.INFO)
 
-# Blueprint
+# 📌 Blueprint per la gestione delle impostazioni web
 websettings_bp = Blueprint('websettings', __name__)
 
-# Rotte per la gestione
+# 🔹 **Rotta per la modifica delle impostazioni web**
 @websettings_bp.route('/admin/web_settings/edit')
 def edit_web_settings():
     username = check_user_authentication()
 
     if isinstance(username, str):
-        db_conn = db_helper.get_db_connection()
-        shop_subdomain = request.host.split('.')[0]  
-        web_settings_model = WebSettings(db_conn)
-        web_settings = web_settings_model.get_web_settings(shop_subdomain)  
+        try:
+            shop_subdomain = request.host.split('.')[0]
+            web_settings = WebSettings.query.filter_by(shop_name=shop_subdomain).first()
 
-        if web_settings:
-            return render_template(
-                'admin/cms/store_editor/script_editor.html',
-                title='Edit Web Settings',
-                username=username,
-                web_settings=web_settings 
-            )
-        else:
-            flash('Web settings not found for this shop.', 'danger')
+            if web_settings:
+                return render_template(
+                    'admin/cms/store_editor/script_editor.html',
+                    title='Edit Web Settings',
+                    username=username,
+                    web_settings=web_settings
+                )
+            else:
+                flash('Web settings not found for this shop.', 'danger')
+                return redirect(url_for('ui.homepage'))
+
+        except Exception as e:
+            logging.error(f"❌ Error loading web settings: {str(e)}")
+            flash('An error occurred while retrieving web settings.', 'danger')
             return redirect(url_for('ui.homepage'))
-        
-    return redirect(url_for('login'))  
 
-# Funzione per aggiornare le impostazioni web
+    return redirect(url_for('user.login'))
+
+# 🔹 **Rotta per aggiornare le impostazioni web**
 @websettings_bp.route('/admin/web_settings/update', methods=['POST'])
 def update_web_settings():
     try:
@@ -46,12 +50,28 @@ def update_web_settings():
         if not head_content or not script_content or not foot_content:
             return jsonify({'success': False, 'error': 'Missing content'}), 400
 
-        db_conn = db_helper.get_db_connection()
-        shop_subdomain = request.host.split('.')[0]  
-        web_settings_model = WebSettings(db_conn)
-        success = web_settings_model.update_web_settings(shop_subdomain, head_content, script_content, foot_content)
+        shop_subdomain = request.host.split('.')[0]
+        web_settings = WebSettings.query.filter_by(shop_name=shop_subdomain).first()
 
-        return jsonify({'success': success})
+        if web_settings:
+            web_settings.head_content = head_content
+            web_settings.script_content = script_content
+            web_settings.foot_content = foot_content
+        else:
+            web_settings = WebSettings(
+                shop_name=shop_subdomain,
+                head_content=head_content,
+                script_content=script_content,
+                foot_content=foot_content
+            )
+            db.session.add(web_settings)
+
+        db.session.commit()
+
+        logging.info(f"✅ Web settings updated for {shop_subdomain}")
+        return jsonify({'success': True})
 
     except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Error updating web settings: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 400

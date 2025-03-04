@@ -1,133 +1,127 @@
+from models.database import db
+from datetime import datetime, timedelta
 import logging
-import datetime
 
+# 📌 Inizializza il database SQLAlchemy
 logging.basicConfig(level=logging.INFO)
 
-class SiteVisits:
-    def __init__(self, db_conn):
-        self.conn = db_conn
+# 🔹 **Modello per le Visite del Sito**
+class SiteVisit(db.Model):
+    __tablename__ = "site_visits"
 
-    # 🔹 REGISTRA UNA NUOVA VISITA
-    def log_visit(self, shop_name, ip_address, user_agent, referrer, page_url):
-        """
-        Registra una nuova visita nel database.
-        """
-        try:
-            visit_time = datetime.datetime.now()
-            with self.conn.cursor() as cursor:
-                cursor.execute("""
-                    INSERT INTO site_visits (shop_name, ip_address, user_agent, referrer, page_url, visit_time)
-                    VALUES (%s, %s, %s, %s, %s, %s)
-                """, (shop_name, ip_address, user_agent, referrer, page_url, visit_time))
-            self.conn.commit()
-        except Exception as e:
-            logging.error(f"Errore durante la registrazione della visita: {e}")
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 🔑 ID univoco
+    shop_name = db.Column(db.String(255), nullable=False)  # 🏪 Nome del negozio
+    ip_address = db.Column(db.String(50), nullable=False)  # 🌍 Indirizzo IP del visitatore
+    user_agent = db.Column(db.String(500), nullable=True)  # 🖥️ User-Agent del browser
+    referrer = db.Column(db.String(500), nullable=True)  # 🔗 Pagina di provenienza
+    page_url = db.Column(db.String(500), nullable=False)  # 📄 URL visitato
+    visit_time = db.Column(db.DateTime, default=datetime.utcnow)  # ⏱️ Data della visita
 
-    # 🔹 OTTIENI VISITATORI ATTIVI
-    def get_active_visitors(self, shop_name, minutes=10):
-        """
-        Conta i visitatori attivi negli ultimi 'minutes' minuti.
-        """
-        try:
-            time_threshold = datetime.datetime.now() - datetime.timedelta(minutes=minutes)
-            with self.conn.cursor(dictionary=True) as cursor:
-                cursor.execute("""
-                    SELECT COUNT(DISTINCT ip_address) AS active_visitors
-                    FROM site_visits
-                    WHERE shop_name = %s AND visit_time >= %s
-                """, (shop_name, time_threshold))
-                result = cursor.fetchone() or {"active_visitors": 0}
-            return result["active_visitors"]
-        except Exception as e:
-            logging.error(f"Errore durante il conteggio dei visitatori attivi: {e}")
-            return 0
+    def __repr__(self):
+        return f"<SiteVisit {self.id} - {self.ip_address} - {self.page_url} - {self.visit_time}>"
 
-    # 🔹 OTTIENI VISITE GIORNALIERE
-    def get_daily_visitors(self, shop_name):
-        """
-        Conta i visitatori unici per la giornata corrente.
-        """
-        try:
-            with self.conn.cursor(dictionary=True) as cursor:
-                cursor.execute("""
-                    SELECT COUNT(DISTINCT ip_address) AS daily_visitors
-                    FROM site_visits
-                    WHERE shop_name = %s AND DATE(visit_time) = CURDATE()
-                """, (shop_name,))
-                result = cursor.fetchone() or {"daily_visitors": 0}
-            return result["daily_visitors"]
-        except Exception as e:
-            logging.error(f"Errore durante il conteggio dei visitatori giornalieri: {e}")
-            return 0
+# ✅ **Registra una nuova visita**
+def log_visit(shop_name, ip_address, user_agent, referrer, page_url):
+    try:
+        visit = SiteVisit(
+            shop_name=shop_name,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            referrer=referrer,
+            page_url=page_url,
+            visit_time=datetime.utcnow(),
+        )
+        db.session.add(visit)
+        db.session.commit()
+        logging.info(f"✅ Visita registrata: {ip_address} - {page_url}")
+        return True
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nella registrazione della visita: {e}")
+        return False
 
-    # 🔹 OTTIENI LE PAGINE PIÙ VISITATE
-    def get_most_visited_pages(self, shop_name, limit=5):
-        """
-        Recupera le pagine più visitate per un negozio, ordinate per numero di visite.
-        """
-        try:
-            with self.conn.cursor(dictionary=True) as cursor:
-                cursor.execute("""
-                    SELECT page_url, COUNT(*) AS visit_count
-                    FROM site_visits
-                    WHERE shop_name = %s
-                    GROUP BY page_url
-                    ORDER BY visit_count DESC
-                    LIMIT %s
-                """, (shop_name, limit))
-                pages = cursor.fetchall()
-            return pages
-        except Exception as e:
-            logging.error(f"Errore durante il recupero delle pagine più visitate: {e}")
-            return []
+# 🔍 **Recupera i visitatori attivi negli ultimi X minuti**
+def get_active_visitors(shop_name, minutes=10):
+    try:
+        time_threshold = datetime.utcnow() - timedelta(minutes=minutes)
+        active_visitors = (
+            db.session.query(db.func.count(SiteVisit.ip_address.distinct()))
+            .filter(SiteVisit.shop_name == shop_name, SiteVisit.visit_time >= time_threshold)
+            .scalar()
+        )
+        return active_visitors or 0
+    except Exception as e:
+        logging.error(f"❌ Errore nel conteggio dei visitatori attivi: {e}")
+        return 0
 
-    # 🔹 ELIMINA LE VISITE PIÙ VECCHIE DI N GIORNI
-    def clean_old_visits(self, days=30):
-        """
-        Rimuove le visite più vecchie di 'days' giorni per mantenere pulito il database.
-        """
-        try:
-            time_threshold = datetime.datetime.now() - datetime.timedelta(days=days)
-            with self.conn.cursor() as cursor:
-                cursor.execute("DELETE FROM site_visits WHERE visit_time < %s", (time_threshold,))
-            self.conn.commit()
-            logging.info(f"Visite più vecchie di {days} giorni eliminate con successo.")
-        except Exception as e:
-            logging.error(f"Errore durante la pulizia delle vecchie visite: {e}")
+# 🔍 **Recupera i visitatori giornalieri**
+def get_daily_visitors(shop_name):
+    try:
+        daily_visitors = (
+            db.session.query(db.func.count(SiteVisit.ip_address.distinct()))
+            .filter(SiteVisit.shop_name == shop_name, db.func.date(SiteVisit.visit_time) == db.func.current_date())
+            .scalar()
+        )
+        return daily_visitors or 0
+    except Exception as e:
+        logging.error(f"❌ Errore nel conteggio dei visitatori giornalieri: {e}")
+        return 0
 
-    # 🔹 ELIMINA TUTTE LE VISITE DI UNO SHOP
-    def delete_visits_by_shop(self, shop_name):
-        """
-        Elimina tutte le visite registrate per uno specifico shop.
-        """
-        try:
-            with self.conn.cursor() as cursor:
-                cursor.execute("DELETE FROM site_visits WHERE shop_name = %s", (shop_name,))
-            self.conn.commit()
-            logging.info(f"Tutte le visite per il negozio '{shop_name}' sono state eliminate.")
-        except Exception as e:
-            logging.error(f"Errore durante l'eliminazione delle visite per '{shop_name}': {e}")
+# 🔍 **Recupera le pagine più visitate**
+def get_most_visited_pages(shop_name, limit=5):
+    try:
+        pages = (
+            db.session.query(SiteVisit.page_url, db.func.count().label("visit_count"))
+            .filter(SiteVisit.shop_name == shop_name)
+            .group_by(SiteVisit.page_url)
+            .order_by(db.func.count().desc())
+            .limit(limit)
+            .all()
+        )
+        return [{"page_url": page[0], "visit_count": page[1]} for page in pages]
+    except Exception as e:
+        logging.error(f"❌ Errore nel recupero delle pagine più visitate: {e}")
+        return []
 
-    def get_recent_visits(self, shop_name, limit=100):
-            """
-            Recupera le visite più recenti per un determinato shop, ordinate per data di visita.
+# ❌ **Elimina le visite più vecchie di X giorni**
+def clean_old_visits(days=30):
+    try:
+        time_threshold = datetime.utcnow() - timedelta(days=days)
+        deleted_count = SiteVisit.query.filter(SiteVisit.visit_time < time_threshold).delete()
+        db.session.commit()
+        logging.info(f"🗑️ Eliminati {deleted_count} record di visite più vecchie di {days} giorni.")
+        return deleted_count
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nella pulizia delle visite: {e}")
+        return 0
 
-            :param shop_name: Nome del negozio (subdomain)
-            :param limit: Numero massimo di visite da recuperare (default: 100)
-            :return: Lista di visite [{ip_address, referrer, page_url, visit_time}]
-            """
-            try:
-                with self.conn.cursor(dictionary=True) as cursor:
-                    cursor.execute("""
-                        SELECT ip_address, user_agent, referrer, page_url, visit_time
-                        FROM site_visits
-                        WHERE shop_name = %s
-                        ORDER BY visit_time DESC
-                        LIMIT %s
-                    """, (shop_name, limit))
-                    visits = cursor.fetchall()
-                return visits
+# ❌ **Elimina tutte le visite di uno shop**
+def delete_visits_by_shop(shop_name):
+    try:
+        deleted_count = SiteVisit.query.filter(SiteVisit.shop_name == shop_name).delete()
+        db.session.commit()
+        logging.info(f"🗑️ Eliminati {deleted_count} record per lo shop '{shop_name}'.")
+        return deleted_count
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Errore nell'eliminazione delle visite per '{shop_name}': {e}")
+        return 0
 
-            except Exception as e:
-                logging.error(f"Errore durante il recupero delle visite recenti per '{shop_name}': {e}")
-                return []
+# 🔍 **Recupera le visite recenti**
+def get_recent_visits(shop_name, limit=100):
+    try:
+        visits = (
+            SiteVisit.query.filter(SiteVisit.shop_name == shop_name)
+            .order_by(SiteVisit.visit_time.desc())
+            .limit(limit)
+            .all()
+        )
+        return [visit_to_dict(visit) for visit in visits]
+    except Exception as e:
+        logging.error(f"❌ Errore nel recupero delle visite recenti per '{shop_name}': {e}")
+        return []
+
+# 📌 **Helper per convertire una visita in dizionario**
+def visit_to_dict(visit):
+    return {col.name: getattr(visit, col.name) for col in SiteVisit.__table__.columns} if visit else None

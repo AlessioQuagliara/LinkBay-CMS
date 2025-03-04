@@ -1,28 +1,22 @@
 import os
 from dotenv import load_dotenv
 
+# Carica le variabili d'ambiente dal file .env
 load_dotenv()
 
-SECRET_KEY = os.getenv("SECRET_KEY", "SpotexSrl@2024")
-
 class Config:
+    """
+    Configurazione generale dell'applicazione.
+    """
     LANGUAGES = ['en', 'it', 'es', 'fr', 'de']
     DEFAULT_LANGUAGE = 'en'
-    SECRET_KEY = os.getenv("SECRET_KEY", "SpotexSrl@2024")
     
-    # Configurazioni del Database dell'app (CMS_DEF)
-    DB_HOST = '127.0.0.1'
-    DB_USER = 'root'
-    DB_PASSWORD = 'root'
-    DB_NAME = 'CMS_DEF'
-    DB_PORT = 8889
+    # Chiave segreta per la sicurezza dell'app
+    SECRET_KEY = os.getenv("SECRET_KEY", "SpotexSrl@2024")
 
-    #Configurazioni del database globale (CMS_INDEX)
-    AUTH_DB_HOST = '127.0.0.1'
-    AUTH_DB_USER = 'root'
-    AUTH_DB_PASSWORD = 'root'
-    AUTH_DB_NAME = 'CMS_INDEX'
-    AUTH_DB_PORT = 8889
+    # Configurazione database PostgreSQL per CMS_DEF
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'postgresql+psycopg2://root:root@localhost/cms_def')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # OpenAI API Key
     OPENAI_API_KEY = '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'
