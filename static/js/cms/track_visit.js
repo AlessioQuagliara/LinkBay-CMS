@@ -1,0 +1,10 @@
+document.addEventListener("DOMContentLoaded", function () {
+    fetch("/api/track-visit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page_url: window.location.pathname })
+    })
+    .then(response => response.json())
+    .then(data => console.log("📊 Analytics:", data))
+    .catch(error => console.error("Error tracking visit:", error));
+});

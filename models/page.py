@@ -1,9 +1,12 @@
 from models.database import db
+import logging
+from functools import wraps
 from datetime import datetime
-import logging, os, json
+import os
+import json
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Modello per le Pagine**
 class Page(db.Model):
@@ -25,146 +28,145 @@ class Page(db.Model):
 
     def __repr__(self):
         return f"<Page {self.slug} - {self.shop_name}>"
+    
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
+# 🔄 **Helper per convertire un modello in dizionario**
+def model_to_dict(model):
+    return {column.name: getattr(model, column.name) for column in model.__table__.columns}
 
 # 🔍 **Recupera tutte le pagine di un negozio**
+@handle_db_errors
 def get_all_pages(shop_name):
-    try:
-        pages = Page.query.filter_by(shop_name=shop_name).all()
-        return [page_to_dict(p) for p in pages]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero delle pagine per {shop_name}: {e}")
-        return []
+    pages = Page.query.filter_by(shop_name=shop_name).all()
+    return [model_to_dict(p) for p in pages]
+
+# 🔍 **Recupera tutti i nomi e gli slug delle pagine di un negozio**
+@handle_db_errors
+def get_published_pages(shop_name):
+    pages = (
+        db.session.query(Page.title, Page.slug)
+        .filter_by(shop_name=shop_name, published=True)
+        .all()
+    )
+    return [{"title": page.title, "slug": page.slug} for page in pages]
 
 # 🔍 **Recupera una pagina per slug e negozio**
+@handle_db_errors
 def get_page_by_slug(slug, shop_name):
-    try:
-        page = Page.query.filter_by(slug=slug, shop_name=shop_name).first()
-        return page_to_dict(page) if page else None
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero della pagina {slug} per {shop_name}: {e}")
-        return None
+    page = Page.query.filter_by(slug=slug, shop_name=shop_name).first()
+    return model_to_dict(page) if page else None
 
 # ✅ **Crea una nuova pagina**
+@handle_db_errors
 def create_page(data):
-    try:
-        new_page = Page(
-            shop_name=data["shop_name"],
-            title=data["title"],
-            description=data["description"],
-            keywords=data["keywords"],
-            slug=data["slug"],
-            content=data["content"],
-            theme_name=data["theme_name"],
-            paid=data["paid"],
-            language=data["language"],
-            published=data["published"],
-        )
-        db.session.add(new_page)
-        db.session.commit()
-        logging.info(f"✅ Pagina '{data['slug']}' creata con successo")
-        return new_page.id
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella creazione della pagina: {e}")
-        return None
+    new_page = Page(
+        shop_name=data["shop_name"],
+        title=data["title"],
+        description=data["description"],
+        keywords=data["keywords"],
+        slug=data["slug"],
+        content=data["content"],
+        theme_name=data["theme_name"],
+        paid=data["paid"],
+        language=data["language"],
+        published=data["published"],
+    )
+    db.session.add(new_page)
+    db.session.commit()
+    logging.info(f"✅ Pagina '{data['slug']}' creata con successo")
+    return new_page.id
 
 # 🔄 **Aggiorna il contenuto di una pagina**
+@handle_db_errors
 def update_page_content(page_id, content):
-    try:
-        page = Page.query.get(page_id)
-        if not page:
-            return False
-
-        page.content = content
-        page.updated_at = datetime.utcnow()
-        db.session.commit()
-        logging.info(f"✅ Contenuto della pagina {page_id} aggiornato")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiornamento della pagina {page_id}: {e}")
+    page = Page.query.get(page_id)
+    if not page:
         return False
+
+    page.content = content
+    page.updated_at = datetime.utcnow()
+    db.session.commit()
+    logging.info(f"✅ Contenuto della pagina {page_id} aggiornato")
+    return True
 
 # 🔄 **Aggiorna i metadati SEO della pagina**
+@handle_db_errors
 def update_page_seo(page_id, data):
-    try:
-        page = Page.query.get(page_id)
-        if not page:
-            return False
-
-        page.title = data["title"]
-        page.description = data["description"]
-        page.keywords = data["keywords"]
-        page.slug = data["slug"]
-        page.updated_at = datetime.utcnow()
-        db.session.commit()
-        logging.info(f"✅ SEO aggiornato per la pagina {page_id}")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiornamento SEO della pagina {page_id}: {e}")
+    page = Page.query.get(page_id)
+    if not page:
         return False
+
+    page.title = data["title"]
+    page.description = data["description"]
+    page.keywords = data["keywords"]
+    page.slug = data["slug"]
+    page.updated_at = datetime.utcnow()
+    db.session.commit()
+    logging.info(f"✅ SEO aggiornato per la pagina {page_id}")
+    return True
 
 # ❌ **Elimina una pagina**
+@handle_db_errors
 def delete_page(page_id):
-    try:
-        page = Page.query.get(page_id)
-        if not page:
-            return False
-
-        db.session.delete(page)
-        db.session.commit()
-        logging.info(f"✅ Pagina {page_id} eliminata con successo")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'eliminazione della pagina {page_id}: {e}")
+    page = Page.query.get(page_id)
+    if not page:
         return False
+
+    db.session.delete(page)
+    db.session.commit()
+    logging.info(f"✅ Pagina {page_id} eliminata con successo")
+    return True
 
 # 🔍 **Recupera una pagina tradotta**
+@handle_db_errors
 def get_page_by_slug_and_language(slug, language, shop_name):
-    try:
-        page = Page.query.filter_by(slug=slug, language=language, shop_name=shop_name).first()
-        return page_to_dict(page) if page else None
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero della pagina tradotta {slug}: {e}")
-        return None
+    page = Page.query.filter_by(slug=slug, language=language, shop_name=shop_name).first()
+    return model_to_dict(page) if page else None
 
 # ✅ **Aggiorna o crea una pagina tradotta**
+@handle_db_errors
 def update_or_create_page_content(page_id, content, language, shop_name):
-    try:
-        page = Page.query.filter_by(id=page_id, language=language, shop_name=shop_name).first()
+    page = Page.query.filter_by(id=page_id, language=language, shop_name=shop_name).first()
 
-        if page:
-            page.content = content
-            page.updated_at = datetime.utcnow()
-        else:
-            new_page = Page(
-                id=page_id,
-                content=content,
-                language=language,
-                shop_name=shop_name,
-            )
-            db.session.add(new_page)
+    if page:
+        page.content = content
+        page.updated_at = datetime.utcnow()
+    else:
+        new_page = Page(
+            id=page_id,
+            content=content,
+            language=language,
+            shop_name=shop_name,
+        )
+        db.session.add(new_page)
 
-        db.session.commit()
-        logging.info(f"✅ Pagina tradotta aggiornata/creata")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella creazione/aggiornamento della pagina tradotta: {e}")
-        return False
+    db.session.commit()
+    logging.info(f"✅ Pagina tradotta aggiornata/creata")
+    return True
 
 # 🔍 **Recupera le pagine pubblicate**
+@handle_db_errors
 def get_published_pages(shop_name):
-    try:
-        pages = Page.query.filter_by(shop_name=shop_name, published=True).all()
-        return [page_to_dict(p) for p in pages if p.slug not in ["navbar", "footer"]]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero delle pagine pubblicate per {shop_name}: {e}")
-        return []
+    pages = Page.query.filter_by(shop_name=shop_name, published=True).all()
+    return [model_to_dict(p) for p in pages if p.slug not in ["navbar", "footer"]]
 
 # 🎨 **Applica un tema a un negozio**
+@handle_db_errors
 def apply_theme(theme_name, shop_name):
     theme_path = os.path.join("themes", f"{theme_name}.json")
 
@@ -203,7 +205,3 @@ def apply_theme(theme_name, shop_name):
     except Exception as e:
         logging.error(f"❌ Errore nell'applicazione del tema '{theme_name}': {e}")
         return False
-
-# 📌 **Helper per convertire una pagina in dizionario**
-def page_to_dict(page):
-    return {col.name: getattr(page, col.name) for col in Page.__table__.columns} if page else None

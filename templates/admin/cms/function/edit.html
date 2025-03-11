@@ -5,9 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LinkBay - {{ title }}</title>
     {% include 'admin/cms/heading/admin_head.html' %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/editor.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/editor.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/grapesjs@0.22.5/dist/grapes.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/grapesjs@0.22.5/dist/css/grapes.min.css" rel="stylesheet">    
+    <link href="https://cdn.jsdelivr.net/npm/grapesjs@0.22.5/dist/css/grapes.min.css" rel="stylesheet">
+    <style>
+        /* 🔥 Nascondere completamente la UI di GrapesJS */
+        .gjs-pn-panels, .gjs-pn-views-container { display: none !important; }
+
+        /* 🔥 Muovere il pannello grigio a sinistra sotto la sidebar */
+        .gjs-cv-canvas {
+            position: absolute;
+            left: 0; /* Spazio per la tua sidebar */
+            top: 0;
+            width: calc(100% - 0%); /* Rende il canvas largo tutto tranne la sidebar */
+            height: 100vh; /* Imposta altezza a schermo intero */
+            z-index: 1;
+        }
+
+        /* 🔥 Aggiungere un po' di margine inferiore per la barra grigia */
+        .gjs-pn-views-container {
+            bottom: 0;
+            top: auto;
+            left: 0;
+            right: 0;
+            z-index: 2; /* Barra sopra il canvas */
+            width: 100%;
+        }
+        #sidebar {
+            width: 300px;
+            background: #222;
+            color: white;
+            padding: 15px;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        #editor-container { 
+            flex-grow: 1; 
+            height: 100vh; 
+            background: #f8f9fa; 
+            position: relative; 
+            overflow: hidden;
+        }
+        /* Imposta la dimensione fissa del modale */
+        .modal-dialog {
+            max-width: 90%; /* Dimensione massima del modale, puoi personalizzare */
+            max-height: 80vh; /* Imposta l'altezza massima del modale */
+        }
+        
+        /* Aggiunge scroll solo al corpo del modale se il contenuto è troppo grande */
+        .modal-body {
+            overflow-y: auto; /* Abilita lo scroll verticale */
+            max-height: 60vh; /* Limita l'altezza del corpo, permettendo lo scroll */
+        }
+    </style>    
 </head>
 <body>
     <nav class="navbar navbar-dark d-md-none" style="background-color: #343a40;">
@@ -21,13 +73,17 @@
         <div class="content" style="padding: 0 !important;">
             <div id="editor" style="height: 100vh;">{{ page.content | safe }}</div>
         </div>
+        <!-- Zen Mode Button on the Bottom Right -->
+        <button id="toggleFullscreen" class="btn btn-dark" style="position: fixed; bottom: 20px; right: 20px; z-index: 999;">
+            <i class="fa-solid fa-expand me-2"></i> Zen Mode
+        </button>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/pica@8.0.1/dist/pica.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    {% if selected_theme_ui %}
-    {% include 'admin/cms/themes/' ~ selected_theme_ui.name ~ '.html' %}
-    {% else %}
-    {% include 'admin/cms/themes/Norman.html' %}
-    {% endif %}
+    <script>
+        var pageID = "{{ page.id }}";
+        var pageSlug = "{{ page.slug }}";
+    </script>
+    <script src="{{ url_for('static', filename='js/admin/grapesJS.js') }}"></script>
 </body>
 </html>

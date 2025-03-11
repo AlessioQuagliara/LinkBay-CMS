@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const productId = event.target.closest('.add-product-btn').dataset.id;
 
         // Chiamata AJAX per aggiungere il prodotto
-        fetch('/admin/cms/add_product_to_collection', {
+        fetch('/api/add_product_to_collection', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ collection_id: "{{ collection.id }}", product_id: productId })
@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 confirmButtonText: 'Yes, remove them!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch('/admin/cms/delete_products_from_collection', {
+                    fetch('/api/delete_products_from_collection', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ collection_id: "{{ collection.id }}", product_ids: selectedProducts })
@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 confirmButtonText: 'Yes, add them!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch('/admin/cms/add_products_to_collection', {
+                    fetch('/api/add_products_to_collection', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ collection_id: "{{ collection.id }}", product_ids: productIds })
@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
             confirmButtonText: 'Yes, add them!'
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch('/admin/cms/add_products_to_collection', {
+                fetch('/api/add_products_to_collection', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ collection_id: "{{ collection.id }}", product_ids: productIds })

@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
             didOpen: () => Swal.showLoading()
         });
 
-        fetch('/admin/cms/update_customer', {
+        fetch('/api/update_customer', {
             method: 'POST',
             body: formData,
         })

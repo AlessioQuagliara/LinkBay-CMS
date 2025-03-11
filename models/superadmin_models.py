@@ -1,9 +1,10 @@
 from models.database import db
 import logging
 from datetime import datetime
+from functools import wraps
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Tabella per i SuperAdmin**
 class SuperAdmin(db.Model):
@@ -19,6 +20,7 @@ class SuperAdmin(db.Model):
 
     def __repr__(self):
         return f"<SuperAdmin email={self.email}, role={self.role}>"
+
 
 # 🔹 **Tabella per le pagine del sito landing del CMS**
 class SuperPages(db.Model):
@@ -37,6 +39,7 @@ class SuperPages(db.Model):
     def __repr__(self):
         return f"<SuperPages title={self.title}, slug={self.slug}>"
 
+
 # 🔹 **Tabella per i media caricati sul CMS**
 class SuperMedia(db.Model):
     __tablename__ = "supermedia"
@@ -50,6 +53,7 @@ class SuperMedia(db.Model):
 
     def __repr__(self):
         return f"<SuperMedia file_name={self.file_name}, file_type={self.file_type}>"
+
 
 # 🔹 **Tabella per le fatture emesse ai clienti**
 class SuperInvoice(db.Model):
@@ -69,6 +73,7 @@ class SuperInvoice(db.Model):
     def __repr__(self):
         return f"<SuperInvoice invoice_number={self.invoice_number}, status={self.status}>"
 
+
 # 🔹 **Tabella per i messaggi di sistema (annunci, aggiornamenti)**
 class SuperMessages(db.Model):
     __tablename__ = "supermessages"
@@ -83,6 +88,7 @@ class SuperMessages(db.Model):
 
     def __repr__(self):
         return f"<SuperMessages title={self.title}, type={self.message_type}>"
+
 
 # 🔹 **Tabella per i ticket complessi inviati dalle agenzie**
 class SuperSupport(db.Model):
@@ -101,3 +107,25 @@ class SuperSupport(db.Model):
 
     def __repr__(self):
         return f"<SuperSupport subject={self.subject}, priority={self.priority}>"
+    
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
+
+# 📌 **Helper per convertire un modello in dizionario**
+def model_to_dict(model):
+    return {col.name: getattr(model, col.name) for col in model.__table__.columns} if model else None

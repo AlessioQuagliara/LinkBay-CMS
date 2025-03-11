@@ -1,9 +1,10 @@
 from models.database import db
 import logging
+from functools import wraps
 from datetime import datetime
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Modello per le Suggestioni di Miglioramento**
 class ImprovementSuggestion(db.Model):
@@ -17,55 +18,54 @@ class ImprovementSuggestion(db.Model):
 
     def __repr__(self):
         return f"<ImprovementSuggestion {self.id} - {self.category}>"
+    
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
+# 🔄 **Helper per convertire un modello in dizionario**
+def model_to_dict(model):
+    return {column.name: getattr(model, column.name) for column in model.__table__.columns}
 
 # ✅ **Crea una nuova suggestione di miglioramento**
+@handle_db_errors
 def create_suggestion(shop_name, suggestion_text, category):
-    try:
-        new_suggestion = ImprovementSuggestion(
-            shop_name=shop_name,
-            suggestion_text=suggestion_text,
-            category=category,
-        )
-        db.session.add(new_suggestion)
-        db.session.commit()
-        logging.info(f"✅ Suggestione creata con successo per {shop_name}")
-        return new_suggestion.id
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella creazione della suggestione per {shop_name}: {e}")
-        return None
+    new_suggestion = ImprovementSuggestion(
+        shop_name=shop_name,
+        suggestion_text=suggestion_text,
+        category=category,
+    )
+    db.session.add(new_suggestion)
+    db.session.commit()
+    logging.info(f"✅ Suggestione creata con successo per {shop_name}")
+    return new_suggestion.id
 
 # 🔍 **Ottieni tutte le suggestioni per uno shop**
+@handle_db_errors
 def get_suggestions_by_shop(shop_name):
-    try:
-        suggestions = ImprovementSuggestion.query.filter_by(shop_name=shop_name).all()
-        return [suggestion_to_dict(s) for s in suggestions]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero delle suggestioni per {shop_name}: {e}")
-        return []
+    suggestions = ImprovementSuggestion.query.filter_by(shop_name=shop_name).all()
+    return [model_to_dict(s) for s in suggestions]
 
 # ❌ **Elimina una suggestione specifica**
+@handle_db_errors
 def delete_suggestion(suggestion_id):
-    try:
-        suggestion = ImprovementSuggestion.query.get(suggestion_id)
-        if not suggestion:
-            return False
-
-        db.session.delete(suggestion)
-        db.session.commit()
-        logging.info(f"✅ Suggestione {suggestion_id} eliminata con successo")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'eliminazione della suggestione {suggestion_id}: {e}")
+    suggestion = ImprovementSuggestion.query.get(suggestion_id)
+    if not suggestion:
         return False
 
-# 📌 **Helper per convertire una suggestion in dizionario**
-def suggestion_to_dict(suggestion):
-    return {
-        "id": suggestion.id,
-        "shop_name": suggestion.shop_name,
-        "suggestion_text": suggestion.suggestion_text,
-        "category": suggestion.category,
-        "created_at": suggestion.created_at,
-    }
+    db.session.delete(suggestion)
+    db.session.commit()
+    logging.info(f"✅ Suggestione {suggestion_id} eliminata con successo")
+    return True

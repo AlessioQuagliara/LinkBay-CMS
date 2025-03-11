@@ -50,13 +50,16 @@ from models import (
 # 📌 Registrazione dei Blueprint (Modularizzazione delle route)
 from blueprints.admin import register_admin_blueprints
 from blueprints.shop import register_user_blueprints
+from blueprints.api import register_api_blueprints
 from blueprints.main import main_bp
 from errors import register_error_handlers 
 
 app.register_blueprint(main_bp)  # Blueprint per la parte pubblica
 register_admin_blueprints(app)   # Blueprint per il pannello admin
+register_api_blueprints(app)  # Blueprint per le chiamate
 register_user_blueprints(app)    # Blueprint per la gestione utenti
 register_error_handlers(app)     # Gestione degli errori personalizzata
+
 
 # 📌 Chiude la sessione del database al termine della richiesta per ottimizzare le risorse
 @app.teardown_appcontext

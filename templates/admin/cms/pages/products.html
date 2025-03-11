@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container my-4">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/toolbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/toolbar.css') }}">
 
     <!-- Card per le funzioni della tabella -->
     <div class="card shadow-sm mb-4" data-aos="fade-up">
@@ -298,30 +298,43 @@
         });
     });
 </script>
-
 <script>
     // GESTIONE DEL PULSANTE COPIA SELEZIONATI
     document.addEventListener('DOMContentLoaded', function () {
-        const copySelectedButton = document.getElementById('copy-selected-btn');
+    const copySelectedButton = document.getElementById('copy-selected-btn');
 
-        copySelectedButton.addEventListener('click', function () {
-            const selectedRows = document.querySelectorAll('.row-checkbox:checked');
-            if (selectedRows.length === 0) {
-                Swal.fire('No Selection', 'Please select at least one product to copy.', 'warning');
-                return;
+    copySelectedButton.addEventListener('click', function () {
+        const selectedRows = document.querySelectorAll('.row-checkbox:checked');
+        if (selectedRows.length === 0) {
+            Swal.fire('No Selection', 'Please select at least one product to copy.', 'warning');
+            return;
+        }
+
+        // Recupera gli ID dei prodotti selezionati
+        const productIds = Array.from(selectedRows).map(row =>
+            row.closest('.table-row').getAttribute('data-product-id')
+        );
+
+        // Invia gli ID al server per salvarli nella sessione Flask
+        fetch('/api/set_copied_products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product_ids: productIds })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire('Copied!', `${productIds.length} products have been copied.`, 'success');
+            } else {
+                Swal.fire('Error', 'Failed to copy products.', 'error');
             }
-
-            // Recupera gli ID dei prodotti selezionati
-            const productIds = Array.from(selectedRows).map(row =>
-                row.closest('.table-row').getAttribute('data-product-id')
-            );
-
-            // Salva gli ID nel sessionStorage
-            sessionStorage.setItem('copiedProductIds', productIds.join(','));
-
-            Swal.fire('Copied!', `${productIds.length} products have been copied.`, 'success');
+        })
+        .catch(error => {
+            console.error('Error saving copied products:', error);
+            Swal.fire('Error', 'A network error occurred.', 'error');
         });
     });
+});
 </script>
 <script>
     // CREAZIONE RIGA PRODOTTO
@@ -335,7 +348,7 @@
             didOpen: () => Swal.showLoading()
         });
 
-        fetch('/admin/cms/create_product', {
+        fetch('/api/create_product', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
         })
@@ -394,7 +407,7 @@
                     didOpen: () => Swal.showLoading()
                 });
 
-                fetch('/admin/cms/delete_products', {
+                fetch('/api/delete_products', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ product_ids: productIds })

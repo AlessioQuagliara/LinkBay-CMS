@@ -1,15 +1,13 @@
 from models.database import db
 from werkzeug.security import generate_password_hash, check_password_hash
 import logging
+from functools import wraps
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Definizione della tabella User**
 class User(db.Model):
-    """
-    Modello ORM per gli utenti del CMS.
-    """
     __tablename__ = "user"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 🔑 ID univoco dell'utente
@@ -24,113 +22,88 @@ class User(db.Model):
 
     # 🛠️ **Hash della password**
     def set_password(self, password):
-        """
-        Imposta la password dell'utente con un hash sicuro.
-        """
         self.password = generate_password_hash(password)
 
     # ✅ **Verifica la password**
     def check_password(self, password):
-        """
-        Verifica se la password inserita è corretta.
-        """
         return check_password_hash(self.password, password)
+    
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
 
 
 # ✅ **Recupera tutti gli utenti**
+@handle_db_errors
 def get_all_users():
-    """
-    Recupera tutti gli utenti dal database.
-    """
-    try:
-        return db.session.query(User).all()
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero di tutti gli utenti: {e}")
-        return []
+    return db.session.query(User).all()
 
 
 # 🔍 **Recupera un utente per ID**
+@handle_db_errors
 def get_user_by_id(user_id):
-    """
-    Recupera un utente dal database tramite ID.
-    """
-    try:
-        return db.session.get(User, user_id)  # ⚡ Ottimizzato per velocità
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero dell'utente con ID {user_id}: {e}")
-        return None
+    return db.session.get(User, user_id)  # ⚡ Ottimizzato per velocità
 
 
 # 🔎 **Recupera un utente per Email**
+@handle_db_errors
 def get_user_by_email(email):
-    """
-    Recupera un utente dal database tramite email.
-    """
-    try:
-        return db.session.query(User).filter_by(email=email).first()
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero dell'utente con email {email}: {e}")
-        return None
+    return db.session.query(User).filter_by(email=email).first()
 
 
 # 🆕 **Crea un nuovo utente**
+@handle_db_errors
 def create_user(email, password, nome, cognome, telefono=None, profilo_foto=None):
-    """
-    Crea un nuovo utente nel database.
-    """
-    try:
-        hashed_password = generate_password_hash(password)  # 🔐 Hash della password
-        new_user = User(
-            email=email,
-            password=hashed_password,
-            nome=nome,
-            cognome=cognome,
-            telefono=telefono,
-            profilo_foto=profilo_foto,
-            is_2fa_enabled=False,
-            otp_secret=None
-        )
-        db.session.add(new_user)
-        db.session.commit()
-        return new_user.id
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella creazione dell'utente {email}: {e}")
-        return None
+    hashed_password = generate_password_hash(password)  # 🔐 Hash della password
+    new_user = User(
+        email=email,
+        password=hashed_password,
+        nome=nome,
+        cognome=cognome,
+        telefono=telefono,
+        profilo_foto=profilo_foto,
+        is_2fa_enabled=False,
+        otp_secret=None
+    )
+    db.session.add(new_user)
+    db.session.commit()
+    return new_user.id
 
 
 # ✏️ **Aggiorna i dati di un utente**
+@handle_db_errors
 def update_user(user_id, **kwargs):
-    """
-    Aggiorna i dati di un utente esistente nel database.
-    """
-    try:
-        user = get_user_by_id(user_id)
-        if not user:
-            return False
-        for key, value in kwargs.items():
-            setattr(user, key, value)  # 🛠️ Aggiorna dinamicamente i campi
-        db.session.commit()
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiornamento dell'utente {user_id}: {e}")
+    user = get_user_by_id(user_id)
+    if not user:
         return False
+
+    for key, value in kwargs.items():
+        setattr(user, key, value)  # 🛠️ Aggiorna dinamicamente i campi
+
+    db.session.commit()
+    return True
 
 
 # 🗑️ **Elimina un utente**
+@handle_db_errors
 def delete_user(user_id):
-    """
-    Elimina un utente dal database.
-    """
-    try:
-        user = get_user_by_id(user_id)
-        if not user:
-            return False
-        db.session.delete(user)
-        db.session.commit()
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'eliminazione dell'utente {user_id}: {e}")
+    user = get_user_by_id(user_id)
+    if not user:
         return False
+
+    db.session.delete(user)
+    db.session.commit()
+    return True

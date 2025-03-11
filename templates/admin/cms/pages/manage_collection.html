@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
             didOpen: () => Swal.showLoading()
         });
 
-        fetch('/admin/cms/update_collection', {
+        fetch('/api/update_collection', {
             method: 'POST',
             body: formData,
         })
@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
             didOpen: () => Swal.showLoading()
         });
 
-        fetch('/admin/cms/upload_image_collection', {
+        fetch('/api/upload_image_collection', {
             method: 'POST',
             body: formData
         })
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch('/admin/cms/delete_image_collection', {
+                fetch('/api/delete_image_collection', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ image_id: imageId })
@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', function () {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch('/admin/cms/delete_image_collection', {
+                fetch('/api/delete_image_collection', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ image_id: imageId })

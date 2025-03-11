@@ -4,7 +4,7 @@
    
 <div class="container my-4">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/toolbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/toolbar.css') }}">
 
     <!-- Card per le funzioni della tabella -->
     <div class="card shadow-sm mb-4" data-aos="fade-up">
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function () {
             didOpen: () => Swal.showLoading()
         });
 
-        fetch('/admin/cms/create_customer', {
+        fetch('/api/create_customer', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
         })
@@ -312,7 +312,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     didOpen: () => Swal.showLoading()
                 });
 
-                fetch('/admin/cms/delete_customers', {
+                fetch('/api/delete_customers', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ customer_ids: customerIds })

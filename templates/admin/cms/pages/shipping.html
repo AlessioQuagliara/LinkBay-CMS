@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container my-4">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/toolbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/toolbar.css') }}">
 
     <!-- Card per le funzioni della tabella -->
     <div class="card shadow-sm mb-4" data-aos="fade-up">
@@ -244,7 +244,7 @@ document.getElementById('add-shipping-btn').addEventListener('click', function (
         didOpen: () => Swal.showLoading()
     });
 
-    fetch('/admin/cms/create_shipping_method', {
+    fetch('/api/create_shipping_method', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -308,7 +308,7 @@ document.getElementById('add-shipping-btn').addEventListener('click', function (
                     didOpen: () => Swal.showLoading()
                 });
 
-                fetch('/admin/cms/delete_shippings', {
+                fetch('/api/delete_shippings', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ shipping_ids: shippingIds })

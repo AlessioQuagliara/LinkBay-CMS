@@ -12,169 +12,35 @@
     </head>
     <body>
         <!-- Include la navbar -->
+
         <nav>
             {{ navbar | safe }}
         </nav>
 
-        <!-- Contenuto dinamico gestito con GrapesJS -->
-        <div id="content-wrapper">
-            <br><br>
-            <div class="product-section">
-                <div class="container my-4">
-                    <div class="row">
-                        <!-- Slideshow dinamico per immagini prodotto -->
-                        <div class="col-md-6">
-                            <div id="productImageSlideshow" class="carousel slide" data-bs-ride="carousel">
-                                <div class="carousel-inner">
-                                    {% if images %}
-                                        {% for image in images %}
-                                            <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
-                                                <img src="{{ image.image_url }}" class="d-block w-100" alt="{{ image.alt_text }}">
-                                            </div>
-                                        {% endfor %}
-                                    {% else %}
-                                        <div class="carousel-item active">
-                                            <img src="/static/images/placeholder.png" class="d-block w-100" alt="Placeholder">
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <button class="carousel-control-prev" type="button" data-bs-target="#productImageSlideshow" data-bs-slide="prev">
-                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Previous</span>
-                                </button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#productImageSlideshow" data-bs-slide="next">
-                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Next</span>
-                                </button>
-                            </div>
-                        </div>
+        <!-- Include il contenuto dinamico della pagina -->
 
-                        <!-- Dettagli prodotto -->
-                        <div class="col-md-6">
-                            <h1 class="product-title">{{ product.name }}</h1>
-                            <input type="hidden" value="{{ product.image_url}}">
-                            <p class="product-price">
-                                <span class="price fs-3 text-success">€{{ product.price }}</span>
-                                {% if product.discount_price %}
-                                    <span class="discount-price text-danger fs-4 ms-2">€{{ product.discount_price }}</span>
-                                {% endif %}
-                            </p>
-                            <p class="product-stock">
-                                {% if product.stock_quantity > 0 %}
-                                <label for="quantity" class="form-label">Quantity:</label>
-                                <input type="number" 
-                                       id="quantity" 
-                                       name="quantity" 
-                                       class="form-control" 
-                                       value="1" 
-                                       min="1" 
-                                       max="{{ product.stock_quantity }}">
-                                {% else %}
-                                    <span class="text-danger">Out of Stock</span>
-                                {% endif %}
-                            </p>
-                            <button id="addToCartButton" class="btn btn-dark btn-lg w-100 add-to-cart">
-                                Aggiungi al Carrello
-                            </button>
-                            <br><br>
-                            <p class="product-description">{{ product.description | safe }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        {{ page | safe }}
 
+        <!-- Carica cookie personalizzati -->
 
-            <script>
-                function addToCart(product) {
-                     const addToCartButton = document.getElementById('addToCartButton');
-         
-                     // Cambia temporaneamente il testo del pulsante
-                     const originalText = addToCartButton.textContent;
-                     addToCartButton.textContent = 'Aggiungendo...';
-                     addToCartButton.disabled = true;
-         
-                     fetch('/add_to_cart', {
-                         method: 'POST',
-                         headers: { 'Content-Type': 'application/json' },
-                         body: JSON.stringify(product)
-                     })
-                     .then(response => response.json())
-                     .then(data => {
-                         if (data.success) {
-                             console.log('Prodotto aggiunto al carrello:', data.cart);
-         
-                             // Cambia il testo del pulsante per confermare l'aggiunta
-                             addToCartButton.textContent = 'Aggiunto!';
-                             addToCartButton.classList.add('btn-success');
-                             setTimeout(() => {
-                                 addToCartButton.textContent = originalText;
-                                 addToCartButton.classList.remove('btn-success');
-                                 addToCartButton.disabled = false;
-         
-                                 // Aggiorna il contenuto della sidebar se aperta
-                                 if (document.getElementById('cartSidebar').classList.contains('open')) {
-                                     fetchCartContents();
-                                 }
-                             }, 2000);
-                         } else {
-                             // Gestione errore
-                             addToCartButton.textContent = 'Errore!';
-                             addToCartButton.classList.add('btn-danger');
-                             setTimeout(() => {
-                                 addToCartButton.textContent = originalText;
-                                 addToCartButton.classList.remove('btn-danger');
-                                 addToCartButton.disabled = false;
-                             }, 2000);
-                         }
-                     })
-                     .catch(error => {
-                         console.error('Errore:', error);
-                         // Mostra errore sul pulsante
-                         addToCartButton.textContent = 'Errore!';
-                         addToCartButton.classList.add('btn-danger');
-                         setTimeout(() => {
-                             addToCartButton.textContent = originalText;
-                             addToCartButton.classList.remove('btn-danger');
-                             addToCartButton.disabled = false;
-                         }, 2000);
-                     });
-                 }
-         
-                 // Aggiungi l'evento click al pulsante
-                 document.getElementById('addToCartButton').addEventListener('click', () => {
-                     // Ottieni la quantità dall'input
-                     const quantityInput = document.getElementById('quantity');
-                     const quantity = parseInt(quantityInput.value) || 1; // Default a 1 se l'input non è valido
-         
-                     // Crea l'oggetto prodotto dinamicamente
-                     const product = {
-                         product_id: '{{ product.id }}',
-                         name: '{{ product.name }}',
-                         image: '{{ product.image_url }}',
-                         price: '{{ product.price }}',
-                         quantity: quantity
-                     };
-         
-                     addToCart(product);
-                 });
-             </script>
-
-
-            {{ page | safe}}
-        </div>
+        {{ cookie_policy_banner | safe }}  <!-- Questo carica i cookie personalizzati -->
 
         <!-- Include il footer -->
+
         <footer>
             {{ footer | safe }}
         </footer>
         
         <!-- Carica script personalizzati -->
+
         {{ script | safe }}
         
         <!-- Carica gli script del footer impostati dall'utente -->
+
         {{ foot | safe }}
 
         <!-- Carica gli script predefiniti da sistema -->
-        {% include 'footer.html' %}
+
+        {% include 'content_after_body.html' %}
     </body>
     </html>

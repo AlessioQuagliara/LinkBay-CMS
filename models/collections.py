@@ -1,9 +1,10 @@
 from models.database import db
 import logging
+from functools import wraps
 from datetime import datetime
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Modello per le Collezioni**
 class Collection(db.Model):
@@ -25,7 +26,6 @@ class Collection(db.Model):
     def __repr__(self):
         return f"<Collection {self.name} (ID: {self.id})>"
 
-
 # 📸 **Modello per le Immagini delle Collezioni**
 class CollectionImage(db.Model):
     __tablename__ = "collection_images"
@@ -38,7 +38,6 @@ class CollectionImage(db.Model):
     def __repr__(self):
         return f"<CollectionImage {self.image_url} (Collection ID: {self.collection_id})>"
 
-
 # 🛒 **Modello per i Prodotti nelle Collezioni**
 class CollectionProduct(db.Model):
     __tablename__ = "collection_products"
@@ -49,160 +48,114 @@ class CollectionProduct(db.Model):
     def __repr__(self):
         return f"<CollectionProduct Collection ID: {self.collection_id}, Product ID: {self.product_id}>"
 
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
+# 🔄 **Helper per convertire un modello in dizionario**
+def model_to_dict(model):
+    return {column.name: getattr(model, column.name) for column in model.__table__.columns}
 
 # ✅ **Crea una nuova collezione**
+@handle_db_errors
 def create_collection(shop_name, name, slug, description=None, image_url=None, is_active=True):
-    try:
-        new_collection = Collection(
-            shop_name=shop_name,
-            name=name,
-            slug=slug,
-            description=description,
-            image_url=image_url,
-            is_active=is_active
-        )
-        db.session.add(new_collection)
-        db.session.commit()
-        logging.info(f"✅ Collezione '{name}' creata con successo")
-        return new_collection.id
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella creazione della collezione '{name}': {e}")
-        return None
-
+    new_collection = Collection(
+        shop_name=shop_name,
+        name=name,
+        slug=slug,
+        description=description,
+        image_url=image_url,
+        is_active=is_active
+    )
+    db.session.add(new_collection)
+    db.session.commit()
+    logging.info(f"✅ Collezione '{name}' creata con successo")
+    return new_collection.id
 
 # 🔍 **Recupera tutte le collezioni per uno shop**
+@handle_db_errors
 def get_all_collections(shop_name):
-    try:
-        collections = Collection.query.filter_by(shop_name=shop_name).all()
-        return [collection_to_dict(col) for col in collections]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero delle collezioni per lo shop '{shop_name}': {e}")
-        return []
-
+    collections = Collection.query.filter_by(shop_name=shop_name).all()
+    return [model_to_dict(col) for col in collections]
 
 # 🔄 **Aggiorna una collezione**
+@handle_db_errors
 def update_collection(collection_id, data):
-    try:
-        collection = Collection.query.get(collection_id)
-        if not collection:
-            return False
-
-        for key, value in data.items():
-            setattr(collection, key, value)
-
-        db.session.commit()
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiornamento della collezione {collection_id}: {e}")
+    collection = Collection.query.get(collection_id)
+    if not collection:
         return False
 
+    for key, value in data.items():
+        setattr(collection, key, value)
+
+    db.session.commit()
+    logging.info(f"✅ Collezione {collection_id} aggiornata con successo")
+    return True
 
 # ❌ **Elimina una collezione**
+@handle_db_errors
 def delete_collection(collection_id):
-    try:
-        collection = Collection.query.get(collection_id)
-        if not collection:
-            return False
-
-        db.session.delete(collection)
-        db.session.commit()
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'eliminazione della collezione {collection_id}: {e}")
+    collection = Collection.query.get(collection_id)
+    if not collection:
         return False
 
+    db.session.delete(collection)
+    db.session.commit()
+    logging.info(f"🗑️ Collezione {collection_id} eliminata con successo")
+    return True
 
 # 📸 **Aggiunge un'immagine a una collezione**
+@handle_db_errors
 def add_collection_image(collection_id, image_url, is_main=False):
-    try:
-        new_image = CollectionImage(collection_id=collection_id, image_url=image_url, is_main=is_main)
-        db.session.add(new_image)
-        db.session.commit()
-        return new_image.id
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiunta dell'immagine alla collezione {collection_id}: {e}")
-        return None
-
+    new_image = CollectionImage(collection_id=collection_id, image_url=image_url, is_main=is_main)
+    db.session.add(new_image)
+    db.session.commit()
+    logging.info(f"✅ Immagine aggiunta alla collezione {collection_id}")
+    return new_image.id
 
 # 📸 **Recupera tutte le immagini di una collezione**
+@handle_db_errors
 def get_collection_images(collection_id):
-    try:
-        images = CollectionImage.query.filter_by(collection_id=collection_id).all()
-        return [image_to_dict(img) for img in images]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero delle immagini per la collezione {collection_id}: {e}")
-        return []
-
+    images = CollectionImage.query.filter_by(collection_id=collection_id).all()
+    return [model_to_dict(img) for img in images]
 
 # 🛒 **Aggiunge un prodotto a una collezione**
+@handle_db_errors
 def add_product_to_collection(collection_id, product_id):
-    try:
-        new_relation = CollectionProduct(collection_id=collection_id, product_id=product_id)
-        db.session.add(new_relation)
-        db.session.commit()
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiunta del prodotto {product_id} alla collezione {collection_id}: {e}")
-        return False
-
+    new_relation = CollectionProduct(collection_id=collection_id, product_id=product_id)
+    db.session.add(new_relation)
+    db.session.commit()
+    logging.info(f"✅ Prodotto {product_id} aggiunto alla collezione {collection_id}")
+    return True
 
 # ❌ **Rimuove un prodotto da una collezione**
+@handle_db_errors
 def remove_product_from_collection(collection_id, product_id):
-    try:
-        CollectionProduct.query.filter_by(collection_id=collection_id, product_id=product_id).delete()
-        db.session.commit()
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella rimozione del prodotto {product_id} dalla collezione {collection_id}: {e}")
-        return False
-
+    CollectionProduct.query.filter_by(collection_id=collection_id, product_id=product_id).delete()
+    db.session.commit()
+    logging.info(f"✅ Prodotto {product_id} rimosso dalla collezione {collection_id}")
+    return True
 
 # 🔍 **Recupera i prodotti di una collezione**
+@handle_db_errors
 def get_products_in_collection(collection_id):
-    try:
-        products = db.session.query(CollectionProduct.product_id).filter_by(collection_id=collection_id).all()
-        return [p.product_id for p in products]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero dei prodotti della collezione {collection_id}: {e}")
-        return []
-
+    products = db.session.query(CollectionProduct.product_id).filter_by(collection_id=collection_id).all()
+    return [p.product_id for p in products]
 
 # 🔍 **Recupera tutte le collezioni attive per uno shop**
+@handle_db_errors
 def get_collections_by_shop(shop_name):
-    try:
-        collections = Collection.query.filter_by(shop_name=shop_name, is_active=True).order_by(Collection.name).all()
-        return [collection_to_dict(col) for col in collections]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero delle collezioni attive per lo shop '{shop_name}': {e}")
-        return []
-
-
-# 📌 **Helper per convertire una collezione in dizionario**
-def collection_to_dict(collection):
-    return {
-        "id": collection.id,
-        "shop_name": collection.shop_name,
-        "name": collection.name,
-        "slug": collection.slug,
-        "description": collection.description,
-        "image_url": collection.image_url,
-        "is_active": collection.is_active,
-        "created_at": collection.created_at,
-        "updated_at": collection.updated_at,
-    }
-
-
-# 📸 **Helper per convertire un'immagine in dizionario**
-def image_to_dict(image):
-    return {
-        "id": image.id,
-        "collection_id": image.collection_id,
-        "image_url": image.image_url,
-        "is_main": image.is_main,
-    }
+    collections = Collection.query.filter_by(shop_name=shop_name, is_active=True).order_by(Collection.name).all()
+    return [model_to_dict(col) for col in collections]

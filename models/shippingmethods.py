@@ -1,9 +1,10 @@
 from models.database import db
 from datetime import datetime
 import logging
+from functools import wraps
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Modello per i Metodi di Spedizione**
 class ShippingMethod(db.Model):
@@ -23,82 +24,87 @@ class ShippingMethod(db.Model):
 
     def __repr__(self):
         return f"<ShippingMethod {self.id} - {self.name} ({self.shop_name})>"
+    
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
 
 # ✅ **Crea un nuovo metodo di spedizione**
+@handle_db_errors
 def create_shipping_method(data):
-    try:
-        new_shipping = ShippingMethod(
-            shop_name=data["shop_name"],
-            name=data["name"],
-            description=data.get("description"),
-            country=data.get("country"),
-            region=data.get("region"),
-            cost=data["cost"],
-            estimated_delivery_time=data.get("estimated_delivery_time"),
-            is_active=data.get("is_active", True),
-        )
-        db.session.add(new_shipping)
-        db.session.commit()
-        logging.info(f"✅ Metodo di spedizione '{data['name']}' creato per '{data['shop_name']}'.")
-        return new_shipping.id
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella creazione del metodo di spedizione: {e}")
-        return None
+    new_shipping = ShippingMethod(
+        shop_name=data["shop_name"],
+        name=data["name"],
+        description=data.get("description"),
+        country=data.get("country"),
+        region=data.get("region"),
+        cost=data["cost"],
+        estimated_delivery_time=data.get("estimated_delivery_time"),
+        is_active=data.get("is_active", True),
+    )
+    db.session.add(new_shipping)
+    db.session.commit()
+    logging.info(f"✅ Metodo di spedizione '{data['name']}' creato per '{data['shop_name']}'.")
+    return new_shipping.id
+
 
 # 🔍 **Recupera tutti i metodi di spedizione attivi per un negozio**
+@handle_db_errors
 def get_all_shipping_methods(shop_name):
-    try:
-        methods = ShippingMethod.query.filter_by(shop_name=shop_name, is_active=True).order_by(ShippingMethod.created_at.desc()).all()
-        return [shipping_method_to_dict(m) for m in methods]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero dei metodi di spedizione per '{shop_name}': {e}")
-        return []
+    methods = ShippingMethod.query.filter_by(shop_name=shop_name, is_active=True).order_by(ShippingMethod.created_at.desc()).all()
+    return [shipping_method_to_dict(m) for m in methods]
+
 
 # 🔄 **Aggiorna un metodo di spedizione**
+@handle_db_errors
 def update_shipping_method(method_id, shop_name, data):
-    try:
-        shipping = ShippingMethod.query.filter_by(id=method_id, shop_name=shop_name).first()
-        if not shipping:
-            return False
-
-        for key, value in data.items():
-            if hasattr(shipping, key) and value is not None:
-                setattr(shipping, key, value)
-
-        shipping.updated_at = datetime.utcnow()
-        db.session.commit()
-        logging.info(f"🔄 Metodo di spedizione {method_id} aggiornato per '{shop_name}'.")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiornamento del metodo di spedizione: {e}")
+    shipping = ShippingMethod.query.filter_by(id=method_id, shop_name=shop_name).first()
+    if not shipping:
         return False
+
+    for key, value in data.items():
+        if hasattr(shipping, key) and value is not None:
+            setattr(shipping, key, value)
+
+    shipping.updated_at = datetime.utcnow()
+    db.session.commit()
+    logging.info(f"🔄 Metodo di spedizione {method_id} aggiornato per '{shop_name}'.")
+    return True
+
 
 # ❌ **Elimina un metodo di spedizione**
+@handle_db_errors
 def delete_shipping_method(shipping_id, shop_name):
-    try:
-        shipping = ShippingMethod.query.filter_by(id=shipping_id, shop_name=shop_name).first()
-        if not shipping:
-            return False
-
-        db.session.delete(shipping)
-        db.session.commit()
-        logging.info(f"❌ Metodo di spedizione {shipping_id} eliminato per '{shop_name}'.")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'eliminazione del metodo di spedizione: {e}")
+    shipping = ShippingMethod.query.filter_by(id=shipping_id, shop_name=shop_name).first()
+    if not shipping:
         return False
 
+    db.session.delete(shipping)
+    db.session.commit()
+    logging.info(f"❌ Metodo di spedizione {shipping_id} eliminato per '{shop_name}'.")
+    return True
+
+
 # 🔍 **Recupera un metodo di spedizione per ID**
+@handle_db_errors
 def get_shipping_method_by_id(shipping_id, shop_name):
-    try:
-        shipping = ShippingMethod.query.filter_by(id=shipping_id, shop_name=shop_name).first()
-        return shipping_method_to_dict(shipping) if shipping else None
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero del metodo di spedizione ID {shipping_id}: {e}")
-        return None
+    shipping = ShippingMethod.query.filter_by(id=shipping_id, shop_name=shop_name).first()
+    return shipping_method_to_dict(shipping) if shipping else None
+
 
 # 📌 **Helper per convertire un metodo di spedizione in dizionario**
 def shipping_method_to_dict(shipping):

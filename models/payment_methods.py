@@ -1,9 +1,10 @@
 from models.database import db
-from datetime import datetime
 import logging
+from functools import wraps
+from datetime import datetime
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Modello per i Metodi di Pagamento**
 class PaymentMethod(db.Model):
@@ -20,89 +21,84 @@ class PaymentMethod(db.Model):
 
     def __repr__(self):
         return f"<PaymentMethod {self.method_name} - {self.shop_name}>"
+    
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
+# 🔄 **Helper per convertire un modello in dizionario**
+def model_to_dict(model):
+    return {column.name: getattr(model, column.name) for column in model.__table__.columns}
 
 # ✅ **Crea un nuovo metodo di pagamento**
+@handle_db_errors
 def create_payment_method(data):
-    try:
-        new_method = PaymentMethod(
-            shop_name=data["shop_name"],
-            method_name=data["method_name"],
-            api_key=data["api_key"],
-            api_secret=data["api_secret"],
-            extra_info=data.get("extra_info"),
-        )
-        db.session.add(new_method)
-        db.session.commit()
-        logging.info(f"✅ Metodo di pagamento '{data['method_name']}' creato con successo")
-        return new_method.id
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella creazione del metodo di pagamento: {e}")
-        return None
+    new_method = PaymentMethod(
+        shop_name=data["shop_name"],
+        method_name=data["method_name"],
+        api_key=data["api_key"],
+        api_secret=data["api_secret"],
+        extra_info=data.get("extra_info"),
+    )
+    db.session.add(new_method)
+    db.session.commit()
+    logging.info(f"✅ Metodo di pagamento '{data['method_name']}' creato con successo")
+    return new_method.id
 
 # 🔄 **Aggiorna un metodo di pagamento**
+@handle_db_errors
 def update_payment_method(method_id, shop_name, data):
-    try:
-        method = PaymentMethod.query.filter_by(id=method_id, shop_name=shop_name).first()
-        if not method:
-            return False
-
-        method.api_key = data.get("api_key", method.api_key)
-        method.api_secret = data.get("api_secret", method.api_secret)
-        method.extra_info = data.get("extra_info", method.extra_info)
-        method.updated_at = datetime.utcnow()
-
-        db.session.commit()
-        logging.info(f"✅ Metodo di pagamento {method_id} aggiornato con successo")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiornamento del metodo di pagamento {method_id}: {e}")
+    method = PaymentMethod.query.filter_by(id=method_id, shop_name=shop_name).first()
+    if not method:
         return False
+
+    method.api_key = data.get("api_key", method.api_key)
+    method.api_secret = data.get("api_secret", method.api_secret)
+    method.extra_info = data.get("extra_info", method.extra_info)
+    method.updated_at = datetime.utcnow()
+
+    db.session.commit()
+    logging.info(f"✅ Metodo di pagamento {method_id} aggiornato con successo")
+    return True
 
 # 🔍 **Recupera tutti i metodi di pagamento per un negozio**
+@handle_db_errors
 def get_all_payment_methods(shop_name):
-    try:
-        methods = PaymentMethod.query.filter_by(shop_name=shop_name).order_by(PaymentMethod.created_at.desc()).all()
-        return [payment_method_to_dict(m) for m in methods]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero dei metodi di pagamento per {shop_name}: {e}")
-        return []
+    methods = PaymentMethod.query.filter_by(shop_name=shop_name).order_by(PaymentMethod.created_at.desc()).all()
+    return [model_to_dict(m) for m in methods]
 
 # ❌ **Elimina un metodo di pagamento**
+@handle_db_errors
 def delete_payment_method(method_id, shop_name):
-    try:
-        method = PaymentMethod.query.filter_by(id=method_id, shop_name=shop_name).first()
-        if not method:
-            return False
-
-        db.session.delete(method)
-        db.session.commit()
-        logging.info(f"✅ Metodo di pagamento {method_id} eliminato con successo")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'eliminazione del metodo di pagamento {method_id}: {e}")
+    method = PaymentMethod.query.filter_by(id=method_id, shop_name=shop_name).first()
+    if not method:
         return False
 
+    db.session.delete(method)
+    db.session.commit()
+    logging.info(f"✅ Metodo di pagamento {method_id} eliminato con successo")
+    return True
+
 # 🔍 **Recupera un metodo di pagamento per ID**
+@handle_db_errors
 def get_payment_method_by_id(method_id, shop_name):
-    try:
-        method = PaymentMethod.query.filter_by(id=method_id, shop_name=shop_name).first()
-        return payment_method_to_dict(method) if method else None
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero del metodo di pagamento {method_id}: {e}")
-        return None
+    method = PaymentMethod.query.filter_by(id=method_id, shop_name=shop_name).first()
+    return model_to_dict(method) if method else None
 
 # 🔍 **Recupera un metodo di pagamento per nome e negozio**
+@handle_db_errors
 def get_payment_method(shop_name, method_name):
-    try:
-        method = PaymentMethod.query.filter_by(shop_name=shop_name, method_name=method_name).first()
-        return payment_method_to_dict(method) if method else None
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero del metodo di pagamento '{method_name}' per {shop_name}: {e}")
-        return None
-
-# 📌 **Helper per convertire un metodo di pagamento in dizionario**
-def payment_method_to_dict(method):
-    return {col.name: getattr(method, col.name) for col in PaymentMethod.__table__.columns} if method else None
+    method = PaymentMethod.query.filter_by(shop_name=shop_name, method_name=method_name).first()
+    return model_to_dict(method) if method else None

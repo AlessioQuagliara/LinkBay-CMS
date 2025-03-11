@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
             didOpen: () => Swal.showLoading()
         });
 
-        fetch('/admin/cms/pages/update_payment_method', {
+        fetch('/api/pages/update_payment_method', {
             method: 'POST',
             body: formData,
         })

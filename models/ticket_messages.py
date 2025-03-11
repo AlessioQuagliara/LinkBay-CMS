@@ -1,9 +1,10 @@
 from models.database import db
 from datetime import datetime
 import logging
+from functools import wraps
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Modello per i Messaggi nei Ticket di Supporto**
 class TicketMessage(db.Model):
@@ -19,64 +20,72 @@ class TicketMessage(db.Model):
 
     def __repr__(self):
         return f"<TicketMessage {self.id} - Ticket {self.ticket_id} ({self.sender_role})>"
+    
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
 
 # ✅ **Crea un nuovo messaggio in un ticket**
+@handle_db_errors
 def create_ticket_message(ticket_id, sender_id, sender_role, message):
-    try:
-        msg = TicketMessage(
-            ticket_id=ticket_id,
-            sender_id=sender_id,
-            sender_role=sender_role,
-            message=message,
-            created_at=datetime.utcnow(),
-        )
-        db.session.add(msg)
-        db.session.commit()
-        logging.info(f"✅ Messaggio aggiunto al ticket {ticket_id} da {sender_role}")
-        return msg.id
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella creazione del messaggio per ticket {ticket_id}: {e}")
-        return None
+    msg = TicketMessage(
+        ticket_id=ticket_id,
+        sender_id=sender_id,
+        sender_role=sender_role,
+        message=message,
+    )
+    db.session.add(msg)
+    db.session.commit()
+    logging.info(f"✅ Messaggio aggiunto al ticket {ticket_id} da {sender_role}")
+    return msg.id
+
 
 # 🔍 **Recupera tutti i messaggi di un ticket**
+@handle_db_errors
 def get_messages_by_ticket(ticket_id):
-    try:
-        messages = TicketMessage.query.filter_by(ticket_id=ticket_id).order_by(TicketMessage.created_at.asc()).all()
-        return [message_to_dict(msg) for msg in messages]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero dei messaggi per ticket {ticket_id}: {e}")
-        return []
+    messages = TicketMessage.query.filter_by(ticket_id=ticket_id).order_by(TicketMessage.created_at.asc()).all()
+    return [message_to_dict(msg) for msg in messages]
+
 
 # 🔄 **Segna un messaggio come letto**
+@handle_db_errors
 def mark_message_as_read(message_id):
-    try:
-        msg = TicketMessage.query.get(message_id)
-        if msg:
-            msg.is_read = True
-            db.session.commit()
-            logging.info(f"👀 Messaggio {message_id} segnato come letto")
-            return True
-        return False
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nel segnalare come letto il messaggio {message_id}: {e}")
+    msg = TicketMessage.query.get(message_id)
+    if not msg:
         return False
 
+    msg.is_read = True
+    db.session.commit()
+    logging.info(f"👀 Messaggio {message_id} segnato come letto")
+    return True
+
+
 # ❌ **Elimina un messaggio**
+@handle_db_errors
 def delete_ticket_message(message_id):
-    try:
-        msg = TicketMessage.query.get(message_id)
-        if not msg:
-            return False
-        db.session.delete(msg)
-        db.session.commit()
-        logging.info(f"❌ Messaggio {message_id} eliminato")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'eliminazione del messaggio {message_id}: {e}")
+    msg = TicketMessage.query.get(message_id)
+    if not msg:
         return False
+
+    db.session.delete(msg)
+    db.session.commit()
+    logging.info(f"❌ Messaggio {message_id} eliminato")
+    return True
+
 
 # 📌 **Helper per convertire un messaggio in dizionario**
 def message_to_dict(msg):

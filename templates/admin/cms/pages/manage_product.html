@@ -113,16 +113,24 @@
                     <div class="col-md-6">
                         <label for="category-input" class="form-label">Category</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" id="category-input" name="category_name" placeholder="{{ categories | selectattr('id', 'equalto', product.category_id) | map(attribute='name') | first or '' }}" readonly>
-                            <input type="hidden" id="category-id" name="category_id" value="{{ product.category_id }}"> <!-- Campo nascosto per salvare l'ID -->
+                            <input type="text" class="form-control" id="category-input" name="category_name" 
+                                placeholder="{{ categories | selectattr('id', 'equalto', product.category_id) | map(attribute='name') | first or '' }}" readonly>
+                            <input type="hidden" id="category-id" name="category_id" value="{{ product.category_id }}">
                             <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#categoryModal">
                                 Select
                             </button>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <label for="brand_id" class="form-label">Brand</label>
-                        <input type="text" class="form-control" id="brand_id" name="brand_id" value="{{ product.brand_id }}">
+                        <label for="brand-input" class="form-label">Brand</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="brand-input" name="brand_name"
+                                placeholder="{{ brands | selectattr('id', 'equalto', product.brand_id) | map(attribute='name') | first or '' }}" readonly>
+                            <input type="hidden" id="brand-id" name="brand_id" value="{{ product.brand_id }}">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#brandModal">
+                                Select
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -180,8 +188,8 @@
                     <div class="col-md-6">
                         <label for="is_active" class="form-label">Is Active</label>
                         <select class="form-select" id="is_active" name="is_active">
-                            <option value="1" {% if product.is_active %}selected{% endif %}>Yes</option>
-                            <option value="0" {% if not product.is_active %}selected{% endif %}>No</option>
+                            <option value="TRUE" {% if product.is_active %}selected{% endif %}>Yes</option>
+                            <option value="FALSE" {% if not product.is_active %}selected{% endif %}>No</option>
                         </select>
                     </div>
                 </div>
@@ -206,8 +214,37 @@
 
 {% endif %}
 
+<!--MODALE PER BRAND-->
+<div class="modal fade" id="brandModal" tabindex="-1" aria-labelledby="brandModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="brandModalLabel">Select or Create Brand</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <ul class="list-group" id="brand-list">
+                            {% for brand in brands %}
+                            <li class="list-group-item brand-item" data-id="{{ brand.id }}">
+                                {{ brand.name }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Create New Brand</h6>
+                        <input type="text" id="new-brand-input" class="form-control mb-2" placeholder="New brand name">
+                        <button class="btn btn-danger" id="create-brand-btn">Create</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-<!--MODALI-->
+<!--MODALE PER CATEGORIE-->
 <div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -236,6 +273,76 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const brandInput = document.getElementById('brand-input');
+    const brandIdInput = document.getElementById('brand-id');
+    const brandList = document.getElementById('brand-list');
+    const createBrandBtn = document.getElementById('create-brand-btn');
+    const newBrandInput = document.getElementById('new-brand-input');
+
+    // Seleziona un brand esistente
+    brandList.addEventListener('click', function (e) {
+        if (e.target.classList.contains('brand-item')) {
+            const brandId = e.target.dataset.id;
+            const brandName = e.target.textContent.trim();
+
+            // Aggiorna l'input con i dati selezionati
+            brandInput.value = brandName;
+            brandIdInput.value = brandId;
+
+            // Chiudi il modale
+            const modal = bootstrap.Modal.getInstance(document.getElementById('brandModal'));
+            modal.hide();
+        }
+    });
+
+    // Crea un nuovo brand
+    createBrandBtn.addEventListener('click', function () {
+        const newBrandName = newBrandInput.value.trim();
+
+        if (!newBrandName) {
+            Swal.fire('Error', 'Please enter a brand name.', 'error');
+            return;
+        }
+
+        fetch('/api/create_brand', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: newBrandName })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Aggiungi il nuovo brand alla lista
+                    const newBrandItem = document.createElement('li');
+                    newBrandItem.classList.add('list-group-item', 'brand-item');
+                    newBrandItem.dataset.id = data.brand_id;
+                    newBrandItem.textContent = newBrandName;
+
+                    brandList.appendChild(newBrandItem);
+
+                    // Imposta il nuovo brand
+                    brandInput.value = newBrandName;
+                    brandIdInput.value = data.brand_id;
+
+                    // Pulisci il campo di input
+                    newBrandInput.value = '';
+
+                    // Chiudi il modale
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('brandModal'));
+                    modal.hide();
+                } else {
+                    Swal.fire('Error', data.message || 'Failed to create brand.', 'error');
+                }
+            })
+            .catch(error => {
+                Swal.fire('Error', 'A network or server error occurred.', 'error');
+                console.error(error);
+            });
+    });
+});
+</script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const categoryInput = document.getElementById('category-input');
@@ -269,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        fetch('/admin/cms/create_category', {
+        fetch('/api/create_category', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: newCategoryName })
@@ -376,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
             didOpen: () => Swal.showLoading()
         });
 
-        fetch('/admin/cms/update_product', {
+        fetch('/api/update_product', {
             method: 'POST',
             body: formData,
         })
@@ -424,7 +531,7 @@ document.addEventListener('DOMContentLoaded', function () {
             didOpen: () => Swal.showLoading()
         });
 
-        fetch('/admin/cms/upload_image_product', {
+        fetch('/api/upload_image_product', {
             method: 'POST',
             body: formData
         })
@@ -473,7 +580,7 @@ document.addEventListener('DOMContentLoaded', function () {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch('/admin/cms/delete_image_product', {
+                fetch('/api/delete_image_product', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ image_id: imageId })
@@ -517,7 +624,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch('/admin/cms/delete_image_product', {
+                    fetch('/api/delete_image_product', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ image_id: imageId })

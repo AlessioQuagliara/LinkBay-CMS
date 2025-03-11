@@ -1,9 +1,10 @@
 from models.database import db
 from datetime import datetime
 import logging
+from functools import wraps
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Modello per le Spedizioni**
 class Shipping(db.Model):
@@ -23,74 +24,82 @@ class Shipping(db.Model):
     def __repr__(self):
         return f"<Shipping {self.id} - {self.order_id} - {self.delivery_status}>"
 
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
+
 # 🔍 **Recupera i dettagli di spedizione per un ordine**
+@handle_db_errors
 def get_shipping_by_order_id(order_id):
-    try:
-        shipping = Shipping.query.filter_by(order_id=order_id).first()
-        return shipping_to_dict(shipping) if shipping else None
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero della spedizione per ordine {order_id}: {e}")
-        return None
+    shipping = Shipping.query.filter_by(order_id=order_id).first()
+    return shipping_to_dict(shipping) if shipping else None
+
 
 # 🔍 **Recupera tutte le spedizioni per un negozio**
+@handle_db_errors
 def get_all_shippings(shop_name):
-    try:
-        shippings = Shipping.query.filter_by(shop_name=shop_name).order_by(Shipping.created_at.desc()).all()
-        return [shipping_to_dict(s) for s in shippings]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero delle spedizioni per '{shop_name}': {e}")
-        return []
+    shippings = Shipping.query.filter_by(shop_name=shop_name).order_by(Shipping.created_at.desc()).all()
+    return [shipping_to_dict(s) for s in shippings]
+
 
 # ✅ **Aggiunge o aggiorna una spedizione**
+@handle_db_errors
 def upsert_shipping(data):
-    try:
-        shipping = Shipping.query.filter_by(order_id=data["order_id"]).first()
+    shipping = Shipping.query.filter_by(order_id=data["order_id"]).first()
 
-        if shipping:
-            # Aggiorna la spedizione esistente
-            for key, value in data.items():
-                if hasattr(shipping, key) and value is not None:
-                    setattr(shipping, key, value)
+    if shipping:
+        # Aggiorna la spedizione esistente
+        for key, value in data.items():
+            if hasattr(shipping, key) and value is not None:
+                setattr(shipping, key, value)
 
-            shipping.updated_at = datetime.utcnow()
-            logging.info(f"🔄 Spedizione per ordine {data['order_id']} aggiornata.")
-        else:
-            # Crea una nuova spedizione
-            shipping = Shipping(
-                shop_name=data["shop_name"],
-                order_id=data["order_id"],
-                shipping_method=data["shipping_method"],
-                tracking_number=data.get("tracking_number"),
-                carrier_name=data.get("carrier_name"),
-                estimated_delivery_date=data.get("estimated_delivery_date"),
-                delivery_status=data.get("delivery_status", "pending"),
-            )
-            db.session.add(shipping)
-            logging.info(f"✅ Nuova spedizione per ordine {data['order_id']} creata.")
+        shipping.updated_at = datetime.utcnow()
+        logging.info(f"🔄 Spedizione per ordine {data['order_id']} aggiornata.")
+    else:
+        # Crea una nuova spedizione
+        shipping = Shipping(
+            shop_name=data["shop_name"],
+            order_id=data["order_id"],
+            shipping_method=data["shipping_method"],
+            tracking_number=data.get("tracking_number"),
+            carrier_name=data.get("carrier_name"),
+            estimated_delivery_date=data.get("estimated_delivery_date"),
+            delivery_status=data.get("delivery_status", "pending"),
+        )
+        db.session.add(shipping)
+        logging.info(f"✅ Nuova spedizione per ordine {data['order_id']} creata.")
 
-        db.session.commit()
-        return shipping.id
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella creazione/aggiornamento della spedizione: {e}")
-        return None
+    db.session.commit()
+    return shipping.id
+
 
 # 🔄 **Aggiorna lo stato della spedizione**
+@handle_db_errors
 def update_shipping_status(order_id, status):
-    try:
-        shipping = Shipping.query.filter_by(order_id=order_id).first()
-        if not shipping:
-            return False
-
-        shipping.delivery_status = status
-        shipping.updated_at = datetime.utcnow()
-        db.session.commit()
-        logging.info(f"✅ Stato della spedizione per ordine {order_id} aggiornato a '{status}'.")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiornamento dello stato della spedizione: {e}")
+    shipping = Shipping.query.filter_by(order_id=order_id).first()
+    if not shipping:
         return False
+
+    shipping.delivery_status = status
+    shipping.updated_at = datetime.utcnow()
+    db.session.commit()
+    logging.info(f"✅ Stato della spedizione per ordine {order_id} aggiornato a '{status}'.")
+    return True
+
 
 # 📌 **Helper per convertire una spedizione in dizionario**
 def shipping_to_dict(shipping):

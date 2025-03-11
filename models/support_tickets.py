@@ -1,9 +1,10 @@
 from models.database import db
 from datetime import datetime
 import logging
+from functools import wraps
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Modello per la gestione dei Ticket di Supporto**
 class SupportTicket(db.Model):
@@ -24,84 +25,90 @@ class SupportTicket(db.Model):
 
     def __repr__(self):
         return f"<SupportTicket {self.id} - {self.title} ({self.status})>"
+    
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
 
 # ✅ **Crea un nuovo ticket**
+@handle_db_errors
 def create_support_ticket(shop_name, user_id, title, category, message, priority="normal", agency_id=None, assigned_to=None):
-    try:
-        ticket = SupportTicket(
-            shop_name=shop_name,
-            user_id=user_id,
-            agency_id=agency_id,
-            title=title,
-            category=category,
-            message=message,
-            priority=priority,
-            status="open",
-            assigned_to=assigned_to,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
-        )
-        db.session.add(ticket)
-        db.session.commit()
-        logging.info(f"✅ Ticket creato: {title} per {shop_name}")
-        return ticket.id
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella creazione del ticket per {shop_name}: {e}")
-        return None
+    ticket = SupportTicket(
+        shop_name=shop_name,
+        user_id=user_id,
+        agency_id=agency_id,
+        title=title,
+        category=category,
+        message=message,
+        priority=priority,
+        status="open",
+        assigned_to=assigned_to,
+    )
+    db.session.add(ticket)
+    db.session.commit()
+    logging.info(f"✅ Ticket creato: {title} per {shop_name}")
+    return ticket.id
+
 
 # 🔍 **Recupera tutti i ticket di uno shop**
+@handle_db_errors
 def get_tickets_by_shop(shop_name, status=None):
-    try:
-        query = SupportTicket.query.filter_by(shop_name=shop_name)
-        if status:
-            query = query.filter_by(status=status)
-        tickets = query.order_by(SupportTicket.created_at.desc()).all()
-        return [ticket_to_dict(ticket) for ticket in tickets]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero dei ticket per {shop_name}: {e}")
-        return []
+    query = SupportTicket.query.filter_by(shop_name=shop_name)
+    if status:
+        query = query.filter_by(status=status)
+    tickets = query.order_by(SupportTicket.created_at.desc()).all()
+    return [ticket_to_dict(ticket) for ticket in tickets]
+
 
 # 🔍 **Recupera un ticket per ID**
+@handle_db_errors
 def get_ticket_by_id(ticket_id):
-    try:
-        ticket = SupportTicket.query.get(ticket_id)
-        return ticket_to_dict(ticket) if ticket else None
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero del ticket ID {ticket_id}: {e}")
-        return None
+    ticket = SupportTicket.query.get(ticket_id)
+    return ticket_to_dict(ticket) if ticket else None
+
 
 # 🔄 **Aggiorna un ticket**
+@handle_db_errors
 def update_ticket(ticket_id, **kwargs):
-    try:
-        ticket = SupportTicket.query.get(ticket_id)
-        if not ticket:
-            return False
-        for key, value in kwargs.items():
-            setattr(ticket, key, value)
-        ticket.updated_at = datetime.utcnow()
-        db.session.commit()
-        logging.info(f"🔄 Ticket {ticket_id} aggiornato")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiornamento del ticket {ticket_id}: {e}")
+    ticket = SupportTicket.query.get(ticket_id)
+    if not ticket:
         return False
 
+    for key, value in kwargs.items():
+        setattr(ticket, key, value)
+
+    ticket.updated_at = datetime.utcnow()
+    db.session.commit()
+    logging.info(f"🔄 Ticket {ticket_id} aggiornato")
+    return True
+
+
 # ❌ **Elimina un ticket**
+@handle_db_errors
 def delete_ticket(ticket_id):
-    try:
-        ticket = SupportTicket.query.get(ticket_id)
-        if not ticket:
-            return False
-        db.session.delete(ticket)
-        db.session.commit()
-        logging.info(f"❌ Ticket {ticket_id} eliminato")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'eliminazione del ticket {ticket_id}: {e}")
+    ticket = SupportTicket.query.get(ticket_id)
+    if not ticket:
         return False
+
+    db.session.delete(ticket)
+    db.session.commit()
+    logging.info(f"❌ Ticket {ticket_id} eliminato")
+    return True
+
 
 # 📌 **Helper per convertire un ticket in dizionario**
 def ticket_to_dict(ticket):
