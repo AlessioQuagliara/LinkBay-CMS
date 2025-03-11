@@ -1,17 +1,11 @@
 from models.database import db
-from datetime import datetime
 import logging
-
-# 📌 Inizializza il logger
-logging.basicConfig(level=logging.INFO)
-
-
-from models.database import db
+from functools import wraps
 from datetime import datetime
-import logging
+import uuid
 
-# 📌 Inizializza il logger
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Modello per i Prodotti**
 class Product(db.Model):
@@ -41,10 +35,28 @@ class Product(db.Model):
     # 🔗 Relazioni con altre tabelle
     images = db.relationship("ProductImage", back_populates="product", cascade="all, delete-orphan")
     attributes = db.relationship("ProductAttribute", back_populates="product", cascade="all, delete-orphan")
+    category = db.relationship("Category", backref="products", lazy=True)
+
 
     def __repr__(self):
         return f"<Product {self.id} - {self.name}>"
-
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "shop_name": self.shop_name,
+            "name": self.name,
+            "description": self.description,
+            "price": self.price,
+            "discount_price": self.discount_price,
+            "stock_quantity": self.stock_quantity,
+            "sku": self.sku,
+            "ean_code": self.ean_code,
+            "category_id": self.category_id,
+            "brand_id": self.brand_id,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+        }
 
 # 🔹 **Modello per le Immagini dei Prodotti**
 class ProductImage(db.Model):
@@ -79,6 +91,7 @@ class ProductAttribute(db.Model):
     def __repr__(self):
         return f"<ProductAttribute {self.id} - Product {self.product_id} - {self.attribute_name}: {self.attribute_value}>"
 
+
 # 🔹 **Modello per i Brands**    
 class Brand(db.Model):
     __tablename__ = "brands"
@@ -89,135 +102,134 @@ class Brand(db.Model):
     # Relazione con prodotti (opzionale, se vuoi caricare i prodotti insieme ai brand)
     products = db.relationship("Product", backref="brand", lazy=True)
 
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
+
 # ✅ **Crea un nuovo prodotto**
-def create_product(data):
-    try:
-        new_product = Product(
-            shop_name=data["shop_name"],
-            name=data["name"],
-            description=data.get("description"),
-            short_description=data.get("short_description"),
-            price=data["price"],
-            discount_price=data.get("discount_price"),
-            stock_quantity=data["stock_quantity"],
-            sku=data["sku"],
-            category_id=data.get("category_id"),
-            brand_id=data.get("brand_id"),
-            weight=data.get("weight"),
-            dimensions=data.get("dimensions"),
-            color=data.get("color"),
-            material=data.get("material"),
-            image_url=data.get("image_url"),
-            slug=data["slug"],
-            is_active=data.get("is_active", True),
-        )
-        db.session.add(new_product)
-        db.session.commit()
-        logging.info(f"✅ Prodotto '{data['name']}' aggiunto con successo.")
-        return new_product.id
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella creazione del prodotto: {e}")
-        return None
+@handle_db_errors
+def create_new_product(shop_subdomain):
+    new_product = Product(
+        name="New Product",
+        short_description="Short description",
+        description="Detailed description",
+        price=0.0,
+        discount_price=0.0,
+        stock_quantity=0,
+        sku=f"SKU-{uuid.uuid4().hex[:8]}",  # SKU univoco generato
+        category_id=None,  
+        brand_id=None,
+        weight=0.0,
+        dimensions="0x0x0",
+        color="Default color",
+        material="Default material",
+        slug=f"new-product-{uuid.uuid4().hex[:8]}",  # Slug univoco generato
+        is_active=False,
+        shop_name=shop_subdomain
+    )
+
+    db.session.add(new_product)
+    db.session.commit()
+
+    return {
+        'success': True,
+        'message': 'Product created successfully.',
+        'product_id': new_product.id
+    }
+
 
 # 🔍 **Recupera tutti i prodotti per un negozio**
+@handle_db_errors
 def get_all_products(shop_name):
-    try:
-        products = Product.query.filter_by(shop_name=shop_name).all()
-        return [product_to_dict(p) for p in products]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero dei prodotti per '{shop_name}': {e}")
-        return []
+    products = Product.query.filter_by(shop_name=shop_name).all()
+    return [product_to_dict(p) for p in products]
+
 
 # 🔍 **Recupera un prodotto per slug**
+@handle_db_errors
 def get_product_by_slug(slug, shop_name):
-    try:
-        product = Product.query.filter_by(slug=slug, shop_name=shop_name).first()
-        return product_to_dict(product) if product else None
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero del prodotto '{slug}': {e}")
-        return None
+    product = Product.query.filter_by(slug=slug, shop_name=shop_name).first()
+    return product_to_dict(product) if product else None
+
 
 # 🔄 **Aggiorna un prodotto**
+@handle_db_errors
 def update_product(product_id, data):
-    try:
-        product = Product.query.filter_by(id=product_id).first()
-        if not product:
-            return False
-
-        for key, value in data.items():
-            if hasattr(product, key) and value is not None:
-                setattr(product, key, value)
-
-        product.updated_at = datetime.utcnow()
-        db.session.commit()
-        logging.info(f"✅ Prodotto '{product_id}' aggiornato con successo.")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiornamento del prodotto {product_id}: {e}")
+    product = Product.query.filter_by(id=product_id).first()
+    if not product:
         return False
+
+    for key, value in data.items():
+        if hasattr(product, key) and value is not None:
+            setattr(product, key, value)
+
+    product.updated_at = datetime.utcnow()
+    db.session.commit()
+    logging.info(f"✅ Prodotto '{product_id}' aggiornato con successo.")
+    return True
+
 
 # ❌ **Elimina un prodotto**
+@handle_db_errors
 def delete_product(product_id):
-    try:
-        product = Product.query.filter_by(id=product_id).first()
-        if not product:
-            return False
-
-        db.session.delete(product)
-        db.session.commit()
-        logging.info(f"🗑️ Prodotto '{product_id}' eliminato con successo.")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'eliminazione del prodotto {product_id}: {e}")
+    product = Product.query.filter_by(id=product_id).first()
+    if not product:
         return False
 
+    db.session.delete(product)
+    db.session.commit()
+    logging.info(f"🗑️ Prodotto '{product_id}' eliminato con successo.")
+    return True
+
+
 # 🔍 **Recupera prodotti per categoria**
+@handle_db_errors
 def get_products_by_category(category_id):
-    try:
-        products = Product.query.filter_by(category_id=category_id).all()
-        return [product_to_dict(p) for p in products]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero dei prodotti per categoria {category_id}: {e}")
-        return []
+    products = Product.query.filter_by(category_id=category_id).all()
+    return [product_to_dict(p) for p in products]
+
 
 # 🔍 **Recupera prodotti per brand**
+@handle_db_errors
 def get_products_by_brand(brand_id):
-    try:
-        products = Product.query.filter_by(brand_id=brand_id).all()
-        return [product_to_dict(p) for p in products]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero dei prodotti per brand {brand_id}: {e}")
-        return []
+    products = Product.query.filter_by(brand_id=brand_id).all()
+    return [product_to_dict(p) for p in products]
+
 
 # 🔍 **Cerca prodotti per nome**
+@handle_db_errors
 def search_products(query_text, shop_name):
-    try:
-        products = Product.query.filter(Product.name.ilike(f"%{query_text}%"), Product.shop_name == shop_name).all()
-        return [product_to_dict(p) for p in products]
-    except Exception as e:
-        logging.error(f"❌ Errore nella ricerca prodotti: {e}")
-        return []
+    products = Product.query.filter(Product.name.ilike(f"%{query_text}%"), Product.shop_name == shop_name).all()
+    return [product_to_dict(p) for p in products]
+
 
 # 🔍 **Recupera prodotti per ID multipli**
+@handle_db_errors
 def get_products_by_ids(product_ids):
-    try:
-        products = Product.query.filter(Product.id.in_(product_ids)).all()
-        return [product_to_dict(p) for p in products]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero di prodotti multipli: {e}")
-        return []
+    products = Product.query.filter(Product.id.in_(product_ids)).all()
+    return [product_to_dict(p) for p in products]
+
 
 # 🔍 **Recupera il primo prodotto di un negozio**
+@handle_db_errors
 def get_first_product_by_shop(shop_name):
-    try:
-        product = Product.query.filter_by(shop_name=shop_name).order_by(Product.id.asc()).first()
-        return product_to_dict(product) if product else None
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero del primo prodotto per '{shop_name}': {e}")
-        return None
+    product = Product.query.filter_by(shop_name=shop_name).order_by(Product.id.asc()).first()
+    return product_to_dict(product) if product else None
+
 
 # 📌 **Helper per convertire un prodotto in dizionario**
 def product_to_dict(product):

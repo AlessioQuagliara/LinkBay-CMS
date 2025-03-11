@@ -1,0 +1,252 @@
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    var editor = grapesjs.init({
+        container: '#editor',
+        height: '100vh',
+        width: '100%',
+        storageManager: false,
+        fromElement: true,
+        plugins: [],
+        blockManager: false, // 🔥 Disabilita la UI GrapesJS
+        panels: { defaults: [] },
+        styleManager: { sectors: [] },
+        layerManager: false,
+        traitManager: false,
+        canvas: {
+            styles: [
+                'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
+                'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css'
+            ],
+            scripts: [
+                'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js'
+            ]
+        }
+    });
+
+    // Caricamento del contenuto HTML direttamente nell'editor
+    const content = `{{ page.content | tojson | safe }}`;  // Usa Jinja2 per includere il contenuto direttamente
+    editor.setComponents(content);  // Aggiungi i contenuti HTML all'editor
+
+    let selectedComponent = null;
+
+    // Gestione dei pulsanti Undo/Redo
+    document.getElementById('undo-btn').addEventListener('click', () => {
+        editor.UndoManager.undo();
+    });
+    
+    document.getElementById('redo-btn').addEventListener('click', () => {
+        editor.UndoManager.redo();
+    });
+
+    // 🔹 Pulsante per il fullscreen
+    const fullscreenBtn = document.getElementById("toggleFullscreen");
+
+    fullscreenBtn.addEventListener("click", () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.log("Fullscreen non supportato:", err);
+            });
+            fullscreenBtn.innerHTML = "⏏ Exit";
+        } else {
+            document.exitFullscreen();
+            fullscreenBtn.innerHTML = "⛶ Zen Mode";
+        }
+    });
+
+    // 🔹 Quando un elemento viene selezionato
+    editor.on('component:selected', (component) => {
+        selectedComponent = component;
+
+        if (selectedComponent) {
+            // Imposta il colore del testo
+            document.getElementById('style-text-color').value = component.getStyle()['color'] || "#000000";
+            
+            // Imposta il colore di sfondo
+            document.getElementById('style-bg-color').value = component.getStyle()['background-color'] || "#ffffff";
+            
+            // Imposta la dimensione del font
+            document.getElementById('style-font-size').value = parseInt(component.getStyle()['font-size']) || 16;
+
+            // Imposta il padding
+            document.getElementById('style-padding').value = parseInt(component.getStyle()['padding']) || 0;
+
+            // Imposta il margin
+            document.getElementById('style-margin').value = parseInt(component.getStyle()['margin']) || 0;
+
+            // Imposta il font-family (selezionato o predefinito)
+            document.getElementById('style-font-family').value = component.getStyle()['font-family'] || 'Arial';
+        }
+    });
+
+
+    // 🔹 Evita errori quando nessun elemento è selezionato
+    function updateStyle(property, value) {
+        if (selectedComponent) {
+            selectedComponent.addStyle({ [property]: value });
+        }
+    }
+
+    // 🔹 Funzione per aggiornare lo stile dell'elemento selezionato
+    function updateStyle(property, value) {
+        if (selectedComponent) {
+            selectedComponent.addStyle({ [property]: value });
+        }
+    }
+
+    // 🔹 Cambia il colore del testo
+    document.getElementById('style-text-color').addEventListener('input', function () {
+        updateStyle('color', this.value);
+    });
+
+    // 🔹 Cambia il colore di sfondo
+    document.getElementById('style-bg-color').addEventListener('input', function () {
+        updateStyle('background-color', this.value);
+    });
+
+    // 🔹 Cambia la dimensione del font
+    document.getElementById('style-font-size').addEventListener('input', function () {
+        updateStyle('font-size', this.value + "px");
+    });
+
+    // 🔹 Cambia il font-family
+    document.getElementById('style-font-family').addEventListener('change', function () {
+        updateStyle('font-family', this.value);
+    });
+
+    // 🔹 Cambia il padding
+    document.getElementById('style-padding').addEventListener('input', function () {
+        updateStyle('padding', this.value + "px");
+    });
+
+    // 🔹 Cambia il margin
+    document.getElementById('style-margin').addEventListener('input', function () {
+        updateStyle('margin', this.value + "px");
+    });
+
+    let blocks = {};  // Variabile per contenere i blocchi caricati
+
+    // Carica i blocchi da un file JSON
+    fetch('{{ url_for("static", filename="js/admin/blocks.json") }}')
+        .then(response => response.json())
+        .then(data => {
+            blocks = data;  // Salva i blocchi nella variabile globale
+        })
+        .catch(error => console.error('Errore nel caricamento dei blocchi:', error));
+
+    // Funzione per aggiungere un blocco
+    function addBlock(type) {
+        // Verifica se il blocco esiste nei dati caricati
+        if (blocks[type]) {
+            const content = blocks[type].content;
+            editor.addComponents(content);  // Aggiungi il blocco all'editor
+        } else {
+            console.error(`Blocco '${type}' non trovato`);
+        }
+    }
+
+    // Aggiungi la funzione `addBlock` globalmente
+    window.addBlock = addBlock;
+
+    function setView(mode) {
+        editor.setDevice(mode);
+    }
+
+    function undo() { editor.UndoManager.undo(); }
+    function redo() { editor.UndoManager.redo(); }
+    function clearCanvas() { editor.DomComponents.clear(); }
+
+    window.setView = setView;
+    window.undo = undo;
+    window.redo = redo;
+    window.clearCanvas = clearCanvas;
+
+    
+
+    document.getElementById('save-page').addEventListener('click', async function() {
+        var content = editor.getHtml();  // Ottieni il contenuto HTML dall'editor di GrapesJS
+        var slug = "{{ page.slug }}";     // Slug della pagina corrente
+        var page_id = "{{ page.id }}";    // ID della pagina corrente
+        var language = document.getElementById('language-selector').value; // Lingua selezionata
+
+        if (!content) {
+            Swal.fire('Error!', 'Content is empty.', 'error');
+            return;
+        }
+
+            // Mostra un messaggio di caricamento
+            Swal.fire({
+                title: 'Saving...',
+                text: 'Processing your content and uploading images.',
+                icon: 'info',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => Swal.showLoading(),
+            });
+
+        // Funzione per gestire l'upload delle immagini in formato base64
+        async function uploadBase64Image(base64Image) {
+            try {
+                const response = await fetch('/upload-image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ image: base64Image })
+                });
+                const data = await response.json();
+                if (data.url) {
+                    return data.url; 
+                } else {
+                    throw new Error('Image upload failed');
+                }
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                return null;
+            }
+        }
+
+        // Processa tutte le immagini base64 trovate nel contenuto
+        var div = document.createElement('div');
+        div.innerHTML = content;
+        var images = div.querySelectorAll('img');
+        var uploadPromises = [];
+
+        // Carica tutte le immagini in base64 e sostituisci i riferimenti nel contenuto
+        for (let img of images) {
+            if (img.src.startsWith('data:image')) {
+                const uploadPromise = uploadBase64Image(img.src).then(url => {
+                    if (url) {
+                        img.src = url;  
+                    }
+                });
+                uploadPromises.push(uploadPromise);
+            }
+        }
+
+        // Aspetta che tutte le immagini siano caricate e sostituite
+        await Promise.all(uploadPromises);
+
+        // Salva il contenuto nella tabella `pages`, identificando la lingua
+        fetch("{{ url_for('page.save_page') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: page_id,
+                content: div.innerHTML,   // Nuovo contenuto con immagini sostituite
+                language: language        // Lingua selezionata
+            })
+        }).then(response => response.json()).then(data => {
+            if (data.success) {
+                Swal.fire('Saved!', 'Your page content has been successfully saved.', 'success');
+            } else {
+                Swal.fire('Error!', 'There was an error saving the page content.', 'error');
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            Swal.fire('Error!', 'There was an error saving the page content.', 'error');
+        });
+    });
+});
+</script>

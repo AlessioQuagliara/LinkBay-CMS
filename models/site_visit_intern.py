@@ -1,9 +1,10 @@
 from models.database import db
 import logging
 from datetime import datetime, timedelta
+from functools import wraps
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Modello per le Visite Interne**
 class SiteVisitIntern(db.Model):
@@ -18,47 +19,57 @@ class SiteVisitIntern(db.Model):
 
     def __repr__(self):
         return f"<SiteVisitIntern {self.id} - {self.ip_address} - {self.page_url} - {self.visit_time}>"
+    
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
 
 # ✅ **Registra una nuova visita interna**
+@handle_db_errors
 def log_internal_visit(ip_address, user_agent, referrer, page_url):
-    try:
-        visit = SiteVisitIntern(
-            ip_address=ip_address,
-            user_agent=user_agent,
-            referrer=referrer,
-            page_url=page_url,
-            visit_time=datetime.utcnow(),
-        )
-        db.session.add(visit)
-        db.session.commit()
-        logging.info(f"✅ Visita registrata: {ip_address} - {page_url}")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella registrazione della visita interna: {e}")
-        return False
+    visit = SiteVisitIntern(
+        ip_address=ip_address,
+        user_agent=user_agent,
+        referrer=referrer,
+        page_url=page_url,
+        visit_time=datetime.utcnow(),
+    )
+    db.session.add(visit)
+    db.session.commit()
+    logging.info(f"✅ Visita registrata: {ip_address} - {page_url}")
+    return True
+
 
 # 🔍 **Recupera le visite più recenti**
+@handle_db_errors
 def get_recent_internal_visits(limit=50):
-    try:
-        visits = SiteVisitIntern.query.order_by(SiteVisitIntern.visit_time.desc()).limit(limit).all()
-        return [visit_to_dict(visit) for visit in visits]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero delle visite interne: {e}")
-        return []
+    visits = SiteVisitIntern.query.order_by(SiteVisitIntern.visit_time.desc()).limit(limit).all()
+    return [visit_to_dict(visit) for visit in visits]
+
 
 # ❌ **Elimina le visite più vecchie di N giorni**
+@handle_db_errors
 def clean_old_internal_visits(days=30):
-    try:
-        time_threshold = datetime.utcnow() - timedelta(days=days)
-        deleted_count = SiteVisitIntern.query.filter(SiteVisitIntern.visit_time < time_threshold).delete()
-        db.session.commit()
-        logging.info(f"🗑️ Eliminati {deleted_count} record di visite più vecchie di {days} giorni.")
-        return deleted_count
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella pulizia delle visite interne: {e}")
-        return 0
+    time_threshold = datetime.utcnow() - timedelta(days=days)
+    deleted_count = SiteVisitIntern.query.filter(SiteVisitIntern.visit_time < time_threshold).delete()
+    db.session.commit()
+    logging.info(f"🗑️ Eliminati {deleted_count} record di visite più vecchie di {days} giorni.")
+    return deleted_count
+
 
 # 📌 **Helper per convertire una visita in dizionario**
 def visit_to_dict(visit):

@@ -98,7 +98,7 @@
                 didOpen: () => Swal.showLoading()
             });
     
-            fetch('/admin/cms/update_shipping_method', {
+            fetch('/api/update_shipping_method', {
                 method: 'POST',
                 body: formData,
             })

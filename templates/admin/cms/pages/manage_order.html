@@ -14,7 +14,7 @@
             <form id="order-form">
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <input type="hidden" name="order_id" id="order_id" value="{{ order.order_id }}">
+                        <input type="hidden" name="order_id" id="order_id" value="{{ order.id }}">
                         <label for="order_number" class="form-label">Order Number</label>
                         <input type="text" class="form-control" id="order_number" name="order_number" value="{{ order.order_number }}" readonly>
                     </div>
@@ -181,7 +181,7 @@
                         Swal.showLoading();
     
                         // Esegui la richiesta Fetch
-                        fetch('/admin/cms/update_order', {
+                        fetch('/api/update_order', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(formObject),
@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
             allowOutsideClick: false,
             didOpen: () => {
                 Swal.showLoading();
-                fetch('/admin/cms/customers')
+                fetch('/api/get-customers')
                     .then(response => response.json())
                     .then(data => {
                         Swal.close();
@@ -298,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const customerId = customerCardHeader?.dataset.customerId;
 
         if (customerId) {
-            fetch(`/admin/cms/customer/${customerId}`)
+            fetch(`/api/customer/${customerId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.customer) {

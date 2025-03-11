@@ -1,8 +1,9 @@
 from models.database import db
 import logging
+from functools import wraps
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Modello per le impostazioni web di un negozio**
 class WebSettings(db.Model):
@@ -21,32 +22,44 @@ class WebSettings(db.Model):
 
     def __repr__(self):
         return f"<WebSettings shop_name={self.shop_name}, theme={self.theme_name}>"
+    
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
 
 # ✅ **Recupera le impostazioni web di un negozio**
+@handle_db_errors
 def get_web_settings(shop_name):
-    try:
-        settings = WebSettings.query.filter_by(shop_name=shop_name).first()
-        return settings if settings else None
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero delle impostazioni web per '{shop_name}': {e}")
-        return None
+    settings = WebSettings.query.filter_by(shop_name=shop_name).first()
+    return settings if settings else None
+
 
 # ✅ **Aggiorna head, foot e script per un negozio**
+@handle_db_errors
 def update_web_settings(shop_name, head_content=None, script_content=None, foot_content=None):
-    try:
-        settings = WebSettings.query.filter_by(shop_name=shop_name).first()
-        if settings:
-            settings.head = head_content if head_content is not None else settings.head
-            settings.script = script_content if script_content is not None else settings.script
-            settings.foot = foot_content if foot_content is not None else settings.foot
-        else:
-            settings = WebSettings(shop_name=shop_name, head=head_content, script=script_content, foot=foot_content)
-            db.session.add(settings)
+    settings = WebSettings.query.filter_by(shop_name=shop_name).first()
+    if settings:
+        settings.head = head_content if head_content is not None else settings.head
+        settings.script = script_content if script_content is not None else settings.script
+        settings.foot = foot_content if foot_content is not None else settings.foot
+    else:
+        settings = WebSettings(shop_name=shop_name, head=head_content, script=script_content, foot=foot_content)
+        db.session.add(settings)
 
-        db.session.commit()
-        logging.info(f"✅ Impostazioni web aggiornate per '{shop_name}'")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiornamento delle impostazioni web per '{shop_name}': {e}")
-        return False
+    db.session.commit()
+    logging.info(f"✅ Impostazioni web aggiornate per '{shop_name}'")
+    return True

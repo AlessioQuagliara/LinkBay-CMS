@@ -1,9 +1,10 @@
 from models.database import db
 from datetime import datetime
 import logging
+from functools import wraps
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Modello per la gestione degli abbonamenti**
 class Subscription(db.Model):
@@ -27,83 +28,89 @@ class Subscription(db.Model):
 
     def __repr__(self):
         return f"<Subscription {self.shop_name} - {self.plan_name} ({self.status})>"
+    
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
 
 # ✅ **Crea un nuovo abbonamento**
+@handle_db_errors
 def create_subscription(shop_name, user_id, plan_name, price, currency, features, limits, payment_gateway, payment_reference, renewal_date, trial_end=None):
-    try:
-        subscription = Subscription(
-            shop_name=shop_name,
-            user_id=user_id,
-            plan_name=plan_name,
-            price=price,
-            currency=currency,
-            features=features,
-            limits=limits,
-            status="active",
-            payment_gateway=payment_gateway,
-            payment_reference=payment_reference,
-            renewal_date=renewal_date,
-            trial_end=trial_end,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
-        )
-        db.session.add(subscription)
-        db.session.commit()
-        logging.info(f"✅ Abbonamento creato per {shop_name} - Piano: {plan_name}")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella creazione dell'abbonamento per {shop_name}: {e}")
-        return False
+    subscription = Subscription(
+        shop_name=shop_name,
+        user_id=user_id,
+        plan_name=plan_name,
+        price=price,
+        currency=currency,
+        features=features,
+        limits=limits,
+        status="active",
+        payment_gateway=payment_gateway,
+        payment_reference=payment_reference,
+        renewal_date=renewal_date,
+        trial_end=trial_end,
+    )
+    db.session.add(subscription)
+    db.session.commit()
+    logging.info(f"✅ Abbonamento creato per {shop_name} - Piano: {plan_name}")
+    return True
+
 
 # 🔍 **Recupera l'abbonamento di uno shop**
+@handle_db_errors
 def get_subscription_by_shop(shop_name):
-    try:
-        subscription = Subscription.query.filter_by(shop_name=shop_name).first()
-        return subscription_to_dict(subscription) if subscription else None
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero dell'abbonamento per {shop_name}: {e}")
-        return None
+    subscription = Subscription.query.filter_by(shop_name=shop_name).first()
+    return subscription_to_dict(subscription) if subscription else None
+
 
 # 🔄 **Aggiorna l'abbonamento di uno shop**
+@handle_db_errors
 def update_subscription(shop_name, **kwargs):
-    try:
-        subscription = Subscription.query.filter_by(shop_name=shop_name).first()
-        if not subscription:
-            return False
-        for key, value in kwargs.items():
-            setattr(subscription, key, value)
-        subscription.updated_at = datetime.utcnow()
-        db.session.commit()
-        logging.info(f"🔄 Abbonamento aggiornato per {shop_name}")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiornamento dell'abbonamento per {shop_name}: {e}")
+    subscription = Subscription.query.filter_by(shop_name=shop_name).first()
+    if not subscription:
         return False
+
+    for key, value in kwargs.items():
+        setattr(subscription, key, value)
+
+    subscription.updated_at = datetime.utcnow()
+    db.session.commit()
+    logging.info(f"🔄 Abbonamento aggiornato per {shop_name}")
+    return True
+
 
 # ❌ **Elimina un abbonamento**
+@handle_db_errors
 def delete_subscription(shop_name):
-    try:
-        subscription = Subscription.query.filter_by(shop_name=shop_name).first()
-        if not subscription:
-            return False
-        db.session.delete(subscription)
-        db.session.commit()
-        logging.info(f"❌ Abbonamento eliminato per {shop_name}")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'eliminazione dell'abbonamento per {shop_name}: {e}")
+    subscription = Subscription.query.filter_by(shop_name=shop_name).first()
+    if not subscription:
         return False
 
+    db.session.delete(subscription)
+    db.session.commit()
+    logging.info(f"❌ Abbonamento eliminato per {shop_name}")
+    return True
+
+
 # 🔍 **Controlla se uno shop ha un abbonamento attivo**
+@handle_db_errors
 def has_active_subscription(shop_name):
-    try:
-        return Subscription.query.filter_by(shop_name=shop_name, status="active").first() is not None
-    except Exception as e:
-        logging.error(f"❌ Errore nel controllo dello stato dell'abbonamento per {shop_name}: {e}")
-        return False
+    return Subscription.query.filter_by(shop_name=shop_name, status="active").first() is not None
+
 
 # 📌 **Helper per convertire un abbonamento in dizionario**
 def subscription_to_dict(subscription):

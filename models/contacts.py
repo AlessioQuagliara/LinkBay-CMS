@@ -1,9 +1,10 @@
 from models.database import db
 import logging
+from functools import wraps
 from datetime import datetime
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Modello per i Contatti**
 class Contact(db.Model):
@@ -18,59 +19,55 @@ class Contact(db.Model):
     def __repr__(self):
         return f"<Contact {self.name} ({self.email})>"
 
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
+# 🔄 **Helper per convertire un modello in dizionario**
+def model_to_dict(model):
+    return {column.name: getattr(model, column.name) for column in model.__table__.columns}
+
 # ✅ **Crea un nuovo contatto**
+@handle_db_errors
 def create_contact(name, email, message):
-    try:
-        new_contact = Contact(name=name, email=email, message=message)
-        db.session.add(new_contact)
-        db.session.commit()
-        logging.info(f"✅ Contatto '{name}' creato con successo")
-        return new_contact.id
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella creazione del contatto '{name}': {e}")
-        return None
+    new_contact = Contact(name=name, email=email, message=message)
+    db.session.add(new_contact)
+    db.session.commit()
+    logging.info(f"✅ Contatto '{name}' creato con successo")
+    return new_contact.id
 
 # 🔍 **Recupera tutti i contatti**
+@handle_db_errors
 def get_all_contacts():
-    try:
-        contacts = Contact.query.order_by(Contact.created_at.desc()).all()
-        return [contact_to_dict(c) for c in contacts]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero dei contatti: {e}")
-        return []
+    contacts = Contact.query.order_by(Contact.created_at.desc()).all()
+    return [model_to_dict(c) for c in contacts]
 
 # 🔍 **Recupera un contatto per ID**
+@handle_db_errors
 def get_contact_by_id(contact_id):
-    try:
-        contact = Contact.query.get(contact_id)
-        return contact_to_dict(contact) if contact else None
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero del contatto ID {contact_id}: {e}")
-        return None
+    contact = Contact.query.get(contact_id)
+    return model_to_dict(contact) if contact else None
 
 # ❌ **Elimina un contatto**
+@handle_db_errors
 def delete_contact(contact_id):
-    try:
-        contact = Contact.query.get(contact_id)
-        if not contact:
-            return False
-
-        db.session.delete(contact)
-        db.session.commit()
-        logging.info(f"🗑️ Contatto ID {contact_id} eliminato con successo")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'eliminazione del contatto ID {contact_id}: {e}")
+    contact = Contact.query.get(contact_id)
+    if not contact:
         return False
 
-# 📌 **Helper per convertire un contatto in dizionario**
-def contact_to_dict(contact):
-    return {
-        "id": contact.id,
-        "name": contact.name,
-        "email": contact.email,
-        "message": contact.message,
-        "created_at": contact.created_at,
-    }
+    db.session.delete(contact)
+    db.session.commit()
+    logging.info(f"🗑️ Contatto ID {contact_id} eliminato con successo")
+    return True

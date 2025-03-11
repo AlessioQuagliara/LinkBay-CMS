@@ -1,9 +1,10 @@
 from models.database import db
 import logging
+from functools import wraps
 from datetime import datetime
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Modello per i Domini**
 class Domain(db.Model):
@@ -27,128 +28,104 @@ class Domain(db.Model):
     def __repr__(self):
         return f"<Domain {self.domain} (Status: {self.status})>"
 
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
+# 🔄 **Helper per convertire un modello in dizionario**
+def model_to_dict(model):
+    return {column.name: getattr(model, column.name) for column in model.__table__.columns}
+
 # 🔍 **Recupera tutti i domini di un negozio**
+@handle_db_errors
 def get_all_domains(shop_id):
-    try:
-        domains = Domain.query.filter_by(shop_id=shop_id).all()
-        return [domain_to_dict(domain) for domain in domains]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero dei domini per Shop ID {shop_id}: {e}")
-        return []
+    domains = Domain.query.filter_by(shop_id=shop_id).all()
+    return [model_to_dict(domain) for domain in domains]
 
 # 🔎 **Recupera un dominio specifico per ID**
+@handle_db_errors
 def get_domain_by_id(domain_id):
-    try:
-        domain = Domain.query.get(domain_id)
-        return domain_to_dict(domain) if domain else None
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero del dominio ID {domain_id}: {e}")
-        return None
+    domain = Domain.query.get(domain_id)
+    return model_to_dict(domain) if domain else None
 
 # ✅ **Crea un nuovo dominio**
+@handle_db_errors
 def create_domain(data):
-    try:
-        new_domain = Domain(
-            shop_id=data["shop_id"],
-            domain=data["domain"],
-            dns_provider=data.get("dns_provider"),
-            record_a=data.get("record_a"),
-            record_cname=data.get("record_cname"),
-            record_mx=data.get("record_mx"),
-            record_txt=data.get("record_txt"),
-            record_ns=data.get("record_ns"),
-            record_aaaa=data.get("record_aaaa"),
-            record_srv=data.get("record_srv"),
-            status=data.get("status", "pending"),
-        )
-        db.session.add(new_domain)
-        db.session.commit()
-        logging.info(f"✅ Dominio {data['domain']} creato con successo")
-        return new_domain.id
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella creazione del dominio: {e}")
-        return None
+    new_domain = Domain(
+        shop_id=data["shop_id"],
+        domain=data["domain"],
+        dns_provider=data.get("dns_provider"),
+        record_a=data.get("record_a"),
+        record_cname=data.get("record_cname"),
+        record_mx=data.get("record_mx"),
+        record_txt=data.get("record_txt"),
+        record_ns=data.get("record_ns"),
+        record_aaaa=data.get("record_aaaa"),
+        record_srv=data.get("record_srv"),
+        status=data.get("status", "pending"),
+    )
+    db.session.add(new_domain)
+    db.session.commit()
+    logging.info(f"✅ Dominio {data['domain']} creato con successo")
+    return new_domain.id
 
 # 🔄 **Aggiorna i record DNS di un dominio**
+@handle_db_errors
 def update_domain_records(domain_id, data):
-    try:
-        domain = Domain.query.get(domain_id)
-        if not domain:
-            return False
-
-        domain.record_a = data.get("record_a", domain.record_a)
-        domain.record_cname = data.get("record_cname", domain.record_cname)
-        domain.record_mx = data.get("record_mx", domain.record_mx)
-        domain.record_txt = data.get("record_txt", domain.record_txt)
-        domain.record_ns = data.get("record_ns", domain.record_ns)
-        domain.record_aaaa = data.get("record_aaaa", domain.record_aaaa)
-        domain.record_srv = data.get("record_srv", domain.record_srv)
-
-        db.session.commit()
-        logging.info(f"✅ Record DNS aggiornati per il dominio {domain.domain}")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiornamento dei record DNS per dominio ID {domain_id}: {e}")
+    domain = Domain.query.get(domain_id)
+    if not domain:
         return False
+
+    domain.record_a = data.get("record_a", domain.record_a)
+    domain.record_cname = data.get("record_cname", domain.record_cname)
+    domain.record_mx = data.get("record_mx", domain.record_mx)
+    domain.record_txt = data.get("record_txt", domain.record_txt)
+    domain.record_ns = data.get("record_ns", domain.record_ns)
+    domain.record_aaaa = data.get("record_aaaa", domain.record_aaaa)
+    domain.record_srv = data.get("record_srv", domain.record_srv)
+
+    db.session.commit()
+    logging.info(f"✅ Record DNS aggiornati per il dominio {domain.domain}")
+    return True
 
 # ❌ **Elimina un dominio**
+@handle_db_errors
 def delete_domain(domain_id):
-    try:
-        domain = Domain.query.get(domain_id)
-        if not domain:
-            return False
-
-        db.session.delete(domain)
-        db.session.commit()
-        logging.info(f"✅ Dominio {domain.domain} eliminato con successo")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'eliminazione del dominio ID {domain_id}: {e}")
+    domain = Domain.query.get(domain_id)
+    if not domain:
         return False
+
+    db.session.delete(domain)
+    db.session.commit()
+    logging.info(f"✅ Dominio {domain.domain} eliminato con successo")
+    return True
 
 # 🔎 **Recupera un dominio per nome**
+@handle_db_errors
 def get_domain_by_name(domain_name):
-    try:
-        domain = Domain.query.filter_by(domain=domain_name).first()
-        return domain_to_dict(domain) if domain else None
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero del dominio {domain_name}: {e}")
-        return None
+    domain = Domain.query.filter_by(domain=domain_name).first()
+    return model_to_dict(domain) if domain else None
 
 # 🔄 **Aggiorna lo stato di un dominio**
+@handle_db_errors
 def update_domain_status(domain_id, status):
-    try:
-        domain = Domain.query.get(domain_id)
-        if not domain:
-            return False
-
-        domain.status = status
-        db.session.commit()
-        logging.info(f"✅ Stato del dominio {domain.domain} aggiornato a {status}")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiornamento dello stato del dominio ID {domain_id}: {e}")
+    domain = Domain.query.get(domain_id)
+    if not domain:
         return False
 
-# 📌 **Helper per convertire un dominio in dizionario**
-def domain_to_dict(domain):
-    return {
-        "id": domain.id,
-        "shop_id": domain.shop_id,
-        "domain": domain.domain,
-        "dns_provider": domain.dns_provider,
-        "record_a": domain.record_a,
-        "record_cname": domain.record_cname,
-        "record_mx": domain.record_mx,
-        "record_txt": domain.record_txt,
-        "record_ns": domain.record_ns,
-        "record_aaaa": domain.record_aaaa,
-        "record_srv": domain.record_srv,
-        "status": domain.status,
-        "created_at": domain.created_at,
-        "updated_at": domain.updated_at,
-    }
+    domain.status = status
+    db.session.commit()
+    logging.info(f"✅ Stato del dominio {domain.domain} aggiornato a {status}")
+    return True

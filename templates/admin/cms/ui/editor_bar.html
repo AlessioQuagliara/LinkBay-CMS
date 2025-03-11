@@ -1,4 +1,4 @@
-<div id="editor-bar" class="d-flex flex-column flex-shrink-0 sidebar collapse">
+<div id="editor-bar" class="d-flex flex-column flex-shrink-0 sidebar collapse" style="overflow-y: auto; display: flex; flex-direction: column;">
     <a href="#" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
         <img src="https://www.linkbay.it/static/image/lb-logo-w.svg" width="200px" alt="Logo">
     </a>
@@ -22,11 +22,8 @@
                 </a>
             </li>
             <hr>
-            {% if page.slug in ['products', 'navbar', 'footer'] %}
+            {% if page.slug in ['navbar', 'footer'] %}
             <li class="nav-item">
-                <p class="nav-link text-white"> 
-                    Select language
-                </p>
                 <select id="language-selector" class="form-select">
                     <option value="en" {% if page.language == 'en' %}selected{% endif %}>English</option>
                     <option value="it" {% if page.language == 'it' %}selected{% endif %}>Italian</option>
@@ -35,6 +32,146 @@
                 </select>
             </li>
             {% else %}
+            <!-- Contro Z button -->
+            <div class="d-flex justify-content-center mb-3">
+                <!-- Undo Button -->
+                <button id="undo-btn" class="btn btn-sm bg-danger text-light mx-3" title="Undo">
+                    Undo <i class="fa-solid fa-undo"></i>
+                </button>
+                <!-- Redo Button -->
+                <button id="redo-btn" class="btn btn-sm bg-danger text-light mx-3" title="Redo">
+                    Redo <i class="fa-solid fa-redo"></i>
+                </button>
+            </div>
+
+            <hr>
+
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#" data-bs-toggle="modal" data-bs-target="#componentsModal">
+                    <i class="fa-solid fa-plus-circle me-2"></i> Add Elements
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#" data-bs-toggle="collapse" data-bs-target="#stylesSection">
+                    <i class="fa-solid fa-paint-brush me-2"></i> Element Styles
+                </a>
+                <div id="stylesSection" class="collapse">
+                    <!-- Selettore per il colore di sfondo -->
+                    <label for="bg-color-select">Background Color</label>
+                    <select id="bg-color-select" class="form-select mb-2">
+                        <option value="bg-primary">Primary</option>
+                        <option value="bg-secondary">Secondary</option>
+                        <option value="bg-success">Success</option>
+                        <option value="bg-danger">Danger</option>
+                        <option value="bg-warning">Warning</option>
+                        <option value="bg-info">Info</option>
+                        <option value="bg-light">Light</option>
+                        <option value="bg-dark">Dark</option>
+                        <option value="bg-white">White</option>
+                    </select>
+            
+                    <!-- Selettore per il padding -->
+                    <label for="padding-select">Padding</label>
+                    <select id="padding-select" class="form-select mb-2">
+                        <option value="p-0">None</option>
+                        <option value="p-1">Small</option>
+                        <option value="p-2">Medium</option>
+                        <option value="p-3">Large</option>
+                        <option value="p-4">X-Large</option>
+                        <option value="p-5">XX-Large</option>
+                    </select>
+            
+                    <!-- Selettore per il margin -->
+                    <label for="margin-select">Margin</label>
+                    <select id="margin-select" class="form-select mb-2">
+                        <option value="m-0">None</option>
+                        <option value="m-1">Small</option>
+                        <option value="m-2">Medium</option>
+                        <option value="m-3">Large</option>
+                        <option value="m-4">X-Large</option>
+                        <option value="m-5">XX-Large</option>
+                    </select>
+            
+                    <!-- Selettore per il testo -->
+                    <label for="text-color-select">Text Color</label>
+                    <select id="text-color-select" class="form-select mb-2">
+                        <option value="text-primary">Primary</option>
+                        <option value="text-secondary">Secondary</option>
+                        <option value="text-success">Success</option>
+                        <option value="text-danger">Danger</option>
+                        <option value="text-warning">Warning</option>
+                        <option value="text-info">Info</option>
+                        <option value="text-light">Light</option>
+                        <option value="text-dark">Dark</option>
+                        <option value="text-muted">Muted</option>
+                        <option value="text-white">White</option>
+                    </select>
+            
+                    <!-- Selettore per il font family -->
+                    <label for="font-family-select">Font Family</label>
+                    <select id="font-family-select" class="form-select mb-2">
+                        <option value="font-sans-serif">Sans-serif</option>
+                        <option value="font-serif">Serif</option>
+                        <option value="font-monospace">Monospace</option>
+                    </select>
+            
+                    <!-- Selettore per la sezione o sezione a larghezza intera -->
+                    <label for="section-type-select">Section Type</label>
+                    <select id="section-type-select" class="form-select mb-2">
+                        <option value="container">Container</option>
+                        <option value="container-fluid">Container Fluid</option>
+                        <option value="section">Section</option>
+                        <option value="section-full">Section Full</option>
+                    </select>
+            
+                    <!-- Selettore per Flex -->
+                    <label for="flex-select">Display Flex</label>
+                    <select id="flex-select" class="form-select mb-2">
+                        <option value="d-flex">Yes</option>
+                        <option value="d-none">No</option>
+                    </select>
+                </div>
+            </li>
+
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#" data-bs-toggle="collapse" data-bs-target="#viewModesSection">
+                        <i class="fa-solid fa-mobile-screen-button me-2"></i> Display Modes
+                    </a>
+                    <div id="viewModesSection" class="collapse">
+                        <!-- Modalità Mobile -->
+                        <button class="btn bg-white w-100 mt-2" onclick="setView('mobileLandscape')">
+                            <i class="fa-solid fa-mobile-screen-button me-2"></i> Mobile
+                        </button>
+                
+                        <!-- Modalità Tablet -->
+                        <button class="btn bg-white w-100 mt-2" onclick="setView('tablet')">
+                            <i class="fa-solid fa-tablet-screen-button me-2"></i> Tablet
+                        </button>
+                
+                        <!-- Modalità Desktop -->
+                        <button class="btn bg-white w-100 mt-2" onclick="setView('desktop')">
+                            <i class="fa-solid fa-laptop me-2"></i> Desktop
+                        </button>
+                    </div>
+                </li>
+                <br>
+            </ul>
+
+
+
+            <li class="nav-item">
+                <select id="language-selector" class="form-select">
+                    <option value="en" {% if page.language == 'en' %}selected{% endif %}>English</option>
+                    <option value="it" {% if page.language == 'it' %}selected{% endif %}>Italian</option>
+                    <option value="fr" {% if page.language == 'fr' %}selected{% endif %}>French</option>
+                    <option value="de" {% if page.language == 'de' %}selected{% endif %}>German</option>
+                </select>
+            </li>
+
+            <hr>
+
             <li class="nav-item">
                 <a href="#" class="nav-link text-white" data-bs-toggle="modal" data-bs-target="#seoModal">
                     <i class="fa-solid fa-magnifying-glass-chart"></i>&nbsp; Edit SEO
@@ -45,18 +182,7 @@
                     <i class="fa-solid fa-eye"></i>&nbsp; View Online
                 </a>
             </li>
-            <hr>
-            <li class="nav-item">
-                <p class="nav-link text-white">
-                    Select language
-                </p>
-                <select id="language-selector" class="form-select">
-                    <option value="en" {% if page.language == 'en' %}selected{% endif %}>English</option>
-                    <option value="it" {% if page.language == 'it' %}selected{% endif %}>Italian</option>
-                    <option value="fr" {% if page.language == 'fr' %}selected{% endif %}>French</option>
-                    <option value="de" {% if page.language == 'de' %}selected{% endif %}>German</option>
-                </select>
-            </li>
+
             {% endif %}
             {% if page.slug in ['home', 'about-us', 'catalogs', 'products', 'navbar', 'footer' ] %}
             {% else %}
@@ -200,10 +326,47 @@
     </div>
 </div>
 
+<!-- Modal with Sections / Elements Functions -->
+<div class="modal fade" id="componentsModal" tabindex="-1" aria-labelledby="componentsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-dark" id="componentsModalLabel">Add Components</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="sections-tab" data-bs-toggle="tab" href="#sections">Sections</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="elements-tab" data-bs-toggle="tab" href="#elements">Elements</a>
+                    </li>
+                </ul>
+                <div class="tab-content mt-3">
+                    <!-- Sections -->
+                    <div class="tab-pane fade show active" id="sections">
+                        <div class="row g-3" id="sections-list">
+                            <!-- Dynamically filled with JavaScript -->
+                        </div>
+                    </div>
+                
+                    <!-- Elements -->
+                    <div class="tab-pane fade" id="elements">
+                        <div class="row g-3" id="elements-list">
+                            <!-- Dynamically filled with JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Popper.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{{ url_for('static', filename='js/editor.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/editor.js') }}"></script>

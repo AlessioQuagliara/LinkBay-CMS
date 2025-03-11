@@ -1,9 +1,10 @@
 from models.database import db
-from datetime import datetime
 import logging
+from functools import wraps
+from datetime import datetime
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Modello per le Opportunità**
 class Opportunity(db.Model):
@@ -53,119 +54,90 @@ class OpportunityMessage(db.Model):
 
     def __repr__(self):
         return f"<OpportunityMessage {self.id} - {self.sender_role}>"
+    
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
+# 🔄 **Helper per convertire un modello in dizionario**
+def model_to_dict(model):
+    return {column.name: getattr(model, column.name) for column in model.__table__.columns}
 
 # 🔍 **Recupera tutte le opportunità per uno shop**
+@handle_db_errors
 def get_opportunities(shop_name):
-    try:
-        opportunities = Opportunity.query.filter_by(shop_name=shop_name).order_by(Opportunity.created_at.desc()).all()
-        return [opportunity_to_dict(o) for o in opportunities]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero delle opportunità per {shop_name}: {e}")
-        return []
+    opportunities = Opportunity.query.filter_by(shop_name=shop_name).order_by(Opportunity.created_at.desc()).all()
+    return [model_to_dict(o) for o in opportunities]
 
 # ✅ **Crea una nuova opportunità**
+@handle_db_errors
 def create_opportunity(shop_name, user_id, title, category, description, budget):
-    try:
-        new_opportunity = Opportunity(
-            shop_name=shop_name,
-            user_id=user_id,
-            title=title,
-            category=category,
-            description=description,
-            budget=budget,
-        )
-        db.session.add(new_opportunity)
-        db.session.commit()
-        logging.info(f"✅ Opportunità '{title}' creata con successo per {shop_name}")
-        return new_opportunity.id
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella creazione dell'opportunità '{title}' per {shop_name}: {e}")
-        return None
+    new_opportunity = Opportunity(
+        shop_name=shop_name,
+        user_id=user_id,
+        title=title,
+        category=category,
+        description=description,
+        budget=budget,
+    )
+    db.session.add(new_opportunity)
+    db.session.commit()
+    logging.info(f"✅ Opportunità '{title}' creata con successo per {shop_name}")
+    return new_opportunity.id
 
 # 🔄 **Aggiorna lo stato di un'opportunità**
+@handle_db_errors
 def update_opportunity_status(opportunity_id, status):
-    try:
-        opportunity = Opportunity.query.get(opportunity_id)
-        if not opportunity:
-            return False
-
-        opportunity.status = status
-        opportunity.updated_at = datetime.utcnow()
-        db.session.commit()
-        logging.info(f"✅ Stato opportunità {opportunity_id} aggiornato a {status}")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiornamento dello stato dell'opportunità {opportunity_id}: {e}")
+    opportunity = Opportunity.query.get(opportunity_id)
+    if not opportunity:
         return False
+
+    opportunity.status = status
+    opportunity.updated_at = datetime.utcnow()
+    db.session.commit()
+    logging.info(f"✅ Stato opportunità {opportunity_id} aggiornato a {status}")
+    return True
 
 # ❌ **Elimina un'opportunità**
+@handle_db_errors
 def delete_opportunity(opportunity_id):
-    try:
-        opportunity = Opportunity.query.get(opportunity_id)
-        if not opportunity:
-            return False
-
-        db.session.delete(opportunity)
-        db.session.commit()
-        logging.info(f"✅ Opportunità {opportunity_id} eliminata con successo")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'eliminazione dell'opportunità {opportunity_id}: {e}")
+    opportunity = Opportunity.query.get(opportunity_id)
+    if not opportunity:
         return False
 
+    db.session.delete(opportunity)
+    db.session.commit()
+    logging.info(f"✅ Opportunità {opportunity_id} eliminata con successo")
+    return True
+
 # 📩 **Invia un messaggio per un'opportunità**
+@handle_db_errors
 def send_opportunity_message(opportunity_id, sender_id, sender_role, message):
-    try:
-        new_message = OpportunityMessage(
-            opportunity_id=opportunity_id,
-            sender_id=sender_id,
-            sender_role=sender_role,
-            message=message,
-        )
-        db.session.add(new_message)
-        db.session.commit()
-        logging.info(f"✅ Messaggio inviato per opportunità {opportunity_id} da {sender_role}")
-        return new_message.id
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'invio del messaggio per opportunità {opportunity_id}: {e}")
-        return None
+    new_message = OpportunityMessage(
+        opportunity_id=opportunity_id,
+        sender_id=sender_id,
+        sender_role=sender_role,
+        message=message,
+    )
+    db.session.add(new_message)
+    db.session.commit()
+    logging.info(f"✅ Messaggio inviato per opportunità {opportunity_id} da {sender_role}")
+    return new_message.id
 
 # 🔍 **Recupera i messaggi di un'opportunità**
+@handle_db_errors
 def get_opportunity_messages(opportunity_id):
-    try:
-        messages = OpportunityMessage.query.filter_by(opportunity_id=opportunity_id).order_by(OpportunityMessage.created_at.asc()).all()
-        return [message_to_dict(m) for m in messages]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero dei messaggi per opportunità {opportunity_id}: {e}")
-        return []
-
-# 📌 **Helper per convertire un'opportunità in dizionario**
-def opportunity_to_dict(opportunity):
-    return {
-        "id": opportunity.id,
-        "shop_name": opportunity.shop_name,
-        "user_id": opportunity.user_id,
-        "title": opportunity.title,
-        "category": opportunity.category,
-        "description": opportunity.description,
-        "budget": opportunity.budget,
-        "status": opportunity.status,
-        "created_at": opportunity.created_at,
-        "updated_at": opportunity.updated_at,
-    }
-
-# 📌 **Helper per convertire un messaggio in dizionario**
-def message_to_dict(message):
-    return {
-        "id": message.id,
-        "opportunity_id": message.opportunity_id,
-        "sender_id": message.sender_id,
-        "sender_role": message.sender_role,
-        "message": message.message,
-        "is_read": message.is_read,
-        "created_at": message.created_at,
-    }
+    messages = OpportunityMessage.query.filter_by(opportunity_id=opportunity_id).order_by(OpportunityMessage.created_at.asc()).all()
+    return [model_to_dict(m) for m in messages]

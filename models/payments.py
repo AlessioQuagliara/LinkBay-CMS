@@ -1,9 +1,10 @@
 from models.database import db
-from datetime import datetime
 import logging
+from functools import wraps
+from datetime import datetime
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Modello per i Pagamenti**
 class Payment(db.Model):
@@ -20,61 +21,70 @@ class Payment(db.Model):
     def __repr__(self):
         return f"<Payment {self.id} - Order {self.order_id} ({self.payment_status})>"
 
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
+# 🔄 **Helper per convertire un modello in dizionario**
+def model_to_dict(model):
+    return {column.name: getattr(model, column.name) for column in model.__table__.columns}
+
 # ✅ **Aggiunge un nuovo pagamento**
+@handle_db_errors
 def add_payment(data):
-    try:
-        new_payment = Payment(
-            order_id=data["order_id"],
-            payment_method=data["payment_method"],
-            payment_status=data["payment_status"],
-            paid_amount=data["paid_amount"],
-            transaction_id=data.get("transaction_id"),
-        )
-        db.session.add(new_payment)
-        db.session.commit()
-        logging.info(f"✅ Pagamento aggiunto con successo per l'ordine {data['order_id']}")
-        return new_payment.id
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiunta del pagamento: {e}")
+    # Validazione dei dati obbligatori
+    required_fields = ["order_id", "payment_method", "payment_status", "paid_amount"]
+    if not all(field in data for field in required_fields):
+        logging.error("❌ Dati mancanti per la creazione del pagamento")
         return None
+
+    new_payment = Payment(
+        order_id=data["order_id"],
+        payment_method=data["payment_method"],
+        payment_status=data["payment_status"],
+        paid_amount=data["paid_amount"],
+        transaction_id=data.get("transaction_id"),
+    )
+    db.session.add(new_payment)
+    db.session.commit()
+    logging.info(f"✅ Pagamento aggiunto con successo per l'ordine {data['order_id']}")
+    return new_payment.id
 
 # 🔍 **Recupera tutti i pagamenti associati a un ordine**
+@handle_db_errors
 def get_payments_by_order_id(order_id):
-    try:
-        payments = Payment.query.filter_by(order_id=order_id).order_by(Payment.created_at.desc()).all()
-        return [payment_to_dict(p) for p in payments]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero dei pagamenti per l'ordine {order_id}: {e}")
-        return []
+    payments = Payment.query.filter_by(order_id=order_id).order_by(Payment.created_at.desc()).all()
+    return [model_to_dict(p) for p in payments]
 
 # 🔍 **Recupera un pagamento per ID**
+@handle_db_errors
 def get_payment_by_id(payment_id):
-    try:
-        payment = Payment.query.filter_by(id=payment_id).first()
-        return payment_to_dict(payment) if payment else None
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero del pagamento {payment_id}: {e}")
-        return None
+    payment = Payment.query.filter_by(id=payment_id).first()
+    return model_to_dict(payment) if payment else None
 
 # 🔄 **Aggiorna lo stato di un pagamento**
+@handle_db_errors
 def update_payment_status(payment_id, new_status):
-    try:
-        payment = Payment.query.filter_by(id=payment_id).first()
-        if not payment:
-            return False
-
-        payment.payment_status = new_status
-        payment.updated_at = datetime.utcnow()
-
-        db.session.commit()
-        logging.info(f"✅ Stato del pagamento {payment_id} aggiornato a {new_status}")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiornamento dello stato del pagamento {payment_id}: {e}")
+    payment = Payment.query.filter_by(id=payment_id).first()
+    if not payment:
+        logging.error(f"❌ Pagamento {payment_id} non trovato")
         return False
 
-# 📌 **Helper per convertire un pagamento in dizionario**
-def payment_to_dict(payment):
-    return {col.name: getattr(payment, col.name) for col in Payment.__table__.columns} if payment else None
+    payment.payment_status = new_status
+    payment.updated_at = datetime.utcnow()
+
+    db.session.commit()
+    logging.info(f"✅ Stato del pagamento {payment_id} aggiornato a {new_status}")
+    return True

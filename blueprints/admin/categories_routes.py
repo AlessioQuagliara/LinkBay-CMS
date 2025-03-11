@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.INFO)
 # Creazione del Blueprint per la gestione delle categorie
 categories_bp = Blueprint('categories' , __name__)
 
-@categories_bp.route('/admin/cms/create_category', methods=['POST'])
+@categories_bp.route('/api/create_category', methods=['POST'])
 def create_category():
     """
     API per creare una nuova categoria associata a uno shop.

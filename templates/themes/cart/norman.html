@@ -1,0 +1,26 @@
+<!-- Sidebar del carrello -->
+<div id="cartSidebar" class="cart-sidebar">
+    <div class="cart-sidebar-header">
+        <h5>Il tuo Carrello</h5>
+        <button type="button" class="btn btn-light" onclick="toggleCartSidebar()"><i class="fa-solid fa-times"></i></button></button>
+    </div>
+    <div class="cart-sidebar-body">
+        <!-- Contenitore per i prodotti -->
+        <div id="cartItemsContainer">
+            <!-- I prodotti verranno iniettati qui via JS -->
+        </div>
+    </div>
+    <div class="cart-sidebar-footer">
+        <!-- Totali -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span>Subtotale:</span>
+            <strong id="cartSubtotal">€0.00</strong>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <span>Totale:</span>
+            <strong id="cartTotal">€0.00</strong>
+        </div>
+        <!-- Pulsanti -->
+        <button class="btn btn-dark w-100" onclick="proceedToCheckout()">Procedi al Checkout</button>
+    </div>
+</div>

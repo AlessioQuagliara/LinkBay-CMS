@@ -1,8 +1,9 @@
 from models.database import db
 import logging
+from functools import wraps
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Modello per la Lista Negozi**
 class ShopList(db.Model):
@@ -17,40 +18,51 @@ class ShopList(db.Model):
 
     def __repr__(self):
         return f"<ShopList {self.id} - {self.shop_name} ({self.shop_type})>"
+    
+# DIZIONARIO ---------------------------------------------------- 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
 
 # 🔍 **Recupera un negozio per nome**
+@handle_db_errors
 def get_shop_by_name(shop_name):
-    try:
-        shop = ShopList.query.filter_by(shop_name=shop_name).first()
-        return shop_to_dict(shop) if shop else None
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero del negozio '{shop_name}': {e}")
-        return None
+    shop = ShopList.query.filter_by(shop_name=shop_name).first()
+    return shop_to_dict(shop) if shop else None
+
 
 # 🔍 **Recupera un negozio per nome o dominio**
+@handle_db_errors
 def get_shop_by_name_or_domain(value):
-    try:
-        shop = ShopList.query.filter((ShopList.shop_name == value) | (ShopList.domain == value)).first()
-        return shop_to_dict(shop) if shop else None
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero del negozio con valore '{value}': {e}")
-        return None
+    shop = ShopList.query.filter((ShopList.shop_name == value) | (ShopList.domain == value)).first()
+    return shop_to_dict(shop) if shop else None
+
 
 # 🔄 **Aggiorna il dominio di un negozio**
+@handle_db_errors
 def update_shop_domain(shop_name, domain):
-    try:
-        shop = ShopList.query.filter_by(shop_name=shop_name).first()
-        if not shop:
-            return False
-
-        shop.domain = domain
-        db.session.commit()
-        logging.info(f"🔄 Dominio aggiornato per '{shop_name}': {domain}")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiornamento del dominio per '{shop_name}': {e}")
+    shop = ShopList.query.filter_by(shop_name=shop_name).first()
+    if not shop:
         return False
+
+    shop.domain = domain
+    db.session.commit()
+    logging.info(f"🔄 Dominio aggiornato per '{shop_name}': {domain}")
+    return True
+
 
 # 📌 **Helper per convertire un negozio in dizionario**
 def shop_to_dict(shop):

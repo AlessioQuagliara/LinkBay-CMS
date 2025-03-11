@@ -1,10 +1,11 @@
 from models.database import db
 import logging
+from functools import wraps
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# 📌 Inizializza il database SQLAlchemy
-logging.basicConfig(level=logging.INFO)
+# Configurazione del logging (da spostare nel file principale dell'app)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 🔹 **Modello per i Clienti**
 class Customer(db.Model):
@@ -31,131 +32,107 @@ class Customer(db.Model):
 
     def __repr__(self):
         return f"<Customer {self.first_name} {self.last_name} ({self.email})>"
+    
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+# 🔄 **Decoratore per la gestione degli errori del database**
+def handle_db_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"❌ Errore in {func.__name__}: {e}")
+            return None
+    return wrapper
+
+# 🔄 **Helper per convertire un modello in dizionario**
+def model_to_dict(model):
+    return {column.name: getattr(model, column.name) for column in model.__table__.columns}
 
 # 🔍 **Recupera un cliente per ID**
+@handle_db_errors
 def get_customer_by_id(customer_id):
-    try:
-        customer = Customer.query.get(customer_id)
-        return customer_to_dict(customer) if customer else None
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero del cliente ID {customer_id}: {e}")
-        return None
+    customer = Customer.query.get(customer_id)
+    return model_to_dict(customer) if customer else None
 
 # ✅ **Crea un nuovo cliente**
+@handle_db_errors
 def create_customer(data):
-    try:
-        new_customer = Customer(
-            shop_name=data["shop_name"],
-            first_name=data["first_name"],
-            last_name=data["last_name"],
-            email=data["email"],
-            phone=data.get("phone"),
-            address=data.get("address"),
-            city=data.get("city"),
-            state=data.get("state"),
-            postal_code=data.get("postal_code"),
-            country=data.get("country"),
-            password=generate_password_hash(data["password"]),  # 🔒 Hash della password
-            codice_fiscale=data.get("codice_fiscale"),
-            partita_iva=data.get("partita_iva"),
-            pec=data.get("pec"),
-            codice_destinatario=data.get("codice_destinatario"),
-        )
-        db.session.add(new_customer)
-        db.session.commit()
-        logging.info(f"✅ Cliente {data['first_name']} {data['last_name']} creato con successo")
-        return new_customer.id
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nella creazione del cliente: {e}")
-        return None
+    new_customer = Customer(
+        shop_name=data["shop_name"],
+        first_name=data["first_name"],
+        last_name=data["last_name"],
+        email=data["email"],
+        phone=data.get("phone"),
+        address=data.get("address"),
+        city=data.get("city"),
+        state=data.get("state"),
+        postal_code=data.get("postal_code"),
+        country=data.get("country"),
+        password=generate_password_hash(data["password"]),  # 🔒 Hash della password
+        codice_fiscale=data.get("codice_fiscale"),
+        partita_iva=data.get("partita_iva"),
+        pec=data.get("pec"),
+        codice_destinatario=data.get("codice_destinatario"),
+    )
+    db.session.add(new_customer)
+    db.session.commit()
+    logging.info(f"✅ Cliente {data['first_name']} {data['last_name']} creato con successo")
+    return new_customer.id
 
 # 🔄 **Recupera tutti i clienti di un negozio**
+@handle_db_errors
 def get_all_customers(shop_name):
-    try:
-        customers = Customer.query.filter_by(shop_name=shop_name).all()
-        return [customer_to_dict(customer) for customer in customers]
-    except Exception as e:
-        logging.error(f"❌ Errore nel recupero dei clienti per {shop_name}: {e}")
-        return []
+    customers = Customer.query.filter_by(shop_name=shop_name).all()
+    return [model_to_dict(customer) for customer in customers]
 
 # ✏️ **Aggiorna un cliente**
+@handle_db_errors
 def update_customer(customer_id, shop_name, data):
-    try:
-        customer = Customer.query.filter_by(id=customer_id, shop_name=shop_name).first()
-        if not customer:
-            return False
-
-        # Aggiorna i dati solo se forniti
-        customer.first_name = data.get("first_name", customer.first_name)
-        customer.last_name = data.get("last_name", customer.last_name)
-        customer.email = data.get("email", customer.email)
-        if "password" in data:
-            customer.password = generate_password_hash(data["password"])  # 🔒 Hash della password aggiornata
-        customer.phone = data.get("phone", customer.phone)
-        customer.address = data.get("address", customer.address)
-        customer.city = data.get("city", customer.city)
-        customer.state = data.get("state", customer.state)
-        customer.postal_code = data.get("postal_code", customer.postal_code)
-        customer.country = data.get("country", customer.country)
-        customer.codice_fiscale = data.get("codice_fiscale", customer.codice_fiscale)
-        customer.partita_iva = data.get("partita_iva", customer.partita_iva)
-        customer.pec = data.get("pec", customer.pec)
-        customer.codice_destinatario = data.get("codice_destinatario", customer.codice_destinatario)
-
-        db.session.commit()
-        logging.info(f"✅ Cliente {customer.first_name} {customer.last_name} aggiornato con successo")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'aggiornamento del cliente: {e}")
+    customer = Customer.query.filter_by(id=customer_id, shop_name=shop_name).first()
+    if not customer:
         return False
+
+    # Aggiorna i dati solo se forniti
+    customer.first_name = data.get("first_name", customer.first_name)
+    customer.last_name = data.get("last_name", customer.last_name)
+    customer.email = data.get("email", customer.email)
+    if "password" in data:
+        customer.password = generate_password_hash(data["password"])  # 🔒 Hash della password aggiornata
+    customer.phone = data.get("phone", customer.phone)
+    customer.address = data.get("address", customer.address)
+    customer.city = data.get("city", customer.city)
+    customer.state = data.get("state", customer.state)
+    customer.postal_code = data.get("postal_code", customer.postal_code)
+    customer.country = data.get("country", customer.country)
+    customer.codice_fiscale = data.get("codice_fiscale", customer.codice_fiscale)
+    customer.partita_iva = data.get("partita_iva", customer.partita_iva)
+    customer.pec = data.get("pec", customer.pec)
+    customer.codice_destinatario = data.get("codice_destinatario", customer.codice_destinatario)
+
+    db.session.commit()
+    logging.info(f"✅ Cliente {customer.first_name} {customer.last_name} aggiornato con successo")
+    return True
 
 # ❌ **Elimina un cliente**
+@handle_db_errors
 def delete_customer(customer_id, shop_name):
-    try:
-        customer = Customer.query.filter_by(id=customer_id, shop_name=shop_name).first()
-        if not customer:
-            return False
-
-        db.session.delete(customer)
-        db.session.commit()
-        logging.info(f"✅ Cliente {customer.first_name} {customer.last_name} eliminato con successo")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"❌ Errore nell'eliminazione del cliente: {e}")
+    customer = Customer.query.filter_by(id=customer_id, shop_name=shop_name).first()
+    if not customer:
         return False
+
+    db.session.delete(customer)
+    db.session.commit()
+    logging.info(f"✅ Cliente {customer.first_name} {customer.last_name} eliminato con successo")
+    return True
 
 # 🔒 **Verifica la password di un cliente**
+@handle_db_errors
 def verify_customer_password(customer_id, provided_password):
-    try:
-        customer = Customer.query.get(customer_id)
-        if customer and check_password_hash(customer.password, provided_password):
-            return True
-        return False
-    except Exception as e:
-        logging.error(f"❌ Errore nella verifica della password per il cliente ID {customer_id}: {e}")
-        return False
-
-# 📌 **Helper per convertire un cliente in dizionario**
-def customer_to_dict(customer):
-    return {
-        "id": customer.id,
-        "shop_name": customer.shop_name,
-        "first_name": customer.first_name,
-        "last_name": customer.last_name,
-        "email": customer.email,
-        "phone": customer.phone,
-        "address": customer.address,
-        "city": customer.city,
-        "state": customer.state,
-        "postal_code": customer.postal_code,
-        "country": customer.country,
-        "codice_fiscale": customer.codice_fiscale,
-        "partita_iva": customer.partita_iva,
-        "pec": customer.pec,
-        "codice_destinatario": customer.codice_destinatario,
-        "created_at": customer.created_at,
-        "updated_at": customer.updated_at,
-    }
+    customer = Customer.query.get(customer_id)
+    if customer and check_password_hash(customer.password, provided_password):
+        return True
+    return False

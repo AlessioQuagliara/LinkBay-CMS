@@ -3,7 +3,7 @@
 {% block content %}
 <!-- CONTENUTO -->
 
-{% if order.shop_name == shop_subdomain %}
+{% if order and order.shop_name == shop_subdomain %}
 <div class="container my-4" data-aos="fade-up">
 
     <div class="card shadow-sm mb-4">
@@ -11,7 +11,7 @@
             <h6 class="text-white mb-0">Products in Order</h6>
         </div>
         <div class="card-body">
-            {% if order_items %}
+            {% if order and order.order_items %}
                 <div class="table-responsive">
                     <table class="table table-striped table-hover">
                         <thead>
@@ -26,18 +26,18 @@
                             </tr>
                         </thead>
                         <tbody id="product-list">
-                            {% for item in order_items %}
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" class="form-check-input product-checkbox" data-product-id="{{ item.product_id }}">
-                                    </td>
-                                    <td>{{ item.product_name }}</td>
-                                    <td>
-                                        <input type="number" class="form-control quantity-input" value="{{ item.quantity }}" min="1" data-item-id="{{ item.id }}">
-                                    </td>
-                                    <td>€ {{ item.price }}</td>
-                                    <td>€ {{ item.subtotal }}</td>
-                                </tr>
+                            {% for item in order.order_items %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input product-checkbox" data-product-id="{{ item.product_id }}">
+                                </td>
+                                <td>{{ item.product.name }}</td>  
+                                <td>
+                                    <input type="number" class="form-control quantity-input" value="{{ item.quantity }}" min="1" data-item-id="{{ item.id }}">
+                                </td>
+                                <td>€ {{ item.price }}</td>
+                                <td>€ {{ item.subtotal }}</td>
+                            </tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -49,7 +49,6 @@
     </div>
 
 </div>
-
 {% else %}
 <div class="d-flex align-items-center justify-content-center vh-100 bg-light">
     <div class="text-center">
@@ -102,7 +101,7 @@
     </div>
 </div>
 
-<div id="order-data" data-order-id="{{ order.order_id }}"></div>
+<div id="order-data" data-order-id="{{ order.id }}"></div>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -163,8 +162,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Delegazione evento per pulsanti "Add"
     searchResults.addEventListener('click', (e) => {
-        if (e.target.classList.contains('add-product-btn')) {
-            const button = e.target;
+        if (e.target.closest('.add-product-btn')) {
+            const button = e.target.closest('.add-product-btn');
             const productId = button.dataset.id;
             const orderId = document.getElementById('order-data').dataset.orderId;
 
@@ -173,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            fetch('/admin/cms/add_product_to_order', {
+            fetch('/api/add_product_to_order_from_table', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ order_id: orderId, product_id: productId })
@@ -213,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            fetch('/admin/cms/add_product_to_order', {
+            fetch('/api/add_products_to_order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ order_id: orderId, product_id: productId, quantity: quantity })
@@ -240,24 +239,22 @@ document.addEventListener('DOMContentLoaded', () => {
 <script>
     // Funzione per incollare prodotti copiati
     document.addEventListener('DOMContentLoaded', () => {
-        const pasteProductsButton = document.querySelector('.fa-paste').closest('a');
+    const pasteProductsButton = document.querySelector('.fa-paste').closest('a');
 
-        pasteProductsButton.addEventListener('click', (e) => {
-            e.preventDefault();
+    pasteProductsButton.addEventListener('click', async (e) => {
+        e.preventDefault();
 
-            // Recupera gli ID dei prodotti copiati dalla clipboard
-            const copiedProductIds = sessionStorage.getItem('copiedProductIds');
-            if (!copiedProductIds) {
-                Swal.fire('Error', 'No product IDs found in clipboard.', 'error');
+        try {
+            // Recupera gli ID dei prodotti copiati dalla sessione Flask
+            const response = await fetch('/api/get_copied_products');
+            const data = await response.json();
+
+            if (!data.success || data.product_ids.length === 0) {
+                Swal.fire('Error', 'No copied products found.', 'error');
                 return;
             }
 
-            const productIds = copiedProductIds.split(',').map(id => parseInt(id, 10));
-
-            if (productIds.length === 0) {
-                Swal.fire('Error', 'Clipboard is empty or invalid.', 'error');
-                return;
-            }
+            const productIds = data.product_ids;
 
             Swal.fire({
                 title: 'Adding Products...',
@@ -268,50 +265,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 didOpen: () => Swal.showLoading()
             });
 
-            // Effettua una richiesta al backend per recuperare i dettagli dei prodotti
-            fetch('/admin/cms/get_products_by_ids', {
+            // Invia direttamente gli ID salvati nella sessione per inserirli in OrderItems
+            const addResponse = await fetch('/api/add_products_to_order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ product_ids: productIds })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.products) {
-                        // Invia i prodotti recuperati per aggiungerli all'ordine
-                        fetch('/admin/cms/add_products_to_order', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                order_id: document.getElementById('order-data').dataset.orderId,
-                                products: data.products // Includi ID e prezzi
-                            })
-                        })
-                            .then(response => response.json())
-                            .then(result => {
-                                Swal.close();
-                                if (result.success) {
-                                    Swal.fire('Success', 'Products added to the order.', 'success').then(() => {
-                                        location.reload();
-                                    });
-                                } else {
-                                    Swal.fire('Error', result.message || 'Failed to add products.', 'error');
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error adding products to order:', error);
-                                Swal.fire('Error', 'A network error occurred.', 'error');
-                            });
-                    } else {
-                        Swal.close();
-                        Swal.fire('Error', data.message || 'Failed to retrieve product details.', 'error');
-                    }
+                body: JSON.stringify({
+                    order_id: document.getElementById('order-data').dataset.orderId
                 })
-                .catch(error => {
-                    console.error('Error retrieving product details:', error);
-                    Swal.fire('Error', 'A network error occurred while fetching product details.', 'error');
+            });
+
+            const result = await addResponse.json();
+            Swal.close();
+
+            if (result.success) {
+                Swal.fire('Success', 'Products added to the order.', 'success').then(() => {
+                    location.reload();
                 });
-        });
+            } else {
+                Swal.fire('Error', result.message || 'Failed to add products.', 'error');
+            }
+
+        } catch (error) {
+            console.error('Error processing products:', error);
+            Swal.fire('Error', 'A network error occurred.', 'error');
+        }
     });
+});
 </script>
 
 <script>
@@ -341,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
             confirmButtonText: 'Yes, remove them!'
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch('/admin/cms/remove_products_from_order', {
+                fetch('/api/remove_products_from_order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ order_id: orderId, product_ids: selectedProducts })
@@ -368,68 +347,75 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <script>
     // Salvataggio delle Quantità Modificate
-    document.addEventListener('DOMContentLoaded', () => {
-        const saveButton = document.getElementById('save-content');
-        const orderId = document.getElementById('order-data').dataset.orderId;
+// Salvataggio delle Quantità Modificate
+document.addEventListener('DOMContentLoaded', () => {
+    const saveButton = document.getElementById('save-content');
+    const orderId = document.getElementById('order-data').dataset.orderId;
 
-        saveButton.addEventListener('click', () => {
-            const updatedItems = [];
+    saveButton.addEventListener('click', () => {
+        const updatedItems = [];
 
-            // Itera su ogni riga della tabella per raccogliere le quantità aggiornate
-            document.querySelectorAll('#product-list tr').forEach(row => {
-                const quantityInput = row.querySelector('.quantity-input');
-                const productId = row.querySelector('.product-checkbox').dataset.productId;
+        // Itera su ogni riga della tabella per raccogliere le quantità aggiornate
+        document.querySelectorAll('#product-list tr').forEach(row => {
+            const quantityInput = row.querySelector('.quantity-input');
+            const productId = row.querySelector('.product-checkbox').dataset.productId;
 
-                if (quantityInput && productId) {
-                    const quantity = parseInt(quantityInput.value, 10);
-                    if (!isNaN(quantity) && quantity > 0) {
-                        updatedItems.push({
-                            product_id: productId,
-                            quantity: quantity
-                        });
-                    }
+            if (quantityInput && productId) {
+                const quantity = parseInt(quantityInput.value, 10);
+                if (!isNaN(quantity) && quantity > 0) {
+                    updatedItems.push({
+                        product_id: parseInt(productId),  // Assicura che sia un numero
+                        quantity: quantity
+                    });
                 }
-            });
-
-            if (updatedItems.length === 0) {
-                Swal.fire('Warning', 'No quantities to update.', 'warning');
-                return;
             }
+        });
 
-            Swal.fire({
-                title: 'Saving Changes...',
-                text: 'Please wait while we update the quantities.',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
+        console.log("📌 Dati inviati al backend:", {
+            order_id: orderId,
+            items: updatedItems
+        });
 
-                    fetch('/admin/cms/update_order_quantities', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            order_id: orderId,
-                            items: updatedItems
-                        })
+        if (updatedItems.length === 0) {
+            Swal.fire('Warning', 'No quantities to update.', 'warning');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Saving Changes...',
+            text: 'Please wait while we update the quantities.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+
+                fetch('/api/update_order_quantities', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        order_id: orderId,
+                        items: updatedItems
                     })
-                        .then(response => response.json())
-                        .then(data => {
-                            Swal.close();
-                            if (data.success) {
-                                Swal.fire('Success', 'Quantities updated successfully.', 'success').then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire('Error', data.message || 'Failed to update quantities.', 'error');
-                            }
-                        })
-                        .catch(error => {
-                            Swal.close();
-                            console.error('Error updating quantities:', error);
-                            Swal.fire('Error', 'A network error occurred.', 'error');
-                        });
-                }
-            });
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("📌 Risposta dal backend:", data);
+                        Swal.close();
+                        if (data.success) {
+                            Swal.fire('Success', 'Quantities updated successfully.', 'success').then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire('Error', data.message || 'Failed to update quantities.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.close();
+                        console.error('❌ Errore aggiornamento quantità:', error);
+                        Swal.fire('Error', 'A network error occurred.', 'error');
+                    });
+            }
         });
     });
+});
 </script>
 {% endblock %}

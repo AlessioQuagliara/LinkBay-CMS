@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
             slug: formData.get('slug')
         };
 
-        fetch('/admin/cms/function/save-seo', {
+        fetch('/api/function/save-seo', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         // Invia i dati al server solo se i campi sono validi
-        fetch('/admin/cms/function/create', {
+        fetch('/api/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -299,7 +299,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Send the request to the server
-                    fetch('/admin/cms/function/delete', {
+                    fetch('/api/delete', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -337,3 +337,4 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+

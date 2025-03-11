@@ -1,10 +1,11 @@
-from flask import session, request
+from flask import session, request, render_template_string, jsonify
 from models import ShopList
 from models.cookiepolicy import CookiePolicy
 from models.websettings import WebSettings
 from db_helpers import DatabaseHelper
 import logging
 from jinja2 import Template
+from sqlalchemy.sql import text
 
 logging.basicConfig(level=logging.INFO)
 
@@ -29,11 +30,11 @@ def load_page_content(slug, shop_subdomain):
     """
     shop_name = shop_subdomain.split('.')[0]  # Rimuove il dominio locale
 
-    query = """
+    query = text("""
         SELECT title, description, keywords, content, language 
         FROM pages 
         WHERE slug = :slug AND shop_name = :shop_name
-    """
+    """)
     params = {'slug': slug, 'shop_name': shop_name}
     result = db_helper.execute_query(query, params)
     
@@ -86,7 +87,7 @@ def get_web_settings(shop_subdomain):
     """
     Recupera le impostazioni web per il negozio.
     """
-    query = "SELECT * FROM web_settings WHERE shop_name = :shop_name"
+    query = text("SELECT * FROM web_settings WHERE shop_name = :shop_name")
     params = {'shop_name': shop_subdomain}
     result = db_helper.execute_query(query, params)
     return result[0] if result else {}
@@ -95,7 +96,7 @@ def get_cookie_policy_content(shop_subdomain):
     """
     Recupera il contenuto del banner cookie policy per il negozio.
     """
-    query = "SELECT * FROM cookie_policy WHERE shop_name = :shop_name"
+    query = text("SELECT * FROM cookie_policy WHERE shop_name = :shop_name")
     params = {'shop_name': shop_subdomain}
     result = db_helper.execute_query(query, params)
 
@@ -130,19 +131,19 @@ def get_navbar_content(shop_subdomain):
     shop_name = shop_subdomain.split('.')[0]
 
     # Recupera il template della navbar
-    query_navbar = "SELECT content FROM pages WHERE slug = 'navbar' AND shop_name = :shop_name"
+    query_navbar = text("SELECT content FROM pages WHERE slug = 'navbar' AND shop_name = :shop_name")
     result = db_helper.execute_query(query_navbar, {'shop_name': shop_name})
     navbar_html = result[0]['content'] if result else ''
 
     # Recupera i link della navbar
-    query_links = """
+    query_links = text("""
         SELECT id, link_text, link_url, link_type, parent_id, position 
         FROM navbar_links WHERE shop_name = :shop_name ORDER BY position ASC
-    """
+    """)
     links = db_helper.execute_query(query_links, {'shop_name': shop_name})
 
     # Recupera le collezioni attive per il dropdown
-    query_collections = "SELECT name, slug FROM collections WHERE shop_name = :shop_name AND is_active = 1"
+    query_collections = text("SELECT name, slug FROM collections WHERE shop_name = :shop_name AND is_active = TRUE")
     collections = db_helper.execute_query(query_collections, {'shop_name': shop_name})
 
     if not links or not navbar_html:

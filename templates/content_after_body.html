@@ -1,0 +1,21 @@
+<!-- Include la logica del carrello a seconda del tema -->
+
+{% if selected_theme_ui %}
+    {% include 'themes/cart/' ~ selected_theme_ui.name ~ '.html' %}
+{% else %}
+    {% include 'themes/cart/norman.html' %}
+{% endif %}
+
+<!-- Include gli script funzionali -->
+
+<script src="{{ url_for('static', filename='js/cms/add_to_cart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/cms/get_cart_content.js') }}"></script>
+<script src="{{ url_for('static', filename='js/cms/navbar_dropdown_get_collections.js') }}"></script>
+<script src="{{ url_for('static', filename='js/cms/remove_from_cart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/cms/track_visit.js') }}"></script>
+<script src="{{ url_for('static', filename='js/cms/open_close_sidebar.js') }}"></script>
+<script src="{{ url_for('static', filename='js/cms/navbar_links_interactions.js') }}"></script>
+<script src="{{ url_for('static', filename='js/cms/cookie_banner.js') }}"></script>
+<script src="{{ url_for('static', filename='js/cms/procede_to_checkout.js') }}"></script>
+<script src="{{ url_for('static', filename='js/cms/update_count_cart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/cms/view_cart_items.js') }}"></script>
