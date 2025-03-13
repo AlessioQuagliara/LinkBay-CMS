@@ -1,4 +1,4 @@
-// ➕ CREAZIONE ORDINE ------------------------------------------------------------------------------------------------
+// ➕ CREAZIONE ------------------------------------------------------------------------------------------------
     document.getElementById('add-order-btn').addEventListener('click', function () {
         const orderData = {
             order_number: `ORD-${Date.now()}`, // Genera un numero di ordine unico
@@ -41,7 +41,7 @@
             });
     });
 
-// 🗑️ CANCELLAZIONE ORDINE ------------------------------------------------------------------------------------------------
+// 🗑️ CANCELLAZIONE ------------------------------------------------------------------------------------------------
         document.querySelector('.delete-selected').addEventListener('click', function () {
             const selectedRows = document.querySelectorAll('.row-checkbox:checked');
             if (selectedRows.length === 0) {

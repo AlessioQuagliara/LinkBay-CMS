@@ -64,6 +64,16 @@
                 <i class="fa-solid fa-list"></i>&nbsp; List of Products
             </a>
         </li>
+        <li>
+            <a href="{{ url_for('orders.download_order_pdf', order_id=order.id) }}" class="nav-link text-white">
+                <i class="fa-solid fa-file-pdf"></i>&nbsp; Generate DDT
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('orders.generate_invoice_pdf', order_id=order.id) }}" class="nav-link text-white">
+                <i class="fa-solid fa-file-pdf"></i>&nbsp; Generate Invoice
+            </a>
+        </li>
         {% elif title in ['Manage Order Items']%}
         <li class="nav-item mb-2">
             <a href="/admin/cms/pages/order/{{ order.id }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">

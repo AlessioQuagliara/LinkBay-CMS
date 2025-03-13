@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            fetch(`/admin/cms/search_products?query=${encodeURIComponent(query)}`)
+            fetch(`/api/search_products?query=${encodeURIComponent(query)}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.products.length > 0) {

@@ -21,7 +21,12 @@ class Order(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 🔄 Ultimo aggiornamento
 
     # Relazione con gli articoli dell'ordine
-    order_items = db.relationship('OrderItem', backref='order', lazy=True)
+    order_items = db.relationship('OrderItem', backref='order', lazy=True, cascade="all, delete-orphan")
+
+    @property
+    def total_amount(self):
+        """Calcola il totale dell'ordine sommando i subtotali degli OrderItems."""
+        return sum(item.subtotal for item in self.order_items)
 
     def __repr__(self):
         return f"<Order {self.order_number} - {self.status}>"
@@ -197,32 +202,40 @@ def update_order_items_quantities(order_id, items):
 # 📌 **Recupera i dati ordini con join ottimizzato**
 @handle_db_errors
 def get_orders_by_shop(shop_name):
+    """
+    Recupera gli ordini di un negozio con dettagli sul cliente e statistiche sui prodotti ordinati.
+    """
     orders = (
         db.session.query(
             Order,
+            Customer.first_name.label("customer_name"),
+            Customer.last_name.label("customer_surname"),
             Customer.email.label("customer_email"),
             db.func.count(OrderItem.id).label("total_items"),
-            db.func.sum(OrderItem.quantity).label("total_quantity")
+            db.func.coalesce(db.func.sum(OrderItem.quantity), 0).label("total_quantity")
         )
         .outerjoin(Customer, Order.customer_id == Customer.id)
         .outerjoin(OrderItem, Order.id == OrderItem.order_id)
         .filter(Order.shop_name == shop_name)
-        .group_by(Order.id, Customer.email)
+        .group_by(Order.id, Customer.first_name, Customer.last_name, Customer.email)
         .order_by(Order.created_at.desc())
         .all()
     )
 
-    detailed_orders = []
-    for order, customer_email, total_items, total_quantity in orders:
-        detailed_orders.append({
+    detailed_orders = [
+        {
             "id": order.id,
             "order_number": order.order_number,
-            "customer_email": customer_email or "Guest",
+            "customer_name": customer_name or "Guest",
+            "customer_surname": customer_surname or "Unknown",
+            "customer_email": customer_email or "No Email",
             "status": order.status,
             "created_at": order.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-            "total_amount": order.total_amount,
+            "total_amount": round(order.total_amount, 2),
             "total_items": total_items or 0,
             "total_quantity": total_quantity or 0,
-        })
+        }
+        for order, customer_name, customer_surname, customer_email, total_items, total_quantity in orders
+    ]
 
     return detailed_orders

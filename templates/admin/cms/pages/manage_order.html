@@ -10,6 +10,7 @@
         <div class="card-header bg-dark text-white">
             <h5 class="mb-0">Order Details</h5>
         </div>
+
         <div class="card-body">
             <form id="order-form">
                 <div class="row mb-3">
@@ -34,7 +35,7 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-4">
-                        <label for="total_amount" class="form-label">Total Amount</label>
+                        <label for="total_amount" class="form-label">Total Amount €</label>
                         <input type="number" class="form-control" id="total_amount" name="total_amount" value="{{ order.total_amount }}" readonly>
                     </div>
                     <div class="col-md-4">
@@ -48,11 +49,11 @@
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <label for="created_at" class="form-label">Created At: </label>
-                        <span class="bg-light">{{ order.created_at }}</span>
+                        <label for="created_at" class="form-label">Created At:</label>
+                        <span class="bg-light">{{ order.created_at.strftime('%d %B %Y, %H:%M') }}</span>
                         <br>
-                        <label for="updated_at" class="form-label">Updated At: </label>
-                        <span class="bg-light">{{ order.updated_at }}</span>
+                        <label for="updated_at" class="form-label">Updated At:</label>
+                        <span class="bg-light">{{ order.updated_at.strftime('%d %B %Y, %H:%M') }}</span>
                     </div>
                 </div>
             </form>

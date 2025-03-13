@@ -173,3 +173,40 @@ def get_products_by_ids():
     if products:
         return jsonify({'success': True, 'products': [product.to_dict() for product in products]})
     return jsonify({'success': False, 'message': 'No products found.'}), 404
+
+@productsapi_bp.route('/search_products', methods=['GET'])
+def search_products():
+    """
+    API per cercare prodotti nel database filtrando per nome e negozio.
+    """
+    try:
+        query_text = request.args.get('query', '').strip()
+        shop_name = request.host.split('.')[0]  # Ottiene il nome del negozio dal sottodominio
+
+        if not query_text:
+            return jsonify({'success': False, 'message': 'Search query is missing.'}), 400
+
+        # Esegue la ricerca nel database con case-insensitive LIKE
+        products = Product.query.filter(
+            Product.name.ilike(f"%{query_text}%"),
+            Product.shop_name == shop_name
+        ).all()
+
+        if not products:
+            return jsonify({'success': True, 'products': []})  # Nessun prodotto trovato
+
+        # Converte i prodotti in formato JSON-friendly
+        product_list = [
+            {
+                'id': product.id,
+                'name': product.name,
+                'price': product.price
+            }
+            for product in products
+        ]
+
+        return jsonify({'success': True, 'products': product_list})
+
+    except Exception as e:
+        logging.error(f"Errore durante la ricerca dei prodotti: {e}")
+        return jsonify({'success': False, 'message': 'An unexpected error occurred.'}), 500

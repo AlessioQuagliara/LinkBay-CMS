@@ -10,62 +10,27 @@ logging.basicConfig(level=logging.INFO)
 # Creazione del Blueprint per la gestione delle collezioni
 collections_bp = Blueprint('collections' , __name__)
 
-# 📌 Route per visualizzare la pagina delle collezioni
+# 📌 Route per visualizzare la pagina delle collezioni con paginazione
 @collections_bp.route('/admin/cms/pages/collections')
 def collections():
-    """
-    Visualizza tutte le collezioni di un negozio.
-    """
     username = check_user_authentication()
     if isinstance(username, str):
         shop_name = request.host.split('.')[0]  # Ottieni il nome del negozio dal sottodominio
-        collections_list = Collection.query.filter_by(shop_name=shop_name).all()  # Query con SQLAlchemy
+        
+        page = request.args.get('page', 1, type=int)  # Ottieni il numero della pagina dalla query string
+        per_page = 8  # Numero di collezioni per pagina
+
+        pagination = Collection.query.filter_by(shop_name=shop_name).paginate(page=page, per_page=per_page, error_out=False)
 
         return render_template(
             'admin/cms/pages/collections.html', 
             title='Collections', 
             username=username, 
-            collections=collections_list
+            collections=pagination.items,  # Elementi della pagina corrente
+            pagination=pagination  # Oggetto paginazione
         )
     return username
 
-# 📌 Route per creare una nuova collezione
-@collections_bp.route('/admin/cms/create_collection', methods=['POST'])
-def create_collection():
-    """
-    API per creare una nuova collezione nel CMS.
-    """
-    try:
-        shop_name = request.host.split('.')[0]  # Sottodominio per identificare il negozio
-        data = request.form
-
-        # Generazione slug univoco basato sul nome
-        name = data.get('name', 'New Collection').strip()
-        slug = f"{re.sub(r'[^\w\s-]', '', name).replace(' ', '-').lower()}-{uuid.uuid4().hex[:8]}"
-
-        # Creazione della nuova collezione
-        new_collection = Collection(
-            name=name,
-            slug=slug,
-            description=data.get('description', 'Detailed description'),
-            image_url=data.get('image_url', '/static/images/default.png'),
-            is_active=False,
-            shop_name=shop_name,
-        )
-
-        db.session.add(new_collection)
-        db.session.commit()  # Conferma la transazione
-
-        return jsonify({
-            'success': True,
-            'message': 'Collection created successfully.',
-            'collection_id': new_collection.id
-        })
-
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"Error creating collection: {e}")
-        return jsonify({'success': False, 'message': 'Failed to create Collection.'}), 500
 
 # 📌 Route per visualizzare/modificare una collezione specifica
 @collections_bp.route('/admin/cms/pages/collection/<int:collection_id>', methods=['GET', 'POST'])
