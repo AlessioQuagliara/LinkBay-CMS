@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, render_template, flash, redirect, url_for
 from models.database import db
+from sqlalchemy.exc import SQLAlchemyError
 from models.websettings import WebSettings  # Importiamo la classe del database
 from helpers import check_user_authentication
 import logging
@@ -13,30 +14,39 @@ websettings_bp = Blueprint('websettings', __name__)
 # 🔹 **Rotta per la modifica delle impostazioni web**
 @websettings_bp.route('/admin/web_settings/edit')
 def edit_web_settings():
+    """
+    Permette la modifica delle impostazioni web del negozio.
+    """
     username = check_user_authentication()
 
-    if isinstance(username, str):
-        try:
-            shop_subdomain = request.host.split('.')[0]
-            web_settings = WebSettings.query.filter_by(shop_name=shop_subdomain).first()
+    if not username:  # ✅ Se la sessione è scaduta, reindirizza alla login
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
 
-            if web_settings:
-                return render_template(
-                    'admin/cms/store_editor/script_editor.html',
-                    title='Edit Web Settings',
-                    username=username,
-                    web_settings=web_settings
-                )
-            else:
-                flash('Web settings not found for this shop.', 'danger')
-                return redirect(url_for('ui.homepage'))
+    try:
+        shop_subdomain = request.host.split('.')[0]
+        web_settings = WebSettings.query.filter_by(shop_name=shop_subdomain).first()
 
-        except Exception as e:
-            logging.error(f"❌ Error loading web settings: {str(e)}")
-            flash('An error occurred while retrieving web settings.', 'danger')
-            return redirect(url_for('ui.homepage'))
+        if not web_settings:
+            flash("Nessuna impostazione web trovata per questo negozio. Creane una nuova.", "info")
+            return redirect(url_for('websettings.create_web_settings'))  # ✅ Reindirizza a una rotta per creare le impostazioni
 
-    return redirect(url_for('user.login'))
+        return render_template(
+            'admin/cms/store_editor/script_editor.html',
+            title='Edit Web Settings',
+            username=username,
+            web_settings=web_settings
+        )
+
+    except SQLAlchemyError as e:
+        logging.error(f"❌ Errore nel caricamento delle impostazioni web: {str(e)}")
+        flash("Si è verificato un errore nel caricamento delle impostazioni web.", "danger")
+        return redirect(url_for('admin.dashboard'))  # ✅ Redirect a una pagina sicura
+
+    except Exception as e:
+        logging.error(f"❌ Errore sconosciuto nel caricamento delle impostazioni web: {str(e)}")
+        flash("Errore imprevisto. Contatta il supporto.", "danger")
+        return redirect(url_for('admin.dashboard'))  # ✅ Redirect a una pagina sicura
 
 # 🔹 **Rotta per aggiornare le impostazioni web**
 @websettings_bp.route('/admin/web_settings/update', methods=['POST'])

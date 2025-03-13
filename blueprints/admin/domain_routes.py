@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
 from models.database import db
 from models.domain import Domain  # Importa il modello SQLAlchemy per i domini
 from models.shoplist import ShopList  # Importa il modello SQLAlchemy per i negozi
@@ -21,10 +21,12 @@ def domain():
     Mostra la pagina di gestione dei domini per il negozio attuale.
     """
     username = check_user_authentication()
-    if not isinstance(username, str):
-        return username
 
-    shop_name = request.host.split('.')[0]  # Identifica il negozio dal sottodominio
+    if not username:  # ✅ Se la sessione è scaduta, reindirizza alla login
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
+
+    shop_name = request.host.split('.')[0]  # ✅ Recupera il nome del negozio solo se autenticato
 
     # Recupera i dati del negozio dal database
     shop = ShopList.query.filter_by(shop_name=shop_name).first()

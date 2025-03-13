@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
 from models.database import db
 from models.customers import Customer  # Importa il modello SQLAlchemy
 from helpers import check_user_authentication
@@ -17,10 +17,12 @@ def customers():
     Mostra la lista dei clienti del negozio.
     """
     username = check_user_authentication()
-    if not isinstance(username, str):
-        return username
 
-    shop_name = request.host.split('.')[0]  # Identifica il negozio dal sottodominio
+    if not username:  # ✅ Se la sessione è scaduta, reindirizza alla login
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
+
+    shop_name = request.host.split('.')[0]  # ✅ Recupera il nome del negozio solo se autenticato
 
     # Recupera i clienti dal database
     customers_list = Customer.query.filter_by(shop_name=shop_name).all()
@@ -74,10 +76,12 @@ def manage_customer(customer_id):
     Modifica o visualizza i dettagli di un cliente.
     """
     username = check_user_authentication()
-    if not isinstance(username, str):
-        return username
 
-    shop_name = request.host.split('.')[0]
+    if not username:  # ✅ Se la sessione è scaduta, reindirizza alla login
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
+
+    shop_name = request.host.split('.')[0]  # ✅ Recupera il nome del negozio solo se autenticato
     
     # Recupera il cliente dal database
     customer = Customer.query.filter_by(id=customer_id, shop_name=shop_name).first()
@@ -167,14 +171,3 @@ def delete_customers():
         db.session.rollback()
         logging.error(f"Error deleting customers: {e}")
         return jsonify({'success': False, 'message': 'An error occurred during deletion.'}), 500
-
-# 📌 Route per visualizzare la pagina marketing
-@customers_bp.route('/admin/cms/pages/marketing')
-def marketing():
-    """
-    Visualizza la pagina di marketing nel pannello admin.
-    """
-    username = check_user_authentication()
-    if isinstance(username, str):
-        return render_template('admin/cms/pages/marketing.html', title='Marketing', username=username)
-    return username

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, send_file
+from flask import Blueprint, render_template, request, jsonify, send_file, redirect, url_for, flash
 from public.pdf_printer import generate_order_pdf, generate_invoice_pdf
 from models.database import db
 from models.orders import Order, OrderItem, get_orders_by_shop
@@ -49,11 +49,16 @@ def get_order_details(order_id, shop_subdomain):
 @orders_bp.route('/admin/cms/pages/orders', methods=['GET'])
 @handle_request_errors
 def orders():
+    """
+    Mostra la lista degli ordini per il negozio corrente.
+    """
     username = check_user_authentication()
-    if not isinstance(username, str):
-        return username
 
-    shop_subdomain = request.host.split('.')[0]
+    if not username:  # ✅ Se la sessione è scaduta, reindirizza alla login
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
+
+    shop_subdomain = request.host.split('.')[0]  # ✅ Recupera il nome del negozio solo se autenticato
     detailed_orders = get_orders_by_shop(shop_subdomain)
 
     return render_template(
@@ -69,39 +74,53 @@ def orders():
 @orders_bp.route('/admin/cms/pages/order', defaults={'order_id': None}, methods=['GET', 'POST'])
 @handle_request_errors
 def manage_order(order_id=None):
+    """
+    Visualizza, modifica o crea un ordine.
+    """
     username = check_user_authentication()
-    if not isinstance(username, str):
-        return username
 
-    shop_subdomain = request.host.split('.')[0]
+    if not username:  # ✅ Se la sessione è scaduta, reindirizza alla login
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
+
+    shop_subdomain = request.host.split('.')[0]  # ✅ Recupera il nome del negozio solo se autenticato
 
     if request.method == 'POST':
-        data = request.get_json()
+        try:
+            data = request.get_json()
 
-        if order_id:
-            # Modifica ordine esistente
-            order = Order.query.filter_by(id=order_id, shop_name=shop_subdomain).first()
-            if not order:
-                return jsonify({'status': 'error', 'message': 'Order not found.'}), 404
+            if not data:
+                return jsonify({'status': 'error', 'message': 'Invalid JSON data.'}), 400
 
-            order.status = data.get('status', order.status)
-            order.total_price = data.get('total_price', order.total_price)
-            order.customer_id = data.get('customer_id', order.customer_id)
+            if order_id:
+                # Modifica ordine esistente
+                order = Order.query.filter_by(id=order_id, shop_name=shop_subdomain).first()
+                if not order:
+                    return jsonify({'status': 'error', 'message': 'Order not found.'}), 404
 
-            db.session.commit()
-            return jsonify({'status': 'success', 'message': 'Order updated successfully!'})
+                order.status = data.get('status', order.status)
+                order.total_price = data.get('total_price', order.total_price)
+                order.customer_id = data.get('customer_id', order.customer_id)
 
-        else:
-            # Creazione nuovo ordine
-            new_order = Order(
-                shop_name=shop_subdomain,
-                customer_id=data.get('customer_id'),
-                total_price=data.get('total_price', 0),
-                status=data.get('status', 'pending')
-            )
-            db.session.add(new_order)
-            db.session.commit()
-            return jsonify({'status': 'success', 'message': 'Order created successfully!', 'order_id': new_order.id})
+                db.session.commit()
+                return jsonify({'status': 'success', 'message': 'Order updated successfully!'})
+
+            else:
+                # Creazione nuovo ordine
+                new_order = Order(
+                    shop_name=shop_subdomain,
+                    customer_id=data.get('customer_id'),
+                    total_price=data.get('total_price', 0),
+                    status=data.get('status', 'pending')
+                )
+                db.session.add(new_order)
+                db.session.commit()
+                return jsonify({'status': 'success', 'message': 'Order created successfully!', 'order_id': new_order.id})
+
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error managing order: {e}")
+            return jsonify({'status': 'error', 'message': 'An error occurred while processing the order.'}), 500
 
     # Recupera i dettagli dell'ordine se esiste
     order_details = get_order_details(order_id, shop_subdomain) if order_id else None
@@ -113,7 +132,7 @@ def manage_order(order_id=None):
         username=username,
         products=products,
         shop_subdomain=shop_subdomain,
-        **order_details if order_details else {}
+        **(order_details if order_details else {})
     )
 
 # 📌 Route per ottenere i dettagli di un ordine e i suoi prodotti
@@ -121,27 +140,33 @@ def manage_order(order_id=None):
 @orders_bp.route('/admin/cms/pages/order-list/', defaults={'order_id': None}, methods=['GET'])
 @handle_request_errors
 def manage_order_list(order_id=None):
+    """
+    Visualizza la lista degli ordini o i dettagli di un ordine specifico.
+    """
     username = check_user_authentication()
-    if not isinstance(username, str):
-        return username
+
+    if not username:  # ✅ Se la sessione è scaduta, lo reindirizziamo correttamente
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
 
     shop_subdomain = request.host.split('.')[0]
 
     # Se viene fornito un order_id, otteniamo i dettagli dell'ordine e i prodotti associati
     order = None
     order_items = []
-    
+
     if order_id:
         order = Order.query.filter_by(id=order_id, shop_name=shop_subdomain).first()
         if order:
-            order_items = OrderItem.query.filter_by(order_id=order_id).all()
+            order_items = order.order_items  # ✅ Ottimizzato con la relazione tra Order e OrderItem
 
     return render_template(
         'admin/cms/pages/manage_order_list.html',
         title='Manage Order Items',
         username=username,
         shop_subdomain=shop_subdomain,
-        order=order
+        order=order,
+        order_items=order_items  # ✅ Passiamo gli articoli dell'ordine al template
     )
 
 

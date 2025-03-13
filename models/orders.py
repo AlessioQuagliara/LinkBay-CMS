@@ -23,11 +23,6 @@ class Order(db.Model):
     # Relazione con gli articoli dell'ordine
     order_items = db.relationship('OrderItem', backref='order', lazy=True, cascade="all, delete-orphan")
 
-    @property
-    def total_amount(self):
-        """Calcola il totale dell'ordine sommando i subtotali degli OrderItems."""
-        return sum(item.subtotal for item in self.order_items)
-
     def __repr__(self):
         return f"<Order {self.order_number} - {self.status}>"
 
@@ -45,6 +40,7 @@ class OrderItem(db.Model):
 
     # Relazione con il prodotto
     product = db.relationship('Product', backref='order_items', lazy=True)
+
 
     def __repr__(self):
         return f"<OrderItem {self.order_id} - {self.product_id}>"

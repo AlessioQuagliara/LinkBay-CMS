@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
 from models.database import db
 from models.payments import Payment
 from models.payment_methods import PaymentMethod
@@ -16,43 +16,73 @@ def payments():
     """
     Renderizza la pagina dei metodi di pagamento.
     """
+    username = check_user_authentication()
+
+    if not username:  # ✅ Se la sessione è scaduta, reindirizza alla login
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
+
     shop_name = request.host.split('.')[0]
 
     try:
         active_methods = PaymentMethod.query.filter_by(shop_name=shop_name).all()
 
         # Lista dei metodi attivi in formato dizionario
-        active_methods_dict = {method.method_name: method.to_dict() for method in active_methods}
+        active_methods_dict = {method.method_name: method.to_dict() for method in active_methods} if active_methods else {}
+
+        if not active_methods:
+            flash("Nessun metodo di pagamento attivo. Aggiungine uno nelle impostazioni.", "info")
 
         return render_template(
             'admin/cms/pages/payments.html',
             active_methods=active_methods_dict,
             shop_name=shop_name,
-            title='Payments'
+            title='Payments',
+            username=username  # ✅ Passiamo il nome utente al template
         )
 
     except SQLAlchemyError as e:
         logging.error(f"❌ Errore nel rendering della pagina dei pagamenti: {str(e)}")
+        flash("Si è verificato un errore nel caricamento dei metodi di pagamento.", "danger")
         return render_template('admin/cms/pages/error.html', title='Error 500', message="Unable to load payment methods"), 500
 
 # 🔹 **Renderizzazione della configurazione di un metodo di pagamento**
 @payments_bp.route('/admin/cms/pages/manage_payments/<method_name>', methods=['GET'])
 def configure_payment_method(method_name):
+    """
+    Permette la configurazione di un metodo di pagamento specifico.
+    """
+    username = check_user_authentication()
+
+    if not username:  # ✅ Se la sessione è scaduta, reindirizza alla login
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
+
     shop_name = request.host.split('.')[0]
 
     try:
         method = PaymentMethod.query.filter_by(shop_name=shop_name, method_name=method_name).first()
 
+        if not method:
+            flash(f"Il metodo di pagamento '{method_name}' non è stato trovato. Puoi configurarne uno nuovo.", "info")
+
         return render_template(
             'admin/cms/pages/manage_payments.html',
             shop_name=shop_name,
-            method=method.to_dict() if method else {"method_name": method_name},
-            title="Manage Payment"
+            method=method.to_dict() if method else {"method_name": method_name},  # ✅ Assicura che il template non riceva un valore nullo
+            title="Manage Payment",
+            username=username  # ✅ Passiamo il nome utente al template
         )
 
     except SQLAlchemyError as e:
         logging.error(f"❌ Errore nella configurazione del metodo di pagamento: {str(e)}")
-        return render_template('admin/cms/pages/error.html', message="Unable to load payment method configuration"), 500
+        flash("Si è verificato un errore nel caricamento della configurazione del metodo di pagamento.", "danger")
+        return render_template(
+            'admin/cms/pages/error.html',
+            title='Error 500',
+            message="Unable to load payment method configuration"
+        ), 500
+    
 
 # 🔹 **Aggiornamento di un metodo di pagamento**
 @payments_bp.route('/admin/cms/pages/update_payment_method', methods=['POST'])

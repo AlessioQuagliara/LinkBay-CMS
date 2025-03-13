@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
 from models.database import db
 from models.cookiepolicy import CookiePolicy
 from helpers import check_user_authentication
@@ -16,10 +16,12 @@ def cookie_setting():
     Gestisce la configurazione della barra cookie del negozio.
     """
     username = check_user_authentication()
-    if not isinstance(username, str):
-        return username
+    
+    if not username:  # ✅ Se la sessione è scaduta, reindirizza subito
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
 
-    shop_name = request.host.split('.')[0]
+    shop_name = request.host.split('.')[0]  # ✅ Recupera il nome del negozio solo se autenticato
 
     if request.method == 'POST':
         try:
@@ -32,6 +34,7 @@ def cookie_setting():
 
             if not cookie_settings:
                 cookie_settings = CookiePolicy(shop_name=shop_name)
+                db.session.add(cookie_settings)  # ✅ Aggiungi al DB solo se è nuovo
 
             # Aggiorna i valori della policy
             cookie_settings.title = data.get('title', 'Cookie Policy')
@@ -44,7 +47,6 @@ def cookie_setting():
             cookie_settings.animation = data.get('animation', 'fade')
 
             # Salva nel database
-            db.session.add(cookie_settings)
             db.session.commit()
 
             return jsonify({'success': True, 'message': 'Cookie settings updated successfully'})
@@ -71,10 +73,12 @@ def cookie_setting_third_party():
     Gestisce le impostazioni della cookie policy di terze parti per il negozio.
     """
     username = check_user_authentication()
-    if not isinstance(username, str):
-        return username
 
-    shop_name = request.host.split('.')[0]
+    if not username:  # ✅ Se la sessione è scaduta, reindirizza alla login
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
+
+    shop_name = request.host.split('.')[0]  # ✅ Recupera il nome del negozio solo se autenticato
 
     if request.method == 'POST':
         try:
@@ -87,6 +91,7 @@ def cookie_setting_third_party():
 
             if not cookie_settings:
                 cookie_settings = CookiePolicy(shop_name=shop_name)
+                db.session.add(cookie_settings)  # ✅ Aggiungi solo se la configurazione non esiste
 
             # Aggiorna i valori per i cookie di terze parti
             cookie_settings.use_third_party = data.get('use_third_party', False)
@@ -96,7 +101,6 @@ def cookie_setting_third_party():
             cookie_settings.third_party_consent = data.get('third_party_consent', '')
 
             # Salva nel database
-            db.session.add(cookie_settings)
             db.session.commit()
 
             return jsonify({'status': 'success', 'message': 'Third-party cookie settings updated successfully!'})
