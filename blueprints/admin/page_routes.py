@@ -53,13 +53,17 @@ def save_image(base64_img, page_id, shop_subdomain):
         return None
 
 # Rotte per la gestione delle pagine
-
 @page_bp.route('/admin/cms/pages/online-content')
 @handle_request_errors
 def online_content():
+    """
+    Mostra il contenuto online del negozio.
+    """
     username = check_user_authentication()
-    if not isinstance(username, str):
-        return username
+
+    if not username:  # ✅ Se la sessione è scaduta, lo reindirizziamo correttamente
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
 
     shop_subdomain = request.host.split('.')[0]
     logging.info(f"📢 Accesso al contenuto online per: {shop_subdomain} da {request.remote_addr}")
@@ -73,36 +77,49 @@ def online_content():
     page = db.session.query(Page).filter_by(slug='home', shop_name=shop_subdomain).first()
     if page:
         minutes_ago = (datetime.utcnow() - page.updated_at).total_seconds() // 60
-        return render_template('admin/cms/pages/content.html', 
-                               title='Online Content', 
-                               username=username, 
-                               page=page,
-                               shop=shop,
-                               minutes_ago=int(minutes_ago))
-    else:
-        return redirect(url_for('cmsaddon.theme_ui'))
+        return render_template(
+            'admin/cms/pages/content.html', 
+            title='Online Content', 
+            username=username, 
+            page=page,
+            shop=shop,
+            minutes_ago=int(minutes_ago)
+        )
+    
+    flash("La pagina home non è stata trovata. Verifica le impostazioni del tema.", "warning")
+    return redirect(url_for('cmsaddon.theme_ui'))  # ✅ Aggiunto flash per feedback all'utente
 
 @page_bp.route('/admin/cms/function/edit-code/<slug>')
 @handle_request_errors
 def edit_code_page(slug):
+    """
+    Permette la modifica del codice di una pagina specifica identificata dallo slug.
+    """
     username = check_user_authentication()
-    if not isinstance(username, str):
-        return username
+
+    if not username:  # ✅ Se la sessione è scaduta, lo reindirizziamo correttamente
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
 
     shop_subdomain = request.host.split('.')[0]
+
+    # Recupera la pagina specifica e tutte le pagine dello shop
     page = db.session.query(Page).filter_by(slug=slug, shop_name=shop_subdomain).first()
     pages = db.session.query(Page).filter_by(shop_name=shop_subdomain).all()
 
-    if page:
-        return render_template('admin/cms/store_editor/code_editor.html', 
-                               title=page.title, 
-                               pages=pages,
-                               page=page, 
-                               slug=slug,  
-                               content=page.content, 
-                               username=username)
-    
-    return username
+    if not page:
+        flash("La pagina specificata non è stata trovata.", "warning")
+        return redirect(url_for('page_bp.online_content'))  # ✅ Redirect a una pagina esistente
+
+    return render_template(
+        'admin/cms/store_editor/code_editor.html', 
+        title=page.title, 
+        pages=pages,
+        page=page, 
+        slug=slug,  
+        content=page.content, 
+        username=username
+    )
 
 @page_bp.route('/admin/cms/function/save_code', methods=['POST'])
 @handle_request_errors
@@ -128,46 +145,63 @@ def save_code_page():
 @page_bp.route('/admin/cms/store_editor/editor_interface/<slug>')
 @handle_request_errors
 def editor_interface(slug=None):
+    """
+    Interfaccia dell'editor per modificare i contenuti delle pagine del negozio.
+    """
     username = check_user_authentication()
-    if not isinstance(username, str):
-        return username
+
+    if not username:  # ✅ Se la sessione è scaduta, lo reindirizziamo correttamente
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
 
     shop_subdomain = request.host.split('.')[0]
     shop = db.session.query(ShopList).filter_by(shop_name=shop_subdomain).first()
 
     if not shop:
         flash('Nessun negozio selezionato o negozio non trovato.', 'danger')
-        return redirect(url_for('ui.homepage'))
+        return redirect(url_for('ui.homepage'))  # ✅ Assicurati che la route esista
 
     pages = db.session.query(Page).filter_by(shop_name=shop_subdomain).all()
     page = db.session.query(Page).filter_by(slug=slug, shop_name=shop_subdomain).first() if slug else None
+
+    if slug and not page:
+        flash("La pagina specificata non è stata trovata.", "warning")
+        return redirect(url_for('page_bp.editor_interface'))  # ✅ Redirect alla lista delle pagine
+
     page_title = page.title if page else 'CMS Interface'
 
     # Recupera il tema UI selezionato
     selected_theme_ui = db.session.query(ShopAddon).filter_by(shop_name=shop_subdomain, addon_type='theme_ui').first()
 
-    return render_template('admin/cms/store_editor/editor_interface.html', 
-                           title=page_title, 
-                           pages=pages, 
-                           page=page,
-                           slug=slug,  
-                           current_url=request.path, 
-                           username=username,
-                           selected_theme_ui=selected_theme_ui)
+    return render_template(
+        'admin/cms/store_editor/editor_interface.html', 
+        title=page_title, 
+        pages=pages, 
+        page=page,
+        slug=slug,  
+        current_url=request.path, 
+        username=username,
+        selected_theme_ui=selected_theme_ui
+    )
 
 @page_bp.route('/admin/cms/function/edit/<slug>')
 @handle_request_errors
 def edit_page(slug):
+    """
+    Permette la modifica di una pagina specifica del negozio.
+    """
     username = check_user_authentication()
-    if not isinstance(username, str):
-        return username
+
+    if not username:  # ✅ Se la sessione è scaduta, lo reindirizziamo correttamente
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
 
     shop_subdomain = request.host.split('.')[0]
     shop = db.session.query(ShopList).filter_by(shop_name=shop_subdomain).first()
 
     if not shop:
         flash('Nessun negozio selezionato o negozio non trovato.', 'danger')
-        return redirect(url_for('ui.homepage'))
+        return redirect(url_for('page_bp.editor_interface'))  # ✅ Redirect all'editor invece della homepage
 
     # Recupera la lingua selezionata (default "en")
     language = request.args.get('language', 'en')
@@ -176,17 +210,19 @@ def edit_page(slug):
 
     if not page:
         flash('Pagina non trovata.', 'danger')
-        return redirect(url_for('ui.homepage'))
+        return redirect(url_for('page_bp.editor_interface'))  # ✅ Redirect all'editor invece della homepage
 
     selected_theme_ui = db.session.query(ShopAddon).filter_by(shop_name=shop_subdomain, addon_type='theme_ui').first()
     navbar_content = get_navbar_content(shop_subdomain)
 
-    return render_template('admin/cms/function/edit.html', 
-                           title='Edit Page', 
-                           page=page, 
-                           username=username, 
-                           selected_theme_ui=selected_theme_ui,
-                           navbar=navbar_content)
+    return render_template(
+        'admin/cms/function/edit.html', 
+        title='Edit Page', 
+        page=page, 
+        username=username, 
+        selected_theme_ui=selected_theme_ui,
+        navbar=navbar_content
+    )
 
 # 🔹 **Salvataggio della pagina con gestione immagini**
 @page_bp.route('/admin/cms/function/save', methods=['POST'])
@@ -339,16 +375,32 @@ def save_base64_image(base64_image, upload_folder):
 @page_bp.route('/admin/cms/function/navbar-settings')
 @handle_request_errors
 def navbar_settings():
+    """
+    Visualizza le impostazioni della Navbar per il negozio corrente.
+    """
+    username = check_user_authentication()
+
+    if not username:  # ✅ Se la sessione è scaduta, reindirizza alla login
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
+
     shop_name = request.host.split('.')[0]
 
     navbar_links = db.session.query(NavbarLink).filter_by(shop_name=shop_name).all()
     pages = get_published_pages(shop_name)
 
+    if not navbar_links:
+        flash("Nessun link di navigazione trovato. Aggiungine uno per personalizzare la Navbar.", "info")
+
+    if not pages:
+        flash("Nessuna pagina pubblicata trovata per il negozio.", "info")
+
     return render_template(
         'admin/cms/function/navigation.html',
         title="Navbar Settings",
         navbar_links=navbar_links,
-        pages=pages
+        pages=pages,
+        username=username  # ✅ Passa il nome utente al template
     )
 
 # 🔹 **API per ottenere i link della navbar**

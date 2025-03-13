@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, render_template, url_for
+from flask import Blueprint, request, jsonify, render_template, url_for, flash, redirect
 from models.database import db  # Importa il database SQLAlchemy
 from models.storepayment import StorePayment  # Modello per i pagamenti
 from config import Config
@@ -19,15 +19,26 @@ STRIPE_PUBLISHABLE_KEY = Config.STRIPE_PUBLISHABLE_KEY
 # 🔹 **Pagina di gestione dell'abbonamento**
 @storepayments_bp.route('/admin/cms/pages/subscription')
 def subscription():
+    """
+    Visualizza la pagina delle sottoscrizioni per il negozio.
+    """
     username = check_user_authentication()
-    if isinstance(username, str):
-        return render_template(
-            'admin/cms/pages/subscription.html',
-            title='Subscription',
-            username=username,
-            stripe_publishable_key=STRIPE_PUBLISHABLE_KEY
-        )
-    return username
+
+    if not username:  # ✅ Se la sessione è scaduta, reindirizza alla login
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
+
+    if not STRIPE_PUBLISHABLE_KEY:
+        logging.warning("⚠️ Stripe Publishable Key non configurata correttamente.")
+        flash("Si è verificato un problema con la configurazione del pagamento. Contatta il supporto.", "danger")
+        return redirect(url_for('admin.dashboard'))  # ✅ Redirect a una pagina sicura
+
+    return render_template(
+        'admin/cms/pages/subscription.html',
+        title='Subscription',
+        username=username,
+        stripe_publishable_key=STRIPE_PUBLISHABLE_KEY
+    )
 
 
 # 🔹 **Creazione della sessione di checkout Stripe**

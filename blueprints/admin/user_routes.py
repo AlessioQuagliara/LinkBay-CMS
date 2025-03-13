@@ -17,9 +17,8 @@ logging.basicConfig(level=logging.INFO)
 # 🔹 **Middleware per controllare se l'utente è autenticato**
 def check_user_authentication():
     if 'user_id' not in session:
-        flash('You need to log in first.', 'danger')
-        return redirect(url_for('user.login'))
-    return session['username']
+        return None 
+    return session.get('username')
 
 # 🔹 **Rotta per la registrazione di un nuovo utente**
 @user_bp.route('/admin/sign-in', methods=['GET', 'POST'])

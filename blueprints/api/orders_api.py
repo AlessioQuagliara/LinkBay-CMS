@@ -22,29 +22,28 @@ def get_order_details_api(order_id):
         logging.error(f"Errore nel recupero ordine: {error}")
         return jsonify({'success': False, 'message': str(error)}), 500
     
-    # 📌 API per creare un nuovo ordine
+# 📌 API per creare un nuovo ordine
 @ordersapi_bp.route('/create_order', methods=['POST'])
 def create_order():
-    data = request.get_json()
-    shop_name = request.host.split('.')[0]
+        data = request.get_json()
+        shop_name = request.host.split('.')[0]
 
-    required_fields = ['order_number', 'total_amount', 'status']
-    for field in required_fields:
-        if field not in data:
-            return jsonify({'success': False, 'message': f'Missing required field: {field}'}), 400
+        required_fields = ['order_number', 'status']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'success': False, 'message': f'Missing required field: {field}'}), 400
 
-    new_order = Order(
-        shop_name=shop_name,
-        order_number=data['order_number'],
-        total_amount=data['total_amount'],
-        status=data['status'],
-        customer_id=data.get('customer_id')
-    )
+        new_order = Order(
+            shop_name=shop_name,
+            order_number=data['order_number'],
+            status=data['status'],
+            customer_id=data.get('customer_id')
+        )
 
-    db.session.add(new_order)
-    db.session.commit()
+        db.session.add(new_order)
+        db.session.commit()
 
-    return jsonify({'success': True, 'message': 'Order created successfully.', 'order_id': new_order.id})
+        return jsonify({'success': True, 'message': 'Order created successfully.', 'order_id': new_order.id})
 
 # 📌 API per eliminare uno o più ordini
 @ordersapi_bp.route('/delete_orders', methods=['POST'])

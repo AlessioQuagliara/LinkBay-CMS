@@ -1,5 +1,6 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash
 from models.database import db  # Importa il database SQLAlchemy
+from sqlalchemy.exc import SQLAlchemyError
 from models.shippingmethods import ShippingMethod  # Importa il modello della tabella
 from helpers import check_user_authentication
 import logging
@@ -12,12 +13,23 @@ shipping_methods_bp = Blueprint('shipping_methods' , __name__)
 # 🔹 **Pagina di gestione dei metodi di spedizione**
 @shipping_methods_bp.route('/admin/cms/pages/shipping-methods')
 def shipping_methods():
+    """
+    Visualizza i metodi di spedizione configurati per il negozio corrente.
+    """
     username = check_user_authentication()
-    if isinstance(username, str):
-        shop_name = request.host.split('.')[0]  # Ottieni il nome del negozio dal sottodominio
-        
+
+    if not username:  # ✅ Se la sessione è scaduta, reindirizza alla login
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
+
+    shop_name = request.host.split('.')[0]  # Ottieni il nome del negozio dal sottodominio
+
+    try:
         # Recupera tutti i metodi di spedizione per lo shop
         methods_list = ShippingMethod.query.filter_by(shop_name=shop_name).all()
+
+        if not methods_list:
+            flash("Nessun metodo di spedizione configurato. Aggiungine uno nelle impostazioni.", "info")
 
         return render_template(
             'admin/cms/pages/shipping.html',
@@ -25,7 +37,15 @@ def shipping_methods():
             username=username,
             methods=methods_list
         )
-    return username
+
+    except SQLAlchemyError as e:
+        logging.error(f"❌ Errore nel caricamento dei metodi di spedizione: {str(e)}")
+        flash("Si è verificato un errore nel caricamento dei metodi di spedizione.", "danger")
+        return render_template(
+            'admin/cms/pages/error.html',
+            title="Errore",
+            message="Non è stato possibile caricare i metodi di spedizione."
+        ), 500
 
 
 # 🔹 **Creazione di un nuovo metodo di spedizione**
@@ -84,37 +104,53 @@ def delete_shippings():
 @shipping_methods_bp.route('/admin/cms/pages/shipping-method/<int:method_id>', methods=['GET', 'POST'])
 @shipping_methods_bp.route('/admin/cms/pages/shipping-method', methods=['GET', 'POST'])
 def manage_shipping_method(method_id=None):
+    """
+    Permette la gestione di un metodo di spedizione (creazione/modifica).
+    """
     username = check_user_authentication()
-    if isinstance(username, str):
-        shop_subdomain = request.host.split('.')[0]  # Identifica il negozio
 
-        if request.method == 'POST':
+    if not username:  # ✅ Se la sessione è scaduta, reindirizza alla login
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
+
+    shop_subdomain = request.host.split('.')[0]  # Identifica il negozio
+
+    if request.method == 'POST':
+        try:
             data = request.get_json()
-            try:
-                if method_id:
-                    # Modifica del metodo di spedizione esistente
-                    shipping_method = ShippingMethod.query.filter_by(id=method_id, shop_name=shop_subdomain).first()
-                    if not shipping_method:
-                        return jsonify({'status': 'error', 'message': 'Shipping method not found'}), 404
 
-                    for key, value in data.items():
-                        setattr(shipping_method, key, value)
+            if not data:
+                return jsonify({'status': 'error', 'message': 'Invalid data format.'}), 400
 
-                else:
-                    # Creazione di un nuovo metodo di spedizione
-                    new_method = ShippingMethod(shop_name=shop_subdomain, **data)
-                    db.session.add(new_method)
+            if method_id:
+                # Modifica del metodo di spedizione esistente
+                shipping_method = ShippingMethod.query.filter_by(id=method_id, shop_name=shop_subdomain).first()
+                if not shipping_method:
+                    return jsonify({'status': 'error', 'message': 'Shipping method not found'}), 404
 
-                db.session.commit()
-                return jsonify({'status': 'success', 'message': 'Shipping method saved successfully'})
+                # 🔄 Aggiorna dinamicamente i campi del metodo di spedizione
+                for key, value in data.items():
+                    setattr(shipping_method, key, value)
+            else:
+                # Creazione di un nuovo metodo di spedizione
+                new_method = ShippingMethod(shop_name=shop_subdomain, **data)
+                db.session.add(new_method)
 
-            except Exception as e:
-                db.session.rollback()
-                logging.error(f"❌ Error managing shipping method: {str(e)}")
-                return jsonify({'status': 'error', 'message': 'An error occurred.'}), 500
+            db.session.commit()
+            return jsonify({'status': 'success', 'message': 'Shipping method saved successfully'})
 
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            logging.error(f"❌ Error managing shipping method: {str(e)}")
+            return jsonify({'status': 'error', 'message': 'An error occurred.'}), 500
+
+    try:
         # Recupera il metodo di spedizione se esiste
         shipping_method = ShippingMethod.query.filter_by(id=method_id, shop_name=shop_subdomain).first() if method_id else None
+
+        if method_id and not shipping_method:
+            flash("Il metodo di spedizione specificato non è stato trovato.", "warning")
+            return redirect(url_for('shipping_methods'))
 
         return render_template(
             'admin/cms/pages/manage_shipping.html',
@@ -123,7 +159,15 @@ def manage_shipping_method(method_id=None):
             method=shipping_method,
             shop_subdomain=shop_subdomain
         )
-    return username
+
+    except SQLAlchemyError as e:
+        logging.error(f"❌ Errore nel caricamento del metodo di spedizione: {str(e)}")
+        flash("Si è verificato un errore nel caricamento del metodo di spedizione.", "danger")
+        return render_template(
+            'admin/cms/pages/error.html',
+            title="Errore",
+            message="Non è stato possibile caricare il metodo di spedizione."
+        ), 500
 
 
 # 🔹 **Aggiornamento di un metodo di spedizione**
