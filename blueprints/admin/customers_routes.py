@@ -107,7 +107,7 @@ def manage_customer(customer_id):
     )
 
 # 📌 Route per aggiornare un cliente
-@customers_bp.route('/admin/cms/update_customer', methods=['POST'])
+@customers_bp.route('/api/update_customer', methods=['POST'])
 def update_customer():
     """
     Aggiorna le informazioni di un cliente esistente.

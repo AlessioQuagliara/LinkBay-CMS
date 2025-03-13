@@ -11,14 +11,19 @@ logging.basicConfig(level=logging.INFO)
 # Blueprint
 products_bp = Blueprint('products', __name__)
 
-# 🔹 **Pagina di gestione prodotti**
+# 🔹 **Pagina di gestione prodotti con paginazione**
 @products_bp.route('/admin/cms/pages/products')
 def products():
     username = check_user_authentication()
     if isinstance(username, str):
         shop_subdomain = request.host.split('.')[0]
         
-        products_list = Product.query.filter_by(shop_name=shop_subdomain).all()
+        # 🔄 Recupera il numero della pagina dalla query string (default = 1)
+        page = request.args.get('page', 1, type=int)
+        per_page = 12  # Imposta il numero di prodotti per pagina
+
+        # 📦 Recupera i prodotti con paginazione
+        products_paginated = Product.query.filter_by(shop_name=shop_subdomain).paginate(page=page, per_page=per_page, error_out=False)
         categories = Category.query.filter_by(shop_name=shop_subdomain).all()
 
         return render_template(
@@ -26,7 +31,8 @@ def products():
             title='Products', 
             username=username, 
             categories=categories,
-            products=products_list
+            products=products_paginated.items,  # 🔹 Solo i prodotti della pagina corrente
+            pagination=products_paginated  # 🔹 Passiamo l'oggetto di paginazione al template
         )
     return username
 

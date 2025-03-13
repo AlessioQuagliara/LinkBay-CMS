@@ -2,6 +2,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
     <!-- Quill CSS -->
     <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
     <!-- Quill JS -->
@@ -56,4 +58,44 @@
                 return response;
             };
         });
+    </script>
+<script>
+    $(document).ready(function () {
+        $("#sortable-header").sortable({
+            items: "th:not(:first-child)", // Esclude la checkbox principale
+            cursor: "move",
+            axis: "x",
+            update: function (event, ui) {
+                let columnOrder = [];
+                $("#sortable-header th").each(function (index) {
+                    columnOrder.push($(this).attr("class")); // Salva la classe della colonna
+                });
+    
+                // Salva l'ordine in localStorage
+                localStorage.setItem("columnOrder", JSON.stringify(columnOrder));
+    
+                // Riordina le colonne nelle righe della tabella
+                reorderColumns(columnOrder);
+            }
+        });
+    
+        function reorderColumns(order) {
+            $("#product-list tr").each(function () {
+                let row = $(this);
+                let cells = row.children("td").detach();
+                let newCells = [];
+                order.forEach(className => {
+                    let cell = cells.filter("." + className);
+                    newCells.push(cell);
+                });
+                row.append(newCells);
+            });
+        }
+    
+        // Recupera l'ordine salvato all'avvio
+        let savedOrder = JSON.parse(localStorage.getItem("columnOrder"));
+        if (savedOrder) {
+            reorderColumns(savedOrder);
+        }
+    });
     </script>

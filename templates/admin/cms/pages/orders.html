@@ -69,11 +69,11 @@
                     <td><input type="checkbox" class="row-checkbox"></td>
                     <td class="id">{{ order.id }}</td>
                     <td class="order_number">{{ order.order_number }}</td>
-                    <td class="customer_name">{{ order.customer_name or 'N/A' }}</td>
+                    <td class="customer_name">{{ order.customer_name or 'N/A' }} {{ order.customer_surname or 'N/A' }}</td>
                     <td class="customer_email">{{ order.customer_email or 'N/A' }}</td>
                     <td class="total_items">{{ order.total_items }}</td>
                     <td class="total_quantity">{{ order.total_quantity }}</td>
-                    <td class="total_amount">{{ order.total_amount }}</td>
+                    <td class="total_amount">{{ order.total_amount }} €</td>
                     <td class="status" 
                         {% if order.status == 'Draft' %} style="font-weight: bold; background-color: #dfe2e6; color: #b0b1b5;"
                         {% elif order.status == 'Pending' %} style="font-weight: bold; background-color: #ffc108; color: #332702;"
@@ -111,7 +111,7 @@
 </div>
 
 <!-- Inclusione dei file JavaScript -->
-<script src="{{ url_for('static', filename='js/admin/orders/orders.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/orders.js') }}"></script>
 <script src="{{ url_for('static', filename='js/admin/tables/research_method.js') }}"></script>
 
 {% endblock %}

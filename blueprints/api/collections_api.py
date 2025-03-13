@@ -7,7 +7,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-collections_bp = Blueprint('collectionsApi', __name__, url_prefix='/')
+collections_bp = Blueprint('collectionsApi', __name__, url_prefix='/api/')
 
 # 📌 Route per rimuovere prodotti da una collezione
 @collections_bp.route('/delete_products_from_collection', methods=['POST'])
@@ -95,7 +95,7 @@ def add_product_to_collection():
         return jsonify({'success': False, 'message': 'An error occurred.'}), 500
 
 # 📌 Route per eliminare una collezione
-@collections_bp.route('/delete_collections', methods=['POST'])
+@collections_bp.route('/delete_collection', methods=['POST'])
 def delete_collection():
     """
     Elimina una o più collezioni dal database.
@@ -239,3 +239,41 @@ def get_collections():
     except Exception as e:
         logging.error(f"Error fetching collections: {e}")
         return jsonify({'success': False, 'message': 'An error occurred'}), 500
+    
+# 📌 Route per creare una nuova collezione
+@collections_bp.route('/create_collection', methods=['POST'])
+def create_collection():
+    """
+    API per creare una nuova collezione nel CMS.
+    """
+    try:
+        shop_name = request.host.split('.')[0]  # Sottodominio per identificare il negozio
+        data = request.form
+
+        # Generazione slug univoco basato sul nome
+        name = data.get('name', 'New Collection').strip()
+        slug = f"{re.sub(r'[^\w\s-]', '', name).replace(' ', '-').lower()}-{uuid.uuid4().hex[:8]}"
+
+        # Creazione della nuova collezione
+        new_collection = Collection(
+            name=name,
+            slug=slug,
+            description=data.get('description', 'Detailed description'),
+            image_url=data.get('image_url', '/static/images/default.png'),
+            is_active=False,
+            shop_name=shop_name,
+        )
+
+        db.session.add(new_collection)
+        db.session.commit()  # Conferma la transazione
+
+        return jsonify({
+            'success': True,
+            'message': 'Collection created successfully.',
+            'collection_id': new_collection.id
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Error creating collection: {e}")
+        return jsonify({'success': False, 'message': 'Failed to create Collection.'}), 500

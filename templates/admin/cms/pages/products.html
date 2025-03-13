@@ -16,44 +16,91 @@
                     <i class="fa-solid fa-layer-group"></i> Collections
                 </a>
             </div>
+
             <div class="custom-toolbar">
                 <button class="custom-btn" id="search-toggle-btn" title="Search">
-                  <i class="fa-solid fa-magnifying-glass"></i>
-                  <input type="text" id="search-input" class="custom-input d-none" placeholder="Search..." style="max-width: 200px;">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="search-input" class="custom-input d-none" placeholder="Search..." style="max-width: 200px;">
                 </button>
-                
                 <button class="custom-btn" title="Add Product" id="add-product-btn">
-                  <i class="fa-solid fa-plus"></i>
+                    <i class="fa-solid fa-plus"></i>
                 </button>
-              
                 <button class="custom-btn" title="Copy Selected" id="copy-selected-btn">
-                  <i class="fa-solid fa-copy"></i>
+                    <i class="fa-solid fa-copy"></i>
                 </button>
-              
                 <button class="custom-btn select-all" title="Select All">
-                  <i class="fa-solid fa-check"></i>
+                    <i class="fa-solid fa-check"></i>
                 </button>
-              
                 <button class="custom-btn delete-selected" title="Delete">
-                  <i class="fa-solid fa-trash"></i>
+                    <i class="fa-solid fa-trash"></i>
                 </button>
-              
                 <button class="custom-btn" title="Export" id="export-products-btn">
-                  <i class="fa-solid fa-file-excel"></i>
+                    <i class="fa-solid fa-file-excel"></i>
                 </button>
-              
                 <button class="custom-btn" data-bs-toggle="modal" data-bs-target="#customizationModal" id="customize-columns" title="Customize Columns">
-                  <i class="fa-solid fa-cog"></i>
+                    <i class="fa-solid fa-cog"></i>
                 </button>
             </div>
         </div>
+
+        <!-- Paginazione minimalista e nera -->
+        {% if pagination.pages > 1 %}
+        <div class="card-footer bg-dark text-center py-2">
+            <nav aria-label="Product pagination">
+                <ul class="pagination pagination-sm justify-content-center mb-0">
+                    <!-- 🔙 Indietro -->
+                    {% if pagination.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link text-white bg-secondary border-0" href="{{ url_for('products.products', page=pagination.prev_num) }}">
+                                <i class="fa-solid fa-angle-left"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link text-muted bg-secondary border-0"><i class="fa-solid fa-angle-left"></i></span>
+                        </li>
+                    {% endif %}
+
+                    <!-- 🔢 Numeri delle pagine -->
+                    {% for num in pagination.iter_pages() %}
+                        {% if num %}
+                            {% if num == pagination.page %}
+                                <li class="page-item active">
+                                    <span class="page-link bg-light text-dark border-0">{{ num }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link text-white bg-secondary border-0" href="{{ url_for('products.products', page=num) }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link text-muted bg-secondary border-0">…</span></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- ⏩ Avanti -->
+                    {% if pagination.has_next %}
+                        <li class="page-item">
+                            <a class="page-link text-white bg-secondary border-0" href="{{ url_for('products.products', page=pagination.next_num) }}">
+                                <i class="fa-solid fa-angle-right"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link text-muted bg-secondary border-0"><i class="fa-solid fa-angle-right"></i></span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
     </div>
 
     <!-- Card per la tabella dei prodotti -->
             <div class="table-responsive" data-aos="fade-up">
                 <table class="table table-hover table-bordered align-middle text-center" style="border-radius: 10px;">
                     <thead class="table-dark">
-                        <tr>
+                        <tr id="sortable-header">
                             <th scope="col"><input type="checkbox" id="select-all-checkbox"></th>
                             <th scope="col" class="id">#</th>
                             <th scope="col" class="name">Name</th>
@@ -110,7 +157,6 @@
                     </tbody>
                 </table>
             </div>
-
         </div>
 
 <!-- Modal di configurazione -->

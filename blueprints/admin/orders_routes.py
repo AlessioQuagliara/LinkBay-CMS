@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, send_file
+from public.pdf_printer import generate_order_pdf, generate_invoice_pdf
 from models.database import db
 from models.orders import Order, OrderItem, get_orders_by_shop
 from models.products import Product
@@ -144,3 +145,20 @@ def manage_order_list(order_id=None):
     )
 
 
+@orders_bp.route('/admin/cms/pages/order/<int:order_id>/pdf', methods=['GET'])
+def download_order_pdf(order_id):
+    """ Route per scaricare il PDF dell'ordine """
+    pdf_buffer = generate_order_pdf(order_id)
+    if not pdf_buffer:
+        return jsonify({'success': False, 'message': 'Order not found.'}), 404
+
+    return send_file(pdf_buffer, as_attachment=True, download_name=f"order_{order_id}.pdf", mimetype="application/pdf")
+
+@orders_bp.route('/admin/cms/pages/order/<int:order_id>/pdf', methods=['GET'])
+def generate_invoice_pdf(order_id):
+    """ Route per scaricare il PDF dell'ordine """
+    pdf_buffer = generate_invoice_pdf(order_id)
+    if not pdf_buffer:
+        return jsonify({'success': False, 'message': 'Order not found.'}), 404
+
+    return send_file(pdf_buffer, as_attachment=True, download_name=f"InvoiceN00{order_id}.pdf", mimetype="application/pdf")
