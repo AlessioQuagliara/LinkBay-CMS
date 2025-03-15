@@ -1,12 +1,12 @@
 {% extends "/admin/cms/interface/render.html" %}
 
 {% block content %}
-<div class="container my-4">
+<div class="container my-4" data-aos="fade-up">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/toolbar.css') }}">
 
     <!-- Card per le funzioni della tabella -->
-    <div class="card shadow-sm mb-4" data-aos="fade-up">
+    <div class="card shadow-sm mb-4">
         <div class="card-body d-flex justify-content-between align-items-center">
             <div class="d-flex gap-3">
                 <a href="/admin/cms/pages/products" class="btn {% if title == 'Products' %}btn-dark{% else %}btn-outline-dark{% endif %} btn-sm text-decoration-none ">
@@ -97,10 +97,10 @@
     </div>
 
     <!-- Card per la tabella dei prodotti -->
-            <div class="table-responsive" data-aos="fade-up">
+        <div class="table-responsive" data-aos="fade-up">
                 <table class="table table-hover table-bordered align-middle text-center" style="border-radius: 10px;">
                     <thead class="table-dark">
-                        <tr id="sortable-header">
+                        <tr>
                             <th scope="col"><input type="checkbox" id="select-all-checkbox"></th>
                             <th scope="col" class="id">#</th>
                             <th scope="col" class="name">Name</th>
@@ -168,8 +168,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <h6>Columns to Display</h6>
-                <div id="columns-container">
+                <h6>Drag & Drop to Reorder Columns</h6>
+                <div id="sortable-columns" class="list-group">
                     <!-- Opzioni delle colonne generate dinamicamente -->
                 </div>
             </div>
@@ -180,80 +180,122 @@
 <script>
     // GESTIONE DELLE COLONNE PER PRODUCTS
     document.addEventListener('DOMContentLoaded', function () {
-        const columnsContainer = document.getElementById('columns-container');
-        const tablePreferencesKey = 'productsTablePreferences'; // Chiave univoca per la pagina prodotti
+    const columnsContainer = document.getElementById('sortable-columns');
+    const tablePreferencesKey = 'productsTablePreferences'; // Chiave univoca per localStorage
 
-        const columns = [
-            { value: 'id', label: '#' },
-            { value: 'name', label: 'Name', default: true },
-            { value: 'description', label: 'Description' },
-            { value: 'short_description', label: 'Short Description' },
-            { value: 'price', label: 'Price', default: true },
-            { value: 'discount_price', label: 'Discount Price' },
-            { value: 'stock_quantity', label: 'Stock', default: true },
-            { value: 'sku', label: 'SKU' },
-            { value: 'category', label: 'Category' },
-            { value: 'brand', label: 'Brand' },
-            { value: 'weight', label: 'Weight' },
-            { value: 'dimensions', label: 'Dimensions' },
-            { value: 'color', label: 'Color' },
-            { value: 'material', label: 'Material' },
-            { value: 'image_url', label: 'Image URL' },
-            { value: 'slug', label: 'Slug' },
-            { value: 'is_active', label: 'Is Active', default: true },
-            { value: 'created_at', label: 'Created At' },
-            { value: 'updated_at', label: 'Updated At' }
-        ];
+    const columns = [
+        { value: 'id', label: '#' },
+        { value: 'name', label: 'Name' },
+        { value: 'description', label: 'Description' },
+        { value: 'short_description', label: 'Short Description' },
+        { value: 'price', label: 'Price' },
+        { value: 'discount_price', label: 'Discount Price' },
+        { value: 'stock_quantity', label: 'Stock' },
+        { value: 'sku', label: 'SKU' },
+        { value: 'category', label: 'Category' },
+        { value: 'brand', label: 'Brand' },
+        { value: 'weight', label: 'Weight' },
+        { value: 'dimensions', label: 'Dimensions' },
+        { value: 'color', label: 'Color' },
+        { value: 'material', label: 'Material' },
+        { value: 'image_url', label: 'Image URL' },
+        { value: 'slug', label: 'Slug' },
+        { value: 'is_active', label: 'Is Active' },
+        { value: 'created_at', label: 'Created At' },
+        { value: 'updated_at', label: 'Updated At' }
+    ];
 
-        function renderColumnOptions(preferences) {
-            columnsContainer.innerHTML = '';
-            columns.forEach(column => {
-                const isChecked = preferences[column.value] ?? column.default;
-                columnsContainer.innerHTML += `
-                    <div class="form-check">
-                        <input class="form-check-input column-toggle" type="checkbox" value="${column.value}" id="column-${column.value}" ${isChecked ? 'checked' : ''}>
-                        <label class="form-check-label" for="column-${column.value}">${column.label}</label>
-                    </div>`;
+    function renderColumnOptions(preferences) {
+        columnsContainer.innerHTML = '';
+
+        // Usa l'ordine salvato nelle preferenze, altrimenti l'ordine di default
+        const orderedColumns = preferences.order || columns.map(col => col.value);
+
+        orderedColumns.forEach(columnValue => {
+            const column = columns.find(col => col.value === columnValue);
+            if (!column) return; // Skip se la colonna non esiste
+
+            const isChecked = preferences[column.value] ?? true;
+            const columnItem = document.createElement('div');
+            columnItem.classList.add('list-group-item', 'd-flex', 'align-items-center');
+            columnItem.dataset.column = column.value;
+            columnItem.innerHTML = `
+                <i class="fa-solid fa-grip-lines me-2"></i>
+                <input class="form-check-input column-toggle me-2" type="checkbox" value="${column.value}" ${isChecked ? 'checked' : ''}>
+                <label class="form-check-label flex-grow-1">${column.label}</label>
+            `;
+            columnsContainer.appendChild(columnItem);
+        });
+
+        // Aggiunge il listener per aggiornare la vista automaticamente
+        document.querySelectorAll('.column-toggle').forEach(toggle => {
+            toggle.addEventListener('change', function () {
+                savePreferences();
+                applyPreferences(loadPreferences());
             });
+        });
 
-            document.querySelectorAll('.column-toggle').forEach(toggle => {
-                toggle.addEventListener('change', function () {
-                    savePreferences();
-                    applyPreferences(loadPreferences());
-                });
+        // Rendi il contenitore delle colonne ordinabile
+        new Sortable(columnsContainer, {
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            onEnd: function () {
+                savePreferences(); // Salva il nuovo ordine
+                applyPreferences(loadPreferences());
+            }
+        });
+    }
+
+    function savePreferences() {
+        const preferences = { order: [] };
+        document.querySelectorAll('#sortable-columns .list-group-item').forEach(item => {
+            const columnValue = item.dataset.column;
+            const checkbox = item.querySelector('.column-toggle');
+            preferences[columnValue] = checkbox.checked;
+            preferences.order.push(columnValue);
+        });
+        localStorage.setItem(tablePreferencesKey, JSON.stringify(preferences));
+    }
+
+    function loadPreferences() {
+        return JSON.parse(localStorage.getItem(tablePreferencesKey)) || {};
+    }
+
+    function applyPreferences(preferences) {
+        const orderedColumns = preferences.order || columns.map(col => col.value);
+
+        // Riordina le colonne nella tabella
+        const tableHeadRow = document.querySelector('thead tr');
+        const tableBodyRows = document.querySelectorAll('tbody tr');
+
+        orderedColumns.forEach(columnValue => {
+            const header = tableHeadRow.querySelector(`th.${columnValue}`);
+            if (header) tableHeadRow.appendChild(header);
+
+            tableBodyRows.forEach(row => {
+                const cell = row.querySelector(`td.${columnValue}`);
+                if (cell) row.appendChild(cell);
             });
-        }
+        });
 
-        function savePreferences() {
-            const preferences = {};
-            document.querySelectorAll('.column-toggle').forEach(toggle => {
-                preferences[toggle.value] = toggle.checked;
+        // Nasconde/mostra le colonne in base alle preferenze
+        columns.forEach(column => {
+            const isChecked = preferences[column.value] ?? true;
+            const header = document.querySelector(`thead th.${column.value}`);
+            if (header) {
+                header.style.display = isChecked ? '' : 'none';
+            }
+            document.querySelectorAll(`tbody td.${column.value}`).forEach(cell => {
+                cell.style.display = isChecked ? '' : 'none';
             });
-            localStorage.setItem(tablePreferencesKey, JSON.stringify(preferences));
-        }
+        });
+    }
 
-        function loadPreferences() {
-            return JSON.parse(localStorage.getItem(tablePreferencesKey)) || {};
-        }
-
-        function applyPreferences(preferences) {
-            columns.forEach(column => {
-                const isChecked = preferences[column.value] ?? column.default;
-                const header = document.querySelector(`thead th.${column.value}`);
-                if (header) {
-                    header.style.display = isChecked ? '' : 'none';
-                }
-                document.querySelectorAll(`tbody td.${column.value}`).forEach(cell => {
-                    cell.style.display = isChecked ? '' : 'none';
-                });
-            });
-        }
-
-        // Carica preferenze al caricamento della pagina
-        const savedPreferences = loadPreferences();
-        renderColumnOptions(savedPreferences);
-        applyPreferences(savedPreferences);
-    });
+    // Inizializzazione
+    const savedPreferences = loadPreferences();
+    renderColumnOptions(savedPreferences);
+    applyPreferences(savedPreferences);
+});
 </script>
 
 <script>

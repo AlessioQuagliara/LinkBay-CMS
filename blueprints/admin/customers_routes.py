@@ -11,63 +11,77 @@ logging.basicConfig(level=logging.INFO)
 customers_bp = Blueprint('customers', __name__)
 
 # 📌 Route per visualizzare i clienti nel pannello admin
-@customers_bp.route('/admin/cms/pages/customers')
+@customers_bp.route('/admin/cms/pages/customers', methods=['GET'])
 def customers():
     """
-    Mostra la lista dei clienti del negozio.
+    Mostra la lista dei clienti del negozio con paginazione e ricerca.
     """
     username = check_user_authentication()
 
-    if not username:  # ✅ Se la sessione è scaduta, reindirizza alla login
+    if not username:
         flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
         return redirect(url_for('user.login'))
 
-    shop_name = request.host.split('.')[0]  # ✅ Recupera il nome del negozio solo se autenticato
+    shop_name = request.host.split('.')[0]  # Nome del negozio
 
-    # Recupera i clienti dal database
-    customers_list = Customer.query.filter_by(shop_name=shop_name).all()
+    # Recupera i parametri di ricerca
+    search_query = request.args.get('search', type=str, default='')
 
-    return render_template(
-        'admin/cms/pages/customers.html', 
-        title='Customers', 
-        username=username, 
-        customers=customers_list  # Passa i clienti al template
-    )
+    # Recupera il numero della pagina
+    page = request.args.get('page', 1, type=int)
+    per_page = 12  # Numero di clienti per pagina
 
-# 📌 Route per creare un nuovo cliente
-@customers_bp.route('/admin/cms/create_customer', methods=['POST'])
-def create_customer():
-    """
-    Crea un nuovo cliente nel database.
-    """
     try:
-        shop_name = request.host.split('.')[0]
+        # Costruisce la query con la ricerca
+        query = Customer.query.filter(Customer.shop_name == shop_name)
 
-        # Recupera i dati dal form o imposta valori predefiniti
-        new_customer = Customer(
-            first_name=request.form.get('first_name', 'New Customer'),
-            last_name=request.form.get('last_name', 'Last Name'),
-            password=request.form.get('password', 'default'),
-            email=request.form.get('email', f"{uuid.uuid4().hex[:8]}@linkbay.it"),
-            phone=request.form.get('phone', '0000000'),
-            address=request.form.get('address', 'Customer address'),
-            city=request.form.get('city', 'City'),
-            state=request.form.get('state', 'State'),
-            postal_code=request.form.get('postal_code', 'Postal Code'),
-            country=request.form.get('country', 'Country'),
-            shop_name=shop_name
+        if search_query:
+            query = query.filter(
+                (Customer.name.ilike(f"%{search_query}%")) | 
+                (Customer.email.ilike(f"%{search_query}%"))
+            )
+
+        # Conta il totale dei clienti filtrati
+        total_customers = query.count()
+
+        # Applica la paginazione
+        customers_paginated = query.order_by(Customer.created_at.desc()).offset((page - 1) * per_page).limit(per_page).all()
+
+        # Creiamo un oggetto per la paginazione
+        class Pagination:
+            def __init__(self, total, per_page, page):
+                self.total = total
+                self.per_page = per_page
+                self.page = page
+                self.pages = (total + per_page - 1) // per_page
+                self.has_prev = page > 1
+                self.has_next = page < self.pages
+                self.prev_num = page - 1 if self.has_prev else None
+                self.next_num = page + 1 if self.has_next else None
+
+            def iter_pages(self):
+                return range(1, self.pages + 1)
+
+        pagination = Pagination(total_customers, per_page, page)
+
+        return render_template(
+            'admin/cms/pages/customers.html',
+            title='Customers',
+            username=username,
+            customers=customers_paginated,
+            pagination=pagination,
+            search_query=search_query
         )
 
-        # Salva il cliente nel database
-        db.session.add(new_customer)
-        db.session.commit()
-
-        return jsonify({'success': True, 'message': 'Customer created successfully.', 'customer_id': new_customer.id})
-
     except Exception as e:
-        db.session.rollback()
-        logging.error(f"Error creating customer: {e}")
-        return jsonify({'success': False, 'message': 'Failed to create Customer.'}), 500
+        logging.error(f"❌ Errore nel caricamento dei clienti: {str(e)}")
+        flash("Si è verificato un errore nel caricamento dei clienti.", "danger")
+        return render_template(
+            'admin/cms/pages/error.html',
+            title="Errore",
+            message="Non è stato possibile caricare i clienti."
+        ), 500
+
 
 # 📌 Route per gestire un cliente (visualizzazione o modifica)
 @customers_bp.route('/admin/cms/pages/customer/<int:customer_id>', methods=['GET', 'POST'])

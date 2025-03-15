@@ -25,38 +25,30 @@ def render_dynamic_page(slug=None):
     Renderizza una pagina dinamica basata sullo slug.
     """
     shop_subdomain = request.host.split('.')[0]
-
-    # Carica i contenuti della pagina
     page = load_page_content(slug, shop_subdomain)
 
     if page:
-        # Recupera impostazioni e contenuti del negozio
         language = get_language()
-        navbar_content = get_navbar_content(shop_subdomain)
-        footer_content = get_footer_content(shop_subdomain)
-        web_settings = get_web_settings(shop_subdomain)
+        navbar_content = get_navbar_content(shop_subdomain)  # 🔹 Ora è HTML puro
+        footer_content = get_footer_content(shop_subdomain)  # 🔹 Ora è HTML puro
         render_theme = render_theme_styles(shop_subdomain)
+        web_settings = get_web_settings(shop_subdomain)
         cookie_policy_banner = get_cookie_policy_content(shop_subdomain)
-
-        # Impostazioni SEO e script
-        head_content = web_settings.get('head', '')
-        script_content = web_settings.get('script', '')
-        foot_content = web_settings.get('foot', '')
 
         return render_template(
             'index.html',
-            title=page['title'],
-            description=page['description'],
-            keywords=page['keywords'],
-            content=page['content'],
-            navbar=navbar_content,
-            footer=footer_content,
+            title=page.title,
+            description=page.description,
+            keywords=page.keywords,
+            content=page.content,
+            navbar=navbar_content,  # ✅ Ora è stampato direttamente come HTML
+            footer=footer_content,  # ✅ Ora è stampato direttamente come HTML
             render_theme=render_theme,
             cookie_policy_banner=cookie_policy_banner,
             language=language,
-            head=head_content,
-            script=script_content,
-            foot=foot_content
+            head=web_settings.head if web_settings else '',
+            script=web_settings.script if web_settings else '',
+            foot=web_settings.foot if web_settings else ''
         )
     
     return render_template('errors/404.html'), 404

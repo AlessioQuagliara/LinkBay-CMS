@@ -17,9 +17,22 @@
                 </a>
             </div>
             <div class="custom-toolbar">
-                <button class="custom-btn" id="search-toggle-btn" title="Search">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="search-input" class="custom-input d-none" placeholder="Search..." style="max-width: 200px;">
+
+                <div class="position-relative">
+                    <button class="custom-btn" id="search-toggle-btn" title="Search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="search-input" class="custom-input d-none" placeholder="Search orders..." style="max-width: 200px;">
+                    </button>
+                
+                    <!-- Dropdown per i risultati della ricerca -->
+                    <div id="search-results" class="dropdown-menu w-100 shadow-sm" style="display: none; position: absolute; top: 100%; left: 0; z-index: 1000;">
+                        <div class="dropdown-header text-muted">Resulted</div>
+                        <div id="search-results-list"></div>
+                    </div>
+                </div>
+
+                <button class="custom-btn" title="Filtra Ordini" id="filter-orders-btn">
+                    <i class="fa-solid fa-filter"></i>
                 </button>
                 
                 <button class="custom-btn" title="Add Order" id="add-order-btn">
@@ -43,10 +56,60 @@
                 </button>
             </div>
         </div>
+        {% if pagination.pages > 1 %}
+        <div class="card-footer bg-dark text-center py-2">
+            <nav aria-label="Pagination">
+                <ul class="pagination pagination-sm justify-content-center mb-0">
+                    <!-- 🔙 Indietro -->
+                    {% if pagination.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link text-white bg-secondary border-0" href="{{ url_for('orders.orders', page=pagination.prev_num) }}">
+                                <i class="fa-solid fa-angle-left"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link text-muted bg-secondary border-0"><i class="fa-solid fa-angle-left"></i></span>
+                        </li>
+                    {% endif %}
+
+                    <!-- 🔢 Numeri delle pagine -->
+                    {% for num in pagination.iter_pages() %}
+                        {% if num %}
+                            {% if num == pagination.page %}
+                                <li class="page-item active">
+                                    <span class="page-link bg-light text-dark border-0">{{ num }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link text-white bg-secondary border-0" href="{{ url_for('orders.orders', page=num) }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link text-muted bg-secondary border-0">…</span></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- ⏩ Avanti -->
+                    {% if pagination.has_next %}
+                        <li class="page-item">
+                            <a class="page-link text-white bg-secondary border-0" href="{{ url_for('orders.orders', page=pagination.next_num) }}">
+                                <i class="fa-solid fa-angle-right"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link text-muted bg-secondary border-0"><i class="fa-solid fa-angle-right"></i></span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
     </div>
 
     <!-- Tabella degli ordini -->
-    <div class="table-responsive">
+    <div class="table-responsive" data-aos="fade-up">
         <table class="table table-hover table-bordered align-middle text-center" style="border-radius: 10px;">
             <thead class="table-dark">
                 <tr>
@@ -81,7 +144,19 @@
                         {% elif order.status == 'Complete' %} style="font-weight: bold; background-color: #1a8754; color: #051c12;"
                         {% elif order.status == 'Abbandoned' %} style="font-weight: bold; background-color: #db3545; color: #2b0b0e;"
                         {% endif %}>
-                        {{ order.status }}
+                        
+                        {% if order.status == 'Draft' %}
+                            <i class="fa-solid fa-file-lines"></i> Draft
+                        {% elif order.status == 'Pending' %}
+                            <i class="fa-solid fa-hourglass-half"></i> Pending
+                        {% elif order.status == 'Shipped' %}
+                            <i class="fa-solid fa-truck"></i> Shipped
+                        {% elif order.status == 'Complete' %}
+                            <i class="fa-solid fa-check-circle"></i> Complete
+                        {% elif order.status == 'Abbandoned' %}
+                            <i class="fa-solid fa-ban"></i> Abbandoned
+                        {% endif %}
+                    
                     </td>
                     <td class="created_at">{{ order.created_at }}</td>
                     <td class="updated_at">{{ order.updated_at }}</td>
@@ -101,8 +176,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <h6>Columns to Display</h6>
-                <div id="columns-container">
+                <h6>Drag & Drop to Reorder Columns</h6>
+                <div id="sortable-columns" class="list-group">
                     <!-- Opzioni delle colonne generate dinamicamente -->
                 </div>
             </div>
@@ -110,8 +185,50 @@
     </div>
 </div>
 
+<!-- Modale per i filtri -->
+<div id="filter-modal" class="modal fade" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Filter Orders</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="filter-form">
+                    <!-- Stato -->
+                    <div class="mb-3">
+                        <label for="status-filter" class="form-label">Order Status</label>
+                        <select id="status-filter" class="form-select">
+                            <option value="">All</option>
+                            <option value="Draft">Draft</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Shipped">Shipped</option>
+                            <option value="Complete">Complete</option>
+                            <option value="Abandoned">Abandoned</option>
+                        </select>
+                    </div>
+
+                    <!-- Importo -->
+                    <div class="mb-3">
+                        <label for="amount-filter" class="form-label">Max amount (€)</label>
+                        <input type="number" id="amount-filter" class="form-control" placeholder="Es. 50">
+                    </div>
+
+                    <!-- Data di Creazione -->
+                    <div class="mb-3">
+                        <label for="date-filter" class="form-label">Created Data</label>
+                        <input type="date" id="date-filter" class="form-control">
+                    </div>
+
+                    <button type="submit" class="btn btn-danger w-100">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Inclusione dei file JavaScript -->
 <script src="{{ url_for('static', filename='js/admin/orders.js') }}"></script>
-<script src="{{ url_for('static', filename='js/admin/tables/research_method.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/tables/research_orders.js') }}"></script>
 
 {% endblock %}

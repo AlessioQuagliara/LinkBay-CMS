@@ -36,7 +36,7 @@
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <label for="total_amount" class="form-label">Total Amount €</label>
-                        <input type="number" class="form-control" id="total_amount" name="total_amount" value="{{ order.total_amount }}" readonly>
+                        <input type="number" class="form-control" id="total_amount" name="total_amount" value="{{ "%.2f"|format(total_amount) }}" readonly>
                     </div>
                     <div class="col-md-4">
                         <label for="status" class="form-label">Status</label>

@@ -19,7 +19,7 @@ class CookiePolicy(db.Model):
     button_color = db.Column(db.String(50), nullable=False)  # 🎨 Colore pulsante
     button_text_color = db.Column(db.String(50), nullable=False)  # 🎨 Colore testo pulsante
     text_color = db.Column(db.String(50), nullable=False)  # 🎨 Colore del testo
-    entry_animation = db.Column(db.String(100), nullable=False)  # 🎬 Animazione d'entrata
+    entry_animation = db.Column(db.String(100), nullable=False, default="fade")  # 🎬 Animazione d'entrata
     use_third_party = db.Column(db.Boolean, default=False)  # 🔄 Uso di servizi di terze parti
     third_party_cookie = db.Column(db.String(255), nullable=True)  # 🍪 Cookie di terze parti
     third_party_privacy = db.Column(db.String(255), nullable=True)  # 🔒 Privacy policy di terzi

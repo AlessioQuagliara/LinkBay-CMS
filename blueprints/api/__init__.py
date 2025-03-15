@@ -6,6 +6,7 @@ from .products_api import productsapi_bp
 from .brand_api import brands_bp
 from .collections_api import collections_bp
 from .order_list_api import order_list_bp
+from .subscriptions import subscriptions_bp
 
 
 
@@ -20,3 +21,4 @@ def register_api_blueprints(app):
     app.register_blueprint(brands_bp)
     app.register_blueprint(collections_bp)
     app.register_blueprint(order_list_bp)
+    app.register_blueprint(subscriptions_bp)

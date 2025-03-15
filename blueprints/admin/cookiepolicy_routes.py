@@ -44,7 +44,7 @@ def cookie_setting():
             cookie_settings.button_color = data.get('button_color', '#28a745')
             cookie_settings.button_text_color = data.get('button_text_color', '#ffffff')
             cookie_settings.text_color = data.get('text_color', '#000000')
-            cookie_settings.animation = data.get('animation', 'fade')
+            cookie_settings.entry_animation = data.get('entry_animation', 'fade')  # Se non viene passato, usa 'fade'
 
             # Salva nel database
             db.session.commit()
