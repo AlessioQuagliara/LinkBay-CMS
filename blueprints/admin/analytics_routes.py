@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+import requests
 from datetime import datetime
 from models.database import db
 from models.site_visits import SiteVisit
@@ -49,3 +50,21 @@ def track_visit():
         logging.error(f"Errore nel tracking della visita: {e}")
         db.session.rollback()  # Rollback in caso di errore
         return jsonify({'success': False, 'error': str(e)}), 500
+    
+@analytics_bp.route('/api/get-site-visits', methods=['GET'])
+def get_site_visits():
+    try:
+        visits = SiteVisit.query.order_by(SiteVisit.visit_time.desc()).limit(50).all()
+        visits_data = [
+            {
+                "ip_address": visit.ip_address,
+                "page_url": visit.page_url,
+                "visit_time": visit.visit_time.strftime("%Y-%m-%d %H:%M:%S"),
+                "latitude": visit.latitude,
+                "longitude": visit.longitude
+            }
+            for visit in visits
+        ]
+        return jsonify({"success": True, "visits": visits_data}), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500

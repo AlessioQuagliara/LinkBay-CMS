@@ -1,5 +1,6 @@
 from models.database import db
-from datetime import datetime, timedelta
+from datetime import timedelta
+from datetime import datetime as dt
 import logging
 from functools import wraps
 
@@ -16,7 +17,7 @@ class SiteVisit(db.Model):
     user_agent = db.Column(db.String(500), nullable=True)  # 🖥️ User-Agent del browser
     referrer = db.Column(db.String(500), nullable=True)  # 🔗 Pagina di provenienza
     page_url = db.Column(db.String(500), nullable=False)  # 📄 URL visitato
-    visit_time = db.Column(db.DateTime, default=datetime.utcnow)  # ⏱️ Data della visita
+    visit_time = db.Column(db.DateTime, default=dt.utcnow)  # ⏱️ Data della visita
 
     def __repr__(self):
         return f"<SiteVisit {self.id} - {self.ip_address} - {self.page_url} - {self.visit_time}>"
@@ -48,7 +49,7 @@ def log_visit(shop_name, ip_address, user_agent, referrer, page_url):
         user_agent=user_agent,
         referrer=referrer,
         page_url=page_url,
-        visit_time=datetime.utcnow(),
+        visit_time=dt.utcnow(),
     )
     db.session.add(visit)
     db.session.commit()
@@ -59,7 +60,7 @@ def log_visit(shop_name, ip_address, user_agent, referrer, page_url):
 # 🔍 **Recupera i visitatori attivi negli ultimi X minuti**
 @handle_db_errors
 def get_active_visitors(shop_name, minutes=10):
-    time_threshold = datetime.utcnow() - timedelta(minutes=minutes)
+    time_threshold = dt.utcnow() - timedelta(minutes=minutes)
     active_visitors = (
         db.session.query(db.func.count(SiteVisit.ip_address.distinct()))
         .filter(SiteVisit.shop_name == shop_name, SiteVisit.visit_time >= time_threshold)
@@ -96,7 +97,7 @@ def get_most_visited_pages(shop_name, limit=5):
 # ❌ **Elimina le visite più vecchie di X giorni**
 @handle_db_errors
 def clean_old_visits(days=30):
-    time_threshold = datetime.utcnow() - timedelta(days=days)
+    time_threshold = dt.utcnow() - timedelta(days=days)
     deleted_count = SiteVisit.query.filter(SiteVisit.visit_time < time_threshold).delete()
     db.session.commit()
     logging.info(f"🗑️ Eliminati {deleted_count} record di visite più vecchie di {days} giorni.")

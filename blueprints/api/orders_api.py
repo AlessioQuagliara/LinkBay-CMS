@@ -1,8 +1,11 @@
 from flask import Blueprint, jsonify, request, send_file
+from datetime import datetime, timedelta
 from models.database import db
+from models.customers import Customer
 from models.orders import Order
 import logging
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import func
 
 logging.basicConfig(level=logging.INFO)
 
@@ -100,3 +103,127 @@ def update_order():
     db.session.commit()
     return jsonify({'success': True, 'message': 'Order updated successfully.'})
 
+
+@ordersapi_bp.route('/orders/search', methods=['GET'])
+def search_orders():
+    """
+    API per cercare gli ordini con filtri personalizzati.
+    Permette di filtrare per order_number, status, customer_id e date range.
+    """
+    try:
+        # 🔹 Recupera i parametri della query string
+        order_number = request.args.get('order_number', type=str)
+        status = request.args.get('status', type=str)
+        customer_id = request.args.get('customer_id', type=int)
+        start_date = request.args.get('start_date', type=str)  # Formato: YYYY-MM-DD
+        end_date = request.args.get('end_date', type=str)  # Formato: YYYY-MM-DD
+
+        # 🔍 Costruzione della query dinamica
+        query = Order.query
+
+        if order_number:
+            query = query.filter(Order.order_number.ilike(f"%{order_number}%"))  # 🔍 Cerca per numero d'ordine (parziale)
+
+        if status:
+            query = query.filter(Order.status == status)  # 🎯 Filtra per stato
+
+        if customer_id:
+            query = query.filter(Order.customer_id == customer_id)  # 👤 Filtra per ID cliente
+
+        if start_date:
+            start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
+            query = query.filter(Order.created_at >= start_datetime)  # 🗓️ Filtra per data inizio
+
+        if end_date:
+            end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
+            query = query.filter(Order.created_at <= end_datetime)  # 🗓️ Filtra per data fine
+
+        # 📦 Esegui la query
+        orders = query.order_by(Order.created_at.desc()).all()
+
+        # 🔄 Converti i risultati in formato JSON
+        results = [{
+            "id": order.id,
+            "shop_name": order.shop_name,
+            "order_number": order.order_number,
+            "customer_id": order.customer_id,
+            "total_amount": order.total_amount,
+            "status": order.status,
+            "created_at": order.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "updated_at": order.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
+        } for order in orders]
+
+        return jsonify({"success": True, "orders": results}), 200
+
+    except SQLAlchemyError as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    
+@ordersapi_bp.route('/latest-orders', methods=['GET'])
+def latest_orders():
+    """
+    API per recuperare gli ultimi ordini effettuati nel negozio corrente.
+    """
+    shop_subdomain = request.host.split('.')[0]  # Estrai il nome del negozio dal sottodominio
+    limit = request.args.get('limit', 5, type=int)  # Permette di modificare il numero di risultati (default: 5)
+
+    try:
+        # Query per recuperare gli ultimi ordini con i dati del cliente
+        latest_orders = (
+            db.session.query(
+                Order.id,
+                Order.order_number,
+                Order.total_amount,
+                Order.status,
+                Order.created_at,
+                Customer.first_name.label("customer_name"),
+                Customer.last_name.label("customer_surname"),
+                Customer.email.label("customer_email")
+            )
+            .join(Customer, Order.customer_id == Customer.id, isouter=True)
+            .filter(Order.shop_name == shop_subdomain)
+            .order_by(Order.created_at.desc())
+            .limit(limit)
+            .all()
+        )
+
+        # Convertiamo i dati in formato JSON-friendly
+        orders_data = [
+            {
+                "id": order.id,
+                "order_number": order.order_number,
+                "customer_name": f"{order.customer_name or 'N/A'} {order.customer_surname or ''}".strip(),
+                "customer_email": order.customer_email or 'N/A',
+                "total_amount": order.total_amount,
+                "status": order.status,
+                "created_at": order.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            }
+            for order in latest_orders
+        ]
+
+        return jsonify({"success": True, "orders": orders_data})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    
+@ordersapi_bp.route('/sales-data', methods=['GET'])
+def get_sales_data():
+    try:
+        last_week = datetime.utcnow() - timedelta(days=7)
+
+        sales_data = (
+            db.session.query(
+                func.date(Order.created_at).label("date"),
+                func.sum(Order.total_amount).label("total_sales")
+            )
+            .filter(Order.created_at >= last_week)
+            .group_by(func.date(Order.created_at))
+            .order_by(func.date(Order.created_at))
+            .all()
+        )
+
+        dates = [row.date.strftime("%Y-%m-%d") for row in sales_data]
+        sales = [float(row.total_sales) for row in sales_data]
+
+        return jsonify({"success": True, "dates": dates, "sales": sales}), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500

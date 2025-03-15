@@ -1,10 +1,10 @@
 // 😍 PREFERENZE TABELLA ------------------------------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', function () {
-    const columnsContainer = document.getElementById('columns-container');
+    const columnsContainer = document.getElementById('sortable-columns');
     const tablePreferencesKey = 'customersTablePreferences';
 
     const columns = [
-        { value: 'id', label: '#' },
+        { value: 'id', label: 'ID' },
         { value: 'first_name', label: 'First Name' },
         { value: 'last_name', label: 'Last Name' },
         { value: 'email', label: 'Email' },
@@ -20,13 +20,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function renderColumnOptions(preferences) {
         columnsContainer.innerHTML = '';
-        columns.forEach(column => {
-            const isChecked = preferences[column.value] ?? column.default;
-            columnsContainer.innerHTML += `
-                <div class="form-check">
-                    <input class="form-check-input column-toggle" type="checkbox" value="${column.value}" id="column-${column.value}" ${isChecked ? 'checked' : ''}>
-                    <label class="form-check-label" for="column-${column.value}">${column.label}</label>
-                </div>`;
+
+        // Usa l'ordine salvato nelle preferenze, altrimenti l'ordine di default
+        const orderedColumns = preferences.order || columns.map(col => col.value);
+
+        orderedColumns.forEach(columnValue => {
+            const column = columns.find(col => col.value === columnValue);
+            if (!column) return; // Skip se la colonna non esiste
+
+            const isChecked = preferences[column.value] ?? true;
+            const columnItem = document.createElement('div');
+            columnItem.classList.add('list-group-item', 'd-flex', 'align-items-center');
+            columnItem.dataset.column = column.value;
+            columnItem.innerHTML = `
+                <i class="fa-solid fa-grip-lines me-2"></i>
+                <input class="form-check-input column-toggle me-2" type="checkbox" value="${column.value}" ${isChecked ? 'checked' : ''}>
+                <label class="form-check-label flex-grow-1">${column.label}</label>
+            `;
+            columnsContainer.appendChild(columnItem);
         });
 
         // Aggiunge il listener per aggiornare la vista automaticamente
@@ -36,12 +47,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 applyPreferences(loadPreferences());
             });
         });
+
+        // Rendi il contenitore delle colonne ordinabile
+        new Sortable(columnsContainer, {
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            onEnd: function () {
+                savePreferences(); // Salva il nuovo ordine
+                applyPreferences(loadPreferences());
+            }
+        });
     }
 
     function savePreferences() {
-        const preferences = {};
-        document.querySelectorAll('.column-toggle').forEach(toggle => {
-            preferences[toggle.value] = toggle.checked;
+        const preferences = { order: [] };
+        document.querySelectorAll('#sortable-columns .list-group-item').forEach(item => {
+            const columnValue = item.dataset.column;
+            const checkbox = item.querySelector('.column-toggle');
+            preferences[columnValue] = checkbox.checked;
+            preferences.order.push(columnValue);
         });
         localStorage.setItem(tablePreferencesKey, JSON.stringify(preferences));
     }
@@ -51,8 +75,25 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function applyPreferences(preferences) {
+        const orderedColumns = preferences.order || columns.map(col => col.value);
+
+        // Riordina le colonne nella tabella
+        const tableHeadRow = document.querySelector('thead tr');
+        const tableBodyRows = document.querySelectorAll('tbody tr');
+
+        orderedColumns.forEach(columnValue => {
+            const header = tableHeadRow.querySelector(`th.${columnValue}`);
+            if (header) tableHeadRow.appendChild(header);
+
+            tableBodyRows.forEach(row => {
+                const cell = row.querySelector(`td.${columnValue}`);
+                if (cell) row.appendChild(cell);
+            });
+        });
+
+        // Nasconde/mostra le colonne in base alle preferenze
         columns.forEach(column => {
-            const isChecked = preferences[column.value] ?? column.default;
+            const isChecked = preferences[column.value] ?? true;
             const header = document.querySelector(`thead th.${column.value}`);
             if (header) {
                 header.style.display = isChecked ? '' : 'none';
@@ -63,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Carica le preferenze salvate e aggiorna la vista all'avvio
+    // Inizializzazione
     const savedPreferences = loadPreferences();
     renderColumnOptions(savedPreferences);
     applyPreferences(savedPreferences);

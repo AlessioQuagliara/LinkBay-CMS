@@ -12,9 +12,8 @@
 </head>
 <body>
     <!-- Include la navbar -->
-    <nav>
-        {{ navbar | safe }}  <!-- Stampa il contenuto della navbar -->
-    </nav>
+    {{ navbar | safe }}  <!-- Stampa il contenuto della navbar -->
+
     
     <!-- Contenuto della pagina -->
     {{ content | safe }}
@@ -23,9 +22,8 @@
     {{ cookie_policy_banner | safe }}  <!-- Questo carica i cookie personalizzati -->
 
     <!-- Include il footer -->
-    <footer>
-        {{ footer | safe }}  <!-- Stampa il contenuto del footer -->
-    </footer>
+    {{ footer | safe }}  <!-- Stampa il contenuto del footer -->
+
     
     <!-- Carica script personalizzati -->
     {{ script | safe }}  <!-- Questo carica gli script personalizzati nel body -->

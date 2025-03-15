@@ -2,12 +2,12 @@
 
 {% block content %}
    
-<div class="container my-4">
+<div class="container my-4" data-aos="fade-up">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/toolbar.css') }}">
 
     <!-- Card per le funzioni della tabella -->
-    <div class="card shadow-sm mb-4" data-aos="fade-up">
+    <div class="card shadow-sm mb-4">
         <div class="card-body d-flex justify-content-between align-items-center">
             <div class="d-flex gap-3">
                 <a href="/admin/cms/pages/customers" class="btn {% if title == 'Customers' %}btn-dark{% else %}btn-outline-dark{% endif %} btn-sm text-decoration-none ">
@@ -15,11 +15,20 @@
                 </a>
             </div>
             <div class="custom-toolbar">
-                <button class="custom-btn" id="search-toggle-btn" title="Search">
-                  <i class="fa-solid fa-magnifying-glass"></i>
-                  <input type="text" id="search-input" class="custom-input d-none" placeholder="Search..." style="max-width: 200px;">
-                </button>
+
+                <div class="position-relative">
+                    <button class="custom-btn" id="search-toggle-btn" title="Search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="search-input" class="custom-input d-none" placeholder="Search orders..." style="max-width: 200px;">
+                    </button>
                 
+                    <!-- Dropdown per i risultati della ricerca -->
+                    <div id="search-results" class="dropdown-menu w-100 shadow-sm" style="display: none; position: absolute; top: 100%; left: 0; z-index: 1000;">
+                        <div class="dropdown-header text-muted">Risultati</div>
+                        <div id="search-results-list"></div>
+                    </div>
+                </div>
+
                 <button class="custom-btn" title="Add customer" id="add-customer-btn">
                   <i class="fa-solid fa-plus"></i>
                 </button>
@@ -41,6 +50,59 @@
                 </button>
             </div>
         </div>
+        {% if pagination.pages > 1 %}
+        <div class="card-footer bg-dark text-center py-2">
+            <nav aria-label="Customer pagination">
+                <ul class="pagination pagination-sm justify-content-center mb-0">
+                    <!-- 🔙 Indietro -->
+                    {% if pagination.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link text-white bg-secondary border-0" 
+                            href="{{ url_for('customers.customers', page=pagination.prev_num, search=search_query) }}">
+                                <i class="fa-solid fa-angle-left"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link text-muted bg-secondary border-0"><i class="fa-solid fa-angle-left"></i></span>
+                        </li>
+                    {% endif %}
+
+                    <!-- 🔢 Numeri delle pagine -->
+                    {% for num in pagination.iter_pages() %}
+                        {% if num %}
+                            {% if num == pagination.page %}
+                                <li class="page-item active">
+                                    <span class="page-link bg-light text-dark border-0">{{ num }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link text-white bg-secondary border-0" 
+                                    href="{{ url_for('customers.customers', page=num, search=search_query) }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link text-muted bg-secondary border-0">…</span></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- ⏩ Avanti -->
+                    {% if pagination.has_next %}
+                        <li class="page-item">
+                            <a class="page-link text-white bg-secondary border-0" 
+                            href="{{ url_for('customers.customers', page=pagination.next_num, search=search_query) }}">
+                                <i class="fa-solid fa-angle-right"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link text-muted bg-secondary border-0"><i class="fa-solid fa-angle-right"></i></span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
     </div>
 
     <!-- Card per la tabella dei clienti -->
@@ -96,8 +158,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <h6>Columns to Display</h6>
-                <div id="columns-container">
+                <h6>Drag & Drop to Reorder Columns</h6>
+                <div id="sortable-columns" class="list-group">
                     <!-- Opzioni delle colonne generate dinamicamente -->
                 </div>
             </div>
@@ -107,7 +169,7 @@
 
 <!-- Inclusione dei file JavaScript -->
 <script src="{{ url_for('static', filename='js/admin/customers.js') }}"></script>
-<script src="{{ url_for('static', filename='js/admin/tables/research_method.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/tables/research_customers.js') }}"></script>
 
 
 <style>

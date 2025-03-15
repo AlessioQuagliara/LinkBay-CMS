@@ -504,6 +504,6 @@ def get_pages():
 @handle_request_errors
 def get_site_visits():
     shop_name = request.host.split('.')[0]
-    visits = db.session.query(SiteVisit).filter_by(shop_name=shop_name).order_by(SiteVisit.timestamp.desc()).limit(100).all()
+    visits = db.session.query(SiteVisit).filter_by(shop_name=shop_name).order_by(SiteVisit.visit_time.desc()).limit(100).all()
 
     return jsonify({'success': True, 'visits': [visit.to_dict() for visit in visits]})
