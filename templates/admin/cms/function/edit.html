@@ -70,6 +70,7 @@
     </nav>
     <main class="d-flex">
         {% include 'admin/cms/ui/editor_bar.html' %}
+        <!-- 🔹 Navbar fuori da GrapesJS -->
         <div class="content" style="padding: 0 !important;">
             <div id="editor" style="height: 100vh;">{{ page.content | safe }}</div>
         </div>

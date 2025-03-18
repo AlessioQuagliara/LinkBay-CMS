@@ -19,6 +19,7 @@ class Page(db.Model):
     keywords = db.Column(db.String(255), nullable=True)  # 🔑 Parole chiave SEO
     slug = db.Column(db.String(255), unique=True, nullable=False)  # 🔗 Slug della pagina
     content = db.Column(db.Text, nullable=True)  # 🖋️ Contenuto della pagina
+    styles = db.Column(db.Text, nullable=True)  # 🎨 **Nuovo campo per salvare gli stili CSS**
     theme_name = db.Column(db.String(255), nullable=True)  # 🎨 Nome del tema
     paid = db.Column(db.String(255), nullable=False, default="No")  # 💰 Stato pagato o no
     language = db.Column(db.String(10), nullable=True)  # 🌍 Lingua della pagina
@@ -29,7 +30,7 @@ class Page(db.Model):
     def __repr__(self):
         return f"<Page {self.slug} - {self.shop_name}>"
     
-# DIZIONARIO ---------------------------------------------------- 
+    # DIZIONARIO ---------------------------------------------------- 
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 

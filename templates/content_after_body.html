@@ -7,5 +7,14 @@
 {% endif %}
 
 <!-- Include gli script funzionali -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        AOS.init({
+            once: true,  // 🔹 Assicura che l'animazione avvenga solo una volta
+            delay: 50,   // 🔹 Evita ritardi troppo lunghi
+            duration: 800 // 🔹 Regola la durata dell'animazione
+        });
+    });
+</script>
 
 <script src="{{ url_for('static', filename='js/cms/cms.js') }}"></script>

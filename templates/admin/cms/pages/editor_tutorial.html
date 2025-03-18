@@ -1,8 +1,5 @@
-<!-- Include AOS CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
 
-
-<div class="container mt-5" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
+<div class="container mt-5">
 
     <!-- Section 1 -->
     <div class="row my-5 align-items-center">
@@ -147,21 +144,3 @@
     </div>
 
 </div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        AOS.init({
-            duration: 1000, // Maggiore durata per un effetto più fluido
-            easing: "ease-in-out", // Stile di animazione più naturale
-            once: false, // Le animazioni si attivano anche se scorri su e giù
-            mirror: true, // Riattiva l'animazione se torni indietro
-            delay: 100 // Aggiunge un piccolo ritardo per evitare problemi di caricamento
-        });
-
-        // Forza un refresh di AOS dopo il caricamento della pagina per evitare bug
-        setTimeout(() => {
-            AOS.refresh();
-        }, 1000);
-    });
-</script>

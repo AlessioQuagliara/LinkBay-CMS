@@ -18,40 +18,50 @@ logging.basicConfig(level=logging.INFO)
 main_bp = Blueprint('main', __name__)
 
 # 🔹 **Rotta principale per pagine standard**
-@main_bp.route('/', defaults={'slug': 'home'})
-@main_bp.route('/<slug>')
+@main_bp.route("/", defaults={"slug": "home"})
+@main_bp.route("/<slug>")
 def render_dynamic_page(slug=None):
     """
     Renderizza una pagina dinamica basata sullo slug.
     """
-    shop_subdomain = request.host.split('.')[0]
+    shop_subdomain = request.host.split(".")[0]
     page = load_page_content(slug, shop_subdomain)
 
     if page:
         language = get_language()
-        navbar_content = get_navbar_content(shop_subdomain)  # 🔹 Ora è HTML puro
-        footer_content = get_footer_content(shop_subdomain)  # 🔹 Ora è HTML puro
-        render_theme = render_theme_styles(shop_subdomain)
+
+        # 🔹 Recupera contenuto e stili della navbar
+        navbar_page = load_page_content("navbar", shop_subdomain)
+        navbar_content = navbar_page.content if navbar_page else ""
+        navbar_styles = navbar_page.styles if navbar_page and navbar_page.styles else ""
+
+        # 🔹 Recupera contenuto e stili del footer
+        footer_page = load_page_content("footer", shop_subdomain)
+        footer_content = footer_page.content if footer_page else ""
+        footer_styles = footer_page.styles if footer_page and footer_page.styles else ""
+
         web_settings = get_web_settings(shop_subdomain)
         cookie_policy_banner = get_cookie_policy_content(shop_subdomain)
 
         return render_template(
-            'index.html',
+            "index.html",
             title=page.title,
             description=page.description,
             keywords=page.keywords,
             content=page.content,
-            navbar=navbar_content,  # ✅ Ora è stampato direttamente come HTML
-            footer=footer_content,  # ✅ Ora è stampato direttamente come HTML
-            render_theme=render_theme,
+            styles=page.styles if page.styles else "",  # 🔹 Stili specifici della pagina
+            navbar=navbar_content,  # ✅ Contenuto della navbar
+            navbar_styles=navbar_styles,  # ✅ Stili della navbar
+            footer=footer_content,  # ✅ Contenuto del footer
+            footer_styles=footer_styles,  # ✅ Stili del footer
             cookie_policy_banner=cookie_policy_banner,
             language=language,
-            head=web_settings.head if web_settings else '',
-            script=web_settings.script if web_settings else '',
-            foot=web_settings.foot if web_settings else ''
+            head=web_settings.head if web_settings else "",
+            script=web_settings.script if web_settings else "",
+            foot=web_settings.foot if web_settings else "",
         )
-    
-    return render_template('errors/404.html'), 404
+
+    return render_template("errors/404.html"), 404
 
 # 🔹 **Rotta per le collezioni**
 @main_bp.route('/collections/<slug>', methods=['GET'])

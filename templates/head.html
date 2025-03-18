@@ -49,8 +49,16 @@
  <link rel="icon" href="https://www.linkbay.it/static/image/favicon.ico">
 
  <!-- Theme CSS -->
-
+ 
  {{ render_theme | safe }}
+ 
+ <!-- CSS -->
+  <style>
+      {{ styles | safe }}
+      {{ navbar_styles | safe}}
+      {{ footer_styles | safe}}
+  </style>
+
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/cms/cart.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/cms/cookie_bar.css') }}">

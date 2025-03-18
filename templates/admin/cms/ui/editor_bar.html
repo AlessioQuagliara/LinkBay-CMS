@@ -22,16 +22,7 @@
                 </a>
             </li>
             <hr>
-            {% if page.slug in ['navbar', 'footer'] %}
-            <li class="nav-item">
-                <select id="language-selector" class="form-select">
-                    <option value="en" {% if page.language == 'en' %}selected{% endif %}>English</option>
-                    <option value="it" {% if page.language == 'it' %}selected{% endif %}>Italian</option>
-                    <option value="fr" {% if page.language == 'fr' %}selected{% endif %}>French</option>
-                    <option value="de" {% if page.language == 'de' %}selected{% endif %}>German</option>
-                </select>
-            </li>
-            {% else %}
+
             <!-- Contro Z button -->
             <div class="d-flex justify-content-center mb-3">
                 <!-- Undo Button -->
@@ -56,80 +47,108 @@
                 <a class="nav-link text-white" href="#" data-bs-toggle="collapse" data-bs-target="#stylesSection">
                     <i class="fa-solid fa-paint-brush me-2"></i> Element Styles
                 </a>
-                <div id="stylesSection" class="collapse">
-                    <!-- Selettore per il colore di sfondo -->
-                    <label for="bg-color-select">Background Color</label>
-                    <select id="bg-color-select" class="form-select mb-2">
-                        <option value="bg-primary">Primary</option>
-                        <option value="bg-secondary">Secondary</option>
-                        <option value="bg-success">Success</option>
-                        <option value="bg-danger">Danger</option>
-                        <option value="bg-warning">Warning</option>
-                        <option value="bg-info">Info</option>
-                        <option value="bg-light">Light</option>
-                        <option value="bg-dark">Dark</option>
-                        <option value="bg-white">White</option>
-                    </select>
+                <div id="stylesSection" class="collapse p-3 bg-dark text-white">
+                    <!-- Background Color -->
+                    <label>Background Color</label>
+                    <input type="color" id="bg-color-select" class="form-control mb-2">
             
-                    <!-- Selettore per il padding -->
-                    <label for="padding-select">Padding</label>
-                    <select id="padding-select" class="form-select mb-2">
-                        <option value="p-0">None</option>
-                        <option value="p-1">Small</option>
-                        <option value="p-2">Medium</option>
-                        <option value="p-3">Large</option>
-                        <option value="p-4">X-Large</option>
-                        <option value="p-5">XX-Large</option>
-                    </select>
+                    <!-- Background Image -->
+                    <label>Background Image (URL)</label>
+                    <input type="text" id="bg-image-select" class="form-control mb-2" placeholder="Enter image URL">
             
-                    <!-- Selettore per il margin -->
-                    <label for="margin-select">Margin</label>
-                    <select id="margin-select" class="form-select mb-2">
-                        <option value="m-0">None</option>
-                        <option value="m-1">Small</option>
-                        <option value="m-2">Medium</option>
-                        <option value="m-3">Large</option>
-                        <option value="m-4">X-Large</option>
-                        <option value="m-5">XX-Large</option>
-                    </select>
+                    <!-- Text Color -->
+                    <label>Text Color</label>
+                    <input type="color" id="text-color-select" class="form-control mb-2">
             
-                    <!-- Selettore per il testo -->
-                    <label for="text-color-select">Text Color</label>
-                    <select id="text-color-select" class="form-select mb-2">
-                        <option value="text-primary">Primary</option>
-                        <option value="text-secondary">Secondary</option>
-                        <option value="text-success">Success</option>
-                        <option value="text-danger">Danger</option>
-                        <option value="text-warning">Warning</option>
-                        <option value="text-info">Info</option>
-                        <option value="text-light">Light</option>
-                        <option value="text-dark">Dark</option>
-                        <option value="text-muted">Muted</option>
-                        <option value="text-white">White</option>
-                    </select>
+                    <!-- Text Shadow -->
+                    <label>Text Shadow</label>
+                    <input type="text" id="text-shadow-select" class="form-control mb-2" placeholder="e.g. 2px 2px 5px rgba(0,0,0,0.5)">
             
-                    <!-- Selettore per il font family -->
-                    <label for="font-family-select">Font Family</label>
+                    <!-- Font Size -->
+                    <label>Font Size</label>
+                    <input type="range" id="font-size-range" class="form-range mb-2" min="8" max="72" value="16">
+            
+                    <!-- Border -->
+                    <label>Border</label>
+                    <input type="text" id="border-select" class="form-control mb-2" placeholder="e.g. 2px solid black">
+            
+                    <!-- Border Radius -->
+                    <label>Border Radius</label>
+                    <input type="range" id="border-radius-range" class="form-range mb-2" min="0" max="50" value="0">
+            
+                    <!-- Box Shadow -->
+                    <label>Box Shadow</label>
+                    <input type="text" id="box-shadow-select" class="form-control mb-2" placeholder="e.g. 5px 5px 10px rgba(0,0,0,0.5)">
+            
+                    <!-- Padding -->
+                    <label>Padding</label>
+                    <input type="range" id="padding-range" class="form-range mb-2" min="0" max="50" value="10">
+            
+                    <!-- Margin -->
+                    <label>Margin</label>
+                    <input type="range" id="margin-range" class="form-range mb-2" min="0" max="50" value="10">
+            
+                    <!-- Font Family -->
+                    <label>Font Family</label>
                     <select id="font-family-select" class="form-select mb-2">
-                        <option value="font-sans-serif">Sans-serif</option>
-                        <option value="font-serif">Serif</option>
-                        <option value="font-monospace">Monospace</option>
+                        <option value="Arial, sans-serif">Arial</option>
+                        <option value="Georgia, serif">Georgia</option>
+                        <option value="Courier New, monospace">Courier New</option>
+                        <option value="Times New Roman, serif">Times New Roman</option>
                     </select>
             
-                    <!-- Selettore per la sezione o sezione a larghezza intera -->
-                    <label for="section-type-select">Section Type</label>
-                    <select id="section-type-select" class="form-select mb-2">
-                        <option value="container">Container</option>
-                        <option value="container-fluid">Container Fluid</option>
-                        <option value="section">Section</option>
-                        <option value="section-full">Section Full</option>
+                    <!-- Content Alignment -->
+                    <label>Text Align</label>
+                    <select id="text-align-select" class="form-select mb-2">
+                        <option value="left">Left</option>
+                        <option value="center">Center</option>
+                        <option value="right">Right</option>
                     </select>
             
-                    <!-- Selettore per Flex -->
-                    <label for="flex-select">Display Flex</label>
-                    <select id="flex-select" class="form-select mb-2">
-                        <option value="d-flex">Yes</option>
-                        <option value="d-none">No</option>
+                    <!-- Position -->
+                    <label>Position</label>
+                    <select id="position-select" class="form-select mb-2">
+                        <option value="static">Static</option>
+                        <option value="relative">Relative</option>
+                        <option value="absolute">Absolute</option>
+                        <option value="fixed">Fixed</option>
+                    </select>
+            
+                    <!-- Flexbox -->
+                    <label>Flex Direction</label>
+                    <select id="flex-direction-select" class="form-select mb-2">
+                        <option value="row">Row</option>
+                        <option value="column">Column</option>
+                    </select>
+            
+                    <label>Justify Content</label>
+                    <select id="justify-content-select" class="form-select mb-2">
+                        <option value="flex-start">Start</option>
+                        <option value="center">Center</option>
+                        <option value="flex-end">End</option>
+                        <option value="space-between">Space Between</option>
+                        <option value="space-around">Space Around</option>
+                    </select>
+            
+                    <label>Align Items</label>
+                    <select id="align-items-select" class="form-select mb-2">
+                        <option value="stretch">Stretch</option>
+                        <option value="center">Center</option>
+                        <option value="flex-start">Start</option>
+                        <option value="flex-end">End</option>
+                    </select>
+
+                    <!-- Link URL -->
+                    <label>Link URL</label>
+                    <input type="text" id="link-url-input" class="form-control mb-2" placeholder="Enter link URL">
+                    
+                    <!-- Link Target -->
+                    <label>Link Target</label>
+                    <select id="link-target-select" class="form-select mb-2">
+                        <option value="_self">Same Tab</option>
+                        <option value="_blank">New Tab</option>
+                        <option value="_parent">Parent Frame</option>
+                        <option value="_top">Top Frame</option>
                     </select>
                 </div>
             </li>
@@ -183,7 +202,7 @@
                 </a>
             </li>
 
-            {% endif %}
+
             {% if page.slug in ['home', 'about-us', 'catalogs', 'products', 'navbar', 'footer' ] %}
             {% else %}
             <li class="nav-item">
