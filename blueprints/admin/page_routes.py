@@ -221,16 +221,55 @@ def edit_page(slug):
         page=page, 
         username=username, 
         selected_theme_ui=selected_theme_ui,
-        navbar=navbar_content
+        navbar=navbar_content,
+        styles=page.styles
     )
 
+@page_bp.route('/api/get-page', methods=['GET'])
+@handle_request_errors
+def get_page():
+    """
+    Recupera il contenuto di una pagina in base allo slug.
+    """
+    slug = request.args.get("slug")
+    shop_subdomain = request.host.split('.')[0]
+
+    if not slug:
+        return jsonify({"success": False, "error": "Slug non fornito"}), 400
+
+    page = db.session.query(Page).filter_by(slug=slug, shop_name=shop_subdomain).first()
+
+    if not page:
+        return jsonify({"success": False, "error": "Pagina non trovata"}), 404
+
+    return jsonify({
+        "success": True,
+        "content": page.content,
+        "styles": page.styles
+    })
+    
+
+@page_bp.route('/api/get-page-styles/<int:page_id>', methods=['GET'])
+def get_page_styles(page_id):
+    """
+    API per ottenere gli stili CSS salvati nel database per una pagina.
+    """
+    shop_subdomain = request.host.split('.')[0]
+    page = db.session.query(Page).filter_by(id=page_id, shop_name=shop_subdomain).first()
+
+    if not page:
+        return jsonify({"success": False, "error": "Page not found"}), 404
+
+    return jsonify({"success": True, "styles": page.styles})  # Assumendo che 'styles' esista nel modello Page
+
 # 🔹 **Salvataggio della pagina con gestione immagini**
-@page_bp.route('/admin/cms/function/save', methods=['POST'])
+@page_bp.route('/api/function/save', methods=['POST'])
 @handle_request_errors
 def save_page():
     data = request.get_json()
     page_id = data.get('id')
     content = data.get('content')
+    styles = data.get('styles')
     language = data.get('language')  
     shop_subdomain = request.host.split('.')[0]
 
@@ -247,14 +286,35 @@ def save_page():
                 content = content.replace(base64_img, image_url)
 
         page.content = content
+        page.styles = styles
         page.updated_at = db.func.now()
         db.session.commit()
         return jsonify({'success': True})
     else:
         return jsonify({'success': False, 'error': 'Pagina non trovata'}), 404
+    
+@page_bp.route('/upload-image', methods=['POST'])
+def upload_image():
+    try:
+        data = request.get_json()
+        base64_image = data.get("image")
+
+        if not base64_image:
+            return jsonify({"success": False, "error": "No image data received"}), 400
+
+        # Salva l'immagine e ottieni l'URL
+        image_url = save_image(base64_image, "temp", "global_uploads")
+
+        if image_url:
+            return jsonify({"success": True, "url": image_url}), 200
+        else:
+            return jsonify({"success": False, "error": "Failed to save image"}), 500
+    except Exception as e:
+        logging.error(f"Error in image upload: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
 # 🔹 **Salvataggio SEO della pagina**
-@page_bp.route('/admin/cms/function/save-seo', methods=['POST'])
+@page_bp.route('/api/function/save-seo', methods=['POST'])
 @handle_request_errors
 def save_seo_page():
     data = request.get_json()
@@ -278,7 +338,7 @@ def save_seo_page():
         return jsonify({'success': False, 'error': 'Pagina non trovata'}), 404
 
 # 🔹 **Creazione di una nuova pagina**
-@page_bp.route('/admin/cms/function/create', methods=['POST'])
+@page_bp.route('/api/function/create', methods=['POST'])
 @handle_request_errors
 def create_page():
     if 'user_id' not in session:
@@ -306,7 +366,7 @@ def create_page():
     return jsonify({'success': True})
 
 # 🔹 **Eliminazione di una pagina**
-@page_bp.route('/admin/cms/function/delete', methods=['POST'])
+@page_bp.route('/api/function/delete', methods=['POST'])
 @handle_request_errors
 def delete_page():
     data = request.get_json()
@@ -329,18 +389,18 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def save_image(base64_image, page_id, shop_subdomain):
+def save_image(base64_image, page_id=None, shop_subdomain="global_uploads"):
     try:
         header, encoded = base64_image.split(",", 1)
         binary_data = base64.b64decode(encoded)
 
-        # Creazione della cartella per il negozio specifico
+        # Creazione della cartella di upload
         upload_folder = f"static/uploads/{shop_subdomain}"
         if not os.path.exists(upload_folder):
-            os.makedirs(upload_folder)  
+            os.makedirs(upload_folder)
 
-        # Nome univoco per ogni immagine, ad esempio usando un UUID
-        image_name = f"{page_id}_{uuid.uuid4().hex}.png"
+        # Genera un nome file unico
+        image_name = f"{page_id or 'global'}_{uuid.uuid4().hex}.png"
         image_path = os.path.join(upload_folder, image_name)
 
         # Salva l'immagine
@@ -349,7 +409,7 @@ def save_image(base64_image, page_id, shop_subdomain):
 
         return f"/{upload_folder}/{image_name}"
     except Exception as e:
-        logging.info(f"Error saving image: {str(e)}")
+        logging.error(f"Error saving image: {e}")
         return None
     
 # Funzione per salvare un'immagine base64 generica ---------------------------------------------------------------

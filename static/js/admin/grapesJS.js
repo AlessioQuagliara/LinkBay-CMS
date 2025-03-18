@@ -22,9 +22,30 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // 🔹 Recupera gli stili salvati dal server
+    async function loadStyles() {
+        try {
+            const pageID = window.pageID; // Assumiamo che il page ID sia definito in un <script> nell'HTML
+            const response = await fetch(`/api/get-page-styles/${pageID}`);
+            const data = await response.json();
+
+            if (data.success && data.styles) {
+                editor.setStyle(data.styles);
+            } else {
+                console.warn("⚠️ Nessun stile trovato per questa pagina.");
+            }
+        } catch (error) {
+            console.error("❌ Errore nel recupero degli stili:", error);
+        }
+    }
+
+    loadStyles(); // Chiama la funzione per caricare gli stili
+    
     let selectedComponent = null;
 
 
+
+    
 
     // Gestione dei pulsanti Undo/Redo
     document.getElementById('undo-btn').addEventListener('click', () => {
@@ -53,83 +74,125 @@ document.addEventListener("DOMContentLoaded", function () {
     
 
 
-    // 🔹 Quando un elemento viene selezionato nell'editor
-    editor.on('component:selected', (component) => {
+    editor.on("component:selected", function (component) {
         selectedComponent = component;
-        
-        // Impostiamo i valori dei controlli con le classi correnti
-        let currentClasses = selectedComponent.getClasses().join(' ');
-
-        // Background Color
-        document.getElementById('bg-color-select').value = currentClasses.match(/bg-\w+/)?.[0] || 'bg-light';
-        
-        // Padding
-        document.getElementById('padding-select').value = currentClasses.match(/p-\d+/)?.[0] || 'p-0';
-        
-        // Margin
-        document.getElementById('margin-select').value = currentClasses.match(/m-\d+/)?.[0] || 'm-0';
-        
-        // Text Color
-        document.getElementById('text-color-select').value = currentClasses.match(/text-\w+/)?.[0] || 'text-dark';
-        
-        // Font Family
-        document.getElementById('font-family-select').value = currentClasses.match(/font-\w+/)?.[0] || 'font-sans-serif';
-        
-        // Section Type
-        document.getElementById('section-type-select').value = currentClasses.match(/container-fluid|container|section-full|section/)?.[0] || 'container';
-        
-        // Flex
-        document.getElementById('flex-select').value = currentClasses.includes('d-flex') ? 'd-flex' : 'd-none';
+        updateStyleControls(component);
     });
 
-    // 🔹 Funzione per aggiornare le classi
-    function updateClass(property, value) {
-        if (selectedComponent) {
-            // Prendi tutte le classi esistenti
-            let currentClasses = selectedComponent.getClasses();
-            
-            // Rimuovi la classe se esiste già
-            selectedComponent.removeClass(currentClasses.filter(c => c.startsWith(property)));
+    function updateStyleControls(component) {
+        if (!component) return;
 
-            // Aggiungi la nuova classe
-            selectedComponent.addClass(value);
+        const styles = component.getStyle();
+
+        document.getElementById("bg-color-select").value = styles["background-color"] || "#ffffff";
+        document.getElementById("bg-image-select").value = styles["background-image"] ? styles["background-image"].replace(/url\(['"]?(.*?)['"]?\)/, '$1') : "";
+        document.getElementById("text-color-select").value = styles["color"] || "#000000";
+        document.getElementById("text-shadow-select").value = styles["text-shadow"] || "";
+        document.getElementById("font-size-range").value = parseInt(styles["font-size"]) || 16;
+        document.getElementById("border-select").value = styles["border"] || "";
+        document.getElementById("border-radius-range").value = parseInt(styles["border-radius"]) || 0;
+        document.getElementById("box-shadow-select").value = styles["box-shadow"] || "";
+        document.getElementById("padding-range").value = parseInt(styles["padding"]) || 10;
+        document.getElementById("margin-range").value = parseInt(styles["margin"]) || 10;
+        document.getElementById("text-align-select").value = styles["text-align"] || "left";
+        document.getElementById("position-select").value = styles["position"] || "static";
+        document.getElementById("font-family-select").value = styles["font-family"] || "Arial, sans-serif";
+        document.getElementById("flex-direction-select").value = styles["flex-direction"] || "row";
+        document.getElementById("justify-content-select").value = styles["justify-content"] || "flex-start";
+        document.getElementById("align-items-select").value = styles["align-items"] || "stretch";
+
+        // Se è un link, aggiorna i controlli
+        if (component.is('link')) {
+            document.getElementById("link-url-input").value = component.getAttributes()["href"] || "";
+            document.getElementById("link-target-select").value = component.getAttributes()["target"] || "_self";
         }
     }
 
-    // 🔹 Cambia la classe per il background
-    document.getElementById('bg-color-select').addEventListener('change', function () {
-        updateClass('bg', this.value);
+    function applyStyle(property, value) {
+        if (selectedComponent) {
+            selectedComponent.addStyle({ [property]: value });
+        }
+    }
+
+    // 🔹 EVENT LISTENERS PER OGNI INPUT
+    document.getElementById("bg-color-select").addEventListener("input", function () {
+        applyStyle("background-color", this.value);
     });
 
-    // 🔹 Cambia la classe per il padding
-    document.getElementById('padding-select').addEventListener('change', function () {
-        updateClass('p', this.value);
+    document.getElementById("bg-image-select").addEventListener("input", function () {
+        applyStyle("background-image", `url('${this.value}')`);
     });
 
-    // 🔹 Cambia la classe per il margin
-    document.getElementById('margin-select').addEventListener('change', function () {
-        updateClass('m', this.value);
+    document.getElementById("text-color-select").addEventListener("input", function () {
+        applyStyle("color", this.value);
     });
 
-    // 🔹 Cambia la classe per il colore del testo
-    document.getElementById('text-color-select').addEventListener('change', function () {
-        updateClass('text', this.value);
+    document.getElementById("text-shadow-select").addEventListener("input", function () {
+        applyStyle("text-shadow", this.value);
     });
 
-    // 🔹 Cambia la classe per il font family
-    document.getElementById('font-family-select').addEventListener('change', function () {
-        updateClass('font', this.value);
+    document.getElementById("font-size-range").addEventListener("input", function () {
+        applyStyle("font-size", this.value + "px");
     });
 
-    // 🔹 Cambia la classe per il tipo di sezione
-    document.getElementById('section-type-select').addEventListener('change', function () {
-        updateClass('section-type', this.value);
+    document.getElementById("border-select").addEventListener("input", function () {
+        applyStyle("border", this.value);
     });
 
-    // 🔹 Cambia la classe per Flex
-    document.getElementById('flex-select').addEventListener('change', function () {
-        updateClass('d', this.value);
+    document.getElementById("border-radius-range").addEventListener("input", function () {
+        applyStyle("border-radius", this.value + "px");
     });
+
+    document.getElementById("box-shadow-select").addEventListener("input", function () {
+        applyStyle("box-shadow", this.value);
+    });
+
+    document.getElementById("padding-range").addEventListener("input", function () {
+        applyStyle("padding", this.value + "px");
+    });
+
+    document.getElementById("margin-range").addEventListener("input", function () {
+        applyStyle("margin", this.value + "px");
+    });
+
+    document.getElementById("text-align-select").addEventListener("change", function () {
+        applyStyle("text-align", this.value);
+    });
+
+    document.getElementById("position-select").addEventListener("change", function () {
+        applyStyle("position", this.value);
+    });
+
+    document.getElementById("font-family-select").addEventListener("change", function () {
+        applyStyle("font-family", this.value);
+    });
+
+    document.getElementById("flex-direction-select").addEventListener("change", function () {
+        applyStyle("flex-direction", this.value);
+    });
+
+    document.getElementById("justify-content-select").addEventListener("change", function () {
+        applyStyle("justify-content", this.value);
+    });
+
+    document.getElementById("align-items-select").addEventListener("change", function () {
+        applyStyle("align-items", this.value);
+    });
+
+    document.getElementById("link-url-input").addEventListener("input", function () {
+        if (selectedComponent && selectedComponent.is('link')) {
+            selectedComponent.addAttributes({ href: this.value });
+        }
+    });
+    
+    document.getElementById("link-target-select").addEventListener("change", function () {
+        if (selectedComponent && selectedComponent.is('link')) {
+            selectedComponent.addAttributes({ target: this.value });
+        }
+    });
+
+
+
 
 
     let blocks = {};  // Variabile per contenere i blocchi caricati
@@ -222,10 +285,11 @@ document.addEventListener("DOMContentLoaded", function () {
     
 
     document.getElementById('save-page').addEventListener('click', async function() {
-        var content = editor.getHtml();  // Ottieni il contenuto HTML dall'editor di GrapesJS
-        var slug = pageSlug;     // Slug della pagina corrente
-        var page_id = pageID;    // ID della pagina corrente
-        var language = document.getElementById('language-selector').value; // Lingua selezionata
+        var content = editor.getHtml();
+        var styles = editor.getCss();  
+        var slug = pageSlug;     
+        var page_id = pageID;    
+        var language = document.getElementById('language-selector').value;
 
         if (!content) {
             Swal.fire('Error!', 'Content is empty.', 'error');
@@ -252,11 +316,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     body: JSON.stringify({ image: base64Image })
                 });
+        
                 const data = await response.json();
-                if (data.url) {
+                if (data.success && data.url) {
                     return data.url; 
                 } else {
-                    throw new Error('Image upload failed');
+                    console.error('Image upload failed:', data.error);
+                    return null;
                 }
             } catch (error) {
                 console.error('Error uploading image:', error);
@@ -286,15 +352,16 @@ document.addEventListener("DOMContentLoaded", function () {
         await Promise.all(uploadPromises);
 
         // Salva il contenuto nella tabella `pages`, identificando la lingua
-        fetch("/api/save", {
+        fetch("/api/function/save", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 id: page_id,
-                content: div.innerHTML,   // Nuovo contenuto con immagini sostituite
-                language: language        // Lingua selezionata
+                content: div.innerHTML,   
+                styles: styles,
+                language: language        
             })
         }).then(response => response.json()).then(data => {
             if (data.success) {
@@ -306,5 +373,8 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error('Error:', error);
             Swal.fire('Error!', 'There was an error saving the page content.', 'error');
         });
+
+
+
     });
 });

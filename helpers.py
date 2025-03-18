@@ -3,6 +3,7 @@ from models import ShopList
 from models.cookiepolicy import CookiePolicy
 from models.websettings import WebSettings
 from models.page import Page
+from models.database import db
 from models.navbar import NavbarLink
 from models.collections import Collection
 from functools import lru_cache
@@ -70,17 +71,21 @@ def get_cookie_policy_content(shop_subdomain):
         logging.error(f"Errore nel recupero della Cookie Policy per {shop_name}: {e}")
         return ""
 
-def render_theme_styles(shop_subdomain):
-    settings = get_web_settings(shop_subdomain)
-    if not settings:
+def render_theme_styles(shop_subdomain, page_slug):
+    """
+    Recupera gli stili CSS salvati nella colonna 'styles' della tabella 'Page' e li restituisce in un <style>.
+    """
+    try:
+        page = db.session.query(Page).filter_by(slug=page_slug, shop_name=shop_subdomain).first()
+
+        if not page or not page.styles:
+            return "<style></style>"  # Nessuno stile trovato
+
+        return f"<style>{page.styles}</style>"
+    except Exception as e:
+        logging.error(f"Errore nel recupero degli stili per {shop_subdomain}: {e}")
         return "<style></style>"
 
-    try:
-        theme_css = settings.theme_css  # Supponiamo che la colonna 'theme_css' esista in WebSettings
-        return f"<style>{theme_css}</style>"
-    except Exception as e:
-        logging.error(f"Errore nel recupero del tema per {shop_subdomain}: {e}")
-        return "<style></style>"
 
 def get_navbar_content(shop_subdomain):
     shop_name = extract_shop_name(shop_subdomain)
@@ -109,3 +114,4 @@ def get_footer_content(shop_subdomain):
     except Exception as e:
         logging.error(f"Errore nel recupero del footer per {shop_name}: {e}")
         return ""
+    
