@@ -277,3 +277,30 @@ def create_collection():
         db.session.rollback()
         logging.error(f"Error creating collection: {e}")
         return jsonify({'success': False, 'message': 'Failed to create Collection.'}), 500
+    
+# 📌 Route per ottenere tutte le collezioni attive di uno shop
+@collections_bp.route('/collections', methods=['GET'])
+def get_collections_cms():
+    """Restituisce tutte le collezioni attive di uno shop."""
+    try:
+        shop_subdomain = request.host.split(':')[0]  # Estrae il sottodominio
+        shop_name = shop_subdomain.split('.')[0] if '.' in shop_subdomain else shop_subdomain
+        
+        collections = Collection.query.filter_by(shop_name=shop_name, is_active=True).all()
+        
+        collections_data = [
+            {
+                "id": col.id,
+                "name": col.name,
+                "slug": col.slug,
+                "image_url": col.image_url,
+                "description": col.description,
+                "created_at": col.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                "updated_at": col.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+            }
+            for col in collections
+        ]
+        
+        return jsonify({"shop_name": shop_name, "collections": collections_data}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
