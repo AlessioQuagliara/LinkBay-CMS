@@ -7,7 +7,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-collections_bp = Blueprint('collectionsApi', __name__, url_prefix='/api/')
+collections_bp = Blueprint('collectionsApi', __name__, url_prefix='/api')
 
 # 📌 Route per rimuovere prodotti da una collezione
 @collections_bp.route('/delete_products_from_collection', methods=['POST'])
@@ -156,9 +156,6 @@ def update_collection():
 # 📌 Route per caricare un'immagine per una collezione
 @collections_bp.route('/upload_image_collection', methods=['POST'])
 def upload_image_collection():
-    """
-    Carica un'immagine per una collezione specifica e la salva nel database.
-    """
     try:
         collection_id = request.form.get('collection_id')
         image = request.files.get('image')
@@ -166,8 +163,12 @@ def upload_image_collection():
         if not collection_id or not image:
             return jsonify({'success': False, 'message': 'Collection ID or image is missing.'}), 400
 
+        if not image.mimetype.startswith('image/'):
+            return jsonify({'success': False, 'message': 'File is not a valid image.'}), 400
+
         # Genera un nome univoco per il file
-        unique_filename = f"{uuid.uuid4().hex}_{image.filename}"
+        ext = image.filename.rsplit('.', 1)[-1]
+        unique_filename = f"{uuid.uuid4().hex}.{ext}"
         upload_folder = os.path.join('static', 'uploads', 'collections')
         os.makedirs(upload_folder, exist_ok=True)
         image_path = os.path.join(upload_folder, unique_filename)
@@ -175,17 +176,24 @@ def upload_image_collection():
         # Salva il file
         image.save(image_path)
 
-        # Salva il percorso dell'immagine nel database
-        new_image = CollectionImage(collection_id=collection_id, image_url=f"/{image_path}")
+        # Salva il percorso nel DB
+        new_image = CollectionImage(
+            collection_id=collection_id,
+            image_url=f"/{image_path}"
+        )
         db.session.add(new_image)
         db.session.commit()
 
-        return jsonify({'success': True, 'image_url': f"/{image_path}", 'image_id': new_image.id})
+        return jsonify({
+            'success': True,
+            'image_url': f"/{image_path}",
+            'image_id': new_image.id
+        })
 
     except Exception as e:
         db.session.rollback()
         logging.error(f"Error uploading image: {e}")
-        return jsonify({'success': False, 'message': 'An error occurred.'}), 500
+        return jsonify({'success': False, 'message': f'An error occurred: {str(e)}'}), 500
 
 # 📌 Route per eliminare un'immagine di una collezione
 @collections_bp.route('/delete_image_collection', methods=['POST'])

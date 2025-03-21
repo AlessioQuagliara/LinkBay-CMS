@@ -42,6 +42,9 @@
         </div>
     </div>
 
+    <input type="hidden" id="collection-id" value="{{ collection.id }}">
+    <input type="hidden" id="image-url" value="{{ collection.image_url }}">
+
     <!-- Image Upload Section -->
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-dark">
@@ -55,9 +58,10 @@
                 </div>
                 <button type="button" class="btn btn-primary" id="upload-image-btn">Upload Image</button>
             </form>
+
             <div class="row mt-4" id="image-preview-container">
-                {% if images %}
-                    {% for image in images %}
+                {% if collection and collection.images %}
+                    {% for image in collection.images %}
                         <div class="col-md-3 mb-3" id="image-container-{{ image.id }}">
                             <div class="position-relative">
                                 <img src="{{ image.image_url }}" alt="Collection Image" class="img-fluid rounded shadow-sm">
@@ -73,9 +77,9 @@
                     </div>
                 {% endif %}
             </div>
+
         </div>
     </div>
-
 </div>
 
 {% else %}
@@ -127,16 +131,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Pulsante di salvataggio
-    const saveButton = document.getElementById('save-content');
-    saveButton.addEventListener('click', () => {
+    // 🔹 Salvataggio della collezione con il pulsante "Save Content"
+    document.getElementById('save-content').addEventListener('click', () => {
         console.log("Save button clicked");
 
-        const collectionForm = document.getElementById('collection-form');
-        const formData = new FormData(collectionForm);
+        const collectionId = document.getElementById('collection-id').value;
+        const collectionName = document.getElementById('name').value;
+        const collectionSlug = document.getElementById('slug').value;
+        const isActive = document.getElementById('is_active').value === "1";
+        const description = quill.root.innerHTML;
 
-        // Aggiungi il contenuto di Quill al FormData
-        formData.append('description', quill.root.innerHTML);
+        if (!collectionId || !collectionName) {
+            Swal.fire('Error', 'Collection ID and Name are required.', 'error');
+            return;
+        }
+
+        const formData = {
+            id: collectionId,
+            name: collectionName.trim(),
+            slug: collectionSlug.trim(),
+            description: description,
+            is_active: isActive
+        };
 
         Swal.fire({
             title: 'Saving...',
@@ -149,38 +165,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
         fetch('/api/update_collection', {
             method: 'POST',
-            body: formData,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Response:", data);
-                if (data.success) {
-                    Swal.fire('Success', data.message, 'success');
-                } else {
-                    Swal.fire('Error', data.message || 'Failed to update the collection.', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire('Error', 'A network or server error occurred.', 'error');
-            });
+        .then(response => response.json())
+        .then(data => {
+            Swal.close();
+            if (data.success) {
+                Swal.fire('Success', data.message, 'success');
+            } else {
+                Swal.fire('Error', data.message || 'Failed to update the collection.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire('Error', 'A network or server error occurred.', 'error');
+        });
     });
 
-    // Caricamento immagine
+    // 🔹 Caricamento immagine
     const imageInput = document.getElementById('image-input');
     const uploadImageButton = document.getElementById('upload-image-btn');
     const imagePreviewContainer = document.getElementById('image-preview-container');
 
     uploadImageButton.addEventListener('click', () => {
         const file = imageInput.files[0];
+        const collectionId = document.getElementById('collection-id').value;
+
         if (!file) {
             Swal.fire('Error', 'Please select an image.', 'error');
             return;
         }
 
+        if (!collectionId) {
+            Swal.fire('Error', 'Collection ID is missing.', 'error');
+            return;
+        }
+
         const formData = new FormData();
         formData.append('image', file);
-        formData.append('collection_id', "{{ collection.id }}");
+        formData.append('collection_id', collectionId);
 
         Swal.fire({
             title: 'Uploading...',
@@ -195,40 +221,40 @@ document.addEventListener('DOMContentLoaded', () => {
             method: 'POST',
             body: formData
         })
-            .then(response => response.json())
-            .then(data => {
-                Swal.close();
-                if (data.success) {
-                    const imageContainer = document.createElement('div');
-                    imageContainer.classList.add('col-md-3', 'mb-3');
-                    imageContainer.id = `image-container-${data.image_id}`;
+        .then(response => response.json())
+        .then(data => {
+            Swal.close();
+            if (data.success) {
+                const imageContainer = document.createElement('div');
+                imageContainer.classList.add('col-md-3', 'mb-3');
+                imageContainer.id = `image-container-${data.image_id}`;
 
-                    imageContainer.innerHTML = `
-                        <div class="position-relative">
-                            <img src="${data.image_url}" alt="Collection Image" class="img-fluid rounded shadow-sm">
-                            <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 delete-image-btn" data-id="${data.image_id}">
-                                &times;
-                            </button>
-                        </div>
-                    `;
+                imageContainer.innerHTML = `
+                    <div class="position-relative">
+                        <img src="${data.image_url}" alt="Collection Image" class="img-fluid rounded shadow-sm">
+                        <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 delete-image-btn" data-id="${data.image_id}">
+                            &times;
+                        </button>
+                    </div>
+                `;
 
-                    imagePreviewContainer.appendChild(imageContainer);
+                imagePreviewContainer.appendChild(imageContainer);
 
-                    // Aggiungi evento per eliminare immagine
-                    imageContainer.querySelector('.delete-image-btn').addEventListener('click', function () {
-                        deleteImage(data.image_id);
-                    });
-                } else {
-                    Swal.fire('Error', data.message || 'Failed to upload the image.', 'error');
-                }
-            })
-            .catch(error => {
-                Swal.fire('Error', 'A network error occurred.', 'error');
-                console.error('Error:', error);
-            });
+                // Aggiungi evento per eliminare immagine
+                imageContainer.querySelector('.delete-image-btn').addEventListener('click', function () {
+                    deleteImage(data.image_id);
+                });
+            } else {
+                Swal.fire('Error', data.message || 'Failed to upload the image.', 'error');
+            }
+        })
+        .catch(error => {
+            Swal.fire('Error', 'A network error occurred.', 'error');
+            console.error('Error:', error);
+        });
     });
 
-    // Funzione per eliminare immagine
+    // 🔹 Funzione per eliminare immagine
     function deleteImage(imageId) {
         Swal.fire({
             title: 'Are you sure?',
@@ -245,22 +271,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ image_id: imageId })
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            const imageContainer = document.getElementById(`image-container-${imageId}`);
-                            if (imageContainer) {
-                                imageContainer.remove();
-                            }
-                            Swal.fire('Deleted!', 'The image has been deleted.', 'success');
-                        } else {
-                            Swal.fire('Error', data.message || 'Failed to delete the image.', 'error');
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const imageContainer = document.getElementById(`image-container-${imageId}`);
+                        if (imageContainer) {
+                            imageContainer.remove();
                         }
-                    })
-                    .catch(error => {
-                        Swal.fire('Error', 'A network error occurred.', 'error');
-                        console.error('Error:', error);
-                    });
+                        Swal.fire('Deleted!', 'The image has been deleted.', 'success');
+                    } else {
+                        Swal.fire('Error', data.message || 'Failed to delete the image.', 'error');
+                    }
+                })
+                .catch(error => {
+                    Swal.fire('Error', 'A network error occurred.', 'error');
+                    console.error('Error:', error);
+                });
             }
         });
     }
