@@ -3,7 +3,7 @@ from models.database import db  # Database SQLAlchemy
 from models.collections import Collection, CollectionProduct, CollectionImage  # Modello delle collezioni
 from models.products import Product  # Modello dei prodotti
 from helpers import check_user_authentication
-import os, logging, uuid, re
+import os, logging, uuid, re, base64
 
 logging.basicConfig(level=logging.INFO)
 
@@ -136,3 +136,22 @@ def manage_collection_list(collection_id=None):
     except Exception as e:
         logging.error(f"Error retrieving collection list: {e}")
         return jsonify({'status': 'error', 'message': 'An unexpected error occurred.'}), 500
+    
+# Funzione per salvare un'immagine base64 generica ---------------------------------------------------------------
+def save_base64_image(base64_image, upload_folder):
+    try:
+        header, encoded = base64_image.split(",", 1)
+        binary_data = base64.b64decode(encoded)
+
+        # Genera un nome file unico usando UUID
+        unique_filename = f"{uuid.uuid4().hex}.png"
+        file_path = os.path.join(upload_folder, unique_filename)
+
+        # Salva il file sul server
+        with open(file_path, "wb") as f:
+            f.write(binary_data)
+
+        return f"/static/uploads/{unique_filename}"
+    except Exception as e:
+        logging.info(f"Errore durante il salvataggio dell'immagine: {str(e)}")
+        return None
