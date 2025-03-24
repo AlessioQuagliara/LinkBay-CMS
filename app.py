@@ -2,6 +2,8 @@ from flask import Flask, g, session, jsonify, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
+import logging
+from logging.handlers import RotatingFileHandler
 import openai
 from dotenv import load_dotenv
 
@@ -82,6 +84,21 @@ def set_language():
         session['language'] = lang
         return jsonify({"success": True, "message": f"Language set to {lang}"})
     return jsonify({"success": False, "message": "Invalid language"}), 400
+
+# 📌 Gestione errori di Log
+if not os.path.exists('logs'):
+    os.mkdir('logs')
+
+
+file_handler = RotatingFileHandler('logs/linkbay.log', maxBytes=10240, backupCount=5)
+file_handler.setFormatter(logging.Formatter(
+    '[%(asctime)s] [%(levelname)s] in %(module)s: %(message)s'
+))
+file_handler.setLevel(logging.INFO)
+
+app.logger.addHandler(file_handler)
+app.logger.setLevel(logging.INFO)
+app.logger.info('✅ LinkBayCMS avviato correttamente.')
 
 # 📌 Avvio dell'applicazione Flask
 if __name__ == "__main__":

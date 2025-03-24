@@ -1,5 +1,10 @@
-# Ignore Python virtual environments
-LinkBay/
-environments.py
+# File di configurazione locali
 .env
-**/__pycache__/
+
+# Cartelle con contenuti caricati dagli utenti
+/static/images/
+/static/uploads/
+
+/__pycache__/
+/LinkBay/
+/environments.py
