@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkBay - Dashboard {{ translate('OOOOO') }}</title>
+    <meta name="description" content="{{ translate('description') }}">
+    <meta name="keywords" content="{{ translate('keywords') }}">
+    <meta name="author" content="Quagliara Alessio">
+    {% include '/landing/head.html' %}
+    <style>
+        body {
+          background: url('https://www.linkbay.it/static/image/background.webp') no-repeat center center fixed;
+          background-size: cover;
+          backdrop-filter: blur(10px);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          margin: 0;
+        }
+        .dashboard-card {
+            width: 90%;
+            max-width: 1200px;
+            height: 90vh; /* Altezza quasi piena dello schermo */
+            background-color: rgba(255, 255, 255, 0.9); /* Background semi-trasparente */
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow-y: auto; /* Scroll se il contenuto supera l'altezza della card */
+        }
+        .sidebar {
+            width: 200px;
+            border-right: 1px solid #ddd; /* Bordo tra sidebar e contenuto */
+            padding-right: 15px;
+        }
+        .sidebar a {
+            display: block;
+            padding: 5px;
+            margin-bottom: 5px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: background-color 0.3s, color 0.3s; /* Transizione per l'effetto hover */
+        }
+        .sidebar a:hover,
+        .sidebar a.active {
+            border-radius: 10px;
+            background-color: #ff5757; /* Sfondo blu quando attivo o in hover */
+            color: white; /* Testo bianco quando attivo o in hover */
+        }
+        .content {
+            flex-grow: 1;
+            padding-left: 20px; /* Spaziatura a sinistra del contenuto */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+        <!-- Card Dashboard -->
+        <div class="dashboard-card" data-aos="fade-up">
+            <div class="mb-4 d-flex justify-content-between align-items-center">
+                <a href="{{ url_for('index') }}">
+                    <img src="../static/images/linkbay_logo.png" width="150px" alt="Logo">
+                </a>
+                <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout <i class="fa-solid fa-right-from-bracket"></i></a>
+            </div>
+            <div class="mb-4">
+                {% if user['nome'] and user['nome']|trim != '' %}
+                    <h4>Dashboard di {{ user['nome'] }}</h4>
+                {% else %}
+                    <h4>Benvenuto nella tua Dashboard!</h4>
+                    <p>Il tuo profilo risulta incompleto.. <a href="#" onclick="showContent('content2')">Clicca qui</a> per completare il tuo profilo.</p>
+                    <!--<h4>I sistemi di sicurezza 2FA sono attivi</h4>
+                    <p>Attiva la verifica 2 fattori per avere più sicurezza.. <a href="#" onclick="showContent('content10')">Clicca qui</a>.</p>-->
+                {% endif %}
+            </div>
+
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-3 sidebar">
+                    <a href="#" class="active" onclick="showContent('content9')"><i class="fa-solid fa-store"></i> I Miei Negozi Online</a>
+                    <a href="#" onclick="showContent('content2')"><i class="fa-solid fa-user"></i> Profilo</a>
+                    <!--<a href="#" onclick="showContent('content10')"><i class="fa-solid fa-lock"></i> Sicurezza</a>-->
+                    <a href="#" onclick="showContent('content3')"><i class="fa-solid fa-chart-pie"></i> Statistiche</a>
+                    <a href="#" onclick="showContent('content4')"><i class="fa-solid fa-message"></i> Messaggi</a>
+                    <a href="#" onclick="showContent('content5')"><i class="fa-solid fa-headset"></i> Supporto</a>
+                    <a href="#" onclick="showContent('content6')"><i class="fa-solid fa-book"></i> Risorse</a>
+                    <a href="#" onclick="showContent('content7')"><i class="fa-solid fa-handshake"></i> Partner</a>
+                </div>
+
+                <!--------------------------------------------------- NEGOZI ONLINE  -------------------------------------------------------------->
+                <div class="col-9 content">
+                    <div id="content9" class="content-pane">
+                        <h4>I Miei Negozi Online</h4>
+                        <p>Gestisci o accedi ai tuoi negozi per poterli controllare.</p>
+                            <!-- Itera attraverso i negozi dell'utente e crea una card per ognuno -->
+                            {% for shop in shops %}
+                            <div class="card mb-4 shadow-sm border-0 rounded" style="max-width: 600px;">
+                                <div class="row g-0">
+                                    <!-- Icona del negozio -->
+                                    <div class="col-md-4 d-flex align-items-center justify-content-center bg-light rounded">
+                                        <i class="fa-solid fa-shop fa-4x text-danger"></i>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <!-- Header della card -->
+                                            <h5 class="card-title text-dark">{{ shop['shop_name'] }}</h5>
+                                            <!-- Lista dei dettagli del negozio -->
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item">Tema in uso: <span class="fw-bold">{{ shop['themeOptions'] }}</span></li>
+                                                {% if shop['domain']|trim == '' %}
+                                                <li class="list-group-item text-danger">Nessun Dominio associato</li>
+                                                {% else %}
+                                                <li class="list-group-item">Dominio associato: <span class="fw-bold">{{ shop['domain'] }}</span></li>
+                                                {% endif %}
+                                            </ul>
+                                            <!-- Pulsante per accedere al negozio -->
+                                            <div class="mt-3">
+                                                {% if environment == 'production' %}
+                                                    <a target="_blank" href="https://{{ shop['shop_name'] }}.yoursite-linkbay-cms.com/admin/login?token={{ token }}" 
+                                                        class="btn btn-outline-dark btn-sm" id="cms_link">Entra nel negozio</a>
+                                                {% else %}
+                                                    <a target="_blank" href="http://{{ shop['shop_name'] }}.localhost:8080/admin/login?token={{ token }}" 
+                                                    class="btn btn-outline-dark btn-sm" id="cms_link">Entra nel negozio</a>
+                                                {% endif %}
+                                                <button type="button" class="btn btn-outline-danger btn-sm delete-shop" data-shop-id="{{ shop['id'] }}">Elimina Negozio</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#createShopModal">Crea Negozio</button>
+                    </div>
+                    <!--------------------------------------------------- SICUREZZA ACCOUNT  -------------------------------------------------------------->
+                    <div id="content10" class="content-pane">
+                        <h4>Sicurezza Account</h4>
+                        <p>Qui potrai aggiungere sicurezza al tuo account.</p>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" onchange="toggle2FA(this)" {% if user['is_2fa_enabled'] == 1 %}checked{% else %}{% endif %}>
+                            <label class="form-check-label" for="flexSwitchCheckDefault">Abilita 2 fattori</label>
+                        </div>
+                        <img id="qrcode" src="" alt="QR Code per 2FA" class="d-none mt-3">
+                        <br>
+                        <hr>
+                        <br>
+                        <p>1) Scarica l'app di autenticazione da app store o google play.</p>
+                        <p>2) Scansiona il codice QR.</p>
+                        <p>3) Utilizza l'OTP per accedere la prossima volta.</p>
+                    </div>
+                    <!--------------------------------------------------- PROFILO MODIFICA -------------------------------------------------------------->
+                    <div id="content2" class="content-pane d-none">
+                        <h4>Profilo</h4>
+                        <p>Visualizza o modifica il tuo profilo.</p>
+                        <form id="updateProfileForm">
+                            <div class="row">
+                                <!-- Campo Email -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ user['email'] }}" required>
+                                </div>
+                                <!-- Campo Nome -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="nome" class="form-label">Nome</label>
+                                    <input type="text" class="form-control" id="nome" name="nome" value="{{ user['nome'] }}" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <!-- Campo Cognome -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="cognome" class="form-label">Cognome</label>
+                                    <input type="text" class="form-control" id="cognome" name="cognome" value="{{ user['cognome'] }}" required>
+                                </div>
+                                <!-- Campo Telefono -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="telefono" class="form-label">Telefono</label>
+                                    <input type="tel" class="form-control" id="telefono" name="telefono" value="{{ user['telefono'] }}" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <!-- Campo Password -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="password" class="form-label">Nuova Password</label>
+                                    <input type="password" class="form-control" id="password" name="password">
+                                    <small class="text-muted">Lascia vuoto se non vuoi modificare la password.</small>
+                                </div>
+                                <!-- Campo Foto Profilo -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="profilo_foto" class="form-label">Foto Profilo</label>
+                                    <input type="file" class="form-control" id="profilo_foto" name="profilo_foto" accept="image/*">
+                                    {% if user['profilo_foto'] %}
+                                    <img src="{{ user['profilo_foto'] }}" alt="Foto Profilo" class="mt-2" width="100">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <!-- Bottone Invia -->
+                            <button type="submit" class="btn btn-danger">Aggiorna Profilo</button>
+                        </form>
+                    </div>
+                    <!--------------------------------------------------- STATISTICHE ACCOUNT  -------------------------------------------------------------->
+                    <div id="content3" class="content-pane d-none">
+                        <h4>Statistiche</h4>
+                        <p>Visualizza le tue statistiche e analisi.</p>
+                    </div>
+                    <!--------------------------------------------------- MESSAGGI CHAT  -------------------------------------------------------------->
+                    <div id="content4" class="content-pane d-none">
+                        <h4>Messaggi</h4>
+                        <p>Leggi i tuoi messaggi.</p>
+                    </div>
+                    <!--------------------------------------------------- SUPPORTO PER ASSISTENZA  -------------------------------------------------------------->
+                    <div id="content5" class="content-pane d-none">
+                        <h4>Supporto</h4>
+                        <p>Contatta il supporto per assistenza.</p>
+                    </div>
+                    <!--------------------------------------------------- RISORSE ACCOUNT -------------------------------------------------------------->
+                    <div id="content6" class="content-pane d-none">
+                        <h4>Risorse</h4>
+                        <p>Contatta il supporto per assistenza.</p>
+                    </div>
+                    <!--------------------------------------------------- PARTNER ZONE  -------------------------------------------------------------->
+                    <div id="content7" class="content-pane d-none">
+                        <h4>Partner</h4>
+                        <p>Modifica le tue impostazioni qui.</p>
+                    </div>
+                    <!--------------------------------------------------- IMPOSTAZIONI ACCOUNT  -------------------------------------------------------------->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--------------------------------------------------- MODALE  -------------------------------------------------------------->
+    <div class="modal fade" id="createShopModal" tabindex="-1" aria-labelledby="createShopModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createShopModalLabel">Crea Nuovo Negozio</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form for Creating a New Shop -->
+                    <form id="createShopForm">
+                        <div class="mb-3">
+                            <input type="text" id="shop_name" class="form-control mb-1" placeholder="{{ translate('Name of the Shop') }}">
+                            <small id="shopNameHelp" class="text-muted d-none">{{ translate('OOO67') }}</small>
+                            <small class="invalid-feedback d-none"></small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="themeOptions" class="form-label">Seleziona un Tema:</label>
+                            <select class="form-select" id="themeOptions" required>
+                                <option value="Norman">Norman</option>
+                                <option value="Userless">Userless</option>
+                                <option value="Motion">Motion</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-danger" onclick="submitShopForm()">Crea Negozio</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Popper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- FontAwesome JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <!-- SweetAlert JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.27/dist/sweetalert2.all.min.js"></script>
+    <!-- AOS JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000, // Durata dell'animazione in millisecondi
+            once: true, // L'animazione avviene solo una volta quando si scorre
+        });
+
+        // Funzione per mostrare il contenuto dinamicamente
+        function showContent(contentId) {
+            // Nasconde tutti i pannelli di contenuto
+            document.querySelectorAll('.content-pane').forEach(function(pane) {
+                pane.classList.add('d-none');
+            });
+
+            // Mostra il contenuto selezionato
+            document.getElementById(contentId).classList.remove('d-none');
+
+            // Rimuove la classe "active" da tutti i link della sidebar
+            document.querySelectorAll('.sidebar a').forEach(function(link) {
+                link.classList.remove('active');
+            });
+
+            // Aggiunge la classe "active" al link selezionato
+            event.currentTarget.classList.add('active');
+        }
+
+        // Esegui il codice per selezionare la prima voce di default
+        document.addEventListener('DOMContentLoaded', function() {
+            showContent('content9');
+        });
+
+        // AGGIORNAMENTO PROFILO
+        $('#updateProfileForm').on('submit', function(event) {
+        event.preventDefault(); // Previene il comportamento predefinito del form
+        
+        const formData = new FormData(this); // Ottiene i dati del form
+        
+        // Invia la richiesta tramite fetch
+        fetch('/update_profile', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Profilo Aggiornato!',
+                    text: data.message
+                }).then(() => {
+                location.reload(); // Ricarica la pagina solo dopo che l'utente chiude l'alert
+            });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Errore!',
+                    text: data.message
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Errore:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Errore!',
+                text: 'Si è verificato un errore durante l\'aggiornamento del profilo.'
+            });
+        });
+    });
+
+    // CREAZIONE STORE NEL MODALE
+
+    // Passa l'user_id direttamente come stringa
+    const userId = "{{ user['id'] }}";
+
+    function submitShopForm() {
+        const formData = new FormData();
+        formData.append('shop_name', document.getElementById('shop_name').value);
+        formData.append('themeOptions', document.getElementById('themeOptions').value);
+        formData.append('user_id', userId);
+
+        fetch('/create_shop_registered_user', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Successo',
+                    text: data.message,
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    const modalElement = document.getElementById('createShopModal');
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    modalInstance.hide();
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Errore',
+                    text: data.message,
+                    confirmButtonText: 'OK'
+                });
+            }
+        })
+        .catch(error => console.error('Errore:', error));
+    }
+    
+    // ALREADY SHOP CREATED -------------------------------------------------------------------------
+
+    $(document).ready(function() {
+        $('#shop_name').on('blur', function() {  
+            var shop_name = $(this).val(); 
+            $.ajax({
+            type: 'GET',  
+            url: '/check_shopname',  
+            data: { shop_name: shop_name },  
+            success: function(response) {
+                if (response.status === 'exists') {
+                Swal.fire({
+                    icon: 'error',
+                    title: '{{ translate("Error") }}',
+                    text: '{{ translate("The store name is already in use.") }}'
+                });
+                $('#shop_name').addClass('is-invalid');
+                $('#shop_name').next('.invalid-feedback').removeClass('d-none').text('{{ translate("Store Name Not Available") }}');
+                } else {
+                $('#shop_name').removeClass('is-invalid');
+                $('#shop_name').next('.invalid-feedback').addClass('d-none');
+                }
+            },
+            error: function() {
+                Swal.fire({
+                icon: 'error',
+                title: '{{ translate("Connection error") }}',
+                text: '{{ translate("Connection with the server broken. Try again in a few minutes.") }}'
+                });
+            }
+            });
+        });
+        });
+
+        document.getElementById('shop_name').addEventListener('focus', function() {
+            document.getElementById('shopNameHelp').classList.remove('d-none');
+        });
+
+        document.getElementById('shop_name').addEventListener('input', function() {
+            this.value = this.value.replace(/\s+/g, '-');
+        });
+
+        // CANCELLAZIONE STORE
+        document.addEventListener('DOMContentLoaded', function() {
+            // Trova tutti i pulsanti per cancellare il negozio
+            const deleteButtons = document.querySelectorAll('.delete-shop');
+        
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const shopId = this.getAttribute('data-shop-id');  // Ottieni l'ID del negozio dal data attribute
+                    confirmDeletion(shopId);  // Chiama la funzione di conferma cancellazione
+                });
+            });
+        });
+        
+        // Funzione per confermare la cancellazione del negozio
+        function confirmDeletion(shopId) {
+            Swal.fire({
+                title: 'Sei sicuro?',
+                text: 'Questa azione cancellerà definitivamente il negozio!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sì, cancellalo!',
+                cancelButtonText: 'Annulla'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteShop(shopId);  // Chiama la funzione per cancellare il negozio
+                }
+            });
+        }
+        
+        // Funzione per inviare la richiesta di cancellazione al server utilizzando fetch
+        function deleteShop(shopId) {
+            fetch('/delete_shop', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ shop_id: shopId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire('Cancellato!', 'Il negozio è stato cancellato con successo.', 'success').then(() => {
+                        location.reload();  // Ricarica la pagina dopo la cancellazione
+                    });
+                } else {
+                    Swal.fire('Errore!', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                Swal.fire('Errore!', 'Si è verificato un errore nella cancellazione del negozio.', 'error');
+            });
+        }
+
+          // SCRIPT OTP SICUREZZA:
+          function toggle2FA(checkbox) {
+              if (checkbox.checked) {
+                  // Richiesta per abilitare il 2FA
+                  fetch('/enable_2fa', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json'
+                      },
+                  })
+                  .then(response => response.json())
+                  .then(data => {
+                      if (data.success) {
+                          document.getElementById('qrcode').src = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + encodeURIComponent(data.otp_uri); // Mostra il QR code
+                          document.getElementById('qrcode').classList.remove('d-none');
+                          Swal.fire({
+                              icon: 'success',
+                              title: '2FA Abilitato',
+                              text: 'Scansiona il codice QR con la tua app di autenticazione.'
+                          });
+                      } else {
+                          Swal.fire({
+                              icon: 'error',
+                              title: 'Errore!',
+                              text: data.message
+                          });
+                          checkbox.checked = false; // Disabilita il checkbox se c'è un errore
+                      }
+                  })
+                  .catch(error => {
+                      console.error('Errore:', error);
+                      Swal.fire({
+                          icon: 'error',
+                          title: 'Errore!',
+                          text: 'Si è verificato un errore durante l\'abilitazione del 2FA.'
+                      });
+                      checkbox.checked = false; // Disabilita il checkbox in caso di errore
+                  });
+              } else {
+                  // Richiesta per disabilitare il 2FA
+                  fetch('/disable_2fa', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json'
+                      },
+                  })
+                  .then(response => response.json())
+                  .then(data => {
+                      if (data.success) {
+                          Swal.fire({
+                              icon: 'success',
+                              title: '2FA Disabilitato',
+                              text: data.message
+                          });
+                          document.getElementById('qrcode').classList.add('d-none'); // Nasconde il QR code
+                      } else {
+                          Swal.fire({
+                              icon: 'error',
+                              title: 'Errore!',
+                              text: data.message
+                          });
+                          checkbox.checked = true; // Riattiva il checkbox se c'è un errore
+                      }
+                  })
+                  .catch(error => {
+                      console.error('Errore:', error);
+                      Swal.fire({
+                          icon: 'error',
+                          title: 'Errore!',
+                          text: 'Si è verificato un errore durante la disabilitazione del 2FA.'
+                      });
+                      checkbox.checked = true; // Riattiva il checkbox in caso di errore
+                  });
+              }
+          }
+    </script>
+    {% include 'visit_tracker.html' %}
+</body>
+</html>

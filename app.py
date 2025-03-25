@@ -6,6 +6,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import openai
 from dotenv import load_dotenv
+import json
 
 # 📌 Carica le variabili d'ambiente dal file .env
 load_dotenv()
@@ -54,7 +55,12 @@ from blueprints.admin import register_admin_blueprints
 from blueprints.shop import register_user_blueprints
 from blueprints.api import register_api_blueprints
 from blueprints.main import main_bp
-from errors import register_error_handlers 
+from errors import register_error_handlers # Blueprint del sito ufficiale LinkBay
+
+# 📌 Rotta del sito di facciata
+from landing import landing_bp
+app.register_blueprint(landing_bp, url_prefix='/')  # Serve le route per linkbay-cms.com
+
 
 app.register_blueprint(main_bp)  # Blueprint per la parte pubblica
 register_admin_blueprints(app)   # Blueprint per il pannello admin
@@ -99,6 +105,28 @@ file_handler.setLevel(logging.INFO)
 app.logger.addHandler(file_handler)
 app.logger.setLevel(logging.INFO)
 app.logger.info('✅ LinkBayCMS avviato correttamente.')
+
+# SISTEMA DI TRADUZIONE AUTOMATICA ----------------------------------------------------------------------
+TRANSLATIONS_DIR = os.path.join(os.path.dirname(__file__), 'translations')
+
+def load_translations(lang_code):
+    try:
+        with open(os.path.join(TRANSLATIONS_DIR, f"{lang_code}.json"), 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        with open(os.path.join(TRANSLATIONS_DIR, "en.json"), 'r', encoding='utf-8') as f:
+            return json.load(f)
+
+@app.before_request
+def before_request():
+    lang = request.accept_languages.best_match(['en', 'it', 'es'])  
+    g.translations = load_translations(lang)
+
+def translate(key):
+    return g.translations.get(key, key)
+
+# 🔁 Rendi disponibile la funzione translate nei template
+app.jinja_env.globals.update(translate=translate)
 
 # 📌 Avvio dell'applicazione Flask
 if __name__ == "__main__":
