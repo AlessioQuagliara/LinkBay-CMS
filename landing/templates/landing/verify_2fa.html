@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkBay - Login {{ translate('OOOOO') }}</title>
+    <meta name="description" content="{{ translate('description') }}">
+    <meta name="keywords" content="{{ translate('keywords') }}">
+    <meta name="author" content="Quagliara Alessio">
+    {% include 'head.html' %}
+    <style>
+        body {
+          background: url('static/images/background.webp') no-repeat center center fixed;
+          background-size: cover;
+          backdrop-filter: blur(10px);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          margin: 0;
+        }
+        .login-card {
+          max-width: 400px;
+          width: 100%;
+          padding: 2rem;
+          border-radius: 8px;
+          background-color: rgba(255, 255, 255, 0.9); /* Background semi-trasparente */
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          text-align: center;
+        }
+        .hidden {
+          display: none;
+          transition: 1s;
+        }
+        .custom-btn{
+            background: none;
+            border: none;
+            color: black;
+        }
+        .custom-btn:hover{
+            background: none;
+            border: none;
+            color: grey;
+            font-style: italic;
+            transition: 1s;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container d-flex justify-content-center">
+        <!-- Form di Verifica 2FA -->
+        <div class="login-card" id="verify-2fa-form" data-aos="fade-up">
+            <div class="mb-4">
+                <a href="{{ url_for('index') }}">
+                    <img src="../static/images/linkbay_logo.png" width="150px" alt="Logo">
+                </a>
+            </div>
+            <div class="mb-4">
+                <h3>Verifica 2FA</h3>
+                <p>Inserisci il codice OTP per continuare su LinkBay</p>
+            </div>
+            <form id="otpForm" method="post">
+                <div class="mb-3">
+                    <label for="otp" class="form-label">Inserisci il Codice OTP</label>
+                    <input type="text" class="form-control" id="otp" name="otp" placeholder="Codice OTP" required>
+                </div>
+                <button type="submit" class="btn btn-danger">Verifica OTP</button>
+            </form>
+        </div>
+    </div>
+      
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Popper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- FontAwesome JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <!-- SweetAlert JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.27/dist/sweetalert2.all.min.js"></script>
+    <!-- AOS JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <!-- Script per SweetAlert -->
+    <script>
+        AOS.init({
+            duration: 1000, // Durata dell'animazione in millisecondi
+            once: true, // L'animazione avviene solo una volta quando si scorre
+        });
+
+        // SCRIPT 2FA ------------------------------------------------------------------------------------------------------------
+        document.getElementById('otpForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Previene il comportamento predefinito del form
+        
+            const formData = new FormData(this); // Ottiene i dati del form
+        
+            fetch('/verify_2fa', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                // Verifica se la risposta è JSON
+                if (!response.ok) {
+                    throw new Error('Errore di rete durante la verifica OTP.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Disabilita il scroll quando appare l'alert
+                    document.body.style.overflow = 'hidden';
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successo!',
+                        text: 'OTP verificato con successo. Reindirizzamento alla dashboard...',
+                        showConfirmButton: true,
+                    }).then(() => {
+                        document.body.style.overflow = ''; // Riabilita lo scroll dopo l'alert
+                        window.location.href = data.redirect; // Reindirizza alla dashboard
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Errore!',
+                        text: data.message
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Errore:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Errore!',
+                    text: 'Si è verificato un errore durante la verifica OTP.'
+                });
+            });
+        });
+      </script>
+</body>
+</html>

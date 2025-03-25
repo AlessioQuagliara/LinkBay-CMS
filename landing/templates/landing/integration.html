@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkBay - {{ translate('Apps and Integrations') }}</title>
+    <meta name="description" content="{{ translate('Discover LinkBay, the ideal CMS to create an online store easily and without technical skills. Start today with free tools, customizable themes and 24/7 support. Perfect for small business owners and large companies.') }}">
+    <meta name="keywords" content="{{ translate('Create online store easily, simple e-commerce CMS, cheap e-commerce platform, create e-commerce site without code, best CMS for small stores, start online shop at low cost') }}">
+    <meta name="author" content="Quagliara Alessio">
+    {% include '/landing/head.html' %}
+</head>
+<body>
+
+    <!-- Navbar -->
+    {% include '/landing/navbar.html' %}
+
+    <br><br>
+    <!-- Sezione 1: Testo a Sinistra e Video a Destra -->
+    <div class="container-fluid py-5" style="background-color: #f7f8fa;">
+        <div class="container">
+            <div class="row align-items-center">
+                
+                <!-- Colonna di Sinistra: Testo -->
+                <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
+                    <h1 class="fw-bold mb-4">{{ translate('Boost your eCommerce with Apps and Integrations') }}</h1>
+                    <p class="lead mb-4">{{ translate('Find out how you can extend your online store’s functionality with powerful, easy-to-use apps and integrations. Automate processes, optimize sales and provide a better experience for your customers.') }}</p>
+                    <ul class="list-unstyled mb-4">
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> {{ translate('Integration with marketing and analysis tools') }}</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> {{ translate('App to automate inventory management') }}</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> {{ translate('Flexible payment and shipping solutions') }}</li>
+                    </ul>
+                </div>
+                
+                <!-- Colonna di Destra: Video -->
+                <div class="col-lg-6" data-aos="fade-left">
+                    <div class="ratio ratio-16x9 rounded-4 shadow-sm">
+                        <video src="../static/images/video5.mp4" autoplay muted loop playsinline class="w-100 rounded-4"></video>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Sezione 2: Integrazioni con Titolo e Descrizione -->
+    <div class="container-fluid py-5" style="background-color: #ffffff;">
+        <div class="container">
+            <!-- Titolo della Sezione -->
+            <div class="text-center mb-5" data-aos="fade-down">
+                <h2 class="fw-bold">{{ translate('Some of the Present Integrations') }}</h2>
+                <p class="lead">{{ translate('Expand your eCommerce capabilities with these powerful integrations.') }}</p>
+            </div>
+    
+            <!-- Griglia delle Integrazioni -->
+            <div class="row gy-5">
+                
+                <!-- Integrazione Zapier -->
+                <div class="col-md-4" data-aos="fade-up">
+                    <div class="text-center">
+                        <img src="../static/images/zapier.png" alt="Zapier" class="img-fluid mb-3" style="width: 100px;">
+                        <h5 class="fw-bold">Zapier</h5>
+                        <p>{{ translate('Automate workflows and connect your CMS with over 2,000 apps to optimize business operations without code.') }}</p>
+                    </div>
+                </div>
+    
+                <!-- Integrazione Mailchimp -->
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="text-center">
+                        <img src="../static/images/mailchimp.png" alt="Mailchimp" class="img-fluid mb-3" style="width: 100px;">
+                        <h5 class="fw-bold">Mailchimp</h5>
+                        <p>{{ translate('Manage email marketing campaigns and segment your customers to improve your conversions with advanced automations.') }}</p>
+                    </div>
+                </div>
+    
+                <!-- Integrazione Stripe -->
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-center">
+                        <img src="../static/images/stripe.png" alt="Stripe" class="img-fluid mb-3" style="width: 100px;">
+                        <h5 class="fw-bold">Stripe</h5>
+                        <p>{{ translate('Accept secure online payments with Stripe, one of the most reliable and versatile payment platforms in the world.') }}</p>
+                    </div>
+                </div>
+    
+                <!-- Integrazione Klaviyo -->
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="text-center">
+                        <img src="../static/images/klaviyo.png" alt="Klaviyo" class="img-fluid mb-3" style="width: 100px;">
+                        <h5 class="fw-bold">Klaviyo</h5>
+                        <p>{{ translate('Automate email and SMS marketing, personalize communications and increase customer engagement.') }}</p>
+                    </div>
+                </div>
+    
+                <!-- Integrazione Zendesk -->
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
+                    <div class="text-center">
+                        <img src="../static/images/zendesk.png" alt="Zendesk" class="img-fluid mb-3" style="width: 100px;">
+                        <h5 class="fw-bold">Zendesk</h5>
+                        <p>{{ translate('Provide exceptional customer service with Zendesk’s integrated ticketing, live chat and CRM support.') }}</p>
+                    </div>
+                </div>
+    
+                <!-- Integrazione Twilio -->
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="500">
+                    <div class="text-center">
+                        <img src="../static/images/twilio.png" alt="Twilio" class="img-fluid mb-3" style="width: 100px;">
+                        <h5 class="fw-bold">Twilio</h5>
+                        <p>{{ translate('Add communication features like SMS, voice calls and video directly into your CMS with the Twilio API.') }}</p>
+                    </div>
+                </div>
+    
+            </div>
+        </div>
+    </div>
+
+    <!-- Sezione: Come Funzionano le Integrazioni con LinkBay -->
+    <div class="container-fluid py-5" style="background-color: #f7f8fa;">
+        <div class="container">
+            <!-- Titolo della Sezione -->
+            <div class="text-center mb-5" data-aos="fade-down">
+                <h2 class="fw-bold">{{ translate('How Do LinkBay Integrations Work') }}</h2>
+                <p class="lead">{{ translate('Take full advantage of the integrations offered by LinkBay to optimize your online store and improve the customer experience.') }}</p>
+            </div>
+    
+            <!-- Passi per Configurare le Integrazioni -->
+            <div class="row gy-5">
+                
+                <!-- Passo 1 -->
+                <div class="col-md-4" data-aos="fade-up">
+                    <div class="text-center">
+                        <div class="icon-container mb-3">
+                            <i class="fa-solid fa-plug fa-3x text-danger"></i>
+                        </div>
+                        <h5 class="fw-bold">{{ translate('1. Select an Integration') }}</h5>
+                        <p>{{ translate('Access the CMS administration panel, go to the Integrations section and choose from the different apps available.') }}</p>
+                    </div>
+                </div>
+    
+                <!-- Passo 2 -->
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="text-center">
+                        <div class="icon-container mb-3">
+                            <i class="fa-solid fa-cogs fa-3x text-danger"></i>
+                        </div>
+                        <h5 class="fw-bold">{{ translate('2. Configure the Integration') }}</h5>
+                        <p>{{ translate('Follow the specific instructions to set up the integration. Each app offers a step-by-step guide to get started quickly.') }}</p>
+                    </div>
+                </div>
+    
+                <!-- Passo 3 -->
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-center">
+                        <div class="icon-container mb-3">
+                            <i class="fa-solid fa-chart-line fa-3x text-danger"></i>
+                        </div>
+                        <h5 class="fw-bold">{{ translate('3. Take advantage of the benefits') }}</h5>
+                        <p>{{ translate('Once configured, the integration is ready to be used! Monitor performance and optimize your store with additional features.') }}</p>
+                    </div>
+                </div>
+    
+            </div>
+    
+            <!-- Benefici delle Integrazioni -->
+            <div class="mt-5" data-aos="fade-up">
+                <h4 class="fw-bold text-center mb-4">{{ translate('Benefits of Integrations') }}</h4>
+                <ul class="list-unstyled d-flex justify-content-center">
+                    <li class="me-4"><i class="fa-solid fa-check-circle text-success"></i> {{ translate('Improves operational efficiency') }}</li>
+                    <li class="me-4"><i class="fa-solid fa-check-circle text-success"></i> {{ translate('Automates processes') }}</li>
+                    <li class="me-4"><i class="fa-solid fa-check-circle text-success"></i> {{ translate('Increase customer satisfaction') }}</li>
+                    <li><i class="fa-solid fa-check-circle text-success"></i> {{ translate('Optimize conversions') }}</li>
+                </ul>
+            </div>
+    
+            <!-- Call to Action per Supporto -->
+            <div class="text-center mt-5" data-aos="fade-up">
+                <p class="lead mb-4">{{ translate('Need help setting up integrations? Contact our dedicated support team!') }}</p>
+                <button type="button" class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#contactModal">{{ translate('Contact Support') }}</button>
+            </div>
+    
+        </div>
+    </div>
+    {% include '/landing/visit_tracker.html' %}
+    {% include '/landing/modal.html' %}
+    {% include '/landing/footer.html' %}
+</body>
+</html>

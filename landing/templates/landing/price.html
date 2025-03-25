@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkBay - {{ translate('OO149') }}</title>
+    <meta name="description" content="{{ translate('description') }}">
+    <meta name="keywords" content="{{ translate('keywords') }}">
+    <meta name="author" content="Quagliara Alessio">
+    {% include '/landing/head.html' %}
+</head>
+<body>
+
+    <!-- Navbar -->
+    {% include '/landing/navbar.html' %}
+
+    <br><br>
+    <!-- Sezione Prezzi: Piani di Abbonamento -->
+    <div class="container-fluid py-5" style="background-color: #f7f8fa;">
+        <div class="container">
+            <!-- Titolo della Sezione -->
+            <div class="text-center mb-5" data-aos="fade-down">
+                <h2 class="fw-bold">{{ translate('OO150') }}</h2>
+                <p class="lead">{{ translate('OO151') }}</p>
+            </div>
+
+            <!-- Griglia dei Piani di Prezzo -->
+            <div class="row gy-5">
+                
+                <!-- Piano Freemium -->
+                <div class="col-md-6 col-lg-4" data-aos="fade-up">
+                    <div class="card border-0 shadow-sm text-center h-100">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="fw-bold mb-0">Freemium</h5>
+                            <p class="text-muted mb-0">Piano Gratuito</p>
+                        </div>
+                        <div class="card-body">
+                            <h2 class="fw-bold text-success">0€</h2>
+                            <p class="text-muted">Massimo 50 prodotti, nessun dominio.</p>
+                            <ul class="list-unstyled mb-4">
+                                <li><i class="fa-solid fa-check text-success me-2"></i> 50 Prodotti Massimi</li>
+                                <li><i class="fa-solid fa-check text-success me-2"></i> Supporto Base</li>
+                                <li><i class="fa-solid fa-check text-success me-2"></i> Nessun Dominio</li>
+                            </ul>
+                            <button type="button" class="btn btn-lg btn-success mb-3">Iscriviti Gratis</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Piano AllIsReady -->
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card border-0 shadow-sm text-center h-100">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="fw-bold mb-0">AllIsReady</h5>
+                            <p class="text-muted mb-0">18€ / Mese per Utente</p>
+                        </div>
+                        <div class="card-body">
+                            <h2 class="fw-bold text-danger">18€</h2>
+                            <p class="text-muted">Fino a 5 utenti, 600 prodotti, dominio personalizzabile.</p>
+                            <ul class="list-unstyled mb-4">
+                                <li><i class="fa-solid fa-check text-success me-2"></i> Fino a 5 Utenti</li>
+                                <li><i class="fa-solid fa-check text-success me-2"></i> 600 Prodotti</li>
+                                <li><i class="fa-solid fa-check text-success me-2"></i> Dominio Personalizzabile</li>
+                                <li><i class="fa-solid fa-check text-success me-2"></i> Supporto Prioritario</li>
+                            </ul>
+                            <button type="button" class="btn btn-lg btn-danger mb-3">Scegli AllIsReady</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Piano ProfessionalDesk -->
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card border-0 shadow-sm text-center h-100">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="fw-bold mb-0">ProfessionalDesk</h5>
+                            <p class="text-muted mb-0">36€ / Mese per Utente</p>
+                        </div>
+                        <div class="card-body">
+                            <h2 class="fw-bold text-danger">36€</h2>
+                            <p class="text-muted">Fino a 10 utenti, prodotti illimitati, multidominio e gestione magazzino.</p>
+                            <ul class="list-unstyled mb-4">
+                                <li><i class="fa-solid fa-check text-success me-2"></i> Fino a 10 Utenti</li>
+                                <li><i class="fa-solid fa-check text-success me-2"></i> Prodotti Illimitati</li>
+                                <li><i class="fa-solid fa-check text-success me-2"></i> Multidominio</li>
+                                <li><i class="fa-solid fa-check text-success me-2"></i> Gestione Magazzino</li>
+                                <li><i class="fa-solid fa-check text-success me-2"></i> Assistenza Premium</li>
+                            </ul>
+                            <button type="button" class="btn btn-lg btn-danger mb-3">Scegli ProfessionalDesk</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Sezione Funzionalità: Confronto tra Piani -->
+<!-- Sezione Funzionalità: Confronto tra Piani -->
+<div class="container-fluid py-5" style="background-color: #ffffff;">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-down">
+            <h2 class="fw-bold">Confronto tra Piani</h2>
+            <p class="lead">Scopri le differenze tra i piani disponibili.</p>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light text-center">
+                    <tr>
+                        <th class="text-start">Funzionalità</th>
+                        <th>Freemium</th>
+                        <th>AllIsReady</th>
+                        <th>ProfessionalDesk</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-start">Numero Utenti</td>
+                        <td class="text-center">1</td>
+                        <td class="text-center">Fino a 5</td>
+                        <td class="text-center">Fino a 10</td>
+                    </tr>
+                    <tr>
+                        <td class="text-start">Numero Prodotti</td>
+                        <td class="text-center">50</td>
+                        <td class="text-center">600</td>
+                        <td class="text-center">Illimitati</td>
+                    </tr>
+                    <tr>
+                        <td class="text-start">Dominio Personalizzabile</td>
+                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
+                        <td class="text-center"><i class="fa-solid fa-check text-success"></i></td>
+                        <td class="text-center"><i class="fa-solid fa-check text-success"></i></td>
+                    </tr>
+                    <tr>
+                        <td class="text-start">Gestione Magazzino</td>
+                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
+                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
+                        <td class="text-center"><i class="fa-solid fa-check text-success"></i></td>
+                    </tr>
+                    <tr>
+                        <td class="text-start">Supporto Prioritario</td>
+                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
+                        <td class="text-center"><i class="fa-solid fa-check text-success"></i></td>
+                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> Premium</td>
+                    </tr>
+                    <tr>
+                        <td class="text-start">Report Dettagliati</td>
+                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
+                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> Base</td>
+                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> Avanzati</td>
+                    </tr>
+                    <tr>
+                        <td class="text-start">API per Integrazioni</td>
+                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
+                        <td class="text-center"><i class="fa-solid fa-check text-success"></i></td>
+                        <td class="text-center"><i class="fa-solid fa-check text-success"></i></td>
+                    </tr>
+                    <tr>
+                        <td class="text-start">Backup Automatici</td>
+                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
+                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> Settimanali</td>
+                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> Giornalieri</td>
+                    </tr>
+                    <tr>
+                        <td class="text-start">SEO Ottimizzato</td>
+                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
+                        <td class="text-center"><i class="fa-solid fa-check text-success"></i></td>
+                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> Avanzato</td>
+                    </tr>
+                    <tr>
+                        <td class="text-start">Analytics Integrati</td>
+                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
+                        <td class="text-center"><i class="fa-solid fa-check text-success"></i></td>
+                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> Avanzati + AI</td>
+                    </tr>
+                    <tr>
+                        <td class="text-start">Gestione Ordini e Spedizioni</td>
+                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
+                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> Base</td>
+                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> Completa</td>
+                    </tr>
+                    <tr>
+                        <td class="text-start">LinkBay AI per Ottimizzazione</td>
+                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
+                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
+                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> Incluso</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+    <!-- Sezione Vantaggi dei Nostri Piani -->
+    <div class="container-fluid py-5" style="background-color: #f7f8fa;">
+        <div class="container">
+            <!-- Titolo della Sezione -->
+            <div class="text-center mb-5" data-aos="fade-down">
+                <h2 class="fw-bold">{{ translate('OO204') }}</h2>
+                <p class="lead">{{ translate('OO205') }}</p>
+            </div>
+    
+            <!-- Griglia dei Vantaggi -->
+            <div class="row gy-5">
+                
+                <!-- Vantaggio 1 -->
+                <div class="col-md-4" data-aos="fade-up">
+                    <div class="card border-0 shadow-sm text-center h-100">
+                        <div class="card-body">
+                            <i class="fa-solid fa-thumbs-up fa-3x text-danger mb-3"></i>
+                            <h5 class="card-title fw-bold">{{ translate('OO206') }}</h5>
+                            <p class="card-text">{{ translate('OO207') }}</p>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Vantaggio 2 -->
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card border-0 shadow-sm text-center h-100">
+                        <div class="card-body">
+                            <i class="fa-solid fa-headset fa-3x text-danger mb-3"></i>
+                            <h5 class="card-title fw-bold">{{ translate('OO208') }}</h5>
+                            <p class="card-text">{{ translate('OO209') }}</p>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Vantaggio 3 -->
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card border-0 shadow-sm text-center h-100">
+                        <div class="card-body">
+                            <i class="fa-solid fa-chart-line fa-3x text-danger mb-3"></i>
+                            <h5 class="card-title fw-bold">{{ translate('OO210') }}</h5>
+                            <p class="card-text">{{ translate('OO211') }}</p>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Vantaggio 4 -->
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card border-0 shadow-sm text-center h-100">
+                        <div class="card-body">
+                            <i class="fa-solid fa-cogs fa-3x text-danger mb-3"></i>
+                            <h5 class="card-title fw-bold">{{ translate('OO212') }}</h5>
+                            <p class="card-text">{{ translate('OO213') }}</p>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Vantaggio 5 -->
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
+                    <div class="card border-0 shadow-sm text-center h-100">
+                        <div class="card-body">
+                            <i class="fa-solid fa-rocket fa-3x text-danger mb-3"></i>
+                            <h5 class="card-title fw-bold">{{ translate('OO214') }}</h5>
+                            <p class="card-text">{{ translate('OO215') }}</p>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Vantaggio 6 -->
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="500">
+                    <div class="card border-0 shadow-sm text-center h-100">
+                        <div class="card-body">
+                            <i class="fa-solid fa-shield-alt fa-3x text-danger mb-3"></i>
+                            <h5 class="card-title fw-bold">{{ translate('OO216') }}</h5>
+                            <p class="card-text">{{ translate('OO217') }}</p>
+                        </div>
+                    </div>
+                </div>
+    
+            </div>
+        </div>
+    </div>
+    {% include '/landing/visit_tracker.html' %}
+    {% include '/landing/modal.html' %}
+    {% include '/landing/footer.html' %}
+</body>
+</html>
