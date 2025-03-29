@@ -1,7 +1,7 @@
 from flask import render_template
 from . import landing_bp
 
-@landing_bp.route('/')
+@landing_bp.route('/home')
 def home():
     return render_template('landing/landing_home.html')
 @landing_bp.route('/partner')
