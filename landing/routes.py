@@ -3,7 +3,7 @@ from . import landing_bp
 
 @landing_bp.route('/')
 def home():
-    return render_template('landing/home.html')
+    return render_template('landing/landing_home.html')
 @landing_bp.route('/partner')
 def partner():
     return render_template('landing/partner.html')
