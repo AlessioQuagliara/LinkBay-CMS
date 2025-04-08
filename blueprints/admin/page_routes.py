@@ -12,6 +12,8 @@ import os, uuid, re, base64, logging
 from sqlalchemy.exc import SQLAlchemyError
 from helpers import check_user_authentication, get_navbar_content
 from models.database import db  # Importa il database SQLAlchemy
+from flask import Response
+import json
 
 logging.basicConfig(level=logging.INFO)
 
@@ -121,6 +123,58 @@ def edit_code_page(slug):
         username=username
     )
 
+@page_bp.route('/preview-theme/<theme_name>')
+def preview_theme(theme_name):
+    import os
+    theme_path = os.path.join('Themes', f'{theme_name}.json')
+
+    if not os.path.exists(theme_path):
+        return f"Tema '{theme_name}' non trovato.", 404
+
+    try:
+        with open(theme_path, 'r', encoding='utf-8') as f:
+            theme_data = json.load(f)
+
+        head = theme_data.get('head', '')
+        foot = theme_data.get('foot', '')
+        script = theme_data.get('script', '')
+        pages = theme_data.get('pages', [])
+
+        # Recupera le pagine 'home', 'navbar' e 'footer'
+        page_home = next((p for p in pages if p.get('slug') == 'home'), None)
+        page_navbar = next((p for p in pages if p.get('slug') == 'navbar'), None)
+        page_footer = next((p for p in pages if p.get('slug') == 'footer'), None)
+
+        if not page_home:
+            return "La pagina 'home' non è presente nel tema.", 404
+
+        html = f"""
+        <!DOCTYPE html>
+        <html lang="{page_home.get('language', 'en')}">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>{page_home.get('title')}</title>
+          {head}
+          <style>{page_home.get('styles', '')}</style>
+        </head>
+        <body>
+          {page_navbar.get('content') if page_navbar else ''}
+          <main>
+            {page_home.get('content')}
+          </main>
+          {page_footer.get('content') if page_footer else ''}
+          {foot}
+          <script>{script}</script>
+          <script>AOS.init();</script>
+        </body>
+        </html>
+        """
+        return Response(html, mimetype='text/html')
+    except Exception as e:
+        return f"Errore nella visualizzazione del tema: {str(e)}", 500
+    
+    
 @page_bp.route('/admin/cms/function/save_code', methods=['POST'])
 @handle_request_errors
 def save_code_page():
@@ -567,3 +621,48 @@ def get_site_visits():
     visits = db.session.query(SiteVisit).filter_by(shop_name=shop_name).order_by(SiteVisit.visit_time.desc()).limit(100).all()
 
     return jsonify({'success': True, 'visits': [visit.to_dict() for visit in visits]})
+
+
+@page_bp.route('/export/pages', methods=['GET'])
+def export_pages_json():
+    shop_name = request.args.get('shop_name')
+    theme_name = request.args.get('theme_name')
+    language = request.args.get('language')
+
+    query = Page.query
+    if shop_name:
+        query = query.filter_by(shop_name=shop_name)
+    if theme_name:
+        query = query.filter_by(theme_name=theme_name)
+    if language:
+        query = query.filter_by(language=language)
+
+    pages = query.order_by(Page.id).all()
+
+    result = []
+    for page in pages:
+        result.append({
+            "title": page.title,
+            "description": page.description,
+            "keywords": page.keywords,
+            "slug": page.slug,
+            "content": page.content,
+            "styles": page.styles,
+            "theme_name": page.theme_name,
+            "paid": page.paid,
+            "language": page.language,
+            "published": page.published
+        })
+
+    json_data = json.dumps(result, indent=2, ensure_ascii=False)
+    filename = f"{shop_name or 'all'}_pages_export.json"
+
+    return Response(
+        json_data,
+        mimetype='application/json',
+        headers={
+            "Content-Disposition": f"attachment;filename={filename}"
+        }
+    )
+
+

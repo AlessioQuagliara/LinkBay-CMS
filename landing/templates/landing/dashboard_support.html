@@ -1,0 +1,109 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+<div class="d-flex" style="height: 100vh; overflow: hidden;">
+    <!-- Sidebar inclusa -->
+    <div style="width: 240px; min-width: 240px; background-color: #fff; box-shadow: 2px 0 5px rgba(0,0,0,0.1); z-index: 100;">
+      {% include 'landing/dashboard_sidebar.html' %}
+    </div>
+  
+    <!-- Main Content -->
+    <div class="flex-grow-1 p-4" style="overflow-y: auto; background: #f5f6f8;">
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+      <a href="/home">
+        <img src="/static/images/superadmin/linkbay_logo.png" width="150px" alt="Logo">
+      </a>
+      <a href="/logout" class="btn btn-danger">Logout <i class="fa-solid fa-right-from-bracket"></i></a>
+    </div>
+
+    <div class="d-flex align-items-center mb-3">
+      <div>
+        <h4 class="mb-0">Login come: {{ user['nome'] or 'Utente' }} 👋</h4>
+      </div>
+    </div>
+
+    <!-- INIZIO SEZIONE SUPPORTO -->
+    <div id="support-section" class="pt-3" data-aos="fade-up">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0"><i class="fa-solid fa-headset text-danger me-2"></i> Supporto Clienti</h4>
+        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#newTicketModal">
+          <i class="fa-solid fa-plus me-1"></i> Nuovo Ticket
+        </button>
+      </div>
+
+      <div id="ticketList" class="row gy-3 px-2">
+        <!-- I ticket verranno caricati dinamicamente via JavaScript -->
+      </div>
+    </div>
+
+    <!-- MODALE: NUOVO TICKET -->
+    <div class="modal fade" id="newTicketModal" tabindex="-1" aria-labelledby="newTicketModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="newTicketModalLabel">Apri un nuovo ticket</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+          </div>
+          <div class="modal-body">
+            <form id="ticketForm">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="shopNameSelect" class="form-label">Seleziona Negozio</label>
+                  <select class="form-select" id="shopNameSelect" name="shop_name" required>
+                    <option selected disabled>-- Caricamento negozi... --</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="ticketCategory" class="form-label">Categoria</label>
+                  <select class="form-select" id="ticketCategory" name="category" required>
+                    <option value="tecnico">Problema Tecnico</option>
+                    <option value="fatturazione">Fatturazione</option>
+                    <option value="ecommerce">Funzionalità Ecommerce</option>
+                  </select>
+                </div>
+                <div class="col-md-12">
+                  <label for="ticketTitle" class="form-label">Oggetto del Ticket</label>
+                  <input type="text" class="form-control" id="ticketTitle" name="title" required>
+                </div>
+                <div class="col-md-12">
+                  <label for="ticketMessage" class="form-label">Messaggio</label>
+                  <textarea class="form-control" id="ticketMessage" name="message" rows="5" required></textarea>
+                </div>
+                <div class="col-md-6">
+                  <label for="ticketPriority" class="form-label">Priorità</label>
+                  <select class="form-select" id="ticketPriority" name="priority">
+                    <option value="low">Bassa</option>
+                    <option value="normal" selected>Normale</option>
+                    <option value="high">Alta</option>
+                    <option value="critical">Critica</option>
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer d-flex justify-content-end">
+            <button type="submit" form="ticketForm" class="btn btn-danger">
+              <i class="fa-solid fa-paper-plane me-1"></i> Invia Richiesta
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalTitle" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="ticketModalTitle"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+          </div>
+          <div class="modal-body" id="ticketModalBody">
+            <!-- Contenuto dinamico -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/superadmin/support.js') }}"></script>
+    </div>
+</div>
+{% endblock %}

@@ -67,7 +67,7 @@
     "Create your own online store": "Create your own online store",
     "Step 1: Shop Details": "Step 1: Shop Details",
     "Choose a name for your shop": "Choose a name for your shop",
-    "Other themes available on the platform": "Other themes available on the platform",
+    "Other types available on the platform": "Other types available on the platform",
     "Step 2: Create an account": "Step 2: Create an account",
     "Password security level: Low": "Password security level: Low",
     "Passwords do not match": "Passwords do not match",
@@ -77,7 +77,7 @@
     "Next": "Next",
     "Confirm Password": "Confirm Password",
     "Password": "Password",
-    "Select a Theme:": "Select a Theme:",
+    "Select type:": "Select type:",
     "Low": "Low",
     "Medium": "Medium",
     "Strong": "Strong",
@@ -155,5 +155,8 @@
     "Connect your store with a wide range of integrations, including marketing, inventory management, and secure payments.": "Connect your store with a wide range of integrations, including marketing, inventory management, and secure payments.",
     "Our plans are designed to grow with your business, allowing you to expand without technical or financial limits.": "Our plans are designed to grow with your business, allowing you to expand without technical or financial limits.",
     "First Class Safety": "First Class Safety",
-    "Protect your store and customer data with advanced security solutions integrated into our CMS.": "Protect your store and customer data with advanced security solutions integrated into our CMS."
+    "Protect your store and customer data with advanced security solutions integrated into our CMS.": "Protect your store and customer data with advanced security solutions integrated into our CMS.",
+    "Online Store": "Online Store",
+    "Online Platform": "Online Platform",
+    "Website": "Website"
 }

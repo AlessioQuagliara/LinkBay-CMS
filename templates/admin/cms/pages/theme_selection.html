@@ -15,58 +15,83 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         .container {
-            max-width: 900px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 30px;
-            border-radius: 10px;
+            max-width: 960px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
             text-align: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
+
         .carousel-container {
             position: relative;
             overflow: hidden;
             width: 100%;
         }
+
         .carousel {
             display: flex;
             transition: transform 0.5s ease-in-out;
-            gap: 10px;
+            gap: 20px;
+            padding: 10px 0;
         }
+
         .theme-card {
-            min-width: 80%; /* Ridotto per mostrare una parte della prossima card */
-            max-width: 80%;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
+            width: 300px;
+            height: 300px;
+            background: #fff;
+            border-radius: 20px;
             overflow: hidden;
-            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
             padding: 20px;
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
+
+        .theme-card:hover {
+            transform: scale(1.02);
+        }
+
         .theme-card img {
             width: 100%;
-            border-radius: 8px;
+            object-fit: cover;
+            height: 220px;
         }
+
         .arrow {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
             border: none;
-            padding: 10px;
+            padding: 10px 15px;
             cursor: pointer;
             border-radius: 50%;
+            z-index: 10;
+            transition: background 0.2s;
         }
+
+        .arrow:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
         .arrow-left {
             left: 10px;
         }
+
         .arrow-right {
             right: 10px;
         }
+
         .btn-danger {
             background-color: #ff5757;
             border: none;
@@ -75,16 +100,28 @@
 </head>
 <body>
     <div class="container">
-        <h1>Select Your Theme</h1>
+        <h1 class="mb-4 fw-bold text-dark">🎨 Scegli il tuo Tema</h1>
+        <p class="text-muted mb-5">Anteprima visiva dei temi disponibili. Seleziona il tuo preferito per applicarlo al tuo negozio.</p>
         <div class="carousel-container">
             <button class="arrow arrow-left" onclick="moveSlide(-1)">&#10094;</button>
             <div class="carousel">
                 {% for theme in themes %}
                 <div class="theme-card">
-                    <img src="{{ theme.image_url }}" alt="{{ theme.name }}">
-                    <h3>{{ theme.name }}</h3>
-                    <p>{{ theme.description }}</p>
-                    <button class="btn btn-danger w-100 mt-2" onclick="applyTheme('{{ theme.name }}')">Apply This Theme</button>
+                    <div class="mt-3">
+                        <p class="fw-bold text-dark mb-1">{{ theme.name }}</p>
+                        <p class="text-muted small mb-2">{{ theme.description or 'Tema professionale per eCommerce moderni' }}</p>
+                        {% if theme.preview_html %}
+                        <div class="border rounded bg-light p-2 mb-2" style="height: 100px; overflow: auto; font-size: 0.85em;">
+                            {{ theme.preview_html | safe }}
+                        </div>
+                        {% endif %}
+                        <button class="btn btn-primary btn-lg w-100 mb-2" onclick="applyTheme('{{ theme.name }}')">
+                            <i class="fa-solid fa-brush me-1"></i> Applica Tema
+                        </button>
+                        <button class="btn btn-outline-secondary btn-lg w-100" onclick="previewTheme('{{ theme.name }}')">
+                            <i class="fa-solid fa-eye me-1"></i> Anteprima
+                        </button>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
@@ -133,6 +170,17 @@
                 } else {
                     Swal.fire("Error", "Failed to apply theme: " + data.message, "error");
                 }
+            });
+        }
+
+        function previewTheme(themeName) {
+            Swal.fire({
+                title: 'Anteprima Tema',
+                html: `<iframe src="/preview-theme/${themeName}" style="width:100%;height:700px;border:none;"></iframe>`,
+                width: '100%',
+                padding: '0.5em',
+                showCloseButton: true,
+                showConfirmButton: false
             });
         }
     </script>

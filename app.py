@@ -57,10 +57,6 @@ from blueprints.api import register_api_blueprints
 from blueprints.main import main_bp
 from errors import register_error_handlers # Blueprint del sito ufficiale LinkBay
 
-# 📌 Rotta del sito di facciata
-from landing import landing_bp
-app.register_blueprint(landing_bp, url_prefix='/')  # Serve le route per linkbay-cms.com
-
 
 app.register_blueprint(main_bp)  # Blueprint per la parte pubblica
 register_admin_blueprints(app)   # Blueprint per il pannello admin
@@ -96,7 +92,10 @@ if not os.path.exists('logs'):
     os.mkdir('logs')
 
 
-file_handler = RotatingFileHandler('logs/linkbay.log', maxBytes=10240, backupCount=5)
+if os.getenv('ENVIRONMENT') == 'development':
+    file_handler = RotatingFileHandler('logs/linkbay.log', maxBytes=10240, backupCount=5)
+else:
+    file_handler = RotatingFileHandler('/var/www/CMS_DEF/logs/linkbay.log', maxBytes=10240, backupCount=5)
 file_handler.setFormatter(logging.Formatter(
     '[%(asctime)s] [%(levelname)s] in %(module)s: %(message)s'
 ))

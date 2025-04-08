@@ -126,8 +126,9 @@ document.addEventListener("DOMContentLoaded", function () {
     let blocks = {};  // Variabile per contenere i blocchi caricati
 
     // Carica i blocchi da un file JSON
-    fetch('{{ url_for("static", filename="js/admin/blocks.json") }}')
-        .then(response => response.json())
+    //fetch('{{ url_for("static", filename="js/admin/blocks.json") }}')
+    fetch('{{ url_for("themes", filename="blocks.json") }}')
+    .then(response => response.json())
         .then(data => {
             blocks = data;  // Salva i blocchi nella variabile globale
         })

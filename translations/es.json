@@ -67,7 +67,7 @@
     "Create your own online store": "Crea tu propia tienda online",
     "Step 1: Shop Details": "Paso 1: Detalles de la tienda",
     "Choose a name for your shop": "Elige un nombre para tu tienda",
-    "Other themes available on the platform": "Otros temas disponibles en la plataforma",
+    "Other types available on the platform": "Otros tipos disponibles en la plataforma",
     "Step 2: Create an account": "Paso 2: Crea una cuenta",
     "Password security level: Low": "Nivel de seguridad de la contraseña: Bajo",
     "Passwords do not match": "Las contraseñas no coinciden",
@@ -77,7 +77,7 @@
     "Next": "Siguiente",
     "Confirm Password": "Confirmar contraseña",
     "Password": "Contraseña",
-    "Select a Theme:": "Selecciona un tema:",
+    "Select type:": "Selecciona una tipologia:",
     "Low": "Bajo",
     "Medium": "Medio",
     "Strong": "Fuerte",
@@ -155,5 +155,8 @@
     "Connect your store with a wide range of integrations, including marketing, inventory management, and secure payments.": "Conecta tu tienda con una amplia gama de integraciones, incluyendo marketing, gestión de inventario y pagos seguros.",
     "Our plans are designed to grow with your business, allowing you to expand without technical or financial limits.": "Nuestros planes están diseñados para crecer con tu negocio, permitiéndote expandirte sin límites técnicos ni financieros.",
     "First Class Safety": "Seguridad de Primera Clase",
-    "Protect your store and customer data with advanced security solutions integrated into our CMS.": "Protege tu tienda y los datos de tus clientes con soluciones de seguridad avanzadas integradas en nuestro CMS."
+    "Protect your store and customer data with advanced security solutions integrated into our CMS.": "Protege tu tienda y los datos de tus clientes con soluciones de seguridad avanzadas integradas en nuestro CMS.",
+    "Online Store": "Tienda en línea",
+    "Online Platform": "Plataforma en línea",
+    "Website": "Sitio web"
 }

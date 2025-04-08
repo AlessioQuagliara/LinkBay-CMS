@@ -1,0 +1,61 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+<div class="d-flex" style="height: 100vh; overflow: hidden;">
+    <!-- Sidebar inclusa -->
+    <div style="width: 240px; min-width: 240px; background-color: #fff; box-shadow: 2px 0 5px rgba(0,0,0,0.1); z-index: 100;">
+      {% include 'landing/dashboard_sidebar.html' %}
+    </div>
+  
+    <!-- Main Content -->
+    <div class="flex-grow-1 p-4" style="overflow-y: auto; background: #f5f6f8;">
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+      <a href="/home">
+        <img src="/static/images/superadmin/linkbay_logo.png" width="150px" alt="Logo">
+      </a>
+      <a href="/logout" class="btn btn-danger">Logout <i class="fa-solid fa-right-from-bracket"></i></a>
+    </div>
+
+    <div class="d-flex align-items-center mb-3" data-aos="fade-up">
+      <div>
+        <h4 class="mb-0">🧾 Chat Supporto</h4>
+        <p class="text-muted">Comunica direttamente con il team per risolvere il tuo problema.</p>
+      </div>
+      <a href="/dashboard/support" class="btn btn-outline-dark ms-auto">
+        <i class="fa-solid fa-arrow-left"></i> Torna ai ticket
+      </a>
+    </div>
+
+    <div class="card shadow-sm mb-4" data-aos="fade-up">
+      <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="mb-1">{{ ticket.title }}</h5>
+          <p class="mb-0 text-muted">
+            {{ ticket.category }} • 
+            <span class="text-uppercase fw-bold text-{{ 'success' if ticket.priority == 'low' else 'warning' if ticket.priority == 'normal' else 'danger' }}">
+              {{ ticket.priority }}
+            </span>
+          </p>
+        </div>
+        <span class="badge text-bg-{{ 'secondary' if ticket.status == 'open' else 'info' if ticket.status == 'in_progress' else 'success' }}">
+          {{ ticket.status.replace('_', ' ').title() }}
+        </span>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mb-4" style="height: 60vh;" data-aos="fade-up">
+      <div class="card-body overflow-auto" id="chatMessages" style="max-height: 100%; scroll-behavior: smooth;">
+        <!-- Messaggi caricati dinamicamente -->
+      </div>
+    </div>
+
+    <div class="input-group">
+      <input type="text" id="chatInput" class="form-control" placeholder="Scrivi un messaggio..." aria-label="Messaggio">
+      <button class="btn btn-danger" type="button" id="sendMessageBtn">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/superadmin/ticket_chat.js') }}"></script>
+    </div>
+</div>
+{% endblock %}
