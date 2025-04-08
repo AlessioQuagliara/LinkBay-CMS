@@ -18,6 +18,14 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'postgresql+psycopg2://root:root@localhost/cms_def')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # configurazione per Google AUTH
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "365461856822-j2egbbab7fihijb8vsg4h3298dge1shp.apps.googleusercontent.com")
+    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "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")
+    FACEBOOK_CLIENT_ID = os.getenv("FACEBOOK_CLIENT_ID", "474199322354663")
+    FACEBOOK_CLIENT_SECRET = os.getenv("FACEBOOK_CLIENT_SECRET", "1618a8b7fa1b59c01f1920b2d9de55dd")
+    APPLE_CLIENT_ID = os.getenv("APPLE_CLIENT_ID", "365461856822-j2egbbab7fihijb8vsg4h3298dge1shp.apps.googleusercontent.com")
+    APPLE_CLIENT_SECRET = os.getenv("APPLE_CLIENT_SECRET", "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")
+
     # OpenAI API Key
     OPENAI_API_KEY = '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'
     

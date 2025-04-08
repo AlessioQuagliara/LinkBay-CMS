@@ -13,16 +13,16 @@ class Page(db.Model):
     __tablename__ = "pages"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 🔑 ID univoco
-    shop_name = db.Column(db.String(255), nullable=False)  # 🏪 Nome del negozio
+    shop_name = db.Column(db.String(255), db.ForeignKey('ShopList.shop_name'), nullable=False)  # 🏪 Nome del negozio
     title = db.Column(db.String(255), nullable=False)  # 🏷️ Titolo della pagina
     description = db.Column(db.Text, nullable=True)  # 📝 Descrizione SEO
     keywords = db.Column(db.String(255), nullable=True)  # 🔑 Parole chiave SEO
-    slug = db.Column(db.String(255), unique=True, nullable=False)  # 🔗 Slug della pagina
+    slug = db.Column(db.String(255), nullable=False)  # 🔗 Slug della pagina
     content = db.Column(db.Text, nullable=True)  # 🖋️ Contenuto della pagina
     styles = db.Column(db.Text, nullable=True)  # 🎨 **Nuovo campo per salvare gli stili CSS**
     theme_name = db.Column(db.String(255), nullable=True)  # 🎨 Nome del tema
     paid = db.Column(db.String(255), nullable=False, default="No")  # 💰 Stato pagato o no
-    language = db.Column(db.String(10), nullable=True)  # 🌍 Lingua della pagina
+    language = db.Column(db.String(10), nullable=False, default='it')  # 🌍 Lingua della pagina
     published = db.Column(db.Boolean, default=False)  # ✅ Pubblicata o no
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 🕒 Data di creazione
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 🔄 Ultimo aggiornamento
@@ -33,6 +33,10 @@ class Page(db.Model):
     # DIZIONARIO ---------------------------------------------------- 
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    
+    __table_args__ = (
+    db.UniqueConstraint('slug', 'shop_name', 'language', name='uq_slug_shop_lang'),
+)
 
 # 🔄 **Decoratore per la gestione degli errori del database**
 def handle_db_errors(func):

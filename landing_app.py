@@ -7,17 +7,15 @@ from logging.handlers import RotatingFileHandler
 import openai
 from dotenv import load_dotenv
 import json
+from config import Config
 
 # 📌 Carica le variabili d'ambiente dal file .env
 load_dotenv()
 
 # 🔹 Inizializza l'app Flask
-app = Flask(__name__)
-
-# 📌 Configura le impostazioni dell'applicazione utilizzando il file config.py
-from config import Config
+app = Flask(__name__, template_folder="landing/templates")
 app.config.from_object(Config)
-app = Flask(__name__, template_folder="landing/templates", static_folder="landing/static")
+#app.config['SERVER_NAME'] = "linkbay-cms.com"
 
 # 📌 Configura la chiave segreta per la sicurezza delle sessioni Flask
 app.secret_key = os.getenv('SECRET_KEY', 'default_secret_key')
@@ -53,8 +51,15 @@ from models import (
 
 # 📌 Rotta del sito di facciata
 from landing import landing_bp
-app.register_blueprint(landing_bp, url_prefix='/')  # Serve le route per linkbay-cms.com
+from blueprints.api import register_api_blueprints
+from landing.auth import auth_bp
 
+app.register_blueprint(auth_bp, url_prefix='/auth')  # Serve le route per linkbay-cms.com/auth
+app.register_blueprint(landing_bp, url_prefix='/')  # Serve le route per linkbay-cms.com
+register_api_blueprints(app)
+
+from landing.auth import init_oauth
+init_oauth(app)
 
 # 📌 Chiude la sessione del database al termine della richiesta per ottimizzare le risorse
 @app.teardown_appcontext
@@ -83,7 +88,10 @@ if not os.path.exists('logs'):
     os.mkdir('logs')
 
 
-file_handler = RotatingFileHandler('logs/linkbay.log', maxBytes=10240, backupCount=5)
+if os.getenv('ENVIRONMENT') == 'development':
+    file_handler = RotatingFileHandler('logs/linkbay.log', maxBytes=10240, backupCount=5)
+else:
+    file_handler = RotatingFileHandler('/var/www/CMS_DEF/logs/linkbay.log', maxBytes=10240, backupCount=5)
 file_handler.setFormatter(logging.Formatter(
     '[%(asctime)s] [%(levelname)s] in %(module)s: %(message)s'
 ))

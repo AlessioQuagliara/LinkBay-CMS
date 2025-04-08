@@ -76,10 +76,16 @@
                 </div>
                 <hr>
                 <!-- Opzioni di Login con Google, Facebook, Apple -->
-                <div>
-                    <button type="button" class="btn btn-dark"><i class="fa-brands fa-apple"></i></button>
-                    <button type="button" class="btn btn-dark"><i class="fa-brands fa-facebook"></i></button>
-                    <button type="button" class="btn btn-dark"><i class="fa-brands fa-google"></i></button>
+                <div class="d-flex justify-content-center gap-2">
+                    <!-- <a href="{{ url_for('auth.login_apple') }}" class="btn btn-dark" title="Login con Apple">
+                        <i class="fa-brands fa-apple"></i>
+                    </a> -->
+                    <a href="{{ url_for('auth.login_facebook') }}" class="btn btn-dark" title="Login con Facebook">
+                        <i class="fa-brands fa-facebook"></i>
+                    </a>
+                    <a href="{{ url_for('auth.login_google') }}" class="btn btn-dark" title="Login con Google">
+                        <i class="fa-brands fa-google"></i>
+                    </a>
                 </div>
             </form>
         </div>

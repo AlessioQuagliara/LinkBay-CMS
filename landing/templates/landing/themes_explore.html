@@ -1,0 +1,134 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+<div class="d-flex" style="height: 100vh; overflow: hidden;">
+    <!-- Sidebar inclusa -->
+    <div style="width: 240px; min-width: 240px; background-color: #fff; box-shadow: 2px 0 5px rgba(0,0,0,0.1); z-index: 100;">
+      {% include 'landing/dashboard_sidebar.html' %}
+    </div>
+  
+    <!-- Main Content -->
+    <div class="flex-grow-1 p-4" style="overflow-y: auto; background: #f5f6f8;">
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+      <a href="/home">
+        <img src="/static/images/superadmin/linkbay_logo.png" width="150px" alt="Logo">
+      </a>
+      <a href="/logout" class="btn btn-danger">Logout <i class="fa-solid fa-right-from-bracket"></i></a>
+    </div>
+
+    <div class="d-flex align-items-center mb-3">
+      <div>
+        <h4 class="mb-0">Login come: {{ user['nome'] or 'Utente' }} 👋</h4>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center mb-3">
+      <div>
+        <h4 class="mb-0">🎨 Esplora Temi</h4>
+        <p class="text-muted">Scopri e acquista temi professionali per personalizzare il tuo store.</p>
+      </div>
+      <a href="/dashboard/themes" class="btn btn-outline-dark ms-auto">
+        <i class="fa-solid fa-arrow-left"></i> Torna alla Dashboard Temi
+      </a>
+    </div>
+
+    <section id="themes-showcase" class="container" data-aos="fade-up">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-dark">🎨 Temi Premium del CMS</h3>
+        <a href="/dashboard/themes/upload" class="btn btn-dark">
+          <i class="fa-solid fa-upload me-2"></i>Carica Tema Personalizzato
+        </a>
+      </div>
+
+
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for addon in cms_addons %}
+        {% if addon.addon_type == 'themes' %}
+        <div class="col">
+          <div class="card border-0 shadow theme-card h-100 p-3">
+            {% if addon.preview_image %}
+            <img src="{{ addon.preview_image }}" class="card-img-top mb-3" style="border-radius: 8px; height: 180px; object-fit: cover;">
+            {% endif %}
+            <div class="card-body d-flex flex-column justify-content-between p-3" style="background-color: #fff; border-radius: 8px;">
+              <h5 class="card-title text-danger fw-bold text-center">{{ addon.name }}</h5>
+              <p class="card-text text-muted text-center">{{ addon.description or 'Tema professionale per il tuo store' }}</p>
+              <p class="card-text text-center"><span class="badge bg-dark fs-6 py-2 px-3">€ {{ addon.price }}</span></p>
+              <div class="d-grid gap-2 mt-3">
+                <button class="btn btn-outline-dark fw-semibold" onclick="previewTheme('{{ addon.name }}')">
+                  <i class="fa-solid fa-eye me-1"></i> Anteprima Tema
+                </button>
+                <button class="btn btn-danger fw-semibold" onclick="purchaseTheme('{{ addon.id }}')">
+                  <i class="fa-solid fa-cart-shopping me-1"></i> Acquista Tema
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </section>
+
+    <style>
+      .theme-card {
+        border-radius: 12px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .theme-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0 25px rgba(217, 4, 41, 0.3);
+      }
+
+      .border-dashed {
+        border-style: dashed !important;
+      }
+    </style>
+
+    <script>
+      async function applyThemeToShop(themeId) {
+        const confirmed = await Swal.fire({
+          title: "Applica Tema",
+          text: "Vuoi davvero incollare questo tema su uno dei tuoi negozi?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Sì, scegli negozio",
+          cancelButtonText: "Annulla"
+        });
+
+        if (confirmed.isConfirmed) {
+          // TODO: Aprire modale con elenco negozi (in futuro)
+          console.log("Tema selezionato:", themeId);
+          Swal.fire('Funzione in sviluppo', 'Presto potrai applicare questo tema ai tuoi negozi.', 'info');
+        }
+      }
+      
+      function previewTheme(themeName) {
+        Swal.fire({
+          title: 'Anteprima Tema',
+          html: `<iframe src="/preview-theme/${themeName}" style="width:100%;height:650px;border:none;"></iframe>`,
+          width: '100%',
+          padding: '0.5em',
+          showCloseButton: true,
+          showConfirmButton: false
+        });
+      }
+
+      async function purchaseTheme(addonId) {
+        const confirmed = await Swal.fire({
+          title: "Acquisto Tema",
+          text: "Vuoi procedere con l'acquisto di questo tema?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Sì, acquista",
+          cancelButtonText: "Annulla"
+        });
+
+        if (confirmed.isConfirmed) {
+          // TODO: chiamata all'API di acquisto
+          Swal.fire("Successo", "Tema acquistato con successo!", "success");
+        }
+      }
+    </script>
+    </div>
+</div>
+{% endblock %}

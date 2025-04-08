@@ -16,3 +16,5 @@ Werkzeug
 psycopg2-binary
 reportlab
 uwsgi
+certbot-dns-godaddy
+Authlib

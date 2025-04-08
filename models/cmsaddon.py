@@ -17,6 +17,11 @@ class CMSAddon(db.Model):
     addon_type = db.Column(db.String(255), nullable=False)  # 📌 Tipo di addon
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 🕒 Data di creazione
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 🔄 Ultimo aggiornamento
+    is_theme_json = db.Column(db.Boolean, default=False)  # 🎨 True se è un tema JSON (per GrapesJS)
+    is_block_json = db.Column(db.Boolean, default=False)  # 🧩 True se è un blocco JSON da importare in editor
+    is_integration = db.Column(db.Boolean, default=False)  # 🔌 True se è un'integrazione esterna (API, app)
+    integration_key = db.Column(db.String(255), nullable=True)  # 🔑 Chiave tecnica (es. 'aruba', 'zapier', ecc.)
+    preview_image = db.Column(db.String(255), nullable=True)  # 🖼️ URL dell'immagine di anteprima
 
     def __repr__(self):
         return f"<CMSAddon {self.name} (ID: {self.id})>"
@@ -37,7 +42,10 @@ class ShopAddon(db.Model):
     
 # DIZIONARIO ---------------------------------------------------- 
     def to_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return {
+            column.name: getattr(self, column.name)
+            for column in self.__table__.columns
+        }
 
 # 🔄 **Decoratore per la gestione degli errori del database**
 def handle_db_errors(func):
@@ -53,12 +61,15 @@ def handle_db_errors(func):
 
 # 🔄 **Helper per convertire un modello in dizionario**
 def model_to_dict(model):
-    return {column.name: getattr(model, column.name) for column in model.__table__.columns}
+    return {
+        column.name: getattr(model, column.name)
+        for column in model.__table__.columns
+    }
 
 # ✅ **Crea un nuovo addon**
 @handle_db_errors
-def create_addon(name, description, price, addon_type):
-    new_addon = CMSAddon(name=name, description=description, price=price, addon_type=addon_type)
+def create_addon(name, description, price, addon_type, is_theme_json=False, is_block_json=False, is_integration=False, integration_key=None, preview_image=None):
+    new_addon = CMSAddon(name=name, description=description, price=price, addon_type=addon_type, is_theme_json=is_theme_json, is_block_json=is_block_json, is_integration=is_integration, integration_key=integration_key, preview_image=preview_image)
     db.session.add(new_addon)
     db.session.commit()
     logging.info(f"✅ Addon '{name}' creato con successo")

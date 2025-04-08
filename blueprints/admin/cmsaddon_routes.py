@@ -14,174 +14,9 @@ logging.basicConfig(level=logging.INFO)
 # Creazione del Blueprint per la gestione degli add-on del CMS
 cmsaddon_bp = Blueprint('cmsaddon' , __name__)
 
-def get_addons_by_type(addon_type, shop_name):
-    """
-    Recupera gli add-on di un certo tipo e ne aggiorna lo stato per lo shop corrente.
-    """
-    addons = CMSAddon.query.filter_by(type=addon_type).all()
-    
-    for addon in addons:
-        status = addon.get_addon_status(shop_name, addon.id)
-        addon.status = status if status else 'select'  # Se non ha stato, imposta 'select'
-
-    return addons
-
-@cmsaddon_bp.route('/store-components/theme-ui')
-def theme_ui():
-    """
-    Pagina che mostra gli add-on relativi alla UI del tema.
-    """
-    username = check_user_authentication()
-    if isinstance(username, str):
-        shop_name = request.host.split('.')[0]
-        theme_ui_addons = get_addons_by_type('theme_ui', shop_name)
-        return render_template(
-            'admin/cms/store-components/theme-ui.html',
-            title='Theme UI',
-            username=username,
-            addons=theme_ui_addons
-        )
-    return username
-
-@cmsaddon_bp.route('/store-components/plugin')
-def plugin():
-    """
-    Pagina che mostra gli add-on relativi ai plugin.
-    """
-    username = check_user_authentication()
-    if isinstance(username, str):
-        shop_name = request.host.split('.')[0]
-        plugin_addons = get_addons_by_type('plugin', shop_name)
-        return render_template(
-            'admin/cms/store-components/plugin.html',
-            title='Plugin',
-            username=username,
-            addons=plugin_addons
-        )
-    return username
-
-@cmsaddon_bp.route('/store-components/services')
-def services():
-    """
-    Pagina che mostra gli add-on relativi ai servizi.
-    """
-    username = check_user_authentication()
-    if isinstance(username, str):
-        shop_name = request.host.split('.')[0]
-        service_addons = CMSAddon.query.filter_by(type='service').all()
-        
-        for addon in service_addons:
-            status = addon.get_addon_status(shop_name, addon.id)
-            
-            # Stato di default per add-ons non selezionati né acquistati
-            if status == 'purchased':
-                addon.status = 'purchased'
-            elif status == 'selected':
-                addon.status = 'selected'
-            else:
-                addon.status = 'select'  
-
-        return render_template(
-            'admin/cms/store-components/services.html',
-            title='Services',
-            username=username,
-            addons=service_addons
-        )
-    
-    return username
-
-@cmsaddon_bp.route('/store-components/themes')
-def themes():
-    """
-    Pagina che mostra gli add-on relativi ai temi.
-    """
-    username = check_user_authentication()
-    if isinstance(username, str):
-        shop_name = request.host.split('.')[0]
-        theme_addons = get_addons_by_type('theme', shop_name)
-        return render_template(
-            'admin/cms/store-components/themes.html',
-            title='Themes',
-            username=username,
-            addons=theme_addons
-        )
-    return username
-
-# 📌 Route per selezionare un add-on
-@cmsaddon_bp.route('/api/select-addon', methods=['POST'])
-def select_addon():
-    """
-    API per selezionare un add-on.
-    Imposta lo stato su 'selected' per l'add-on scelto e su 'deselected' per gli altri dello stesso tipo.
-    """
-    try:
-        data = request.get_json()
-        shop_name = request.host.split('.')[0]
-        addon_id = data.get('addon_id')
-        addon_type = data.get('addon_type')
-
-        if not addon_id or not addon_type:
-            return jsonify({'status': 'error', 'message': 'Addon ID and type are required'}), 400
-
-        # Aggiorna lo stato dell'add-on selezionato
-        selected_addon = CMSAddon.query.filter_by(id=addon_id, type=addon_type).first()
-        if not selected_addon:
-            return jsonify({'status': 'error', 'message': 'Addon not found'}), 404
-
-        # Deseleziona gli altri add-on dello stesso tipo per lo stesso negozio
-        CMSAddon.query.filter_by(shop_name=shop_name, type=addon_type).update({'status': 'deselected'})
-
-        # Imposta lo stato su 'selected' per l'add-on scelto
-        selected_addon.status = 'selected'
-        db.session.commit()
-
-        return jsonify({'status': 'success', 'message': 'Addon selected successfully'})
-
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"Error selecting addon: {e}")
-        return jsonify({'status': 'error', 'message': 'Unexpected error occurred'}), 500
-
-# 📌 Route per acquistare un add-on
-@cmsaddon_bp.route('/api/purchase-addon', methods=['POST'])
-def purchase_addon():
-    """
-    API per acquistare un add-on.
-    Imposta lo stato dell'add-on su 'purchased'.
-    """
-    try:
-        data = request.get_json()
-        shop_name = request.host.split('.')[0]
-        addon_id = data.get('addon_id')
-        addon_type = data.get('addon_type')
-
-        if not addon_id or not addon_type:
-            return jsonify({'status': 'error', 'message': 'Addon ID and type are required'}), 400
-
-        # Aggiorna lo stato dell'add-on a 'purchased'
-        purchased_addon = CMSAddon.query.filter_by(id=addon_id, type=addon_type).first()
-        if not purchased_addon:
-            return jsonify({'status': 'error', 'message': 'Addon not found'}), 404
-
-        purchased_addon.status = 'purchased'
-        db.session.commit()
-
-        return jsonify({'status': 'success', 'message': 'Addon purchased successfully'})
-
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"Error purchasing addon: {e}")
-        return jsonify({'status': 'error', 'message': 'Unexpected error occurred'}), 500
-
-# 📌 Route per applicare un tema
+# 📌 Route per applicare un tema -----------------------------------------------------------------------------------------------------------------------------------------------
 @cmsaddon_bp.route('/api/apply-theme', methods=['POST'])
 def apply_theme_api():
-    """
-    API per applicare un tema a un negozio.
-    - Legge il tema da `themes/{theme_name}.json`
-    - Aggiorna o inserisce le pagine nel database
-    - Aggiorna `web_settings` con `head`, `foot` e `script`
-    """
     try:
         data = request.get_json()
         shop_name = request.host.split('.')[0]
@@ -204,7 +39,7 @@ def apply_theme_api():
         return jsonify({'status': 'error', 'message': 'Unexpected error occurred'}), 500
 
 
-# 📌 Funzione per applicare il tema dal file JSON
+# 📌 Funzione per applicare il tema dal file JSON -----------------------------------------------------------------------------------------------------------------------------
 def apply_theme(theme_name, shop_name):
     theme_path = os.path.join("themes", f"{theme_name}.json")
 
@@ -244,14 +79,15 @@ def apply_theme(theme_name, shop_name):
             else:
                 new_page = Page(
                     title=page.get("title", ""),
-                    description=page.get("description", None),
-                    keywords=page.get("keywords", None),
+                    description=page.get("description"),
+                    keywords=page.get("keywords"),
                     slug=page.get("slug", ""),
-                    content=page.get("content", None),
-                    theme_name=theme_name,
-                    paid="Yes",
-                    language=page.get("language", None),
-                    published=bool(page.get("published", True)),
+                    content=page.get("content"),
+                    styles=page.get("styles"),
+                    theme_name=page.get("theme_name"),
+                    paid=page.get("paid", "No"),
+                    language=page.get("language"),
+                    published=bool(page.get("published", False)),
                     shop_name=shop_name,
                 )
                 db.session.add(new_page)

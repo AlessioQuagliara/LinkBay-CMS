@@ -5,6 +5,8 @@ from models.shoplist import ShopList  # Modello per la gestione dei negozi
 from models.cmsaddon import CMSAddon  # Modello per gli add-on (temi)
 from helpers import check_user_authentication
 import logging
+import os
+import json
 
 logging.basicConfig(level=logging.INFO)
 
@@ -121,14 +123,34 @@ def ai_analysis():
 # 🔹 **Selezione del tema del negozio**
 @ui_bp.route('/admin/cms/pages/theme-selection')
 def theme_selection():
-    shop_name = request.host.split('.')[0]  # Ottieni il sottodominio del negozio
+    shop_name = request.host.split('.')[0]
+    themes_folder = os.path.join(os.getcwd(), 'Themes')
+    theme_files = [f for f in os.listdir(themes_folder) if f.endswith('.json')]
 
-    # Recuperiamo SOLO gli add-on di tipo "theme"
-    theme_addons = CMSAddon.query.filter_by(addon_type='theme').all()
+    theme_data = []
+
+    for filename in theme_files:
+        try:
+            with open(os.path.join(themes_folder, filename), 'r', encoding='utf-8') as f:
+                theme_json = json.load(f)
+                if isinstance(theme_json.get("pages"), list):
+                    # Ricava l'anteprima della navbar e del footer se esistono
+                    navbar = next((p for p in theme_json["pages"] if p["slug"] == "navbar"), None)
+                    footer = next((p for p in theme_json["pages"] if p["slug"] == "footer"), None)
+                    theme_data.append({
+                        "name": theme_json["pages"][0].get("theme_name", filename.replace('.json', '')),
+                        "paid": theme_json["pages"][0].get("paid", "No"),
+                        "language": theme_json["pages"][0].get("language", "en"),
+                        "navbar": navbar,
+                        "footer": footer
+                    })
+        except Exception as e:
+            print(f"Errore nel caricamento del tema {filename}: {e}")
+            continue
 
     return render_template(
         'admin/cms/pages/theme_selection.html',
         title='Select Your Theme',
-        themes=theme_addons,
+        themes=theme_data,
         shop_name=shop_name
     )
