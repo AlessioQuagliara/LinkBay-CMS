@@ -23,6 +23,6 @@ def register_api_blueprints(app):
     app.register_blueprint(brands_bp)
     app.register_blueprint(collections_bp)
     app.register_blueprint(order_list_bp)
-    app.register_blueprint(subscriptions_bp)
+    app.register_blueprint(subscriptions_bp, url_prefix='/api')
     app.register_blueprint(navbar_bp)
     app.register_blueprint(landing_api)

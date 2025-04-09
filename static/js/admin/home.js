@@ -320,7 +320,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // SUBSCRIPTION -----------------------------------------------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", function () {
     function loadSubscriptionStatus() {
-        fetch("/api/get-subscription-status")
+        fetch("/api/get-subscription-status", { credentials: "include" })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {

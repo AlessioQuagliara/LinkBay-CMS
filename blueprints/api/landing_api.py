@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, redirect, current_app, flash, url_for
 from werkzeug.security import generate_password_hash
 from models.database import db
 from models.shoplist import ShopList
@@ -6,11 +6,18 @@ from models.user import User
 from models.stores_info import StoreInfo
 from models.userstoreaccess import UserStoreAccess
 from models.orders import Order
+from models.message import ChatMessage
+from models.cmsaddon import CMSAddon
 from models.support_tickets import SupportTicket
+from models.storepayment import StorePayment
+from models.subscription import Subscription
+from public.stripe_connect import create_connect_account
 from sqlalchemy import func
 from flask import session
+import stripe
 import logging
 import os
+from datetime import datetime, timedelta
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -82,6 +89,22 @@ def create_shop():
 
         db.session.commit()
 
+        freemium = Subscription(
+            shop_name=new_shop.shop_name,
+            user_id=new_user.id,
+            plan_name='Freemium',
+            price=0.00,
+            currency='EUR',
+            features='{"max_products":50}',
+            limits='{"max_visits":1000}',
+            status='active',
+            payment_gateway='free',
+            payment_reference=None,
+            renewal_date=datetime.utcnow() + timedelta(days=30)
+        )
+        db.session.add(freemium)
+        db.session.commit()
+
         logger.info(f"✅ Shop '{shop_name}' creato con ID utente: {new_user.id}")
         return jsonify(success=True, message="Negozio creato con successo!")
     except Exception as e:
@@ -126,6 +149,22 @@ def create_shop_access():
         db.session.commit()
         db.session.refresh(access)
         logger.warning(f"🧪 Access level da DB dopo commit: {access.access_level}")
+
+        freemium = Subscription(
+            shop_name=new_shop.shop_name,
+            user_id=user_id,
+            plan_name='Freemium',
+            price=0.00,
+            currency='EUR',
+            features='{"max_products":50}',
+            limits='{"max_visits":1000}',
+            status='active',
+            payment_gateway='free',
+            payment_reference=None,
+            renewal_date=datetime.utcnow() + timedelta(days=30)
+        )
+        db.session.add(freemium)
+        db.session.commit()
 
         logger.info(f"✅ Nuovo shop '{shop_name}' creato da utente ID {user_id}")
         return jsonify(success=True, message="Negozio creato con successo!")
@@ -181,8 +220,14 @@ def delete_shop():
         StoreInfo.query.filter_by(shop_name=shop.shop_name).delete()
 
         # Elimina eventuali domini associati
+        from models.page import Page
+        Page.query.filter_by(shop_name=shop.shop_name).delete()
         from models.domain import Domain
         Domain.query.filter_by(shop_id=shop.id).delete()
+
+        # Elimina la subscription associata
+        from models.subscription import Subscription
+        Subscription.query.filter_by(shop_name=shop.shop_name).delete()
 
         # Ora elimina il negozio
         db.session.delete(shop)
@@ -363,3 +408,139 @@ def post_ticket_message(ticket_id):
         db.session.rollback()
         logger.error(f"Errore nell'invio del messaggio per il ticket {ticket_id}: {e}")
         return jsonify(success=False, message="Errore durante l'invio del messaggio"), 500
+
+
+
+@landing_api.route('/available_themes', methods=['GET'])
+def get_available_themes():
+    try:
+        themes = CMSAddon.query.filter_by(addon_type='themes').order_by(CMSAddon.created_at.desc()).all()
+        data = [{
+            'id': theme.id,
+            'name': theme.name,
+            'description': theme.description,
+            'price': theme.price,
+            'preview_image': theme.preview_image,
+            'is_theme_json': theme.is_theme_json
+        } for theme in themes]
+
+        return jsonify(success=True, data=data)
+    except Exception as e:
+        logger.error(f"Errore nel recupero dei temi disponibili: {e}")
+        return jsonify(success=False, message="Errore durante il recupero dei temi"), 500
+    
+
+
+
+@landing_api.route('/chat/send', methods=['POST'])
+def send_chat_message():
+    if 'user_id' not in session:
+        return jsonify(success=False, message="Utente non autenticato"), 401
+
+    data = request.get_json() or {}
+    sender_id = session['user_id']
+    receiver_id = data.get('receiver_id')
+    message = data.get('message', '').strip()
+    attachment_url = data.get('attachment_url')  # opzionale
+
+    if not receiver_id or not message:
+        return jsonify(success=False, message="Dati mancanti"), 400
+
+    try:
+        new_message = ChatMessage(
+            sender_id=sender_id,
+            receiver_id=receiver_id,
+            message=message,
+            attachment_url=attachment_url
+        )
+        db.session.add(new_message)
+        db.session.commit()
+        return jsonify(success=True, message="Messaggio inviato")
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Errore nell'invio del messaggio: {e}")
+        return jsonify(success=False, message="Errore durante l'invio del messaggio"), 500
+
+@landing_api.route('/chat/messages', methods=['GET'])
+def get_chat_messages():
+    if 'user_id' not in session:
+        return jsonify(success=False, message="Utente non autenticato"), 401
+
+    user_id = session['user_id']
+    target_id = request.args.get('user_id')
+
+    if not target_id:
+        return jsonify(success=False, message="ID utente destinatario mancante"), 400
+
+    try:
+        messages = ChatMessage.query.filter(
+            ((ChatMessage.sender_id == user_id) & (ChatMessage.receiver_id == target_id)) |
+            ((ChatMessage.sender_id == target_id) & (ChatMessage.receiver_id == user_id))
+        ).order_by(ChatMessage.created_at.asc()).all()
+
+        return jsonify(success=True, data=[msg.to_dict() for msg in messages])
+    except Exception as e:
+        logger.error(f"Errore nel recupero messaggi: {e}")
+        return jsonify(success=False, message="Errore durante il recupero dei messaggi"), 500
+    
+
+
+
+    
+
+@landing_api.route('/checkout/subscribe', methods=['GET'])
+def checkout_subscribe():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    stripe.api_key = current_app.config['STRIPE_SECRET_KEY']  # <-- deve esistere nel tuo config.py
+
+    shop_name = request.args.get('shop_name')
+    plan = request.args.get('plan')
+    user_id = session['user_id']
+
+    if not shop_name or not plan:
+        return jsonify(success=False, message="Parametri mancanti"), 400
+
+    plans = {
+        "allisready": {
+            "label": "AllIsReady",
+            "price": 18,
+            "price_id": "price_1RC23wLbvfE9v2XlYWS1fTtS" # Da usare in produzione
+            #"price_id": "price_1RC3XtPteJOX9ukrGj97iGom"
+        },
+        "professionaldesk": {
+            "label": "ProfessionalDesk",
+            "price": 36,
+            "price_id": "price_1RC24VLbvfE9v2XlDtrNqxHg" # Da usare in produzione
+            #"price_id": "price_1RC3Y6PteJOX9ukrratINEP1"
+        }
+    }
+
+    if plan not in plans:
+        return jsonify(success=False, message="Piano non valido"), 400
+
+    plan_data = plans[plan]
+
+    try:
+        session_stripe = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            mode="subscription",
+            line_items=[{
+                "price": plan_data["price_id"],
+                "quantity": 1
+            }],
+            metadata={
+                "shop_name": shop_name,
+                "user_id": str(user_id),
+                "plan_name": plan
+            },
+            success_url=f"{request.host_url}subscription/success?shop={shop_name}",
+            cancel_url=f"{request.host_url}subscription/cancel?shop={shop_name}"
+        )
+        return redirect(session_stripe.url, code=303)
+
+    except Exception as e:
+        logger.error(f"❌ Errore nella creazione della sessione Stripe: {e}")
+        return jsonify(success=False, message="Errore nella creazione della sessione"), 500
+    

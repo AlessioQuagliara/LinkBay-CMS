@@ -1,0 +1,133 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+<div class="d-flex" style="height: 100vh; overflow: hidden;">
+    <!-- Sidebar inclusa -->
+    <div style="width: 240px; min-width: 240px; background-color: #fff; box-shadow: 2px 0 5px rgba(0,0,0,0.1); z-index: 100;">
+      {% include 'landing/dashboard_sidebar.html' %}
+    </div>
+  
+    <!-- Main Content -->
+    <div class="flex-grow-1 p-4" style="overflow-y: auto; background: #f5f6f8;">
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+      <a href="/home">
+        <img src="/static/images/superadmin/linkbay_logo.png" width="150px" alt="Logo">
+      </a>
+      <a href="/logout" class="btn btn-danger">Logout <i class="fa-solid fa-right-from-bracket"></i></a>
+    </div>
+
+    <div class="d-flex align-items-center mb-3">
+      <div>
+        <h4 class="mb-0">Login come: {{ user['nome'] or 'Utente' }} 👋</h4>
+      </div>
+    </div>
+
+    <hr style="border: 0; height: 2px; background-color: red; margin: 20px 0;">
+
+
+
+    <!-- CONTENUTI DINAMICI -->
+    <div class="d-flex align-items-center mb-4" data-aos="fade-up">
+  {% if is_owner == has_access %}
+      <div>
+        <h4 class="mb-0">🛠️ Gestione Risorse</h4>
+        <p class="text-muted">Torna alla panoramica dei tuoi negozi.</p>
+      </div>
+      <a href="/dashboard/stores" class="btn btn-outline-dark ms-auto">
+        <i class="fa-solid fa-arrow-left"></i> Torna alla dashboard
+      </a>
+    </div>
+    <div id="content9" class="content-pane">
+      <div class="row g-4">
+
+        <!-- Abbonamento -->
+        <div class="col-12">
+          <div class="card shadow-sm border-0">
+            <div class="card-body">
+              <h5 class="card-title mb-2">📜 Abbonamento attivo</h5>
+              {% if subscription %}
+                <p><strong>Piano:</strong> {{ subscription.plan_name }}</p>
+                <p><strong>Prezzo:</strong> €{{ subscription.price }} / mese</p>
+                <p><strong>Scadenza:</strong> {{ subscription.renewal_date.strftime('%d/%m/%Y') }}</p>
+              {% else %}
+                <div class="alert alert-warning">Nessun abbonamento attivo</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Collaboratori -->
+        {% if subscription and subscription.plan_name in ['AllIsReady', 'ProfessionalDesk'] %}
+        <div class="col-md-6">
+          <div class="card shadow-sm border-0">
+            <div class="card-body">
+              <h5 class="card-title mb-2">👥 Gestione Utenti</h5>
+              <p>Condividi l’accesso con altri collaboratori e gestisci i permessi.</p>
+              <a href="/dashboard/users/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Gestisci utenti</a>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Domini -->
+        {% if subscription and subscription.plan_name in ['AllIsReady', 'ProfessionalDesk'] %}
+        <div class="col-md-6">
+          <div class="card shadow-sm border-0">
+            <div class="card-body">
+              <h5 class="card-title mb-2">🌍 Gestione Domini</h5>
+              <p>Configura il tuo dominio personalizzato e monitora lo stato DNS.</p>
+              <a href="/dashboard/domains/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Gestisci domini</a>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Plugin -->
+        <div class="col-md-6">
+          <div class="card shadow-sm border-0">
+            <div class="card-body">
+              <h5 class="card-title mb-2">🔌 Plugin & Integrazioni</h5>
+              <p>Aggiungi funzionalità come strumenti marketing, automazioni e API.</p>
+              <a href="/dashboard/plugins/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Vai ai Plugin</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Temi -->
+        <div class="col-md-6">
+          <div class="card shadow-sm border-0">
+            <div class="card-body">
+              <h5 class="card-title mb-2">🎨 Temi & Design</h5>
+              <p>Scegli o personalizza il tema del tuo negozio con il nostro editor.</p>
+              <a href="/dashboard/themes/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Vai ai Temi</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analisi -->
+        {% if subscription and subscription.plan_name == 'ProfessionalDesk' %}
+        <div class="col-md-6">
+          <div class="card shadow-sm border-0">
+            <div class="card-body">
+              <h5 class="card-title mb-2">📊 Analisi & Statistiche</h5>
+              <p>Accedi a dashboard dettagliate per monitorare vendite, traffico e performance.</p>
+              <a href="/dashboard/analytics/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Visualizza Analisi</a>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+    {% else %}
+        <div class="container py-5 text-center">
+          <h2 class="mb-3">🚫 Accesso Negato</h2>
+          <p class="lead">Questo store non è tuo. Per collaborare, puoi inviare una richiesta al proprietario.</p>
+          <a href="/dashboard/stores" class="btn btn-outline-dark mt-3">
+            <i class="fa-solid fa-arrow-left"></i> Torna alla tua dashboard
+          </a>
+        </div>
+    {% endif %}
+    </div>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/superadmin/access.js') }}"></script>
+{% endblock %}

@@ -38,8 +38,9 @@ class Config:
         GODADDY_API_KEY = '3mM44WkB29Cg9H_GRJds69oVsyQQrUYFoeTyh'
         GODADDY_API_SECRET = '42FBcBbn8SZFWuGGsetaDF'
         # Configurazioni Stripe interne
-        STRIPE_SECRET_KEY='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'
-        STRIPE_PUBLISHABLE_KEY='pk_live_51MijPqDLzaeBHrX0rui4jtJnGx1kTSKVNbVy6hbQQYUfoMhVTMVEFoN6U7jfYh2tyRgLhvSgOSM5wpSmi55nS3PH00XUmvoSY0'
+        STRIPE_WEBHOOK_SECRET = 'whsec_9e89f572077eefee590c317bafbb534224b3d64c9c5cbdc4cfebb625a5c80589'
+        STRIPE_SECRET_KEY='sk_test_51R8r8BPteJOX9ukri0MrftLIDZoumDLgnKQz4upe7kHyhuxD3EpG44LAtz6jBdDhUr6iQAbvx9a0oIKfpfNClNCU00zCFovMAA'
+        STRIPE_PUBLISHABLE_KEY='pk_test_51R8r8BPteJOX9ukruE1O5G1S8VqbgKzlHmhTPAqQQdWSibh9fkctSH6zobztupPgnrQiGfDZ7C9En96mSMxyO1Yz00R0EdgIUd'
     else:
         SESSION_COOKIE_SECURE = True  # PER CHI MODIFICA = Sicuro solo su HTTPS, disabilitato in locale
         SESSION_PERMANENT = True  # PER CHI MODIFICA = Non mantenere la sessione dopo la chiusura del browser
@@ -48,5 +49,6 @@ class Config:
         GODADDY_API_KEY = 'h1p3oVvDvVzt_4bcJJnnHMd3naQ74EaWzzS'  
         GODADDY_API_SECRET = 'NeLezhbgDrRdE56raE5KmY'  
         # Configurazioni Stripe interne
-        STRIPE_SECRET_KEY='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'
-        STRIPE_PUBLISHABLE_KEY='pk_live_51MijPqDLzaeBHrX0rui4jtJnGx1kTSKVNbVy6hbQQYUfoMhVTMVEFoN6U7jfYh2tyRgLhvSgOSM5wpSmi55nS3PH00XUmvoSY0'
+        STRIPE_WEBHOOK_SECRET = 'whsec_xEE4UjbnBuwf9HehsVfL7p4OeuSFaequ'
+        STRIPE_SECRET_KEY='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'
+        STRIPE_PUBLISHABLE_KEY='pk_live_51R8r84LbvfE9v2XljJqWpMiNMskDZi4rmfy00FsWVYgxReVXyctlCWUexNxhzq64jlLy7TYwEQ3xiBi8BwVtDMUw00DslS3PLB'

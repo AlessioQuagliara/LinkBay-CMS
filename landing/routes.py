@@ -1,4 +1,4 @@
-from flask import render_template, request, jsonify, redirect, url_for, session, Response
+from flask import render_template, request, jsonify, redirect, url_for, session, Response, flash
 from . import landing_bp
 from models.database import db
 from models.user import User
@@ -9,12 +9,17 @@ from models.orders import Order
 from models.support_tickets import SupportTicket
 from models.cmsaddon import CMSAddon
 from models.cmsaddon import ShopAddon
+from models.site_visits import SiteVisit
+from models.stores_info import StoreInfo
+from models.domain import Domain
+from models.improvement_suggestion import ImprovementSuggestion
 from sqlalchemy import func
 from werkzeug.security import check_password_hash
 import json
 import logging
 from flask import g
 import os
+from datetime import datetime, timedelta
 from flask import send_file
 
 def load_release_notes(language="it"):
@@ -117,12 +122,74 @@ def dashboard_stores():
         subscription = Subscription.query.filter_by(shop_name=shop['shop_name'], user_id=user_id).first()
         shop['subscription'] = subscription.to_dict() if subscription else None
 
+        # VISITE RESTANTI per piano Freemium
+        if not subscription or (subscription and subscription.plan_name == "Freemium"):
+
+            now = datetime.utcnow()
+            start_month = datetime(now.year, now.month, 1)
+
+            visit_count = db.session.query(func.count(SiteVisit.id)).filter(
+                SiteVisit.shop_name == shop['shop_name'],
+                SiteVisit.visit_time >= start_month
+            ).scalar()
+
+            shop['visits_left'] = max(0, 1000 - visit_count)
+        else:
+            shop['visits_left'] = None
+
     return render_template(
         'landing/dashboard_shop.html',
         user=get_user_from_session(),
         shops=list(all_shops.values())
     )
 
+@landing_bp.route('/dashboard/chat/<int:target_user_id>')
+def dashboard_private_chat(target_user_id):
+    if 'user_id' not in session:
+        return redirect(url_for('landing.login'))
+
+    target_user = User.query.get(target_user_id)
+    if not target_user:
+        flash("Utente non trovato.", "warning")
+        return redirect(url_for('landing.dashboard_team'))
+
+    return render_template(
+        'landing/dashboard_private_chat.html',
+        user=get_user_from_session(),
+        target_user=target_user
+    )
+
+@landing_bp.route('/dashboard/team/user/<int:user_id>')
+def dashboard_user_profile(user_id):
+    if 'user_id' not in session:
+        return redirect(url_for('landing.login'))
+
+    user = User.query.get(user_id)
+    if not user:
+        flash("Utente non trovato.", "warning")
+        return redirect(url_for('landing.dashboard_team'))
+
+    # Recupera i negozi di proprietà dell'utente
+    shops = ShopList.query.filter_by(user_id=user_id).all()
+
+    # Statistiche globali
+    total_revenue = 0
+    total_orders = 0
+
+    for shop in shops:
+        orders = Order.query.filter_by(shop_name=shop.shop_name).all()
+        for order in orders:
+            total_revenue += order.total_amount or 0
+            total_orders += 1
+
+    return render_template(
+        'landing/dashboard_user_profile.html',
+        user=get_user_from_session(),
+        target_user=user,
+        total_revenue=round(total_revenue, 2),
+        total_orders=total_orders,
+        shops=shops
+    )
 @landing_bp.route('/dashboard/sales')
 def dashboard_sales():
     if 'user_id' not in session:
@@ -176,18 +243,29 @@ def dashboard_payments():
         return redirect(url_for('landing.login'))
     return render_template('landing/dashboard_payments.html', user=get_user_from_session())
 
-@landing_bp.route('/dashboard/team')
-def dashboard_team():
-    if 'user_id' not in session:
-        return redirect(url_for('landing.login'))
-    return render_template('landing/dashboard_team.html', user=get_user_from_session())
-
 @landing_bp.route('/dashboard/settings')
 def dashboard_settings():
     if 'user_id' not in session:
         return redirect(url_for('landing.login'))
     return render_template('landing/dashboard_settings.html', user=get_user_from_session())
 
+@landing_bp.route('/subscription/select/<shop_name>')
+def subscription_select(shop_name):
+    if 'user_id' not in session:
+        return redirect(url_for('landing.login'))
+
+    # Recupera i dati dello shop
+    shop = ShopList.query.filter_by(shop_name=shop_name).first()
+    if not shop:
+        return redirect(url_for('landing.dashboard_stores'))
+
+    # Verifica se l'utente ha accesso a questo shop
+    is_owner = shop.user_id == session['user_id']
+    has_access = UserStoreAccess.query.filter_by(shop_id=shop.id, user_id=session['user_id']).first()
+    if not is_owner and not has_access:
+        return redirect(url_for('landing.dashboard_stores'))
+
+    return render_template('landing/dashboard_shop_plan.html', user=get_user_from_session(), shop_name=shop_name)
 
 def get_user_from_session():
     return {
@@ -282,3 +360,114 @@ def upload_themes():
     themes = CMSAddon.query.filter_by(addon_type='themes').all()
 
     return render_template('landing/themes_upload.html', user=get_user_from_session(), themes=themes)
+
+@landing_bp.route('/subscription/cancel')
+def subscription_cancel():
+    shop_name = request.args.get("shop", "")
+    return render_template("landing/subscription_cancel.html", shop_name=shop_name)
+
+@landing_bp.route('/subscription/success')
+def subscription_success():
+    shop_name = request.args.get("shop", "")
+    return render_template("landing/subscription_success.html", shop_name=shop_name)
+
+@landing_bp.route('/dashboard/manage/<shop_name>')
+def dashboard_manage_shop(shop_name):
+    if 'user_id' not in session:
+        return redirect(url_for('landing.login'))
+
+    user_id = session['user_id']
+    shop = ShopList.query.filter_by(shop_name=shop_name).first()
+
+    if not shop:
+        flash("Negozio non trovato.", "warning")
+        return redirect(url_for('landing.dashboard_stores'))
+
+    is_owner = shop.user_id == user_id
+    has_access = UserStoreAccess.query.filter_by(shop_id=shop.id, user_id=user_id).first()
+
+    if not is_owner and not has_access:
+        flash("Questo store non è tuo. Per collaborare, invia una richiesta al proprietario.", "warning")
+        return redirect(url_for('landing.dashboard_stores'))
+
+    # 👇 Dati per la dashboard
+    subscription = Subscription.query.filter_by(shop_name=shop_name).first()
+    addons = ShopAddon.query.filter_by(shop_name=shop_name).all()
+    domains = Domain.query.join(ShopList, Domain.shop_id == ShopList.id).filter(ShopList.shop_name == shop_name).all()
+    suggestions = ImprovementSuggestion.query.filter_by(shop_name=shop_name).all()
+
+    return render_template(
+        'landing/dashboard_shop_manage.html',
+        shop_name=shop_name,
+        subscription=subscription,
+        addons=addons,
+        domains=domains,
+        suggestions=suggestions,
+        user=get_user_from_session()
+    )
+
+@landing_bp.route('/dashboard/team')
+def dashboard_admin_leaderboard():
+    if 'user_id' not in session:
+        return redirect(url_for('landing.login'))
+
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+
+    admin_entries = UserStoreAccess.query.filter_by(access_level='admin').all()
+    user_ids = list(set([entry.user_id for entry in admin_entries]))
+
+    leaderboard_data = []
+
+    for uid in user_ids:
+        user = User.query.get(uid)
+        user_shops = ShopList.query.filter_by(user_id=uid).all()
+
+        total_revenue = 0
+        total_orders = 0
+        best_store = None
+        max_revenue = 0
+
+        shop_names = [shop.shop_name for shop in user_shops]
+
+        if shop_names:
+            order_stats = db.session.query(
+                func.sum(Order.total_amount),
+                func.count(Order.id),
+                Order.shop_name
+            ).filter(Order.shop_name.in_(shop_names)).group_by(Order.shop_name).all()
+
+            for revenue, order_count, name in order_stats:
+                revenue = revenue or 0
+                total_revenue += revenue
+                total_orders += order_count or 0
+                if revenue > max_revenue:
+                    max_revenue = revenue
+                    best_store = name
+
+        leaderboard_data.append({
+            "user_id": uid,
+            "nome": user.nome,
+            "cognome": user.cognome,
+            "profilo_foto": user.profilo_foto or "/static/images/superadmin/admin_avatar.png",
+            "total_revenue": round(total_revenue, 2),
+            "total_orders": total_orders,
+            "best_store": best_store or "Nessun negozio"
+        })
+
+    leaderboard_data.sort(key=lambda x: x["total_revenue"], reverse=True)
+
+    # 🔢 Applica la paginazione
+    total_entries = len(leaderboard_data)
+    start = (page - 1) * per_page
+    end = start + per_page
+    paginated_data = leaderboard_data[start:end]
+
+    return render_template(
+        'landing/dashboard_team.html',
+        user=get_user_from_session(),
+        leaderboard=paginated_data,
+        page=page,
+        total_pages=(total_entries + per_page - 1) // per_page
+    )
+

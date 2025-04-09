@@ -1,8 +1,8 @@
-"""Inizializzazione database
+"""Initial clean migration
 
-Revision ID: 10a5ad139cfc
+Revision ID: adcfb25f21f5
 Revises: 
-Create Date: 2025-03-04 00:25:19.204581
+Create Date: 2025-04-10 00:50:09.662782
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '10a5ad139cfc'
+revision = 'adcfb25f21f5'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -50,9 +50,14 @@ def upgrade():
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('description', sa.String(length=255), nullable=True),
     sa.Column('price', sa.Float(), nullable=False),
-    sa.Column('type', sa.String(length=255), nullable=False),
+    sa.Column('addon_type', sa.String(length=255), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('is_theme_json', sa.Boolean(), nullable=True),
+    sa.Column('is_block_json', sa.Boolean(), nullable=True),
+    sa.Column('is_integration', sa.Boolean(), nullable=True),
+    sa.Column('integration_key', sa.String(length=255), nullable=True),
+    sa.Column('preview_image', sa.String(length=255), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('collections',
@@ -132,29 +137,11 @@ def upgrade():
     sa.ForeignKeyConstraint(['parent_id'], ['navbar_links.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('pages',
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('shop_name', sa.String(length=255), nullable=False),
-    sa.Column('title', sa.String(length=255), nullable=False),
-    sa.Column('description', sa.Text(), nullable=True),
-    sa.Column('keywords', sa.String(length=255), nullable=True),
-    sa.Column('slug', sa.String(length=255), nullable=False),
-    sa.Column('content', sa.Text(), nullable=True),
-    sa.Column('theme_name', sa.String(length=255), nullable=True),
-    sa.Column('paid', sa.String(length=255), nullable=False),
-    sa.Column('language', sa.String(length=10), nullable=True),
-    sa.Column('published', sa.Boolean(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('slug')
-    )
     op.create_table('payment_methods',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('shop_name', sa.String(length=255), nullable=False),
     sa.Column('method_name', sa.String(length=255), nullable=False),
-    sa.Column('api_key', sa.String(length=512), nullable=False),
-    sa.Column('api_secret', sa.String(length=512), nullable=False),
+    sa.Column('stripe_account_id', sa.String(length=255), nullable=False),
     sa.Column('extra_info', sa.Text(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
@@ -299,6 +286,18 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
     )
+    op.create_table('chat_messages',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('sender_id', sa.Integer(), nullable=False),
+    sa.Column('receiver_id', sa.Integer(), nullable=False),
+    sa.Column('message', sa.Text(), nullable=False),
+    sa.Column('attachment_url', sa.String(length=500), nullable=True),
+    sa.Column('is_read', sa.Boolean(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['receiver_id'], ['user.id'], ),
+    sa.ForeignKeyConstraint(['sender_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('collection_images',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('collection_id', sa.Integer(), nullable=False),
@@ -330,20 +329,21 @@ def upgrade():
     sa.Column('discount_price', sa.Float(), nullable=True),
     sa.Column('stock_quantity', sa.Integer(), nullable=False),
     sa.Column('sku', sa.String(length=255), nullable=False),
+    sa.Column('ean_code', sa.String(length=255), nullable=True),
     sa.Column('category_id', sa.Integer(), nullable=True),
     sa.Column('brand_id', sa.Integer(), nullable=True),
     sa.Column('weight', sa.Float(), nullable=True),
     sa.Column('dimensions', sa.String(length=255), nullable=True),
     sa.Column('color', sa.String(length=255), nullable=True),
     sa.Column('material', sa.String(length=255), nullable=True),
-    sa.Column('image_url', sa.String(length=512), nullable=True),
     sa.Column('slug', sa.String(length=255), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['brand_id'], ['brands.id'], ),
-    sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
+    sa.ForeignKeyConstraint(['brand_id'], ['brands.id'], ondelete='SET NULL'),
+    sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('ean_code'),
     sa.UniqueConstraint('sku'),
     sa.UniqueConstraint('slug')
     )
@@ -471,6 +471,25 @@ def upgrade():
     sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('pages',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('shop_name', sa.String(length=255), nullable=False),
+    sa.Column('title', sa.String(length=255), nullable=False),
+    sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('keywords', sa.String(length=255), nullable=True),
+    sa.Column('slug', sa.String(length=255), nullable=False),
+    sa.Column('content', sa.Text(), nullable=True),
+    sa.Column('styles', sa.Text(), nullable=True),
+    sa.Column('theme_name', sa.String(length=255), nullable=True),
+    sa.Column('paid', sa.String(length=255), nullable=False),
+    sa.Column('language', sa.String(length=10), nullable=False),
+    sa.Column('published', sa.Boolean(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['shop_name'], ['ShopList.shop_name'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('slug', 'shop_name', 'language', name='uq_slug_shop_lang')
+    )
     op.create_table('payments',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('order_id', sa.Integer(), nullable=False),
@@ -480,6 +499,27 @@ def upgrade():
     sa.Column('transaction_id', sa.String(length=255), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('product_attributes',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('product_id', sa.Integer(), nullable=False),
+    sa.Column('attribute_name', sa.String(length=100), nullable=False),
+    sa.Column('attribute_value', sa.String(length=100), nullable=False),
+    sa.Column('price_modifier', sa.Float(), nullable=True),
+    sa.Column('stock_quantity', sa.Integer(), nullable=False),
+    sa.Column('variant_image_url', sa.String(length=512), nullable=True),
+    sa.Column('ean_code', sa.String(length=255), nullable=True),
+    sa.ForeignKeyConstraint(['product_id'], ['products.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('ean_code')
+    )
+    op.create_table('product_images',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('product_id', sa.Integer(), nullable=False),
+    sa.Column('image_url', sa.String(length=512), nullable=False),
+    sa.Column('is_main', sa.Boolean(), nullable=True),
+    sa.ForeignKeyConstraint(['product_id'], ['products.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('shipping',
@@ -610,7 +650,10 @@ def downgrade():
     op.drop_table('support_tickets')
     op.drop_table('subscription')
     op.drop_table('shipping')
+    op.drop_table('product_images')
+    op.drop_table('product_attributes')
     op.drop_table('payments')
+    op.drop_table('pages')
     op.drop_table('order_items')
     op.drop_table('opportunities')
     op.drop_table('improvement_suggestion')
@@ -624,6 +667,7 @@ def downgrade():
     op.drop_table('products')
     op.drop_table('orders')
     op.drop_table('collection_images')
+    op.drop_table('chat_messages')
     op.drop_table('agency_employees')
     op.drop_table('ShopList')
     op.drop_table('user')
@@ -636,7 +680,6 @@ def downgrade():
     op.drop_table('site_visit_intern')
     op.drop_table('shipping_methods')
     op.drop_table('payment_methods')
-    op.drop_table('pages')
     op.drop_table('navbar_links')
     op.drop_table('customers')
     op.drop_table('cookie_policy')

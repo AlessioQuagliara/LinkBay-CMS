@@ -46,17 +46,20 @@ from models import (
     Category, Brand, ProductImage, ProductAttribute, Product, Collection, CollectionImage, CollectionProduct, Order, OrderItem, 
     Payment, PaymentMethod, Shipping, ShippingMethod, Page, NavbarLink, CMSAddon, ShopAddon, 
     ImprovementSuggestion, Contact, SupportTicket, TicketMessage, SuperAdmin, SuperPages, 
-    SuperMedia, SuperInvoice, SuperMessages, SuperSupport
+    SuperMedia, SuperInvoice, SuperMessages, SuperSupport, ChatMessage
 )
 
 # 📌 Rotta del sito di facciata
 from landing import landing_bp
 from blueprints.api import register_api_blueprints
 from landing.auth import auth_bp
+from webhooks.stripe_webhook import stripe_webhook_bp
 
 app.register_blueprint(auth_bp, url_prefix='/auth')  # Serve le route per linkbay-cms.com/auth
 app.register_blueprint(landing_bp, url_prefix='/')  # Serve le route per linkbay-cms.com
 register_api_blueprints(app)
+app.register_blueprint(stripe_webhook_bp)
+
 
 from landing.auth import init_oauth
 init_oauth(app)

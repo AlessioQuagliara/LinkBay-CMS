@@ -60,6 +60,7 @@ from .contacts import Contact
 # 📌 Tabelle per la gestione delle email, ticket di supporto e messaggi
 from .support_tickets import SupportTicket
 from .ticket_messages import TicketMessage
+from .message import ChatMessage
 
 # 📌 Tabelle per i superadmin
 from .superadmin_models import SuperAdmin
