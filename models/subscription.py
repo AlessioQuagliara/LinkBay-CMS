@@ -13,7 +13,7 @@ class Subscription(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     shop_name = db.Column(db.String(255), db.ForeignKey("ShopList.shop_name"), nullable=False)  # 🏪 Negozio
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)  # 👤 Utente associato
-    plan_name = db.Column(db.String(100), nullable=False)  # 📜 Piano (Starter, Pro, Enterprise)
+    plan_name = db.Column(db.String(100), nullable=False)  # 📜 Piano (Freemium, AllIsReady, ProfessionalDesk)
     price = db.Column(db.Float, nullable=False)  # 💰 Prezzo del piano
     currency = db.Column(db.String(10), nullable=False, default="EUR")  # 💱 Valuta (EUR, USD, ecc.)
     features = db.Column(db.String(500), nullable=True)  # ⭐ Funzionalità incluse

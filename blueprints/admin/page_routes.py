@@ -5,6 +5,8 @@ from models.cmsaddon import CMSAddon, ShopAddon
 from models.products import Product
 from models.navbar import NavbarLink
 from models.site_visits import SiteVisit
+from models.subscription import Subscription
+from models.user import User
 from config import Config
 from datetime import datetime, timedelta
 from functools import wraps
@@ -664,5 +666,3 @@ def export_pages_json():
             "Content-Disposition": f"attachment;filename={filename}"
         }
     )
-
-

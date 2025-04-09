@@ -13,8 +13,7 @@ class PaymentMethod(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 🔑 ID univoco
     shop_name = db.Column(db.String(255), nullable=False)  # 🏪 Nome del negozio
     method_name = db.Column(db.String(255), nullable=False)  # 💳 Nome del metodo di pagamento
-    api_key = db.Column(db.String(512), nullable=False)  # 🔑 API Key
-    api_secret = db.Column(db.String(512), nullable=False)  # 🔒 API Secret
+    stripe_account_id = db.Column(db.String(255), nullable=False)  # 🧩 ID Stripe Connect (es. acct_...)
     extra_info = db.Column(db.Text, nullable=True)  # ℹ️ Informazioni extra
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 🕒 Data di creazione
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 🔄 Ultimo aggiornamento
@@ -48,8 +47,7 @@ def create_payment_method(data):
     new_method = PaymentMethod(
         shop_name=data["shop_name"],
         method_name=data["method_name"],
-        api_key=data["api_key"],
-        api_secret=data["api_secret"],
+        stripe_account_id=data["stripe_account_id"],
         extra_info=data.get("extra_info"),
     )
     db.session.add(new_method)
@@ -64,8 +62,7 @@ def update_payment_method(method_id, shop_name, data):
     if not method:
         return False
 
-    method.api_key = data.get("api_key", method.api_key)
-    method.api_secret = data.get("api_secret", method.api_secret)
+    method.stripe_account_id = data.get("stripe_account_id", method.stripe_account_id)
     method.extra_info = data.get("extra_info", method.extra_info)
     method.updated_at = datetime.utcnow()
 

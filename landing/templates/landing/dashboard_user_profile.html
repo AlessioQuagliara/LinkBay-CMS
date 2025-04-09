@@ -1,0 +1,95 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+<div class="d-flex" style="height: 100vh; overflow: hidden;">
+    <!-- Sidebar inclusa -->
+    <div style="width: 240px; min-width: 240px; background-color: #fff; box-shadow: 2px 0 5px rgba(0,0,0,0.1); z-index: 100;">
+      {% include 'landing/dashboard_sidebar.html' %}
+    </div>
+  
+    <!-- Main Content -->
+    <div class="flex-grow-1 p-4" style="overflow-y: auto; background: #f5f6f8;">
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+      <a href="/home">
+        <img src="/static/images/superadmin/linkbay_logo.png" width="150px" alt="Logo">
+      </a>
+      <a href="/logout" class="btn btn-danger">Logout <i class="fa-solid fa-right-from-bracket"></i></a>
+    </div>
+
+    <div class="d-flex align-items-center mb-3">
+      <div>
+        <h4 class="mb-0">Login come: {{ user['nome'] or 'Utente' }} 👋</h4>
+      </div>
+    </div>
+
+    <hr style="border: 0; height: 2px; background-color: red; margin: 20px 0;">
+
+    <!-- CONTENUTI DINAMICI -->
+    <div id="content9" class="content-pane" data-aos="fade-up">
+      <div class="mb-4 d-flex justify-content-between align-items-center">
+        <div>
+          <h3 class="fw-bold text-danger"><i class="fa-solid fa-user-tie me-2"></i>Profilo Utente Admin</h3>
+          <p class="text-muted mb-0">Dettagli relativi all'amministratore selezionato e ai suoi negozi.</p>
+        </div>
+        <a href="/dashboard/team" class="btn btn-outline-dark">
+          <i class="fa-solid fa-arrow-left"></i> Torna alla Classifica
+        </a>
+      </div>
+
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body d-flex align-items-center">
+          <img src="{{ target_user.profilo_foto or '/static/images/superadmin/admin_avatar.png' }}" alt="Avatar" class="rounded-circle me-3" width="70" height="70">
+          <div>
+            <h5 class="fw-bold mb-0">{{ target_user.nome }} {{ target_user.cognome }}</h5>
+            <p class="mb-0 text-muted">{{ target_user.email }}</p>
+          </div>
+          <div class="text-end mb-4">
+            <a href="/dashboard/chat/{{ target_user.id }}" class="btn btn-danger">
+              <i class="fa-solid fa-comments me-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4 mb-4">
+        <div class="col-md-6">
+          <div class="card border-0 bg-white shadow-sm">
+            <div class="card-body">
+              <h6 class="text-muted">Totale Fatturato</h6>
+              <h3 class="fw-bold text-danger">€ {{ "%.2f"|format(total_revenue) }}</h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card border-0 bg-white shadow-sm">
+            <div class="card-body">
+              <h6 class="text-muted">Totale Ordini</h6>
+              <h3 class="fw-bold text-dark">{{ total_orders }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">
+          <h5 class="mb-0"><i class="fa-solid fa-store me-2"></i>Negozi Gestiti</h5>
+        </div>
+        <div class="card-body">
+          {% if shops %}
+          <ul class="list-group list-group-flush">
+            {% for shop in shops %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span class="fw-semibold text-dark">{{ shop.shop_name }}</span>
+              <span class="badge bg-secondary">{{ shop.shop_type }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p class="text-muted">Nessun negozio associato a questo utente.</p>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+</div>
+</div>
+{% endblock %}

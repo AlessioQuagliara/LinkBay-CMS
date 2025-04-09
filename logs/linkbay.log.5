@@ -1,4 +1,4 @@
-[2025-04-08 14:22:08,016] [ERROR] in app: Exception on /dashboard [GET]
+[2025-04-09 22:54:00,397] [ERROR] in app: Exception on /webhook/stripe [POST]
 Traceback (most recent call last):
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -9,25 +9,11 @@ Traceback (most recent call last):
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/routes.py", line 48, in dashboard
-    return render_template('landing/dashboard.html', user_name=session.get('user_name'))
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
-    return _render(app, template, context)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
-    rv = template.render(context)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/dashboard.html", line 71, in top-level template code
-    <h5 class="card-title">Benvenuto, {{ user['nome'] or 'Utente' }} 👋</h5>
-    ^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 471, in getitem
-    return obj[argument]
-           ~~~^^^^^^^^^^
-jinja2.exceptions.UndefinedError: 'user' is undefined
-[2025-04-08 14:22:27,606] [ERROR] in app: Exception on /dashboard [GET]
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/webhooks/stripe_webhook.py", line 91, in handle_stripe_webhook
+    webhook_logger.info(f"✅ Webhook completato per session ID: {session.get('id')}")
+                                                                 ^^^^^^^
+UnboundLocalError: cannot access local variable 'session' where it is not associated with a value
+[2025-04-09 22:54:00,462] [ERROR] in app: Exception on /webhook/stripe [POST]
 Traceback (most recent call last):
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -38,25 +24,11 @@ Traceback (most recent call last):
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/routes.py", line 48, in dashboard
-    return render_template('landing/dashboard.html', user_name=session.get('user_name'))
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
-    return _render(app, template, context)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
-    rv = template.render(context)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/dashboard.html", line 71, in top-level template code
-    <h5 class="card-title">Benvenuto, {{ user['nome'] or 'Utente' }} 👋</h5>
-    ^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 471, in getitem
-    return obj[argument]
-           ~~~^^^^^^^^^^
-jinja2.exceptions.UndefinedError: 'user' is undefined
-[2025-04-08 14:24:45,099] [ERROR] in app: Exception on /dashboard [GET]
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/webhooks/stripe_webhook.py", line 91, in handle_stripe_webhook
+    webhook_logger.info(f"✅ Webhook completato per session ID: {session.get('id')}")
+                                                                 ^^^^^^^
+UnboundLocalError: cannot access local variable 'session' where it is not associated with a value
+[2025-04-09 22:54:00,536] [ERROR] in app: Exception on /webhook/stripe [POST]
 Traceback (most recent call last):
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -67,24 +39,11 @@ Traceback (most recent call last):
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/routes.py", line 48, in dashboard
-    return render_template('landing/dashboard.html', user_name=session.get('user_name'))
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
-    return _render(app, template, context)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
-    rv = template.render(context)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/dashboard.html", line 71, in top-level template code
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 471, in getitem
-    return obj[argument]
-           ~~~^^^^^^^^^^
-jinja2.exceptions.UndefinedError: 'user' is undefined
-[2025-04-08 14:24:49,754] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-08 14:24:51,009] [ERROR] in app: Exception on /dashboard [GET]
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/webhooks/stripe_webhook.py", line 91, in handle_stripe_webhook
+    webhook_logger.info(f"✅ Webhook completato per session ID: {session.get('id')}")
+                                                                 ^^^^^^^
+UnboundLocalError: cannot access local variable 'session' where it is not associated with a value
+[2025-04-09 22:54:00,676] [ERROR] in app: Exception on /webhook/stripe [POST]
 Traceback (most recent call last):
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -95,35 +54,52 @@ Traceback (most recent call last):
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/routes.py", line 48, in dashboard
-    return render_template('landing/dashboard.html', user_name=session.get('user_name'))
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
-    return _render(app, template, context)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
-    rv = template.render(context)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/dashboard.html", line 1, in top-level template code
-    {% extends 'landing/base.html' %}
-    ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/base.html", line 20, in top-level template code
-    {% block content %}{% endblock %}
-    ^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/dashboard.html", line 10, in block 'content'
-    <a href="{{ url_for('index') }}">
-    ^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1121, in url_for
-    return self.handle_url_build_error(error, endpoint, values)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1110, in url_for
-    rv = url_adapter.build(  # type: ignore[union-attr]
-        endpoint,
-    ...<3 lines>...
-        force_external=_external,
-    )
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/werkzeug/routing/map.py", line 924, in build
-    raise BuildError(endpoint, values, method, self)
-werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'index'. Did you mean 'landing.home' instead?
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/webhooks/stripe_webhook.py", line 91, in handle_stripe_webhook
+    webhook_logger.info(f"✅ Webhook completato per session ID: {session.get('id')}")
+                                                                 ^^^^^^^
+UnboundLocalError: cannot access local variable 'session' where it is not associated with a value
+[2025-04-09 22:54:00,755] [ERROR] in app: Exception on /webhook/stripe [POST]
+Traceback (most recent call last):
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/webhooks/stripe_webhook.py", line 91, in handle_stripe_webhook
+    webhook_logger.info(f"✅ Webhook completato per session ID: {session.get('id')}")
+                                                                 ^^^^^^^
+UnboundLocalError: cannot access local variable 'session' where it is not associated with a value
+[2025-04-09 22:54:00,897] [ERROR] in app: Exception on /webhook/stripe [POST]
+Traceback (most recent call last):
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/webhooks/stripe_webhook.py", line 91, in handle_stripe_webhook
+    webhook_logger.info(f"✅ Webhook completato per session ID: {session.get('id')}")
+                                                                 ^^^^^^^
+UnboundLocalError: cannot access local variable 'session' where it is not associated with a value
+[2025-04-09 22:54:00,963] [ERROR] in app: Exception on /webhook/stripe [POST]
+Traceback (most recent call last):
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/webhooks/stripe_webhook.py", line 91, in handle_stripe_webhook
+    webhook_logger.info(f"✅ Webhook completato per session ID: {session.get('id')}")
+                                                                 ^^^^^^^
+UnboundLocalError: cannot access local variable 'session' where it is not associated with a value

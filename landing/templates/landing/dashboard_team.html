@@ -25,42 +25,80 @@
 
     <!-- CONTENUTI DINAMICI -->
     <div id="content9" class="content-pane" data-aos="fade-up">
-      <h4>I Miei Negozi Online</h4>
-      <p>Gestisci o accedi ai tuoi negozi per poterli controllare.</p>
-      {% for shop in shops %}
-      <div class="card mb-4 shadow-sm border-0 rounded" style="max-width: 600px;">
-        <div class="row g-0">
-          <div class="col-md-4 d-flex align-items-center justify-content-center bg-light rounded">
-            <i class="fa-solid fa-shop fa-4x text-danger"></i>
-          </div>
-          <div class="col-md-8">
-            <div class="card-body">
-              <h5 class="card-title text-dark">{{ shop['shop_name'] }}</h5>
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item">Tema in uso: <span class="fw-bold">{{ shop['themeOptions'] }}</span></li>
-                {% if shop['domain']|trim == '' %}
-                <li class="list-group-item text-danger">Nessun Dominio associato</li>
-                {% else %}
-                <li class="list-group-item">Dominio associato: <span class="fw-bold">{{ shop['domain'] }}</span></li>
-                {% endif %}
-              </ul>
-              <div class="mt-3">
-                {% if environment == 'production' %}
-                  <a target="_blank" href="https://{{ shop['shop_name'] }}.yoursite-linkbay-cms.com/admin/login?token={{ token }}" class="btn btn-outline-dark btn-sm">Entra nel negozio</a>
-                {% else %}
-                  <a target="_blank" href="http://{{ shop['shop_name'] }}.localhost:8080/admin/login?token={{ token }}" class="btn btn-outline-dark btn-sm">Entra nel negozio</a>
-                {% endif %}
-                <button type="button" class="btn btn-outline-danger btn-sm delete-shop" data-shop-id="{{ shop['id'] }}">Elimina Negozio</button>
-              </div>
-            </div>
-          </div>
+
+      <div class="d-flex align-items-center mb-4">
+        <div>
+          <h3 class="mb-1 fw-bold text-danger">
+            <i class="fa-solid fa-ranking-star me-2"></i>Classifica Generale
+          </h3>
+          <p class="text-muted mb-0">Vedi i migliori utenti admin in base al fatturato generato nei loro store.</p>
         </div>
       </div>
-      {% endfor %}
-      <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#createShopModal">Crea Negozio</button>
-    </div>
+      
+      <div class="table-responsive">
+        <table class="table table-striped bg-white rounded shadow-sm overflow-hidden">
+          <thead class="table-danger text-dark">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Avatar</th>
+              <th scope="col">Utente</th>
+              <th scope="col">Store Migliore</th>
+              <th scope="col">Fatturato</th>
+              <th scope="col">Ordini</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in leaderboard %}
+            <tr>
+              <th scope="row">{{ loop.index }}</th>
+              <td>
+                <img src="{{ item.profilo_foto }}" alt="Avatar" class="rounded-circle" width="40" height="40">
+              </td>
+              <td>
+                <a href="{{ url_for('landing.dashboard_user_profile', user_id=item.user_id) }}" class="text-decoration-none fw-bold text-dark">
+                  {{ item.nome }} {{ item.cognome }}
+                </a>
+              </td>
+              <td>
+                <span class="badge bg-light text-dark">
+                  {{ item.best_store or 'Nessun negozio' }}
+                </span>
+              </td>
+              <td>
+                <span class="fw-bold text-danger">€ {{ "%.2f"|format(item.total_revenue) }}</span>
+              </td>
+              <td>
+                <span class="badge bg-secondary">{{ item.total_orders }} ordini</span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
 
-    <!-- Altri contenuti dinamici qui (content2, content3, etc.) -->
+      <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+          {% if page > 1 %}
+            <li class="page-item">
+              <a class="page-link" href="{{ url_for('landing.dashboard_admin_leaderboard', page=page-1) }}">« Precedente</a>
+            </li>
+          {% endif %}
+          
+          {% for p in range(1, total_pages + 1) %}
+            <li class="page-item {% if p == page %}active{% endif %}">
+              <a class="page-link" href="{{ url_for('landing.dashboard_admin_leaderboard', page=p) }}">{{ p }}</a>
+            </li>
+          {% endfor %}
+          
+          {% if page < total_pages %}
+            <li class="page-item">
+              <a class="page-link" href="{{ url_for('landing.dashboard_admin_leaderboard', page=page+1) }}">Successivo »</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+
     </div>
+</div>
 </div>
 {% endblock %}

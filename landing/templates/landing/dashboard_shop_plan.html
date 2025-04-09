@@ -1,0 +1,86 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+<div class="d-flex" style="height: 100vh; overflow: hidden;">
+    <!-- Sidebar inclusa -->
+    <div style="width: 240px; min-width: 240px; background-color: #fff; box-shadow: 2px 0 5px rgba(0,0,0,0.1); z-index: 100;">
+      {% include 'landing/dashboard_sidebar.html' %}
+    </div>
+  
+    <!-- Main Content -->
+    <div class="flex-grow-1 p-4" style="overflow-y: auto; background: #f5f6f8;">
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+      <a href="/home">
+        <img src="/static/images/superadmin/linkbay_logo.png" width="150px" alt="Logo">
+      </a>
+      <a href="/logout" class="btn btn-danger">Logout <i class="fa-solid fa-right-from-bracket"></i></a>
+    </div>
+
+    <div class="d-flex align-items-center mb-3">
+      <div>
+        <h4 class="mb-0">Login come: {{ user['nome'] or 'Utente' }} 👋</h4>
+      </div>
+    </div>
+
+    <hr style="border: 0; height: 2px; background-color: red; margin: 20px 0;">
+
+    <!-- CONTENUTI DINAMICI -->
+    <div id="content9" class="content-pane">
+      <div class="text-center mb-5">
+        <h2 class="fw-bold text-dark">💼 Scegli il piano perfetto per il tuo eCommerce</h2>
+        <p class="text-muted">Più potenza, più vendite. Passa a un piano professionale e sblocca tutte le funzionalità avanzate per far crescere il tuo negozio.</p>
+      </div>
+
+      <div class="row justify-content-center">
+        <!-- AllIsReady -->
+        <div class="col-md-5">
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+              <h4 class="text-primary fw-bold mb-3"><i class="fa-solid fa-rocket me-2"></i>AllIsReady – €18/mese</h4>
+              <ul class="list-unstyled mb-4">
+                <li><i class="fa-solid fa-circle-check text-primary me-2"></i> Fino a 600 prodotti</li>
+                <li><i class="fa-solid fa-circle-check text-primary me-2"></i> Dominio personalizzabile</li>
+                <li><i class="fa-solid fa-circle-check text-primary me-2"></i> Fino a 5 utenti collaboratori</li>
+              </ul>
+              <div class="text-center">
+                <a href="/api/checkout/subscribe?shop_name={{ shop_name }}&plan=allisready" class="btn btn-primary px-4">
+                  Attiva AllIsReady
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ProfessionalDesk -->
+        <div class="col-md-5">
+          <div class="card border border-success shadow-lg mb-4">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h4 class="text-success fw-bold mb-0"><i class="fa-solid fa-star me-2"></i>ProfessionalDesk – €36/mese</h4>
+                <span class="badge bg-success">Più scelto</span>
+              </div>
+              <ul class="list-unstyled mb-4">
+                <li><i class="fa-solid fa-circle-check text-success me-2"></i> Prodotti illimitati</li>
+                <li><i class="fa-solid fa-circle-check text-success me-2"></i> Multi-dominio</li>
+                <li><i class="fa-solid fa-circle-check text-success me-2"></i> Gestione magazzino completa</li>
+                <li><i class="fa-solid fa-circle-check text-success me-2"></i> Fino a 10 utenti</li>
+                <li><i class="fa-solid fa-circle-check text-success me-2"></i> Accesso API e integrazioni</li>
+                <li><i class="fa-solid fa-circle-check text-success me-2"></i> Supporto tecnico prioritario</li>
+              </ul>
+              <p class="text-muted small">Con ProfessionalDesk hai tutto ciò che serve per vendere in modo professionale, gestire lo stock e scalare con più domini e collaboratori.</p>
+              <div class="text-center">
+                <a href="/api/checkout/subscribe?shop_name={{ shop_name }}&plan=professionaldesk" class="btn btn-lg btn-success px-4">
+                  Attiva ProfessionalDesk
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-3 text-muted">
+        <small>Hai dubbi? <a href="/price" target="_blank">Confronta i piani</a> o <a href="/dashboard/support">contatta il supporto</a></small>
+      </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/superadmin/access.js') }}"></script>
+{% endblock %}
