@@ -295,8 +295,16 @@ def dashboard_support_chat(ticket_id):
 @landing_bp.route('/preview-theme/<theme_name>')
 def preview_theme(theme_name):
     import os
-    theme_path = os.path.join('Themes', f'{theme_name}.json')
+    from flask import current_app
+    from flask import Response
+    import json
 
+    # Path assoluto della cartella Themes
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    themes_dir = os.path.join(base_dir, '..', 'Themes')
+    theme_path = os.path.join(themes_dir, f'{theme_name}.json')
+
+    # Se il tema non esiste
     if not os.path.exists(theme_path):
         return f"Tema '{theme_name}' non trovato.", 404
 
@@ -340,8 +348,12 @@ def preview_theme(theme_name):
         </html>
         """
         return Response(html, mimetype='text/html')
+
     except Exception as e:
-        return f"Errore nella visualizzazione del tema: {str(e)}", 500
+        # Mostra l’errore dettagliato in dev, generico in prod
+        if current_app.config.get("ENVIRONMENT") == "development":
+            return f"Errore nella visualizzazione del tema: {str(e)}", 500
+        return "Errore durante la visualizzazione del tema.", 500
 
 @landing_bp.route('/dashboard/themes/explore')
 def explore_themes():
