@@ -128,8 +128,15 @@ def edit_code_page(slug):
 @page_bp.route('/preview-theme/<theme_name>')
 def preview_theme(theme_name):
     import os
-    theme_path = os.path.join('Themes', f'{theme_name}.json')
+    import json
+    from flask import current_app, Response
 
+    # Percorso assoluto della cartella Themes (compatibile con Flask Blueprint)
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    themes_dir = os.path.join(base_dir, 'Themes')
+    theme_path = os.path.join(themes_dir, f'{theme_name}.json')
+
+    # Se il tema non esiste
     if not os.path.exists(theme_path):
         return f"Tema '{theme_name}' non trovato.", 404
 
@@ -142,7 +149,7 @@ def preview_theme(theme_name):
         script = theme_data.get('script', '')
         pages = theme_data.get('pages', [])
 
-        # Recupera le pagine 'home', 'navbar' e 'footer'
+        # Recupera le pagine principali
         page_home = next((p for p in pages if p.get('slug') == 'home'), None)
         page_navbar = next((p for p in pages if p.get('slug') == 'navbar'), None)
         page_footer = next((p for p in pages if p.get('slug') == 'footer'), None)
@@ -172,9 +179,14 @@ def preview_theme(theme_name):
         </body>
         </html>
         """
+
         return Response(html, mimetype='text/html')
+
     except Exception as e:
-        return f"Errore nella visualizzazione del tema: {str(e)}", 500
+        # Mostra errore dettagliato solo in sviluppo
+        if current_app.config.get("ENVIRONMENT") == "development":
+            return f"Errore nella visualizzazione del tema: {str(e)}", 500
+        return "Errore durante la visualizzazione del tema.", 500
     
     
 @page_bp.route('/admin/cms/function/save_code', methods=['POST'])
