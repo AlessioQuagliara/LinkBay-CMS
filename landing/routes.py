@@ -301,7 +301,7 @@ def preview_theme(theme_name):
 
     # Path assoluto della cartella Themes
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    themes_dir = os.path.join(base_dir, '..', 'Themes')
+    themes_dir = os.path.join(base_dir, '..', 'themes')
     theme_path = os.path.join(themes_dir, f'{theme_name}.json')
 
     # Se il tema non esiste
