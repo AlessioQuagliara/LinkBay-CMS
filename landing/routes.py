@@ -247,7 +247,14 @@ def dashboard_payments():
 def dashboard_settings():
     if 'user_id' not in session:
         return redirect(url_for('landing.login'))
-    return render_template('landing/dashboard_settings.html', user=get_user_from_session())
+
+    user = User.query.get(session['user_id'])
+
+    if not user:
+        flash("Utente non trovato.", "danger")
+        return redirect(url_for('landing.login'))
+
+    return render_template('landing/dashboard_settings.html', user=user.to_dict())
 
 @landing_bp.route('/subscription/select/<shop_name>')
 def subscription_select(shop_name):

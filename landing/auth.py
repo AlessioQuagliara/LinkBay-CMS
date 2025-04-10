@@ -185,7 +185,7 @@ def generate_token(shop_name):
     }, current_app.config['SECRET_KEY'], algorithm="HS256")
 
     # ✅ Metodo consigliato
-    environment = current_app.config.get('ENV', 'development')
+    environment = os.getenv("ENVIRONMENT", "development")
     
     if environment == 'development':
         return redirect(f"http://{shop_name}.localhost:8080/admin/login?token={token}")

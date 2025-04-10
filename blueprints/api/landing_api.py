@@ -502,20 +502,34 @@ def checkout_subscribe():
     if not shop_name or not plan:
         return jsonify(success=False, message="Parametri mancanti"), 400
 
-    plans = {
-        "allisready": {
-            "label": "AllIsReady",
-            "price": 18,
-            "price_id": "price_1RC23wLbvfE9v2XlYWS1fTtS" # Da usare in produzione
-            #"price_id": "price_1RC3XtPteJOX9ukrGj97iGom"
-        },
-        "professionaldesk": {
-            "label": "ProfessionalDesk",
-            "price": 36,
-            "price_id": "price_1RC24VLbvfE9v2XlDtrNqxHg" # Da usare in produzione
-            #"price_id": "price_1RC3Y6PteJOX9ukrratINEP1"
+    environment = os.getenv('ENVIRONMENT', 'development')
+
+    if environment == 'production':
+        plans = {
+            "allisready": {
+                "label": "AllIsReady",
+                "price": 18,
+                "price_id": "price_1RC23wLbvfE9v2XlYWS1fTtS"
+            },
+            "professionaldesk": {
+                "label": "ProfessionalDesk",
+                "price": 36,
+                "price_id": "price_1RC24VLbvfE9v2XlDtrNqxHg"
+            }
         }
-    }
+    else:
+        plans = {
+            "allisready": {
+                "label": "AllIsReady",
+                "price": 18,
+                "price_id": "price_1RC3XtPteJOX9ukrGj97iGom"
+            },
+            "professionaldesk": {
+                "label": "ProfessionalDesk",
+                "price": 36,
+                "price_id": "price_1RC3Y6PteJOX9ukrratINEP1"
+            }
+        }
 
     if plan not in plans:
         return jsonify(success=False, message="Piano non valido"), 400
@@ -544,3 +558,36 @@ def checkout_subscribe():
         logger.error(f"❌ Errore nella creazione della sessione Stripe: {e}")
         return jsonify(success=False, message="Errore nella creazione della sessione"), 500
     
+@landing_api.route('/update_profile', methods=['POST'])
+def update_profile():
+    if 'user_id' not in session:
+        return jsonify(success=False, message="Utente non autenticato"), 401
+
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify(success=False, message="Utente non trovato"), 404
+
+    data = request.form
+    user.nome = data.get('nome', user.nome)
+    user.cognome = data.get('cognome', user.cognome)
+    user.telefono = data.get('telefono', user.telefono)
+    user.profilo_foto = data.get('profilo_foto', user.profilo_foto)
+
+    # 🔁 Upload dell'immagine dal PC (drag o selezione)
+    if 'immagine_locale' in request.files:
+        immagine = request.files['immagine_locale']
+        if immagine.filename:
+            from werkzeug.utils import secure_filename
+            filename = secure_filename(f"user_{user.id}_{datetime.utcnow().timestamp()}.{immagine.filename.rsplit('.', 1)[-1]}")
+            upload_path = os.path.join(current_app.root_path, 'static', 'uploads', 'users')
+            os.makedirs(upload_path, exist_ok=True)
+            immagine.save(os.path.join(upload_path, filename))
+            user.profilo_foto = f"/static/uploads/users/{filename}"
+
+    try:
+        db.session.commit()
+        return jsonify(success=True, message="Profilo aggiornato con successo", user=user.to_dict())
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Errore aggiornamento profilo: {e}")
+        return jsonify(success=False, message="Errore durante l'aggiornamento"), 500
