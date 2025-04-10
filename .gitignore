@@ -1,10 +1,37 @@
-# File di configurazione locali
+# 👉 Ambiente virtuale
+/venv/
+
+# 👉 Configurazioni locali
 .env
 
-# Cartelle con contenuti caricati dagli utenti
+# 👉 Cache Python e file compilati
+__pycache__/
+/**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 👉 Migrazioni: mantieni la cartella ma ignora cache e file auto-generati non essenziali
+migrations/__pycache__/
+/migrations/README
+/migrations/alembic.ini
+
+# 👉 Uploads e immagini caricate dagli utenti
 /static/images/
 /static/uploads/
 
-/__pycache__/
-/LinkBay/
-/environments.py
+# 👉 Log locali
+/logs/
+
+# 👉 File temporanei
+*.swp
+*.swo
+.DS_Store
+
+# 👉 File lock frontend (se non necessario al progetto)
+/package-lock.json
+
+# 👉 Backup, temp e vari
+*.bak
+*.tmp
+*.log
