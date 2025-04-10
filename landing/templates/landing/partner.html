@@ -9,7 +9,7 @@
     <meta name="author" content="Quagliara Alessio">
     {% include '/landing/head.html' %}
 </head>
-<body>
+<body class="bg-danger">
 
     <!-- Navbar -->
     {% include '/landing/navbar.html' %}
@@ -21,19 +21,19 @@
             <div class="row align-items-center">
                 
                 <!-- Colonna di Sinistra: Testo -->
-                <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
-                    <h1 class="fw-bold mb-4">{{ translate('Become a LinkBay Partner and Create eCommerce for your customers') }}</h1>
-                    <p class="lead mb-4">{{ translate('Join our partner program and earn commission for every subscription sold. Offer your customers a powerful and easy-to-use e-commerce solution with LinkBay’s CMS.') }}</p>
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h1 class="fw-bold mb-4">{{ translate('Become a LinkBay Partner and Join a Thriving Digital Ecosystem') }}</h1>
+                    <p class="lead mb-4">{{ translate('Join our partner program and grow your professional network. Find new customers and earn directly through LinkBay by offering estimates, collaborating on projects, and fixing bugs.') }}</p>
                     <ul class="list-unstyled mb-4">
-                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> {{ translate('Earn up to 30% recurring commission') }}</li>
-                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> {{ translate('Dedicated support for you and your customers') }}</li>
-                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> {{ translate('Marketing tools and promotional material') }}</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> {{ translate('Expand your visibility and reach more potential clients') }}</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> {{ translate('Offer quotes, collaborate, and get paid inside the app') }}</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> {{ translate('Grow inside a dynamic and vibrant environment') }}</li>
                     </ul>
                     <a href="#" class="btn btn-danger btn-lg">{{ translate('Register as a Partner') }}</a>
                 </div>
                 
                 <!-- Colonna di Destra: Video -->
-                <div class="col-lg-6" data-aos="fade-left">
+                <div class="col-lg-6">
                     <div class="ratio ratio-16x9 rounded-5 shadow-sm">
                         <video src="{{ url_for('static', filename="images/superadmin/video3.mp4") }}" autoplay muted loop playsinline class="w-100 rounded-5"></video>
                     </div>
@@ -47,44 +47,44 @@
     <div class="container-fluid py-5" style="background-color: #ff5757;">
         <div class="container text-white">
             <div class="text-center mb-5">
-                <h2 class="fw-bold mb-4" data-aos="fade-down">{{ translate('Why Become a LinkBay Partner?') }}</h2>
-                <p class="lead" data-aos="fade-down" data-aos-delay="100">{{ translate('Discover the exclusive benefits of joining our partner program and offer your customers a powerful, easy-to-use e-commerce platform.') }}</p>
+                <h2 class="fw-bold mb-4">{{ translate('Benefits of the LinkBay Partner Program') }}</h2>
+                <p class="lead">{{ translate('Discover how LinkBay helps you grow professionally by connecting you to a thriving network of store owners and collaborators.') }}</p>
             </div>
             <div class="row gy-5">
                 
                 <!-- Beneficio 1 -->
-                <div class="col-md-4 d-flex" data-aos="fade-up">
+                <div class="col-md-4 d-flex">
                     <div class="card bg-transparent border-0 text-center text-white">
                         <div class="card-body">
-                            <i class="fa-solid fa-coins fa-3x mb-3 text-white"></i>
-                            <h4 class="card-title fw-bold mb-3">{{ translate('Recurring Fees') }}</h4>
-                            <p class="card-text">{{ translate('Earn up to 30% recurring commission on each subscription sold. Increase your ongoing revenue!') }}</p>
+                            <i class="fa-solid fa-network-wired fa-3x mb-3 text-white"></i>
+                            <h4 class="card-title fw-bold mb-3">{{ translate('Expand Your Network') }}</h4>
+                            <p class="card-text">{{ translate('Connect with store owners and offer your services directly through the platform.') }}</p>
                         </div>
                     </div>
                 </div>
-    
+
                 <!-- Beneficio 2 -->
-                <div class="col-md-4 d-flex" data-aos="fade-up" data-aos-delay="100">
+                <div class="col-md-4 d-flex">
                     <div class="card bg-transparent border-0 text-center text-white">
                         <div class="card-body">
-                            <i class="fa-solid fa-headset fa-3x mb-3 text-white"></i>
-                            <h4 class="card-title fw-bold mb-3">{{ translate('Dedicated Support') }}</h4>
-                            <p class="card-text">{{ translate('Exclusive access to a dedicated support team, ready to help you at every stage of your journey as a partner.') }}</p>
+                            <i class="fa-solid fa-file-invoice-dollar fa-3x mb-3 text-white"></i>
+                            <h4 class="card-title fw-bold mb-3">{{ translate('Send Proposals') }}</h4>
+                            <p class="card-text">{{ translate('Provide quotes, close deals, and manage projects directly within LinkBay.') }}</p>
                         </div>
                     </div>
                 </div>
-    
+
                 <!-- Beneficio 3 -->
-                <div class="col-md-4 d-flex" data-aos="fade-up" data-aos-delay="200">
+                <div class="col-md-4 d-flex">
                     <div class="card bg-transparent border-0 text-center text-white">
                         <div class="card-body">
-                            <i class="fa-solid fa-chart-line fa-3x mb-3 text-white"></i>
-                            <h4 class="card-title fw-bold mb-3">{{ translate('Marketing Tools') }}</h4>
-                            <p class="card-text">{{ translate('Use advanced marketing tools and promotional material to attract new customers and grow your business.') }}</p>
+                            <i class="fa-solid fa-bug fa-3x mb-3 text-white"></i>
+                            <h4 class="card-title fw-bold mb-3">{{ translate('Get Paid to Fix Bugs') }}</h4>
+                            <p class="card-text">{{ translate('Offer technical support and improvements and be compensated fairly through the app.') }}</p>
                         </div>
                     </div>
                 </div>
-    
+
             </div>
         </div>
     </div>
@@ -95,26 +95,29 @@
             <div class="row align-items-center">
                 
                 <!-- Colonna di Sinistra: Video -->
-                <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
+                <div class="col-lg-6 mb-4 mb-lg-0">
                     <div class="ratio ratio-16x9 rounded-4 shadow-sm">
                         <video src="{{ url_for('static', filename="images/superadmin/video4.mp4") }}" autoplay muted loop playsinline class="w-100 rounded-4"></video>
                     </div>
                 </div>
                 
                 <!-- Colonna di Destra: Testo -->
-                <div class="col-lg-6" data-aos="fade-left">
-                    <h2 class="fw-bold mb-4">{{ translate('How the LinkBay Partner Program works') }}</h2>
-                    <p class="lead mb-4">{{ translate('Becoming a LinkBay partner is easy. Offer your customers an intuitive e-commerce platform and earn recurring commissions for every subscription sold.') }}</p>
+                <div class="col-lg-6">
+                    <h2 class="fw-bold mb-4">{{ translate('How to Become a LinkBay Partner and Thrive') }}</h2>
+                    <p class="lead mb-4">{{ translate('Get started with LinkBay and unlock new opportunities in the digital market. Everything is managed inside your dashboard.') }}</p>
                     <ul class="list-unstyled mb-4">
-                        <li><i class="bi bi-arrow-right-circle-fill text-danger me-2"></i> {{ translate('Register for free as a LinkBay partner.') }}</li>
-                        <li><i class="bi bi-arrow-right-circle-fill text-danger me-2"></i> {{ translate('Use our CMS to create and manage your customers online stores.') }}</li>
-                        <li><i class="bi bi-arrow-right-circle-fill text-danger me-2"></i> {{ translate('Earn recurring commissions for each subscription sold and renewed.') }}</li>
+                        <li><i class="bi bi-arrow-right-circle-fill text-danger me-2"></i> {{ translate('Create your free partner profile in minutes.') }}</li>
+                        <li><i class="bi bi-arrow-right-circle-fill text-danger me-2"></i> {{ translate('Receive project requests from store owners.') }}</li>
+                        <li><i class="bi bi-arrow-right-circle-fill text-danger me-2"></i> {{ translate('Collaborate, deliver, and get paid with full transparency.') }}</li>
                     </ul>
                 </div>
                 
             </div>
         </div>
     </div>
+</div>
+</div>
+</div>
 
     {% include '/landing/visit_tracker.html' %}
     {% include '/landing/footer.html' %}

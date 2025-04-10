@@ -1,4 +1,4 @@
-[2025-04-09 23:59:53,890] [ERROR] in app: Exception on /dashboard/team [GET]
+[2025-04-10 00:50:45,533] [ERROR] in app: Exception on /dashboard/team/user/5 [GET]
 Traceback (most recent call last):
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -9,96 +9,19 @@ Traceback (most recent call last):
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/routes.py", line 412, in dashboard_admin_leaderboard
-    return render_template(
-        'landing/dashboard_team.html',
-        user=get_user_from_session(),
-        leaderboard=leaderboard_data
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/routes.py", line 170, in dashboard_user_profile
+    return redirect(url_for('landing.dashboard_team'))
+                    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/helpers.py", line 232, in url_for
+    return current_app.url_for(
+           ~~~~~~~~~~~~~~~~~~~^
+        endpoint,
+        ^^^^^^^^^
+    ...<4 lines>...
+        **values,
+        ^^^^^^^^^
     )
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
-    return _render(app, template, context)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
-    rv = template.render(context)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/dashboard_team.html", line 1, in top-level template code
-    {% extends 'landing/base.html' %}
-    ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/base.html", line 22, in top-level template code
-    {% block content %}{% endblock %}
-    ^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/dashboard_team.html", line 70, in block 'content'
-    <span class="fw-bold text-danger">€ {{ "%.2f"|format(item.revenue) }}</span>
-    ^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/filters.py", line 1042, in do_format
-    return soft_str(value) % (kwargs or args)
-           ~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~
-jinja2.exceptions.UndefinedError: 'dict object' has no attribute 'revenue'
-[2025-04-10 00:03:02,529] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:03:15,507] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:03:19,360] [ERROR] in app: Exception on /dashboard/team [GET]
-Traceback (most recent call last):
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/routes.py", line 410, in dashboard_admin_leaderboard
-    leaderboard_data.sort(key=lambda x: x["total_revenue"], reverse=True)
-    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/routes.py", line 410, in <lambda>
-    leaderboard_data.sort(key=lambda x: x["total_revenue"], reverse=True)
-                                        ~^^^^^^^^^^^^^^^^^
-KeyError: 'total_revenue'
-[2025-04-10 00:04:05,142] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:05:12,582] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:07:15,025] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:07:46,961] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:11:33,801] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:11:56,708] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:22:41,665] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:22:43,236] [ERROR] in app: Exception on /dashboard/team [GET]
-Traceback (most recent call last):
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/routes.py", line 419, in dashboard_admin_leaderboard
-    return render_template(
-        'landing/dashboard_team.html',
-    ...<3 lines>...
-        total_pages=(total_entries + per_page - 1) // per_page
-    )
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
-    return _render(app, template, context)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
-    rv = template.render(context)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/dashboard_team.html", line 1, in top-level template code
-    {% extends 'landing/base.html' %}
-    ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/base.html", line 22, in top-level template code
-    {% block content %}{% endblock %}
-    ^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/dashboard_team.html", line 58, in block 'content'
-    <a href="{{ url_for('landing.dashboard_user_profile', user_id=item.user_id) }}" class="text-decoration-none fw-bold text-dark">
-    ^^^^^^^^^
+    ^
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1121, in url_for
     return self.handle_url_build_error(error, endpoint, values)
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -110,26 +33,107 @@ Traceback (most recent call last):
     )
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/werkzeug/routing/map.py", line 924, in build
     raise BuildError(endpoint, values, method, self)
-werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'landing.dashboard_user_profile' with values ['user_id']. Did you mean 'landing.dashboard_sales' instead?
-[2025-04-10 00:24:54,464] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:26:46,869] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:35:43,805] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:36:11,087] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:36:15,764] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:41:48,419] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:44:19,354] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:44:30,224] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:45:05,451] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:45:13,619] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:47:42,151] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:47:46,956] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:47:47,819] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:48:01,778] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:48:21,126] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:48:28,792] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:49:56,944] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:50:09,610] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:50:19,709] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:50:35,796] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:50:36,359] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 00:50:41,694] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'landing.dashboard_team'. Did you mean 'landing.dashboard_themes' instead?
+[2025-04-10 00:55:13,897] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 01:03:16,496] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 01:03:34,146] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 01:04:09,617] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 01:07:35,372] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 01:08:02,702] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 01:09:35,258] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 01:09:53,240] [ERROR] in app: Exception on /dashboard/chat/2 [GET]
+Traceback (most recent call last):
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/routes.py", line 151, in dashboard_private_chat
+    return render_template(
+        'landing/dashboard_private_chat.html',
+        user=get_user_from_session(),
+    )
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/dashboard_private_chat.html", line 1, in top-level template code
+    {% extends 'landing/base.html' %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/base.html", line 22, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/dashboard_private_chat.html", line 31, in block 'content'
+    <strong>{{ target_user.nome }} {{ target_user.cognome }}</strong>
+    ^^^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+jinja2.exceptions.UndefinedError: 'target_user' is undefined
+[2025-04-10 01:09:58,488] [ERROR] in app: Exception on /dashboard/chat/1 [GET]
+Traceback (most recent call last):
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/routes.py", line 151, in dashboard_private_chat
+    return render_template(
+        'landing/dashboard_private_chat.html',
+        user=get_user_from_session(),
+    )
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/dashboard_private_chat.html", line 1, in top-level template code
+    {% extends 'landing/base.html' %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/base.html", line 22, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/dashboard_private_chat.html", line 31, in block 'content'
+    <strong>{{ target_user.nome }} {{ target_user.cognome }}</strong>
+    ^^^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+jinja2.exceptions.UndefinedError: 'target_user' is undefined
+[2025-04-10 01:11:34,520] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 01:11:42,446] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 01:14:29,427] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 01:15:23,103] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 01:25:45,349] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 01:29:00,467] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 12:41:06,020] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 12:43:48,960] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 12:53:14,661] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 12:54:49,557] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 12:55:19,250] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 12:58:31,319] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 13:00:15,619] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 13:00:39,911] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 13:01:15,209] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 13:01:54,881] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 13:04:23,369] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 13:05:54,741] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 13:06:54,973] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 13:07:33,678] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 13:08:03,914] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-10 13:08:20,390] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
