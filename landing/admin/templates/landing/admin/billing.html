@@ -1,0 +1,33 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Gestione Fatturazione - LinkBay CMS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="mb-4">Gestione Fatturazione</h1>
+
+  <div class="alert alert-info">Questa pagina mostrerà le informazioni di fatturazione aggregate per utenti e negozi.</div>
+
+  <table class="table table-bordered table-striped">
+    <thead class="table-light">
+      <tr>
+        <th>Cliente</th>
+        <th>N. Fatture</th>
+        <th>Totale (€)</th>
+        <th>Ultima Fattura</th>
+        <th>Azioni</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Dati esempio -->
+      <tr>
+        <td>Mario Rossi</td>
+        <td>5</td>
+        <td>720.00</td>
+        <td>01/04/2025</td>
+        <td><a href="#" class="btn btn-sm btn-primary">Dettagli</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}

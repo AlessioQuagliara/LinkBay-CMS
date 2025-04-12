@@ -9,28 +9,32 @@ import logging
 from datetime import datetime, timedelta
 from flask_wtf.csrf import CSRFProtect
 
-admin_landing_bp = Blueprint('admin_landing', __name__)
+admin_landing_bp = Blueprint(
+    'admin_landing',
+    __name__,
+    template_folder='templates/landing/admin'
+)
 csrf = CSRFProtect()
 
 @admin_landing_bp.route('/editor/<content_type>', methods=['GET'])
 def editor(content_type):
-    return render_template("admin/editor.html", content_type=content_type)
+    return render_template("editor.html", content_type=content_type)
 
 @admin_landing_bp.route('/dashboard', methods=['GET'])
 def admin_dashboard():
-    return render_template("admin/dashboard.html")
+    return render_template("dashboard.html")
 
 @admin_landing_bp.route('/billing', methods=['GET'])
 def admin_billing():
-    return render_template("admin/billing.html")
+    return render_template("billing.html")
 
 @admin_landing_bp.route('/billing-user', methods=['GET'])
 def admin_billing_user():
-    return render_template("admin/billing_user.html")
+    return render_template("billing_user.html")
 
 @admin_landing_bp.route('/sales', methods=['GET'])
 def admin_sales():
-    return render_template("admin/sales.html")
+    return render_template("sales.html")
 
 @admin_landing_bp.route('/save_content/<content_type>', methods=['POST'])
 def save_content(content_type):
@@ -64,8 +68,8 @@ def admin_login():
             return redirect(url_for('admin_landing.admin_dashboard'))
 
         logging.warning(f"❌ Tentativo fallito login superadmin: {email}")
-        return render_template("admin/login.html", error="Credenziali non valide")
-    return render_template("admin/login.html")
+        return render_template("login.html", error="Credenziali non valide")
+    return render_template("login.html")
 
 @admin_landing_bp.route('/logout')
 def admin_logout():
@@ -95,32 +99,32 @@ def require_login():
 @admin_landing_bp.route('/superadmins', methods=['GET'])
 def view_superadmins():
     admins = SuperAdmin.query.all()
-    return render_template("admin/superadmins.html", admins=admins)
+    return render_template("superadmins.html", admins=admins)
 
 @admin_landing_bp.route('/superpages', methods=['GET'])
 def view_superpages():
     pages = SuperPages.query.order_by(SuperPages.created_at.desc()).all()
-    return render_template("admin/superpages.html", pages=pages)
+    return render_template("superpages.html", pages=pages)
 
 @admin_landing_bp.route('/supermedia', methods=['GET'])
 def view_supermedia():
     media = SuperMedia.query.order_by(SuperMedia.created_at.desc()).all()
-    return render_template("admin/supermedia.html", media=media)
+    return render_template("supermedia.html", media=media)
 
 @admin_landing_bp.route('/superinvoices', methods=['GET'])
 def view_superinvoices():
     invoices = SuperInvoice.query.order_by(SuperInvoice.issued_at.desc()).all()
-    return render_template("admin/superinvoices.html", invoices=invoices)
+    return render_template("superinvoices.html", invoices=invoices)
 
 @admin_landing_bp.route('/supermessages', methods=['GET'])
 def view_supermessages():
     messages = SuperMessages.query.order_by(SuperMessages.created_at.desc()).all()
-    return render_template("admin/supermessages.html", messages=messages)
+    return render_template("supermessages.html", messages=messages)
 
 @admin_landing_bp.route('/supersupport', methods=['GET'])
 def view_supersupport():
     tickets = SuperSupport.query.order_by(SuperSupport.created_at.desc()).all()
-    return render_template("admin/supersupport.html", tickets=tickets)
+    return render_template("supersupport.html", tickets=tickets)
 
 @admin_landing_bp.route('/superadmins/new', methods=['GET', 'POST'])
 def create_superadmin():
@@ -142,4 +146,4 @@ def create_superadmin():
         db.session.commit()
         return redirect(url_for('admin_landing.view_superadmins'))
 
-    return render_template("admin/create_superadmin.html")
+    return render_template("create_superadmin.html")

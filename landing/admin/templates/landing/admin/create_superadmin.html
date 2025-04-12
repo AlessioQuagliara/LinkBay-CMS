@@ -1,0 +1,37 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Nuovo SuperAdmin - LinkBay CMS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="mb-4">Crea un nuovo SuperAdmin</h1>
+
+  <form method="POST">
+    <div class="mb-3">
+      <label for="full_name" class="form-label">Nome completo</label>
+      <input type="text" class="form-control" id="full_name" name="full_name" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" class="form-control" id="email" name="email" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" class="form-control" id="password" name="password" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="role" class="form-label">Ruolo</label>
+      <select class="form-select" id="role" name="role" required>
+        <option value="superadmin">SuperAdmin</option>
+        <option value="owner">Owner</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Crea SuperAdmin</button>
+    <a href="{{ url_for('admin_landing.view_superadmins') }}" class="btn btn-secondary ms-2">Annulla</a>
+  </form>
+</div>
+{% endblock %}
