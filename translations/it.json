@@ -1,4 +1,30 @@
 {
+    "home-title": "Crea il tuo eCommerce con LinkBay",
+    "home-description": "La piattaforma perfetta per creare un negozio online in pochi minuti, senza competenze tecniche.",
+    "home-keywords": "crea ecommerce, CMS semplice, negozio online, piattaforma e-commerce, senza codice",
+    "partner-title": "Diventa Partner di LinkBay",
+    "partner-description": "Collabora con noi e guadagna offrendo il CMS LinkBay ai tuoi clienti.",
+    "partner-keywords": "partner LinkBay, collaborazione CMS, guadagna con ecommerce",
+    "price-title": "Prezzi Piani LinkBay CMS",
+    "price-description": "Scopri i nostri piani flessibili per iniziare a vendere online con il massimo del supporto.",
+    "price-keywords": "prezzi CMS, piani ecommerce, abbonamenti LinkBay",
+    "integration-title": "Integrazioni e App LinkBay",
+    "integration-description": "Potenzia il tuo negozio online con app e integrazioni semplici e potenti.",
+    "integration-keywords": "integrazioni CMS, app ecommerce, automazioni LinkBay",
+    "login-title": "Accedi al tuo Account LinkBay",
+    "login-description": "Entra nel tuo pannello di controllo per gestire il tuo negozio online.",
+    "login-keywords": "login LinkBay, accedi CMS, pannello ecommerce",
+    "docs-title": "Documentazione Ufficiale LinkBay",
+    "docs-description": "Manuali e guide per imparare a usare tutte le funzionalità di LinkBay CMS.",
+    "docs-keywords": "documentazione CMS, guida LinkBay, manuale ecommerce",
+    "blog-title": "Blog di LinkBay CMS",
+    "blog-description": "Notizie, aggiornamenti e consigli per il tuo ecommerce.",
+    "blog-keywords": "blog ecommerce, novità LinkBay, marketing online",        
+    "news-title": "Notizie dal Mondo LinkBay",
+    "news-description": "Scopri tutte le novità, eventi e comunicazioni ufficiali del CMS.",
+    "news-keywords": "notizie LinkBay, eventi CMS, aggiornamenti ecommerce",
+
+
     "LinkBay CMS": "LinkBay CMS",
     "Discover LinkBay, the ideal CMS to create an online store easily and without technical skills. Start today with free tools, customizable themes and 24/7 support. Perfect for small business owners and large companies.": "Scopri LinkBay, il CMS ideale per creare un negozio online facilmente e senza competenze tecniche. Inizia oggi con strumenti gratuiti, temi personalizzabili e supporto 24/7. Perfetto per piccoli imprenditori e grandi aziende.",
     "create online store easily, CMS for simple e-commerce, cheap e-commerce platform, create e-commerce site without code, best CMS for small stores, start online shop at low cost": "crea facilmente un negozio online, CMS per e-commerce semplice, piattaforma e-commerce economica, crea sito e-commerce senza codice, miglior CMS per piccoli negozi, avvia negozio online a basso costo",
@@ -177,5 +203,6 @@
     "Get started with LinkBay and unlock new opportunities in the digital market. Everything is managed inside your dashboard.": "Inizia con LinkBay e scopri nuove opportunità nel mercato digitale. Tutto è gestito dalla tua dashboard.",
     "Create your free partner profile in minutes.": "Crea il tuo profilo partner gratuito in pochi minuti.",
     "Receive project requests from store owners.": "Ricevi richieste di progetto dai proprietari dei negozi.",
-    "Collaborate, deliver, and get paid with full transparency.": "Collabora, consegna e vieni pagato con piena trasparenza."
+    "Collaborate, deliver, and get paid with full transparency.": "Collabora, consegna e vieni pagato con piena trasparenza.",
+    "or": "oppure"
 }

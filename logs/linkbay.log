@@ -1,26 +1,29 @@
-[2025-04-10 13:10:09,666] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 13:10:59,523] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 13:12:03,039] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:08:32,969] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:09:12,953] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:09:49,815] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:10:57,406] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:11:40,376] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:12:27,405] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:12:53,913] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:13:10,953] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:13:33,213] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:14:34,110] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:14:59,830] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:15:29,100] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:15:46,282] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:16:23,640] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:16:50,326] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:17:26,422] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:19:03,299] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:27:42,809] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:32:57,227] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:34:03,593] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 14:35:20,346] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 15:36:22,774] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-10 15:41:37,520] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-11 13:46:47,980] [ERROR] in app: Exception on /webhook/stripe [POST]
+Traceback (most recent call last):
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/webhooks/stripe_webhook.py", line 91, in handle_stripe_webhook
+    webhook_logger.info(f"✅ Webhook completato per session ID: {session.get('id')}")
+                                                                 ^^^^^^^
+UnboundLocalError: cannot access local variable 'session' where it is not associated with a value
+[2025-04-11 13:55:33,580] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-11 13:56:35,564] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-11 21:46:48,039] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-11 21:46:53,223] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-11 21:46:53,788] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 08:11:55,828] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 08:13:39,294] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 08:14:30,362] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 08:14:44,188] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 08:15:18,649] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 08:15:43,431] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 08:15:58,869] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 08:16:45,590] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 08:49:12,588] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.

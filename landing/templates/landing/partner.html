@@ -1,14 +1,23 @@
 <!DOCTYPE html>
 <html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinkBay - {{ translate('Partners') }}</title>
-    <meta name="description" content="{{ translate('description') }}">
-    <meta name="keywords" content="{{ translate('keywords') }}">
-    <meta name="author" content="Quagliara Alessio">
-    {% include '/landing/head.html' %}
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>LinkBay - {{ translate('partner-title') }}</title>
+        <meta name="description" content="{{ translate('partner-description') }}">
+        <meta name="keywords" content="{{ translate('partner-keywords') }}">
+        <meta name="author" content="Quagliara Alessio">
+    
+        <!-- Open Graph Meta Tags -->
+    
+        <meta property="og:title" content="{{ translate('partner-title') }}">
+        <meta property="og:description" content="{{ translate('partner-description') }}">
+        <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png') }}">
+        <meta property="og:url" content="https://www.linkbay-cms.com">
+        <meta property="og:type" content="website">
+    
+        {% include '/landing/head.html' %}
+    </head>
 <body class="bg-danger">
 
     <!-- Navbar -->
@@ -29,7 +38,7 @@
                         <li><i class="bi bi-check-circle-fill text-success me-2"></i> {{ translate('Offer quotes, collaborate, and get paid inside the app') }}</li>
                         <li><i class="bi bi-check-circle-fill text-success me-2"></i> {{ translate('Grow inside a dynamic and vibrant environment') }}</li>
                     </ul>
-                    <a href="#" class="btn btn-danger btn-lg">{{ translate('Register as a Partner') }}</a>
+                    <a href="#" class="btn btn-danger btn-lg">{{ translate('Register as a Partner') }}</a> <span>{{ translate('or')}}</span> <a href="#" class="btn btn-dark btn-lg">{{ translate('Login') }}</a>
                 </div>
                 
                 <!-- Colonna di Destra: Video -->

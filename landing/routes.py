@@ -490,3 +490,47 @@ def dashboard_admin_leaderboard():
         total_pages=(total_entries + per_page - 1) // per_page
     )
 
+
+
+
+@landing_bp.route('/sitemap.xml', methods=['GET'])
+def sitemap():
+    from flask import current_app
+    import urllib.parse
+    import datetime
+
+    allowed_paths = [
+        '/',
+        '/partner',
+        '/price',
+        '/integration',
+        '/login',
+        '/docs',
+        '/blog',
+        '/news'
+    ]
+
+    pages = []
+    lastmod = datetime.datetime.now().date().isoformat()
+
+    for rule in current_app.url_map.iter_rules():
+        if "GET" in rule.methods and len(rule.arguments) == 0:
+            if rule.rule in allowed_paths:
+                url = url_for(rule.endpoint, _external=True)
+                pages.append({
+                    'loc': urllib.parse.quote(url, safe=':/'),
+                    'lastmod': lastmod
+                })
+
+    sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    sitemap_xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+
+    for page in pages:
+        sitemap_xml += '  <url>\n'
+        sitemap_xml += f"    <loc>{page['loc']}</loc>\n"
+        sitemap_xml += f"    <lastmod>{page['lastmod']}</lastmod>\n"
+        sitemap_xml += '  </url>\n'
+
+    sitemap_xml += '</urlset>\n'
+
+    return Response(sitemap_xml, mimetype='application/xml')
