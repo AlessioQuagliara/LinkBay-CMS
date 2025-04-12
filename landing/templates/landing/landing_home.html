@@ -1,54 +1,63 @@
 <!DOCTYPE html>
 <html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ translate('LinkBay CMS') }}</title>
-    <meta name="description" content="{{ translate('Discover LinkBay, the ideal CMS to create an online store easily and without technical skills. Start today with free tools, customizable themes and 24/7 support. Perfect for small business owners and large companies.') }}">
-    <meta name="keywords" content="{{ translate('create online store easily, CMS for simple e-commerce, cheap e-commerce platform, create e-commerce site without code, best CMS for small stores, start online shop at low cost') }}">
-    <meta name="author" content="Quagliara Alessio">
-    {% include '/landing/head.html' %}
-    <style>
-        .full-cover-section {
-            height: 120vh;
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: white;
-            position: relative;
-        }
-        .overlay {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.5);
-        }
-        .content {
-            position: relative;
-            z-index: 1;
-        }
-        /* Contenitore video fisso */
-        .sticky-video-container {
-            position: sticky;
-            top: 20px; /* Puoi regolare il valore di 'top' per il distanziamento */
-            max-height: 80vh; /* Limita l'altezza del video */
-            overflow: hidden; /* Assicura che il contenuto rimanga all'interno */
-        }
-        
-        /* Contenitore dei benefici scorrevoli */
-        .benefits-scroll-container {
-            max-height: 100vh; /* Massima altezza della sezione visibile */
-            overflow-y: auto; /* Scorrimento verticale */
-            padding-right: 15px; /* Margine per lo scorrimento */
-        }
-    </style>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>LinkBay - {{ translate('home-title') }}</title>
+        <meta name="description" content="{{ translate('home-description') }}">
+        <meta name="keywords" content="{{ translate('home-keywords') }}">
+        <meta name="author" content="Quagliara Alessio">
+    
+        <!-- Open Graph Meta Tags -->
+    
+        <meta property="og:title" content="{{ translate('home-title') }}">
+        <meta property="og:description" content="{{ translate('home-description') }}">
+        <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png') }}">
+        <meta property="og:url" content="https://www.linkbay-cms.com">
+        <meta property="og:type" content="website">
+    
+        {% include '/landing/head.html' %}
+        <style>
+            .full-cover-section {
+                height: 120vh;
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position: center center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                color: white;
+                position: relative;
+            }
+            .overlay {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: rgba(0, 0, 0, 0.5);
+            }
+            .content {
+                position: relative;
+                z-index: 1;
+            }
+            /* Contenitore video fisso */
+            .sticky-video-container {
+                position: sticky;
+                top: 20px; /* Puoi regolare il valore di 'top' per il distanziamento */
+                max-height: 80vh; /* Limita l'altezza del video */
+                overflow: hidden; /* Assicura che il contenuto rimanga all'interno */
+            }
+            
+            /* Contenitore dei benefici scorrevoli */
+            .benefits-scroll-container {
+                max-height: 100vh; /* Massima altezza della sezione visibile */
+                overflow-y: auto; /* Scorrimento verticale */
+                padding-right: 15px; /* Margine per lo scorrimento */
+            }
+        </style>
+    </head>
 <body class="bg-danger">
     <!-- Navbar -->
     {% include '/landing/navbar.html' %}

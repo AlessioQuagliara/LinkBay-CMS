@@ -3,10 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinkBay - {{ translate('Apps and Integrations') }}</title>
-    <meta name="description" content="{{ translate('Discover LinkBay, the ideal CMS to create an online store easily and without technical skills. Start today with free tools, customizable themes and 24/7 support. Perfect for small business owners and large companies.') }}">
-    <meta name="keywords" content="{{ translate('Create online store easily, simple e-commerce CMS, cheap e-commerce platform, create e-commerce site without code, best CMS for small stores, start online shop at low cost') }}">
+    <title>LinkBay - {{ translate('integration-title') }}</title>
+    <meta name="description" content="{{ translate('integration-description') }}">
+    <meta name="keywords" content="{{ translate('integration-keywords') }}">
     <meta name="author" content="Quagliara Alessio">
+
+    <!-- Open Graph Meta Tags -->
+
+    <meta property="og:title" content="{{ translate('integration-title') }}">
+    <meta property="og:description" content="{{ translate('integration-description') }}">
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png') }}">
+    <meta property="og:url" content="https://www.linkbay-cms.com">
+    <meta property="og:type" content="website">
+
     {% include '/landing/head.html' %}
 </head>
 <body class="bg-danger">

@@ -1,13 +1,5 @@
 <link rel="icon" href="/static/images/superadmin/favicon.ico" type="image/x-icon">
 
-<!-- Open Graph Meta Tags -->
-
- <meta property="og:title" content="{{ translate('title') }}">
- <meta property="og:description" content="{{ translate('description') }}">
- <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png') }}">
- <meta property="og:url" content="https://www.linkbay.com">
- <meta property="og:type" content="website">
-
  <!-- Google Analytics -->
 
  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-XXXXX-Y"></script>
@@ -38,7 +30,7 @@
 
  <!-- XML Sitemap -->
 
- <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
+ <link rel="sitemap" type="application/xml" title="Sitemap" href="{{ url_for('landing.sitemap') }}">
 
  <!-- Robots.txt -->
 
