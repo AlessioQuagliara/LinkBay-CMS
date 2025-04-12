@@ -1,0 +1,63 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Dashboard SuperAdmin - LinkBay CMS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="mb-4">Benvenuto nella Dashboard SuperAdmin</h1>
+
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card border-primary shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fas fa-users"></i> SuperAdmin</h5>
+          <p class="card-text">Gestione amministratori del sistema.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-success shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fas fa-file-alt"></i> Pagine Landing</h5>
+          <p class="card-text">Gestione contenuti pubblici del CMS.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-info shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fas fa-image"></i> Media</h5>
+          <p class="card-text">File, immagini e video caricati.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mt-3">
+    <div class="col-md-4">
+      <div class="card border-warning shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fas fa-receipt"></i> Fatture</h5>
+          <p class="card-text">Gestione fatture emesse.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-secondary shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fas fa-bullhorn"></i> Messaggi</h5>
+          <p class="card-text">Annunci, aggiornamenti e avvisi globali.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-danger shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fas fa-life-ring"></i> Supporto</h5>
+          <p class="card-text">Ticket da parte delle agenzie.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

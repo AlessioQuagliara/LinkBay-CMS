@@ -54,11 +54,14 @@ from landing import landing_bp
 from blueprints.api import register_api_blueprints
 from landing.auth import auth_bp
 from webhooks.stripe_webhook import stripe_webhook_bp
+from landing.admin.routes_admin import admin_landing_bp
+
 
 app.register_blueprint(auth_bp, url_prefix='/auth')  # Serve le route per linkbay-cms.com/auth
 app.register_blueprint(landing_bp, url_prefix='/')  # Serve le route per linkbay-cms.com
 register_api_blueprints(app)
 app.register_blueprint(stripe_webhook_bp)
+app.register_blueprint(admin_landing_bp, url_prefix='/landing/admin')
 
 
 from landing.auth import init_oauth
