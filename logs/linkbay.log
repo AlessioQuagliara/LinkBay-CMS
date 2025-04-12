@@ -27,3 +27,8 @@ UnboundLocalError: cannot access local variable 'session' where it is not associ
 [2025-04-12 08:15:58,869] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
 [2025-04-12 08:16:45,590] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
 [2025-04-12 08:49:12,588] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 10:29:23,554] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 10:45:36,680] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 10:49:17,123] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 10:49:36,953] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 10:49:57,244] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.

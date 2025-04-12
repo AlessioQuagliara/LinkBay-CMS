@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ translate(page_key ~ '-title') }}{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{{ translate(page_key ~ '-description') }}{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}{{ translate(page_key ~ '-keywords') }}{% endblock %}">
+    <meta name="author" content="Quagliara Alessio">
+
+    <!-- Open Graph Meta Tags -->
+
+    <meta property="og:title" content="{{ translate(page_key ~ '-title') }}">
+    <meta property="og:description" content="{{ translate(page_key ~ '-description') }}">
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png') }}">
+    <meta property="og:url" content="https://www.linkbay-cms.com">
+    <meta property="og:type" content="website">
+
+        {% include '/landing/head.html' %}
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-danger">
+
+    {% include "landing/navbar.html" %}
+
+    <main class="py-5 bg-light">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    {% include "landing/footer.html" %}
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS (optional animation library) -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

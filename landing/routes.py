@@ -490,7 +490,17 @@ def dashboard_admin_leaderboard():
         total_pages=(total_entries + per_page - 1) // per_page
     )
 
+@landing_bp.route("/blog")
+def blog():
+    return render_template("landing/blog.html")
 
+@landing_bp.route("/docs")
+def docs():
+    return render_template("landing/docs.html")
+
+@landing_bp.route("/news")
+def news():
+    return render_template("landing/news.html")
 
 
 @landing_bp.route('/sitemap.xml', methods=['GET'])
@@ -534,3 +544,5 @@ def sitemap():
     sitemap_xml += '</urlset>\n'
 
     return Response(sitemap_xml, mimetype='application/xml')
+
+
