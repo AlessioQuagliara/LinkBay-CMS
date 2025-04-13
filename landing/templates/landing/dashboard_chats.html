@@ -1,0 +1,31 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-danger text-white">
+      <h5 class="mb-0"><i class="fa-solid fa-comments me-2"></i>Le tue Chat</h5>
+    </div>
+    <div class="card-body p-0">
+      <ul class="list-group list-group-flush">
+        {% for u in chat_users %}
+        <a href="{{ url_for('landing.dashboard_private_chat', target_user_id=u.id) }}" class="text-decoration-none text-dark">
+          <li class="list-group-item d-flex align-items-center hover-shadow py-3">
+            <img src="{{ u.profilo_foto or '/static/images/superadmin/user_extend.png' }}" alt="avatar" class="rounded-circle me-3" width="45" height="45" style="object-fit: cover;">
+            <div class="flex-grow-1">
+              <div class="fw-bold">{{ u.nome }} {{ u.cognome }}</div>
+              <div class="text-muted small">Clicca per aprire la chat</div>
+            </div>
+            {% if u.unread_count > 0 %}
+              <span class="badge bg-danger ms-2">{{ u.unread_count }}</span>
+            {% endif %}
+            <i class="fa-solid fa-chevron-right text-muted"></i>
+          </li>
+        </a>
+        {% else %}
+        <li class="list-group-item text-center text-muted">Nessuna chat disponibile</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -26,6 +26,10 @@
         width: 240px;
         min-width: 240px;
         transition: all 0.3s ease;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
       }
 
       #wrapper.toggled #sidebar {
@@ -95,10 +99,21 @@
 </head>
 <body>
     <!-- Mobile Toggle Button -->
-    <button class="btn d-md-none m-2" id="sidebarToggle">
+    {% if '/dashboard/themes/upload' in request.path %}
+      <a href="/dashboard/themes/explore" class="btn ms-auto d-md-none m-2">
+      <i class="fa-solid fa-arrow-left"></i> Torna Indietro
+      </a>
+    {% elif '/dashboard/themes/explore' in request.path or '/dashboard/manage/' in request.path %}
+      <a href="/dashboard/themes" class="btn ms-auto d-md-none p-2">
+      <i class="fa-solid fa-arrow-left"></i> Torna Indietro
+      </a>
+    {% else %}
+      <button class="btn d-md-none m-2" id="sidebarToggle">
       <i class="fas fa-bars"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <img src="/static/images/superadmin/linkbay_logo.png" alt="LinkBay Logo" width="140">
-    </button>
+      </button>
+    {% endif %}
+
     <div class="d-flex" id="wrapper">
         <!-- Sidebar -->
         <div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 bg-light border-end min-vh-100">
@@ -115,13 +130,16 @@
               <a href="/dashboard/support" class="nav-link {% if '/dashboard/support' in request.path %}active{% endif %}"><i class="fa-solid fa-headset me-2"></i> Supporto</a>
               <a href="/dashboard/team" class="nav-link {% if '/dashboard/team' in request.path %}active{% endif %}"><i class="fa-solid fa-users me-2"></i> Collabora</a>
               <a href="/dashboard/payouts" class="nav-link {% if '/dashboard/payouts' in request.path %}active{% endif %}"><i class="fa-solid fa-credit-card me-2"></i> Pagamenti</a>
+              <a href="/dashboard/chats" class="nav-link d-flex justify-content-between align-items-center {% if '/dashboard/chats' in request.path %}active{% endif %}">
+                <span><i class="fa-solid fa-comments me-2"></i> Chat</span>
+              </a>
             </nav>
           </div>
           <div>
             <hr>
             <div class="dropdown mt-3">
               <a class="d-flex align-items-center text-decoration-none dropdown-toggle nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="{{ session.get('user_avatar', '/static/images/superadmin/user_extend.png') }}"
+                <img src="{{ session['profile_photo'] or session.get('user_avatar', '/static/images/superadmin/user_extend.png') }}"
                      alt="user" width="32" height="32" class="rounded-circle me-2" style="object-fit: cover; border: 2px solid #ff5757;">
                 <strong class="text-dark">{{ user['nome'] if user and user['nome'] else 'Utente' }}</strong>
               </a>
@@ -152,9 +170,11 @@
     AOS.init({ duration: 1000, once: true });
 
     // Nasconde sidebar all'avvio su mobile
-    if (window.innerWidth < 768) {
-      $('#wrapper').addClass('toggled');
-    }
+    $(document).ready(function () {
+      if (window.innerWidth < 768 && !$('#wrapper').hasClass('toggled')) {
+        $('#wrapper').addClass('toggled');
+      }
+    });
 
     $('#sidebarToggle').on('click', function () {
       $('#wrapper').toggleClass('toggled');
@@ -164,6 +184,27 @@
     $('#sidebar-overlay').on('click', function () {
       $('#wrapper').removeClass('toggled');
     });
+
+    async function loadUnreadCount() {
+      try {
+        const res = await fetch("/api/chat/unread-count");
+        const data = await res.json();
+        if (data.success && data.unread_count > 0) {
+          const chatLink = document.querySelector('a[href="/dashboard/chats"]');
+          if (chatLink) {
+            const badge = document.createElement("span");
+            badge.className = "badge bg-danger";
+            badge.textContent = data.unread_count;
+            badge.style.marginLeft = "auto";
+            chatLink.appendChild(badge);
+          }
+        }
+      } catch (err) {
+        console.error("Errore caricamento conteggio messaggi:", err);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadUnreadCount);
   </script>
   {% block scripts %}{% endblock %}
 </body>

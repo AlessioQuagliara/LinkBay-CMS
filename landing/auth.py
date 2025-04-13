@@ -57,6 +57,7 @@ def login():
             session['user_id'] = user.id
             session['user_email'] = user.email
             session['user_name'] = user.nome
+            session['user_avatar'] = user.profilo_foto
             logging.info(f"✅ Login effettuato per {user.email}")
             return jsonify(success=True, message="Login effettuato!", redirect='/dashboard')
         else:

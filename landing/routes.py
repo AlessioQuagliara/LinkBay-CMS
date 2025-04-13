@@ -62,6 +62,7 @@ def login_post():
             session['user_id'] = user.id
             session['user_email'] = user.email
             session['user_name'] = user.nome
+            session['profile_photo'] = user.profilo_foto
 
             return jsonify(success=True, message="Login effettuato con successo!", redirect='/dashboard')
         else:
@@ -143,6 +144,37 @@ def dashboard_stores():
         shops=list(all_shops.values())
     )
 
+@landing_bp.route('/dashboard/chats')
+def dashboard_chats_list():
+    if 'user_id' not in session:
+        return redirect(url_for('landing.login'))
+
+    user_id = session['user_id']
+
+    # Tutti gli altri utenti
+    chat_users = User.query.filter(User.id != user_id).all()
+
+    # Recupera conteggio messaggi non letti per ciascun utente
+    from models.message import ChatMessage
+    unread_counts = (
+        db.session.query(ChatMessage.sender_id, db.func.count(ChatMessage.id))
+        .filter(ChatMessage.receiver_id == user_id, ChatMessage.is_read == False)
+        .group_by(ChatMessage.sender_id)
+        .all()
+    )
+    # Crea un dizionario {sender_id: count}
+    unread_dict = {sender_id: count for sender_id, count in unread_counts}
+
+    # Aggiunge il campo unread_count a ogni utente
+    for u in chat_users:
+        u.unread_count = unread_dict.get(u.id, 0)
+
+    return render_template(
+        'landing/dashboard_chats.html',
+        user=get_user_from_session(),
+        chat_users=chat_users
+    )
+
 @landing_bp.route('/dashboard/chat/<int:target_user_id>')
 def dashboard_private_chat(target_user_id):
     if 'user_id' not in session:
@@ -158,6 +190,7 @@ def dashboard_private_chat(target_user_id):
         user=get_user_from_session(),
         target_user=target_user
     )
+
 
 @landing_bp.route('/dashboard/team/user/<int:user_id>')
 def dashboard_user_profile(user_id):
@@ -279,7 +312,7 @@ def get_user_from_session():
         "id": session.get('user_id'),
         "email": session.get('user_email'),
         "nome": session.get('user_name'),
-        "profilo_foto": session.get('profile_photo', '')
+        "profilo_foto": session.get('user_avatar', '')
     }
 
 @landing_bp.route('/logout')

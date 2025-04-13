@@ -27,6 +27,7 @@ def validate_fields(*fields):
 
 landing_api = Blueprint('landingApi', __name__, url_prefix='/api/')
 
+# 🏪 Crea un nuovo negozio (registrazione iniziale) ---------------------------------------------------------------------------------------------------
 @landing_api.route('/create_shop', methods=['POST'])
 def create_shop():
     shop_name = request.form.get('shop_name', '').strip().lower()
@@ -112,6 +113,7 @@ def create_shop():
         logger.error(f"🔥 Errore durante la creazione dello shop: {e}")
         return jsonify(success=False, message="Errore nella creazione del negozio. Riprova più tardi."), 500
 
+#+ 🔑 Crea accesso per negozio esistente ---------------------------------------------------------------------------------------------------
 @landing_api.route('/create_shop_access', methods=['POST'])
 def create_shop_access():
 
@@ -173,6 +175,7 @@ def create_shop_access():
         logger.error(f"🔥 Errore durante la creazione shop_access: {e}")
         return jsonify(success=False, message="Errore durante la creazione del negozio"), 500
 
+#+ 📧 Verifica se l'email è già registrata ---------------------------------------------------------------------------------------------------
 @landing_api.route('/check_email', methods=['GET'])
 def check_email():
     email = request.args.get('email', '').strip().lower()
@@ -183,6 +186,7 @@ def check_email():
     exists = User.query.filter_by(email=email).first() is not None
     return jsonify(status='exists' if exists else 'available')
 
+#+ 🏷️ Controlla la disponibilità del nome negozio ---------------------------------------------------------------------------------------------------
 @landing_api.route('/check_shopname', methods=['GET'])
 def check_shopname():
     shop_name = request.args.get('shop_name', '').strip().lower()
@@ -193,6 +197,7 @@ def check_shopname():
     exists = ShopList.query.filter_by(shop_name=shop_name).first() is not None
     return jsonify(status='exists' if exists else 'available')
 
+#+ 🗑️ Elimina un negozio esistente ---------------------------------------------------------------------------------------------------
 @landing_api.route('/delete_shop', methods=['DELETE'])
 def delete_shop():
     try:
@@ -239,6 +244,7 @@ def delete_shop():
         logger.error(f"❌ Errore durante l'eliminazione del negozio: {e}")
         return jsonify(success=False, message="Errore durante l'eliminazione del negozio."), 500
 
+#+ 📊 Ottieni le vendite dei negozi dell'utente ---------------------------------------------------------------------------------------------------
 @landing_api.route('/user_shops_sales', methods=['GET'])
 def get_user_shops_sales():
     if 'user_id' not in session:
@@ -271,6 +277,7 @@ def get_user_shops_sales():
 
     return jsonify(success=True, data=results)
 
+#+ 🎫 Crea un nuovo ticket di supporto ---------------------------------------------------------------------------------------------------
 @landing_api.route('/create_ticket', methods=['POST'])
 def create_ticket():
     if 'user_id' not in session:
@@ -309,6 +316,7 @@ def create_ticket():
         logger.error(f"Errore durante la creazione del ticket: {e}")
         return jsonify(success=False, message="Errore durante la creazione del ticket"), 500
 
+#+ 📋 Recupera i ticket dell'utente ---------------------------------------------------------------------------------------------------
 @landing_api.route('/my_tickets', methods=['GET'])
 def get_my_tickets():
     if 'user_id' not in session:
@@ -329,6 +337,7 @@ def get_my_tickets():
 
     return jsonify(success=True, data=results)
 
+#+ ❌ Elimina un ticket di supporto ---------------------------------------------------------------------------------------------------
 @landing_api.route('/delete_ticket/<int:ticket_id>', methods=['DELETE'])
 def delete_ticket(ticket_id):
     if 'user_id' not in session:
@@ -359,6 +368,7 @@ def delete_ticket(ticket_id):
         logger.error(f"Errore durante l'eliminazione del ticket: {e}")
         return jsonify(success=False, message="Errore durante l'eliminazione del ticket"), 500
 
+#+ 💬 Recupera i messaggi di un ticket ---------------------------------------------------------------------------------------------------
 @landing_api.route('/ticket_messages/<int:ticket_id>', methods=['GET'])
 def get_ticket_messages(ticket_id):
     from models.ticket_messages import TicketMessage
@@ -381,6 +391,7 @@ def get_ticket_messages(ticket_id):
         logger.error(f"Errore nel recupero dei messaggi per il ticket {ticket_id}: {e}")
         return jsonify(success=False, message="Errore durante il recupero dei messaggi"), 500
 
+#+ ✉️ Invia un messaggio per un ticket ---------------------------------------------------------------------------------------------------
 @landing_api.route('/ticket_messages/<int:ticket_id>', methods=['POST'])
 def post_ticket_message(ticket_id):
     from models.ticket_messages import TicketMessage
@@ -411,6 +422,7 @@ def post_ticket_message(ticket_id):
 
 
 
+#+ 🎨 Ottieni i temi disponibili ---------------------------------------------------------------------------------------------------
 @landing_api.route('/available_themes', methods=['GET'])
 def get_available_themes():
     try:
@@ -430,8 +442,7 @@ def get_available_themes():
         return jsonify(success=False, message="Errore durante il recupero dei temi"), 500
     
 
-
-
+#+ 📤 Invia un messaggio chat ---------------------------------------------------------------------------------------------------
 @landing_api.route('/chat/send', methods=['POST'])
 def send_chat_message():
     if 'user_id' not in session:
@@ -461,6 +472,7 @@ def send_chat_message():
         logger.error(f"Errore nell'invio del messaggio: {e}")
         return jsonify(success=False, message="Errore durante l'invio del messaggio"), 500
 
+#+ 📥 Recupera i messaggi chat ---------------------------------------------------------------------------------------------------
 @landing_api.route('/chat/messages', methods=['GET'])
 def get_chat_messages():
     if 'user_id' not in session:
@@ -483,11 +495,50 @@ def get_chat_messages():
         logger.error(f"Errore nel recupero messaggi: {e}")
         return jsonify(success=False, message="Errore durante il recupero dei messaggi"), 500
     
+#+ ✅ Segna i messaggi come letti nella chat ---------------------------------------------------------------------------------------------------
+@landing_api.route('/chat/mark-read', methods=['POST'])
+def mark_messages_as_read():
+    if 'user_id' not in session:
+        return jsonify(success=False, message="Utente non autenticato"), 401
 
+    try:
+        user_id = session['user_id']
+        data = request.get_json() or {}
+        sender_id = data.get('sender_id')
 
+        if not sender_id:
+            return jsonify(success=False, message="ID mittente mancante"), 400
 
+        updated = ChatMessage.query.filter_by(
+            sender_id=sender_id,
+            receiver_id=user_id,
+            is_read=False
+        ).update({"is_read": True})
+
+        db.session.commit()
+        return jsonify(success=True, updated=updated)
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Errore durante l'aggiornamento dei messaggi come letti: {e}")
+        return jsonify(success=False, message="Errore interno"), 500
+
+#+ 🔔 Conta i messaggi chat non letti ---------------------------------------------------------------------------------------------------
+@landing_api.route('/chat/unread-count', methods=['GET'])
+def get_unread_chat_count():
+    if 'user_id' not in session:
+        return jsonify(success=False, message="Utente non autenticato"), 401
+
+    try:
+        user_id = session['user_id']
+        from models.message import ChatMessage
+        unread_count = ChatMessage.query.filter_by(receiver_id=user_id, is_read=False).count()
+        return jsonify(success=True, unread_count=unread_count)
+    except Exception as e:
+        logger.error(f"Errore nel recupero dei messaggi non letti: {e}")
+        return jsonify(success=False, message="Errore nel recupero dei messaggi"), 500
     
 
+#+ 💳 Gestisci la sottoscrizione tramite checkout Stripe ---------------------------------------------------------------------------------------------------
 @landing_api.route('/checkout/subscribe', methods=['GET'])
 def checkout_subscribe():
     if 'user_id' not in session:
@@ -558,6 +609,7 @@ def checkout_subscribe():
         logger.error(f"❌ Errore nella creazione della sessione Stripe: {e}")
         return jsonify(success=False, message="Errore nella creazione della sessione"), 500
     
+#+ 🔁 Aggiorna il profilo utente ---------------------------------------------------------------------------------------------------
 @landing_api.route('/update_profile', methods=['POST'])
 def update_profile():
     if 'user_id' not in session:
@@ -574,8 +626,8 @@ def update_profile():
     user.profilo_foto = data.get('profilo_foto', user.profilo_foto)
 
     # 🔁 Upload dell'immagine dal PC (drag o selezione)
-    if 'immagine_locale' in request.files:
-        immagine = request.files['immagine_locale']
+    if 'avatar' in request.files:
+        immagine = request.files['avatar']
         if immagine.filename:
             from werkzeug.utils import secure_filename
             filename = secure_filename(f"user_{user.id}_{datetime.utcnow().timestamp()}.{immagine.filename.rsplit('.', 1)[-1]}")
@@ -591,3 +643,4 @@ def update_profile():
         db.session.rollback()
         logger.error(f"Errore aggiornamento profilo: {e}")
         return jsonify(success=False, message="Errore durante l'aggiornamento"), 500
+    
