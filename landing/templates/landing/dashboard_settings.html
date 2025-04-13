@@ -17,7 +17,7 @@
               <!-- 🔄 Avatar Upload (Drag or Click) -->
               <div class="col-12 text-center">
                 <div class="avatar-upload-wrapper position-relative mx-auto mb-3" style="width: 120px; height: 120px;">
-                  <label for="avatarUpload" class="avatar-placeholder rounded-circle border border-2 border-danger d-flex justify-content-center align-items-center text-danger fw-bold" style="width: 120px; height: 120px; border-style: dashed; cursor: pointer;">
+                  <label for="avatarUpload" class="avatar-placeholder rounded-circle border border-2 border-danger d-flex justify-content-center align-items-center text-danger fw-bold" style="width: 120px; height: 120px; border: 2px dashed #dc3545; transition: border 0.3s ease; cursor: pointer;">
                     <i class="fa-solid fa-plus fa-2x"></i>
                   </label>
                   <input type="file" name="avatar" id="avatarUpload" class="d-none" accept="image/*">
@@ -66,6 +66,33 @@
         avatarUpload.addEventListener('change', function () {
           const file = this.files[0];
           if (file) {
+            const reader = new FileReader();
+            reader.onload = e => {
+              avatarPreview.src = e.target.result;
+              avatarPreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+        // 🔄 Supporto drag & drop
+        const avatarWrapper = document.querySelector('.avatar-upload-wrapper');
+
+        avatarWrapper.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          avatarWrapper.classList.add('border-warning');
+        });
+
+        avatarWrapper.addEventListener('dragleave', () => {
+          avatarWrapper.classList.remove('border-warning');
+        });
+
+        avatarWrapper.addEventListener('drop', (e) => {
+          e.preventDefault();
+          avatarWrapper.classList.remove('border-warning');
+          const file = e.dataTransfer.files[0];
+          if (file) {
+            avatarUpload.files = e.dataTransfer.files;
             const reader = new FileReader();
             reader.onload = e => {
               avatarPreview.src = e.target.result;

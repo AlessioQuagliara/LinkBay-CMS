@@ -42,6 +42,12 @@
 
         async function loadMessages() {
           try {
+            chatBox.innerHTML = "";
+            await fetch(`/api/chat/mark-read`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ sender_id: receiverId })
+            });
             const response = await fetch(`/api/chat/messages?user_id=${receiverId}`);
             const data = await response.json();
             chatBox.innerHTML = "";
