@@ -88,15 +88,16 @@
         display: none;
       }
       #wrapper.toggled + #sidebar-overlay {
-        display: block;
+        display: block !important;
       }
     </style>
     {% block head %}{% endblock %}
 </head>
 <body>
     <!-- Mobile Toggle Button -->
-    <button class="btn btn-outline-secondary d-md-none m-2" id="sidebarToggle">
-      <i class="fas fa-bars"></i>
+    <button class="btn d-md-none m-2" id="sidebarToggle">
+      <i class="fas fa-bars"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <img src="/static/images/superadmin/linkbay_logo.png" alt="LinkBay Logo" width="140">
     </button>
     <div class="d-flex" id="wrapper">
         <!-- Sidebar -->
@@ -120,7 +121,7 @@
             <hr>
             <div class="dropdown mt-3">
               <a class="d-flex align-items-center text-decoration-none dropdown-toggle nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="{{ user['profilo_foto'] if user and user['profilo_foto'] else '/static/images/superadmin/user_extend.png' }}"
+                <img src="{{ session.get('user_avatar', '/static/images/superadmin/user_extend.png') }}"
                      alt="user" width="32" height="32" class="rounded-circle me-2" style="object-fit: cover; border: 2px solid #ff5757;">
                 <strong class="text-dark">{{ user['nome'] if user and user['nome'] else 'Utente' }}</strong>
               </a>
