@@ -98,6 +98,7 @@ def google_callback():
     session['user_id'] = user.id
     session['user_email'] = user.email
     session['user_name'] = user.nome
+    session['user_avatar'] = user.profilo_foto 
 
     return redirect('/dashboard')
 
@@ -135,6 +136,7 @@ def facebook_callback():
     session['user_id'] = user.id
     session['user_email'] = user.email
     session['user_name'] = user.nome
+    session['user_avatar'] = user.profilo_foto
 
     return redirect('/dashboard')
 
@@ -171,6 +173,7 @@ def apple_callback():
     session['user_id'] = user.id
     session['user_email'] = user.email
     session['user_name'] = user.nome
+    session['user_avatar'] = user.profilo_foto
 
     return redirect('/dashboard')
 

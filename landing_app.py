@@ -131,4 +131,4 @@ app.jinja_env.globals.update(translate=translate)
 
 # 📌 Avvio dell'applicazione Flask
 if __name__ == "__main__":
-    app.run(port=5000)
+    app.run(port=5000, debug=True)

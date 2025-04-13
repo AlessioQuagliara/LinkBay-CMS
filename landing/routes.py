@@ -279,7 +279,7 @@ def get_user_from_session():
         "id": session.get('user_id'),
         "email": session.get('user_email'),
         "nome": session.get('user_name'),
-        "profilo_foto": session.get('user_profilo_foto', '')
+        "profilo_foto": session.get('profile_photo', '')
     }
 
 @landing_bp.route('/logout')
