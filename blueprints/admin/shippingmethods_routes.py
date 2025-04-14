@@ -49,7 +49,7 @@ def shipping_methods():
 
 
 # 🔹 **Creazione di un nuovo metodo di spedizione**
-@shipping_methods_bp.route('/admin/cms/create_shipping_method', methods=['POST'])
+@shipping_methods_bp.route('/api/create_shipping_method', methods=['POST'])
 def create_shipping_method():
     try:
         data = request.get_json()
