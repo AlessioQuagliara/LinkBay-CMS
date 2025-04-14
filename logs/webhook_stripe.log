@@ -6750,3 +6750,2253 @@
   },
   "type": "invoice.payment_succeeded"
 }
+2025-04-14 20:00:07,333 [INFO] 📦 Ricevuto evento Stripe: charge.succeeded
+2025-04-14 20:00:07,335 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1744653605,
+  "data": {
+    "object": {
+      "amount": 1800,
+      "amount_captured": 1800,
+      "amount_refunded": 0,
+      "application": null,
+      "application_fee": null,
+      "application_fee_amount": null,
+      "balance_transaction": "txn_3RDrIdPteJOX9ukr2HqPA66T",
+      "billing_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "quagliara.alessio@gmail.com",
+        "name": "Ciao",
+        "phone": null
+      },
+      "calculated_statement_descriptor": "DEFAULT SANDBOX",
+      "captured": true,
+      "created": 1744653605,
+      "currency": "eur",
+      "customer": "cus_S87X7YoKDi8O5t",
+      "description": "Subscription creation",
+      "destination": null,
+      "dispute": null,
+      "disputed": false,
+      "failure_balance_transaction": null,
+      "failure_code": null,
+      "failure_message": null,
+      "fraud_details": {},
+      "id": "ch_3RDrIdPteJOX9ukr2p86U8zD",
+      "invoice": "in_1RDrIdPteJOX9ukrIhxU2vrQ",
+      "livemode": false,
+      "metadata": {},
+      "object": "charge",
+      "on_behalf_of": null,
+      "order": null,
+      "outcome": {
+        "advice_code": null,
+        "network_advice_code": null,
+        "network_decline_code": null,
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 52,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+      },
+      "paid": true,
+      "payment_intent": "pi_3RDrIdPteJOX9ukr24XzDbY6",
+      "payment_method": "pm_1RDrIcPteJOX9ukrmKB1bR96",
+      "payment_method_details": {
+        "card": {
+          "amount_authorized": 1800,
+          "authorization_code": null,
+          "brand": "visa",
+          "checks": {
+            "address_line1_check": null,
+            "address_postal_code_check": null,
+            "cvc_check": "pass"
+          },
+          "country": "US",
+          "exp_month": 9,
+          "exp_year": 2028,
+          "extended_authorization": {
+            "status": "disabled"
+          },
+          "fingerprint": "mB6Pyp1GwuciRztS",
+          "funding": "credit",
+          "incremental_authorization": {
+            "status": "unavailable"
+          },
+          "installments": null,
+          "last4": "4242",
+          "mandate": null,
+          "multicapture": {
+            "status": "unavailable"
+          },
+          "network": "visa",
+          "network_token": {
+            "used": false
+          },
+          "network_transaction_id": "109665480121112",
+          "overcapture": {
+            "maximum_amount_capturable": 1800,
+            "status": "unavailable"
+          },
+          "regulated_status": "unregulated",
+          "three_d_secure": null,
+          "wallet": null
+        },
+        "type": "card"
+      },
+      "radar_options": {},
+      "receipt_email": null,
+      "receipt_number": null,
+      "receipt_url": "https://pay.stripe.com/receipts/invoices/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKKea9b8GMgYumH0fnO06LBYfm78aatZh8LJdF3Vp0xDXxrR3FVkAL16JVt0mtZ4ZzEV1JVx35h2FNxZr?s=ap",
+      "refunded": false,
+      "review": null,
+      "shipping": null,
+      "source": null,
+      "source_transfer": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RDrIdPteJOX9ukr2TfdjdcK",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "2a91f3da-df3f-4d79-b52d-deb67552bb24"
+  },
+  "type": "charge.succeeded"
+}
+2025-04-14 20:00:07,373 [INFO] 📦 Ricevuto evento Stripe: checkout.session.completed
+2025-04-14 20:00:07,374 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1744653607,
+  "data": {
+    "object": {
+      "adaptive_pricing": null,
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 1800,
+      "amount_total": 1800,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "cancel_url": "http://127.0.0.1:5000/subscription/cancel?shop=gioielleria",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": {
+        "shipping_details": null
+      },
+      "consent": null,
+      "consent_collection": null,
+      "created": 1744653493,
+      "currency": "eur",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": "cus_S87X7YoKDi8O5t",
+      "customer_creation": "always",
+      "customer_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "quagliara.alessio@gmail.com",
+        "name": "Ciao",
+        "phone": null,
+        "tax_exempt": "none",
+        "tax_ids": []
+      },
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1744739893,
+      "id": "cs_test_a10orRALQE28ocBbBvofCtGLfuFE1sCEVgBFXb8PzLEpJxuNNnRz6gLFf2",
+      "invoice": "in_1RDrIdPteJOX9ukrIhxU2vrQ",
+      "invoice_creation": null,
+      "livemode": false,
+      "locale": null,
+      "metadata": {
+        "plan_name": "allisready",
+        "shop_name": "gioielleria",
+        "user_id": "4"
+      },
+      "mode": "subscription",
+      "object": "checkout.session",
+      "payment_intent": null,
+      "payment_link": null,
+      "payment_method_collection": "always",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "paid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": false
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": null,
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "complete",
+      "submit_type": null,
+      "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp",
+      "success_url": "http://127.0.0.1:5000/subscription/success?shop=gioielleria",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    }
+  },
+  "id": "evt_1RDrIhPteJOX9ukrGmyBXVwS",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "checkout.session.completed"
+}
+2025-04-14 20:00:07,374 [INFO] 📋 Metadata presenti nella sessione: {
+  "plan_name": "allisready",
+  "shop_name": "gioielleria",
+  "user_id": "4"
+}
+2025-04-14 20:00:07,374 [INFO] 🧠 Metadata ricevuti: user_id=4, shop_name=gioielleria, plan_name=allisready
+2025-04-14 20:00:07,377 [INFO] 🔁 Dati aggiornamento -> Piano: AllIsReady, Prezzo: 18, Shop: gioielleria, User: 4
+2025-04-14 20:00:07,381 [INFO] ✅ Abbonamento aggiornato a AllIsReady per gioielleria.
+2025-04-14 20:00:07,381 [INFO] ✅ Webhook completato per session ID: cs_test_a10orRALQE28ocBbBvofCtGLfuFE1sCEVgBFXb8PzLEpJxuNNnRz6gLFf2
+2025-04-14 20:00:07,612 [INFO] 📦 Ricevuto evento Stripe: payment_method.attached
+2025-04-14 20:00:07,613 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1744653605,
+  "data": {
+    "object": {
+      "allow_redisplay": "limited",
+      "billing_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "quagliara.alessio@gmail.com",
+        "name": "Ciao",
+        "phone": null
+      },
+      "card": {
+        "brand": "visa",
+        "checks": {
+          "address_line1_check": null,
+          "address_postal_code_check": null,
+          "cvc_check": "pass"
+        },
+        "country": "US",
+        "display_brand": "visa",
+        "exp_month": 9,
+        "exp_year": 2028,
+        "fingerprint": "mB6Pyp1GwuciRztS",
+        "funding": "credit",
+        "generated_from": null,
+        "last4": "4242",
+        "networks": {
+          "available": [
+            "visa"
+          ],
+          "preferred": null
+        },
+        "regulated_status": "unregulated",
+        "three_d_secure_usage": {
+          "supported": true
+        },
+        "wallet": null
+      },
+      "created": 1744653602,
+      "customer": "cus_S87X7YoKDi8O5t",
+      "id": "pm_1RDrIcPteJOX9ukrmKB1bR96",
+      "livemode": false,
+      "metadata": {},
+      "object": "payment_method",
+      "type": "card"
+    }
+  },
+  "id": "evt_1RDrIhPteJOX9ukrQ0mGPOlg",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "2a91f3da-df3f-4d79-b52d-deb67552bb24"
+  },
+  "type": "payment_method.attached"
+}
+2025-04-14 20:00:07,683 [INFO] 📦 Ricevuto evento Stripe: customer.created
+2025-04-14 20:00:07,683 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1744653602,
+  "data": {
+    "object": {
+      "address": {
+        "city": null,
+        "country": "IT",
+        "line1": null,
+        "line2": null,
+        "postal_code": null,
+        "state": null
+      },
+      "balance": 0,
+      "created": 1744653602,
+      "currency": null,
+      "default_source": null,
+      "delinquent": false,
+      "description": null,
+      "discount": null,
+      "email": "quagliara.alessio@gmail.com",
+      "id": "cus_S87X7YoKDi8O5t",
+      "invoice_prefix": "EE1C4410",
+      "invoice_settings": {
+        "custom_fields": null,
+        "default_payment_method": null,
+        "footer": null,
+        "rendering_options": null
+      },
+      "livemode": false,
+      "metadata": {},
+      "name": "Ciao",
+      "object": "customer",
+      "phone": null,
+      "preferred_locales": [
+        "it-IT"
+      ],
+      "shipping": null,
+      "tax_exempt": "none",
+      "test_clock": null
+    }
+  },
+  "id": "evt_1RDrIhPteJOX9ukr2chMlE9A",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "2a91f3da-df3f-4d79-b52d-deb67552bb24"
+  },
+  "type": "customer.created"
+}
+2025-04-14 20:00:07,742 [INFO] 📦 Ricevuto evento Stripe: customer.updated
+2025-04-14 20:00:07,742 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1744653604,
+  "data": {
+    "object": {
+      "address": {
+        "city": null,
+        "country": "IT",
+        "line1": null,
+        "line2": null,
+        "postal_code": null,
+        "state": null
+      },
+      "balance": 0,
+      "created": 1744653602,
+      "currency": "eur",
+      "default_source": null,
+      "delinquent": false,
+      "description": null,
+      "discount": null,
+      "email": "quagliara.alessio@gmail.com",
+      "id": "cus_S87X7YoKDi8O5t",
+      "invoice_prefix": "EE1C4410",
+      "invoice_settings": {
+        "custom_fields": null,
+        "default_payment_method": null,
+        "footer": null,
+        "rendering_options": null
+      },
+      "livemode": false,
+      "metadata": {},
+      "name": "Ciao",
+      "object": "customer",
+      "phone": null,
+      "preferred_locales": [
+        "it-IT"
+      ],
+      "shipping": null,
+      "tax_exempt": "none",
+      "test_clock": null
+    },
+    "previous_attributes": {
+      "currency": null
+    }
+  },
+  "id": "evt_1RDrIhPteJOX9ukrkNaHqCFy",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "2a91f3da-df3f-4d79-b52d-deb67552bb24"
+  },
+  "type": "customer.updated"
+}
+2025-04-14 20:00:07,874 [INFO] 📦 Ricevuto evento Stripe: customer.subscription.created
+2025-04-14 20:00:07,875 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1744653604,
+  "data": {
+    "object": {
+      "application": null,
+      "application_fee_percent": null,
+      "automatic_tax": {
+        "disabled_reason": null,
+        "enabled": false,
+        "liability": null
+      },
+      "billing_cycle_anchor": 1744653603,
+      "billing_cycle_anchor_config": null,
+      "billing_thresholds": null,
+      "cancel_at": null,
+      "cancel_at_period_end": false,
+      "canceled_at": null,
+      "cancellation_details": {
+        "comment": null,
+        "feedback": null,
+        "reason": null
+      },
+      "collection_method": "charge_automatically",
+      "created": 1744653603,
+      "currency": "eur",
+      "current_period_end": 1747245603,
+      "current_period_start": 1744653603,
+      "customer": "cus_S87X7YoKDi8O5t",
+      "days_until_due": null,
+      "default_payment_method": null,
+      "default_source": null,
+      "default_tax_rates": [],
+      "description": null,
+      "discount": null,
+      "discounts": [],
+      "ended_at": null,
+      "id": "sub_1RDrIdPteJOX9ukrIk679FEp",
+      "invoice_settings": {
+        "account_tax_ids": null,
+        "issuer": {
+          "type": "self"
+        }
+      },
+      "items": {
+        "data": [
+          {
+            "billing_thresholds": null,
+            "created": 1744653603,
+            "current_period_end": 1747245603,
+            "current_period_start": 1744653603,
+            "discounts": [],
+            "id": "si_S87XgTzPGBIcNl",
+            "metadata": {},
+            "object": "subscription_item",
+            "plan": {
+              "active": true,
+              "aggregate_usage": null,
+              "amount": 1800,
+              "amount_decimal": "1800",
+              "billing_scheme": "per_unit",
+              "created": 1744224021,
+              "currency": "eur",
+              "id": "price_1RC3XtPteJOX9ukrGj97iGom",
+              "interval": "month",
+              "interval_count": 1,
+              "livemode": false,
+              "metadata": {},
+              "meter": null,
+              "nickname": null,
+              "object": "plan",
+              "product": "prod_S6G45kGHtuOBye",
+              "tiers_mode": null,
+              "transform_usage": null,
+              "trial_period_days": null,
+              "usage_type": "licensed"
+            },
+            "price": {
+              "active": true,
+              "billing_scheme": "per_unit",
+              "created": 1744224021,
+              "currency": "eur",
+              "custom_unit_amount": null,
+              "id": "price_1RC3XtPteJOX9ukrGj97iGom",
+              "livemode": false,
+              "lookup_key": null,
+              "metadata": {},
+              "nickname": null,
+              "object": "price",
+              "product": "prod_S6G45kGHtuOBye",
+              "recurring": {
+                "aggregate_usage": null,
+                "interval": "month",
+                "interval_count": 1,
+                "meter": null,
+                "trial_period_days": null,
+                "usage_type": "licensed"
+              },
+              "tax_behavior": "inclusive",
+              "tiers_mode": null,
+              "transform_quantity": null,
+              "type": "recurring",
+              "unit_amount": 1800,
+              "unit_amount_decimal": "1800"
+            },
+            "quantity": 1,
+            "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp",
+            "tax_rates": []
+          }
+        ],
+        "has_more": false,
+        "object": "list",
+        "total_count": 1,
+        "url": "/v1/subscription_items?subscription=sub_1RDrIdPteJOX9ukrIk679FEp"
+      },
+      "latest_invoice": "in_1RDrIdPteJOX9ukrIhxU2vrQ",
+      "livemode": false,
+      "metadata": {},
+      "next_pending_invoice_item_invoice": null,
+      "object": "subscription",
+      "on_behalf_of": null,
+      "pause_collection": null,
+      "payment_settings": {
+        "payment_method_options": {
+          "acss_debit": null,
+          "bancontact": null,
+          "card": {
+            "network": null,
+            "request_three_d_secure": "automatic"
+          },
+          "customer_balance": null,
+          "konbini": null,
+          "sepa_debit": null,
+          "us_bank_account": null
+        },
+        "payment_method_types": [
+          "card"
+        ],
+        "save_default_payment_method": "off"
+      },
+      "pending_invoice_item_interval": null,
+      "pending_setup_intent": null,
+      "pending_update": null,
+      "plan": {
+        "active": true,
+        "aggregate_usage": null,
+        "amount": 1800,
+        "amount_decimal": "1800",
+        "billing_scheme": "per_unit",
+        "created": 1744224021,
+        "currency": "eur",
+        "id": "price_1RC3XtPteJOX9ukrGj97iGom",
+        "interval": "month",
+        "interval_count": 1,
+        "livemode": false,
+        "metadata": {},
+        "meter": null,
+        "nickname": null,
+        "object": "plan",
+        "product": "prod_S6G45kGHtuOBye",
+        "tiers_mode": null,
+        "transform_usage": null,
+        "trial_period_days": null,
+        "usage_type": "licensed"
+      },
+      "quantity": 1,
+      "schedule": null,
+      "start_date": 1744653603,
+      "status": "incomplete",
+      "test_clock": null,
+      "transfer_data": null,
+      "trial_end": null,
+      "trial_settings": {
+        "end_behavior": {
+          "missing_payment_method": "create_invoice"
+        }
+      },
+      "trial_start": null
+    }
+  },
+  "id": "evt_1RDrIhPteJOX9ukrbvDJSPBz",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "2a91f3da-df3f-4d79-b52d-deb67552bb24"
+  },
+  "type": "customer.subscription.created"
+}
+2025-04-14 20:00:07,958 [INFO] 📦 Ricevuto evento Stripe: customer.subscription.updated
+2025-04-14 20:00:07,959 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1744653606,
+  "data": {
+    "object": {
+      "application": null,
+      "application_fee_percent": null,
+      "automatic_tax": {
+        "disabled_reason": null,
+        "enabled": false,
+        "liability": null
+      },
+      "billing_cycle_anchor": 1744653603,
+      "billing_cycle_anchor_config": null,
+      "billing_thresholds": null,
+      "cancel_at": null,
+      "cancel_at_period_end": false,
+      "canceled_at": null,
+      "cancellation_details": {
+        "comment": null,
+        "feedback": null,
+        "reason": null
+      },
+      "collection_method": "charge_automatically",
+      "created": 1744653603,
+      "currency": "eur",
+      "current_period_end": 1747245603,
+      "current_period_start": 1744653603,
+      "customer": "cus_S87X7YoKDi8O5t",
+      "days_until_due": null,
+      "default_payment_method": "pm_1RDrIcPteJOX9ukrmKB1bR96",
+      "default_source": null,
+      "default_tax_rates": [],
+      "description": null,
+      "discount": null,
+      "discounts": [],
+      "ended_at": null,
+      "id": "sub_1RDrIdPteJOX9ukrIk679FEp",
+      "invoice_settings": {
+        "account_tax_ids": null,
+        "issuer": {
+          "type": "self"
+        }
+      },
+      "items": {
+        "data": [
+          {
+            "billing_thresholds": null,
+            "created": 1744653603,
+            "current_period_end": 1747245603,
+            "current_period_start": 1744653603,
+            "discounts": [],
+            "id": "si_S87XgTzPGBIcNl",
+            "metadata": {},
+            "object": "subscription_item",
+            "plan": {
+              "active": true,
+              "aggregate_usage": null,
+              "amount": 1800,
+              "amount_decimal": "1800",
+              "billing_scheme": "per_unit",
+              "created": 1744224021,
+              "currency": "eur",
+              "id": "price_1RC3XtPteJOX9ukrGj97iGom",
+              "interval": "month",
+              "interval_count": 1,
+              "livemode": false,
+              "metadata": {},
+              "meter": null,
+              "nickname": null,
+              "object": "plan",
+              "product": "prod_S6G45kGHtuOBye",
+              "tiers_mode": null,
+              "transform_usage": null,
+              "trial_period_days": null,
+              "usage_type": "licensed"
+            },
+            "price": {
+              "active": true,
+              "billing_scheme": "per_unit",
+              "created": 1744224021,
+              "currency": "eur",
+              "custom_unit_amount": null,
+              "id": "price_1RC3XtPteJOX9ukrGj97iGom",
+              "livemode": false,
+              "lookup_key": null,
+              "metadata": {},
+              "nickname": null,
+              "object": "price",
+              "product": "prod_S6G45kGHtuOBye",
+              "recurring": {
+                "aggregate_usage": null,
+                "interval": "month",
+                "interval_count": 1,
+                "meter": null,
+                "trial_period_days": null,
+                "usage_type": "licensed"
+              },
+              "tax_behavior": "inclusive",
+              "tiers_mode": null,
+              "transform_quantity": null,
+              "type": "recurring",
+              "unit_amount": 1800,
+              "unit_amount_decimal": "1800"
+            },
+            "quantity": 1,
+            "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp",
+            "tax_rates": []
+          }
+        ],
+        "has_more": false,
+        "object": "list",
+        "total_count": 1,
+        "url": "/v1/subscription_items?subscription=sub_1RDrIdPteJOX9ukrIk679FEp"
+      },
+      "latest_invoice": "in_1RDrIdPteJOX9ukrIhxU2vrQ",
+      "livemode": false,
+      "metadata": {},
+      "next_pending_invoice_item_invoice": null,
+      "object": "subscription",
+      "on_behalf_of": null,
+      "pause_collection": null,
+      "payment_settings": {
+        "payment_method_options": {
+          "acss_debit": null,
+          "bancontact": null,
+          "card": {
+            "network": null,
+            "request_three_d_secure": "automatic"
+          },
+          "customer_balance": null,
+          "konbini": null,
+          "sepa_debit": null,
+          "us_bank_account": null
+        },
+        "payment_method_types": [
+          "card"
+        ],
+        "save_default_payment_method": "off"
+      },
+      "pending_invoice_item_interval": null,
+      "pending_setup_intent": null,
+      "pending_update": null,
+      "plan": {
+        "active": true,
+        "aggregate_usage": null,
+        "amount": 1800,
+        "amount_decimal": "1800",
+        "billing_scheme": "per_unit",
+        "created": 1744224021,
+        "currency": "eur",
+        "id": "price_1RC3XtPteJOX9ukrGj97iGom",
+        "interval": "month",
+        "interval_count": 1,
+        "livemode": false,
+        "metadata": {},
+        "meter": null,
+        "nickname": null,
+        "object": "plan",
+        "product": "prod_S6G45kGHtuOBye",
+        "tiers_mode": null,
+        "transform_usage": null,
+        "trial_period_days": null,
+        "usage_type": "licensed"
+      },
+      "quantity": 1,
+      "schedule": null,
+      "start_date": 1744653603,
+      "status": "active",
+      "test_clock": null,
+      "transfer_data": null,
+      "trial_end": null,
+      "trial_settings": {
+        "end_behavior": {
+          "missing_payment_method": "create_invoice"
+        }
+      },
+      "trial_start": null
+    },
+    "previous_attributes": {
+      "default_payment_method": null,
+      "status": "incomplete"
+    }
+  },
+  "id": "evt_1RDrIhPteJOX9ukrzAxmUSW6",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "2a91f3da-df3f-4d79-b52d-deb67552bb24"
+  },
+  "type": "customer.subscription.updated"
+}
+2025-04-14 20:00:08,009 [INFO] 📦 Ricevuto evento Stripe: payment_intent.succeeded
+2025-04-14 20:00:08,009 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1744653606,
+  "data": {
+    "object": {
+      "amount": 1800,
+      "amount_capturable": 0,
+      "amount_details": {
+        "tip": {}
+      },
+      "amount_received": 1800,
+      "application": null,
+      "application_fee_amount": null,
+      "automatic_payment_methods": null,
+      "canceled_at": null,
+      "cancellation_reason": null,
+      "capture_method": "automatic",
+      "client_secret": "pi_3RDrIdPteJOX9ukr24XzDbY6_secret_eUl38EeYqtOSHYn0j7xkUQRdJ",
+      "confirmation_method": "automatic",
+      "created": 1744653603,
+      "currency": "eur",
+      "customer": "cus_S87X7YoKDi8O5t",
+      "description": "Subscription creation",
+      "id": "pi_3RDrIdPteJOX9ukr24XzDbY6",
+      "invoice": "in_1RDrIdPteJOX9ukrIhxU2vrQ",
+      "last_payment_error": null,
+      "latest_charge": "ch_3RDrIdPteJOX9ukr2p86U8zD",
+      "livemode": false,
+      "metadata": {},
+      "next_action": null,
+      "object": "payment_intent",
+      "on_behalf_of": null,
+      "payment_method": "pm_1RDrIcPteJOX9ukrmKB1bR96",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "installments": null,
+          "mandate_options": null,
+          "network": null,
+          "request_three_d_secure": "automatic",
+          "setup_future_usage": "off_session"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "processing": null,
+      "receipt_email": null,
+      "review": null,
+      "setup_future_usage": "off_session",
+      "shipping": null,
+      "source": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RDrIdPteJOX9ukr2vhQDn6c",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "2a91f3da-df3f-4d79-b52d-deb67552bb24"
+  },
+  "type": "payment_intent.succeeded"
+}
+2025-04-14 20:00:08,110 [INFO] 📦 Ricevuto evento Stripe: payment_intent.created
+2025-04-14 20:00:08,111 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1744653603,
+  "data": {
+    "object": {
+      "amount": 1800,
+      "amount_capturable": 0,
+      "amount_details": {
+        "tip": {}
+      },
+      "amount_received": 0,
+      "application": null,
+      "application_fee_amount": null,
+      "automatic_payment_methods": null,
+      "canceled_at": null,
+      "cancellation_reason": null,
+      "capture_method": "automatic",
+      "client_secret": "pi_3RDrIdPteJOX9ukr24XzDbY6_secret_eUl38EeYqtOSHYn0j7xkUQRdJ",
+      "confirmation_method": "automatic",
+      "created": 1744653603,
+      "currency": "eur",
+      "customer": "cus_S87X7YoKDi8O5t",
+      "description": "Subscription creation",
+      "id": "pi_3RDrIdPteJOX9ukr24XzDbY6",
+      "invoice": "in_1RDrIdPteJOX9ukrIhxU2vrQ",
+      "last_payment_error": null,
+      "latest_charge": null,
+      "livemode": false,
+      "metadata": {},
+      "next_action": null,
+      "object": "payment_intent",
+      "on_behalf_of": null,
+      "payment_method": null,
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "installments": null,
+          "mandate_options": null,
+          "network": null,
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "processing": null,
+      "receipt_email": null,
+      "review": null,
+      "setup_future_usage": "off_session",
+      "shipping": null,
+      "source": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "requires_payment_method",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RDrIdPteJOX9ukr2W0i7FT1",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "2a91f3da-df3f-4d79-b52d-deb67552bb24"
+  },
+  "type": "payment_intent.created"
+}
+2025-04-14 20:00:08,262 [INFO] 📦 Ricevuto evento Stripe: invoice.created
+2025-04-14 20:00:08,263 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1744653604,
+  "data": {
+    "object": {
+      "account_country": "IT",
+      "account_name": "Default sandbox",
+      "account_tax_ids": null,
+      "amount_due": 1800,
+      "amount_overpaid": 0,
+      "amount_paid": 0,
+      "amount_remaining": 1800,
+      "amount_shipping": 0,
+      "application": null,
+      "application_fee_amount": null,
+      "attempt_count": 0,
+      "attempted": false,
+      "auto_advance": false,
+      "automatic_tax": {
+        "disabled_reason": null,
+        "enabled": false,
+        "liability": null,
+        "status": null
+      },
+      "automatically_finalizes_at": null,
+      "billing_reason": "subscription_create",
+      "charge": null,
+      "collection_method": "charge_automatically",
+      "created": 1744653603,
+      "currency": "eur",
+      "custom_fields": null,
+      "customer": "cus_S87X7YoKDi8O5t",
+      "customer_address": {
+        "city": null,
+        "country": "IT",
+        "line1": null,
+        "line2": null,
+        "postal_code": null,
+        "state": null
+      },
+      "customer_email": "quagliara.alessio@gmail.com",
+      "customer_name": "Ciao",
+      "customer_phone": null,
+      "customer_shipping": null,
+      "customer_tax_exempt": "none",
+      "customer_tax_ids": [],
+      "default_payment_method": null,
+      "default_source": null,
+      "default_tax_rates": [],
+      "description": null,
+      "discount": null,
+      "discounts": [],
+      "due_date": null,
+      "effective_at": 1744653603,
+      "ending_balance": 0,
+      "footer": null,
+      "from_invoice": null,
+      "hosted_invoice_url": "https://invoice.stripe.com/i/acct_1R8r8BPteJOX9ukr/test_YWNjdF8xUjhyOEJQdGVKT1g5dWtyLF9TODdYczh3Y3JZMW5CVERhZlFsTnRpa3Q0Vk5PVWdjLDEzNTE5NDQwOA02006U3BfD28?s=ap",
+      "id": "in_1RDrIdPteJOX9ukrIhxU2vrQ",
+      "invoice_pdf": "https://pay.stripe.com/invoice/acct_1R8r8BPteJOX9ukr/test_YWNjdF8xUjhyOEJQdGVKT1g5dWtyLF9TODdYczh3Y3JZMW5CVERhZlFsTnRpa3Q0Vk5PVWdjLDEzNTE5NDQwOA02006U3BfD28/pdf?s=ap",
+      "issuer": {
+        "type": "self"
+      },
+      "last_finalization_error": null,
+      "latest_revision": null,
+      "lines": {
+        "data": [
+          {
+            "amount": 1800,
+            "amount_excluding_tax": 1800,
+            "currency": "eur",
+            "description": "1 \u00d7 AllIsReady (at \u20ac18.00 / month)",
+            "discount_amounts": [],
+            "discountable": true,
+            "discounts": [],
+            "id": "il_1RDrIdPteJOX9ukrxWz7kI6N",
+            "invoice": "in_1RDrIdPteJOX9ukrIhxU2vrQ",
+            "livemode": false,
+            "metadata": {},
+            "object": "line_item",
+            "parent": {
+              "invoice_item_details": null,
+              "subscription_item_details": {
+                "invoice_item": null,
+                "proration": false,
+                "proration_details": {
+                  "credited_items": null
+                },
+                "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp",
+                "subscription_item": "si_S87XgTzPGBIcNl"
+              },
+              "type": "subscription_item_details"
+            },
+            "period": {
+              "end": 1747245603,
+              "start": 1744653603
+            },
+            "plan": {
+              "active": true,
+              "aggregate_usage": null,
+              "amount": 1800,
+              "amount_decimal": "1800",
+              "billing_scheme": "per_unit",
+              "created": 1744224021,
+              "currency": "eur",
+              "id": "price_1RC3XtPteJOX9ukrGj97iGom",
+              "interval": "month",
+              "interval_count": 1,
+              "livemode": false,
+              "metadata": {},
+              "meter": null,
+              "nickname": null,
+              "object": "plan",
+              "product": "prod_S6G45kGHtuOBye",
+              "tiers_mode": null,
+              "transform_usage": null,
+              "trial_period_days": null,
+              "usage_type": "licensed"
+            },
+            "pretax_credit_amounts": [],
+            "price": {
+              "active": true,
+              "billing_scheme": "per_unit",
+              "created": 1744224021,
+              "currency": "eur",
+              "custom_unit_amount": null,
+              "id": "price_1RC3XtPteJOX9ukrGj97iGom",
+              "livemode": false,
+              "lookup_key": null,
+              "metadata": {},
+              "nickname": null,
+              "object": "price",
+              "product": "prod_S6G45kGHtuOBye",
+              "recurring": {
+                "aggregate_usage": null,
+                "interval": "month",
+                "interval_count": 1,
+                "meter": null,
+                "trial_period_days": null,
+                "usage_type": "licensed"
+              },
+              "tax_behavior": "inclusive",
+              "tiers_mode": null,
+              "transform_quantity": null,
+              "type": "recurring",
+              "unit_amount": 1800,
+              "unit_amount_decimal": "1800"
+            },
+            "pricing": {
+              "price_details": {
+                "price": "price_1RC3XtPteJOX9ukrGj97iGom",
+                "product": "prod_S6G45kGHtuOBye"
+              },
+              "type": "price_details",
+              "unit_amount_decimal": "1800"
+            },
+            "proration": false,
+            "proration_details": {
+              "credited_items": null
+            },
+            "quantity": 1,
+            "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp",
+            "subscription_item": "si_S87XgTzPGBIcNl",
+            "tax_amounts": [],
+            "tax_rates": [],
+            "taxes": [],
+            "type": "subscription",
+            "unit_amount_excluding_tax": "1800"
+          }
+        ],
+        "has_more": false,
+        "object": "list",
+        "total_count": 1,
+        "url": "/v1/invoices/in_1RDrIdPteJOX9ukrIhxU2vrQ/lines"
+      },
+      "livemode": false,
+      "metadata": {},
+      "next_payment_attempt": null,
+      "number": "FD6214D7-0018",
+      "object": "invoice",
+      "on_behalf_of": null,
+      "paid": false,
+      "paid_out_of_band": false,
+      "parent": {
+        "quote_details": null,
+        "subscription_details": {
+          "metadata": {},
+          "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp"
+        },
+        "type": "subscription_details"
+      },
+      "payment_intent": "pi_3RDrIdPteJOX9ukr24XzDbY6",
+      "payment_settings": {
+        "default_mandate": null,
+        "payment_method_options": {
+          "acss_debit": null,
+          "bancontact": null,
+          "card": {
+            "request_three_d_secure": "automatic"
+          },
+          "customer_balance": null,
+          "konbini": null,
+          "sepa_debit": null,
+          "us_bank_account": null
+        },
+        "payment_method_types": [
+          "card"
+        ]
+      },
+      "period_end": 1744653603,
+      "period_start": 1744653603,
+      "post_payment_credit_notes_amount": 0,
+      "pre_payment_credit_notes_amount": 0,
+      "quote": null,
+      "receipt_number": null,
+      "rendering": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "starting_balance": 0,
+      "statement_descriptor": null,
+      "status": "open",
+      "status_transitions": {
+        "finalized_at": 1744653603,
+        "marked_uncollectible_at": null,
+        "paid_at": null,
+        "voided_at": null
+      },
+      "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp",
+      "subscription_details": {
+        "metadata": {}
+      },
+      "subtotal": 1800,
+      "subtotal_excluding_tax": 1800,
+      "tax": null,
+      "test_clock": null,
+      "total": 1800,
+      "total_discount_amounts": [],
+      "total_excluding_tax": 1800,
+      "total_pretax_credit_amounts": [],
+      "total_tax_amounts": [],
+      "total_taxes": [],
+      "transfer_data": null,
+      "webhooks_delivered_at": null
+    }
+  },
+  "id": "evt_1RDrIiPteJOX9ukrRGcLDfaw",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "2a91f3da-df3f-4d79-b52d-deb67552bb24"
+  },
+  "type": "invoice.created"
+}
+2025-04-14 20:00:08,336 [INFO] 📦 Ricevuto evento Stripe: invoice.finalized
+2025-04-14 20:00:08,337 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1744653604,
+  "data": {
+    "object": {
+      "account_country": "IT",
+      "account_name": "Default sandbox",
+      "account_tax_ids": null,
+      "amount_due": 1800,
+      "amount_overpaid": 0,
+      "amount_paid": 0,
+      "amount_remaining": 1800,
+      "amount_shipping": 0,
+      "application": null,
+      "application_fee_amount": null,
+      "attempt_count": 0,
+      "attempted": false,
+      "auto_advance": false,
+      "automatic_tax": {
+        "disabled_reason": null,
+        "enabled": false,
+        "liability": null,
+        "status": null
+      },
+      "automatically_finalizes_at": null,
+      "billing_reason": "subscription_create",
+      "charge": null,
+      "collection_method": "charge_automatically",
+      "created": 1744653603,
+      "currency": "eur",
+      "custom_fields": null,
+      "customer": "cus_S87X7YoKDi8O5t",
+      "customer_address": {
+        "city": null,
+        "country": "IT",
+        "line1": null,
+        "line2": null,
+        "postal_code": null,
+        "state": null
+      },
+      "customer_email": "quagliara.alessio@gmail.com",
+      "customer_name": "Ciao",
+      "customer_phone": null,
+      "customer_shipping": null,
+      "customer_tax_exempt": "none",
+      "customer_tax_ids": [],
+      "default_payment_method": null,
+      "default_source": null,
+      "default_tax_rates": [],
+      "description": null,
+      "discount": null,
+      "discounts": [],
+      "due_date": null,
+      "effective_at": 1744653603,
+      "ending_balance": 0,
+      "footer": null,
+      "from_invoice": null,
+      "hosted_invoice_url": "https://invoice.stripe.com/i/acct_1R8r8BPteJOX9ukr/test_YWNjdF8xUjhyOEJQdGVKT1g5dWtyLF9TODdYczh3Y3JZMW5CVERhZlFsTnRpa3Q0Vk5PVWdjLDEzNTE5NDQwOA02006U3BfD28?s=ap",
+      "id": "in_1RDrIdPteJOX9ukrIhxU2vrQ",
+      "invoice_pdf": "https://pay.stripe.com/invoice/acct_1R8r8BPteJOX9ukr/test_YWNjdF8xUjhyOEJQdGVKT1g5dWtyLF9TODdYczh3Y3JZMW5CVERhZlFsTnRpa3Q0Vk5PVWdjLDEzNTE5NDQwOA02006U3BfD28/pdf?s=ap",
+      "issuer": {
+        "type": "self"
+      },
+      "last_finalization_error": null,
+      "latest_revision": null,
+      "lines": {
+        "data": [
+          {
+            "amount": 1800,
+            "amount_excluding_tax": 1800,
+            "currency": "eur",
+            "description": "1 \u00d7 AllIsReady (at \u20ac18.00 / month)",
+            "discount_amounts": [],
+            "discountable": true,
+            "discounts": [],
+            "id": "il_1RDrIdPteJOX9ukrxWz7kI6N",
+            "invoice": "in_1RDrIdPteJOX9ukrIhxU2vrQ",
+            "livemode": false,
+            "metadata": {},
+            "object": "line_item",
+            "parent": {
+              "invoice_item_details": null,
+              "subscription_item_details": {
+                "invoice_item": null,
+                "proration": false,
+                "proration_details": {
+                  "credited_items": null
+                },
+                "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp",
+                "subscription_item": "si_S87XgTzPGBIcNl"
+              },
+              "type": "subscription_item_details"
+            },
+            "period": {
+              "end": 1747245603,
+              "start": 1744653603
+            },
+            "plan": {
+              "active": true,
+              "aggregate_usage": null,
+              "amount": 1800,
+              "amount_decimal": "1800",
+              "billing_scheme": "per_unit",
+              "created": 1744224021,
+              "currency": "eur",
+              "id": "price_1RC3XtPteJOX9ukrGj97iGom",
+              "interval": "month",
+              "interval_count": 1,
+              "livemode": false,
+              "metadata": {},
+              "meter": null,
+              "nickname": null,
+              "object": "plan",
+              "product": "prod_S6G45kGHtuOBye",
+              "tiers_mode": null,
+              "transform_usage": null,
+              "trial_period_days": null,
+              "usage_type": "licensed"
+            },
+            "pretax_credit_amounts": [],
+            "price": {
+              "active": true,
+              "billing_scheme": "per_unit",
+              "created": 1744224021,
+              "currency": "eur",
+              "custom_unit_amount": null,
+              "id": "price_1RC3XtPteJOX9ukrGj97iGom",
+              "livemode": false,
+              "lookup_key": null,
+              "metadata": {},
+              "nickname": null,
+              "object": "price",
+              "product": "prod_S6G45kGHtuOBye",
+              "recurring": {
+                "aggregate_usage": null,
+                "interval": "month",
+                "interval_count": 1,
+                "meter": null,
+                "trial_period_days": null,
+                "usage_type": "licensed"
+              },
+              "tax_behavior": "inclusive",
+              "tiers_mode": null,
+              "transform_quantity": null,
+              "type": "recurring",
+              "unit_amount": 1800,
+              "unit_amount_decimal": "1800"
+            },
+            "pricing": {
+              "price_details": {
+                "price": "price_1RC3XtPteJOX9ukrGj97iGom",
+                "product": "prod_S6G45kGHtuOBye"
+              },
+              "type": "price_details",
+              "unit_amount_decimal": "1800"
+            },
+            "proration": false,
+            "proration_details": {
+              "credited_items": null
+            },
+            "quantity": 1,
+            "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp",
+            "subscription_item": "si_S87XgTzPGBIcNl",
+            "tax_amounts": [],
+            "tax_rates": [],
+            "taxes": [],
+            "type": "subscription",
+            "unit_amount_excluding_tax": "1800"
+          }
+        ],
+        "has_more": false,
+        "object": "list",
+        "total_count": 1,
+        "url": "/v1/invoices/in_1RDrIdPteJOX9ukrIhxU2vrQ/lines"
+      },
+      "livemode": false,
+      "metadata": {},
+      "next_payment_attempt": null,
+      "number": "FD6214D7-0018",
+      "object": "invoice",
+      "on_behalf_of": null,
+      "paid": false,
+      "paid_out_of_band": false,
+      "parent": {
+        "quote_details": null,
+        "subscription_details": {
+          "metadata": {},
+          "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp"
+        },
+        "type": "subscription_details"
+      },
+      "payment_intent": "pi_3RDrIdPteJOX9ukr24XzDbY6",
+      "payment_settings": {
+        "default_mandate": null,
+        "payment_method_options": {
+          "acss_debit": null,
+          "bancontact": null,
+          "card": {
+            "request_three_d_secure": "automatic"
+          },
+          "customer_balance": null,
+          "konbini": null,
+          "sepa_debit": null,
+          "us_bank_account": null
+        },
+        "payment_method_types": [
+          "card"
+        ]
+      },
+      "period_end": 1744653603,
+      "period_start": 1744653603,
+      "post_payment_credit_notes_amount": 0,
+      "pre_payment_credit_notes_amount": 0,
+      "quote": null,
+      "receipt_number": null,
+      "rendering": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "starting_balance": 0,
+      "statement_descriptor": null,
+      "status": "open",
+      "status_transitions": {
+        "finalized_at": 1744653603,
+        "marked_uncollectible_at": null,
+        "paid_at": null,
+        "voided_at": null
+      },
+      "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp",
+      "subscription_details": {
+        "metadata": {}
+      },
+      "subtotal": 1800,
+      "subtotal_excluding_tax": 1800,
+      "tax": null,
+      "test_clock": null,
+      "total": 1800,
+      "total_discount_amounts": [],
+      "total_excluding_tax": 1800,
+      "total_pretax_credit_amounts": [],
+      "total_tax_amounts": [],
+      "total_taxes": [],
+      "transfer_data": null,
+      "webhooks_delivered_at": null
+    }
+  },
+  "id": "evt_1RDrIiPteJOX9ukriA0We4jf",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "2a91f3da-df3f-4d79-b52d-deb67552bb24"
+  },
+  "type": "invoice.finalized"
+}
+2025-04-14 20:00:08,454 [INFO] 📦 Ricevuto evento Stripe: invoice.updated
+2025-04-14 20:00:08,454 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1744653606,
+  "data": {
+    "object": {
+      "account_country": "IT",
+      "account_name": "Default sandbox",
+      "account_tax_ids": null,
+      "amount_due": 1800,
+      "amount_overpaid": 0,
+      "amount_paid": 1800,
+      "amount_remaining": 0,
+      "amount_shipping": 0,
+      "application": null,
+      "application_fee_amount": null,
+      "attempt_count": 1,
+      "attempted": true,
+      "auto_advance": false,
+      "automatic_tax": {
+        "disabled_reason": null,
+        "enabled": false,
+        "liability": null,
+        "status": null
+      },
+      "automatically_finalizes_at": null,
+      "billing_reason": "subscription_create",
+      "charge": "ch_3RDrIdPteJOX9ukr2p86U8zD",
+      "collection_method": "charge_automatically",
+      "created": 1744653603,
+      "currency": "eur",
+      "custom_fields": null,
+      "customer": "cus_S87X7YoKDi8O5t",
+      "customer_address": {
+        "city": null,
+        "country": "IT",
+        "line1": null,
+        "line2": null,
+        "postal_code": null,
+        "state": null
+      },
+      "customer_email": "quagliara.alessio@gmail.com",
+      "customer_name": "Ciao",
+      "customer_phone": null,
+      "customer_shipping": null,
+      "customer_tax_exempt": "none",
+      "customer_tax_ids": [],
+      "default_payment_method": null,
+      "default_source": null,
+      "default_tax_rates": [],
+      "description": null,
+      "discount": null,
+      "discounts": [],
+      "due_date": null,
+      "effective_at": 1744653603,
+      "ending_balance": 0,
+      "footer": null,
+      "from_invoice": null,
+      "hosted_invoice_url": "https://invoice.stripe.com/i/acct_1R8r8BPteJOX9ukr/test_YWNjdF8xUjhyOEJQdGVKT1g5dWtyLF9TODdYczh3Y3JZMW5CVERhZlFsTnRpa3Q0Vk5PVWdjLDEzNTE5NDQwOA02006U3BfD28?s=ap",
+      "id": "in_1RDrIdPteJOX9ukrIhxU2vrQ",
+      "invoice_pdf": "https://pay.stripe.com/invoice/acct_1R8r8BPteJOX9ukr/test_YWNjdF8xUjhyOEJQdGVKT1g5dWtyLF9TODdYczh3Y3JZMW5CVERhZlFsTnRpa3Q0Vk5PVWdjLDEzNTE5NDQwOA02006U3BfD28/pdf?s=ap",
+      "issuer": {
+        "type": "self"
+      },
+      "last_finalization_error": null,
+      "latest_revision": null,
+      "lines": {
+        "data": [
+          {
+            "amount": 1800,
+            "amount_excluding_tax": 1800,
+            "currency": "eur",
+            "description": "1 \u00d7 AllIsReady (at \u20ac18.00 / month)",
+            "discount_amounts": [],
+            "discountable": true,
+            "discounts": [],
+            "id": "il_1RDrIdPteJOX9ukrxWz7kI6N",
+            "invoice": "in_1RDrIdPteJOX9ukrIhxU2vrQ",
+            "livemode": false,
+            "metadata": {},
+            "object": "line_item",
+            "parent": {
+              "invoice_item_details": null,
+              "subscription_item_details": {
+                "invoice_item": null,
+                "proration": false,
+                "proration_details": {
+                  "credited_items": null
+                },
+                "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp",
+                "subscription_item": "si_S87XgTzPGBIcNl"
+              },
+              "type": "subscription_item_details"
+            },
+            "period": {
+              "end": 1747245603,
+              "start": 1744653603
+            },
+            "plan": {
+              "active": true,
+              "aggregate_usage": null,
+              "amount": 1800,
+              "amount_decimal": "1800",
+              "billing_scheme": "per_unit",
+              "created": 1744224021,
+              "currency": "eur",
+              "id": "price_1RC3XtPteJOX9ukrGj97iGom",
+              "interval": "month",
+              "interval_count": 1,
+              "livemode": false,
+              "metadata": {},
+              "meter": null,
+              "nickname": null,
+              "object": "plan",
+              "product": "prod_S6G45kGHtuOBye",
+              "tiers_mode": null,
+              "transform_usage": null,
+              "trial_period_days": null,
+              "usage_type": "licensed"
+            },
+            "pretax_credit_amounts": [],
+            "price": {
+              "active": true,
+              "billing_scheme": "per_unit",
+              "created": 1744224021,
+              "currency": "eur",
+              "custom_unit_amount": null,
+              "id": "price_1RC3XtPteJOX9ukrGj97iGom",
+              "livemode": false,
+              "lookup_key": null,
+              "metadata": {},
+              "nickname": null,
+              "object": "price",
+              "product": "prod_S6G45kGHtuOBye",
+              "recurring": {
+                "aggregate_usage": null,
+                "interval": "month",
+                "interval_count": 1,
+                "meter": null,
+                "trial_period_days": null,
+                "usage_type": "licensed"
+              },
+              "tax_behavior": "inclusive",
+              "tiers_mode": null,
+              "transform_quantity": null,
+              "type": "recurring",
+              "unit_amount": 1800,
+              "unit_amount_decimal": "1800"
+            },
+            "pricing": {
+              "price_details": {
+                "price": "price_1RC3XtPteJOX9ukrGj97iGom",
+                "product": "prod_S6G45kGHtuOBye"
+              },
+              "type": "price_details",
+              "unit_amount_decimal": "1800"
+            },
+            "proration": false,
+            "proration_details": {
+              "credited_items": null
+            },
+            "quantity": 1,
+            "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp",
+            "subscription_item": "si_S87XgTzPGBIcNl",
+            "tax_amounts": [],
+            "tax_rates": [],
+            "taxes": [],
+            "type": "subscription",
+            "unit_amount_excluding_tax": "1800"
+          }
+        ],
+        "has_more": false,
+        "object": "list",
+        "total_count": 1,
+        "url": "/v1/invoices/in_1RDrIdPteJOX9ukrIhxU2vrQ/lines"
+      },
+      "livemode": false,
+      "metadata": {},
+      "next_payment_attempt": null,
+      "number": "FD6214D7-0018",
+      "object": "invoice",
+      "on_behalf_of": null,
+      "paid": true,
+      "paid_out_of_band": false,
+      "parent": {
+        "quote_details": null,
+        "subscription_details": {
+          "metadata": {},
+          "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp"
+        },
+        "type": "subscription_details"
+      },
+      "payment_intent": "pi_3RDrIdPteJOX9ukr24XzDbY6",
+      "payment_settings": {
+        "default_mandate": null,
+        "payment_method_options": {
+          "acss_debit": null,
+          "bancontact": null,
+          "card": {
+            "request_three_d_secure": "automatic"
+          },
+          "customer_balance": null,
+          "konbini": null,
+          "sepa_debit": null,
+          "us_bank_account": null
+        },
+        "payment_method_types": [
+          "card"
+        ]
+      },
+      "period_end": 1744653603,
+      "period_start": 1744653603,
+      "post_payment_credit_notes_amount": 0,
+      "pre_payment_credit_notes_amount": 0,
+      "quote": null,
+      "receipt_number": null,
+      "rendering": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "starting_balance": 0,
+      "statement_descriptor": null,
+      "status": "paid",
+      "status_transitions": {
+        "finalized_at": 1744653603,
+        "marked_uncollectible_at": null,
+        "paid_at": 1744653606,
+        "voided_at": null
+      },
+      "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp",
+      "subscription_details": {
+        "metadata": {}
+      },
+      "subtotal": 1800,
+      "subtotal_excluding_tax": 1800,
+      "tax": null,
+      "test_clock": null,
+      "total": 1800,
+      "total_discount_amounts": [],
+      "total_excluding_tax": 1800,
+      "total_pretax_credit_amounts": [],
+      "total_tax_amounts": [],
+      "total_taxes": [],
+      "transfer_data": null,
+      "webhooks_delivered_at": null
+    },
+    "previous_attributes": {
+      "amount_paid": 0,
+      "amount_remaining": 1800,
+      "attempt_count": 0,
+      "attempted": false,
+      "charge": null,
+      "paid": false,
+      "status": "open",
+      "status_transitions": {
+        "paid_at": null
+      }
+    }
+  },
+  "id": "evt_1RDrIiPteJOX9ukrIP4TldQj",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "2a91f3da-df3f-4d79-b52d-deb67552bb24"
+  },
+  "type": "invoice.updated"
+}
+2025-04-14 20:00:08,510 [INFO] 📦 Ricevuto evento Stripe: invoice.paid
+2025-04-14 20:00:08,511 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1744653606,
+  "data": {
+    "object": {
+      "account_country": "IT",
+      "account_name": "Default sandbox",
+      "account_tax_ids": null,
+      "amount_due": 1800,
+      "amount_overpaid": 0,
+      "amount_paid": 1800,
+      "amount_remaining": 0,
+      "amount_shipping": 0,
+      "application": null,
+      "application_fee_amount": null,
+      "attempt_count": 1,
+      "attempted": true,
+      "auto_advance": false,
+      "automatic_tax": {
+        "disabled_reason": null,
+        "enabled": false,
+        "liability": null,
+        "status": null
+      },
+      "automatically_finalizes_at": null,
+      "billing_reason": "subscription_create",
+      "charge": "ch_3RDrIdPteJOX9ukr2p86U8zD",
+      "collection_method": "charge_automatically",
+      "created": 1744653603,
+      "currency": "eur",
+      "custom_fields": null,
+      "customer": "cus_S87X7YoKDi8O5t",
+      "customer_address": {
+        "city": null,
+        "country": "IT",
+        "line1": null,
+        "line2": null,
+        "postal_code": null,
+        "state": null
+      },
+      "customer_email": "quagliara.alessio@gmail.com",
+      "customer_name": "Ciao",
+      "customer_phone": null,
+      "customer_shipping": null,
+      "customer_tax_exempt": "none",
+      "customer_tax_ids": [],
+      "default_payment_method": null,
+      "default_source": null,
+      "default_tax_rates": [],
+      "description": null,
+      "discount": null,
+      "discounts": [],
+      "due_date": null,
+      "effective_at": 1744653603,
+      "ending_balance": 0,
+      "footer": null,
+      "from_invoice": null,
+      "hosted_invoice_url": "https://invoice.stripe.com/i/acct_1R8r8BPteJOX9ukr/test_YWNjdF8xUjhyOEJQdGVKT1g5dWtyLF9TODdYczh3Y3JZMW5CVERhZlFsTnRpa3Q0Vk5PVWdjLDEzNTE5NDQwOA02006U3BfD28?s=ap",
+      "id": "in_1RDrIdPteJOX9ukrIhxU2vrQ",
+      "invoice_pdf": "https://pay.stripe.com/invoice/acct_1R8r8BPteJOX9ukr/test_YWNjdF8xUjhyOEJQdGVKT1g5dWtyLF9TODdYczh3Y3JZMW5CVERhZlFsTnRpa3Q0Vk5PVWdjLDEzNTE5NDQwOA02006U3BfD28/pdf?s=ap",
+      "issuer": {
+        "type": "self"
+      },
+      "last_finalization_error": null,
+      "latest_revision": null,
+      "lines": {
+        "data": [
+          {
+            "amount": 1800,
+            "amount_excluding_tax": 1800,
+            "currency": "eur",
+            "description": "1 \u00d7 AllIsReady (at \u20ac18.00 / month)",
+            "discount_amounts": [],
+            "discountable": true,
+            "discounts": [],
+            "id": "il_1RDrIdPteJOX9ukrxWz7kI6N",
+            "invoice": "in_1RDrIdPteJOX9ukrIhxU2vrQ",
+            "livemode": false,
+            "metadata": {},
+            "object": "line_item",
+            "parent": {
+              "invoice_item_details": null,
+              "subscription_item_details": {
+                "invoice_item": null,
+                "proration": false,
+                "proration_details": {
+                  "credited_items": null
+                },
+                "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp",
+                "subscription_item": "si_S87XgTzPGBIcNl"
+              },
+              "type": "subscription_item_details"
+            },
+            "period": {
+              "end": 1747245603,
+              "start": 1744653603
+            },
+            "plan": {
+              "active": true,
+              "aggregate_usage": null,
+              "amount": 1800,
+              "amount_decimal": "1800",
+              "billing_scheme": "per_unit",
+              "created": 1744224021,
+              "currency": "eur",
+              "id": "price_1RC3XtPteJOX9ukrGj97iGom",
+              "interval": "month",
+              "interval_count": 1,
+              "livemode": false,
+              "metadata": {},
+              "meter": null,
+              "nickname": null,
+              "object": "plan",
+              "product": "prod_S6G45kGHtuOBye",
+              "tiers_mode": null,
+              "transform_usage": null,
+              "trial_period_days": null,
+              "usage_type": "licensed"
+            },
+            "pretax_credit_amounts": [],
+            "price": {
+              "active": true,
+              "billing_scheme": "per_unit",
+              "created": 1744224021,
+              "currency": "eur",
+              "custom_unit_amount": null,
+              "id": "price_1RC3XtPteJOX9ukrGj97iGom",
+              "livemode": false,
+              "lookup_key": null,
+              "metadata": {},
+              "nickname": null,
+              "object": "price",
+              "product": "prod_S6G45kGHtuOBye",
+              "recurring": {
+                "aggregate_usage": null,
+                "interval": "month",
+                "interval_count": 1,
+                "meter": null,
+                "trial_period_days": null,
+                "usage_type": "licensed"
+              },
+              "tax_behavior": "inclusive",
+              "tiers_mode": null,
+              "transform_quantity": null,
+              "type": "recurring",
+              "unit_amount": 1800,
+              "unit_amount_decimal": "1800"
+            },
+            "pricing": {
+              "price_details": {
+                "price": "price_1RC3XtPteJOX9ukrGj97iGom",
+                "product": "prod_S6G45kGHtuOBye"
+              },
+              "type": "price_details",
+              "unit_amount_decimal": "1800"
+            },
+            "proration": false,
+            "proration_details": {
+              "credited_items": null
+            },
+            "quantity": 1,
+            "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp",
+            "subscription_item": "si_S87XgTzPGBIcNl",
+            "tax_amounts": [],
+            "tax_rates": [],
+            "taxes": [],
+            "type": "subscription",
+            "unit_amount_excluding_tax": "1800"
+          }
+        ],
+        "has_more": false,
+        "object": "list",
+        "total_count": 1,
+        "url": "/v1/invoices/in_1RDrIdPteJOX9ukrIhxU2vrQ/lines"
+      },
+      "livemode": false,
+      "metadata": {},
+      "next_payment_attempt": null,
+      "number": "FD6214D7-0018",
+      "object": "invoice",
+      "on_behalf_of": null,
+      "paid": true,
+      "paid_out_of_band": false,
+      "parent": {
+        "quote_details": null,
+        "subscription_details": {
+          "metadata": {},
+          "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp"
+        },
+        "type": "subscription_details"
+      },
+      "payment_intent": "pi_3RDrIdPteJOX9ukr24XzDbY6",
+      "payment_settings": {
+        "default_mandate": null,
+        "payment_method_options": {
+          "acss_debit": null,
+          "bancontact": null,
+          "card": {
+            "request_three_d_secure": "automatic"
+          },
+          "customer_balance": null,
+          "konbini": null,
+          "sepa_debit": null,
+          "us_bank_account": null
+        },
+        "payment_method_types": [
+          "card"
+        ]
+      },
+      "period_end": 1744653603,
+      "period_start": 1744653603,
+      "post_payment_credit_notes_amount": 0,
+      "pre_payment_credit_notes_amount": 0,
+      "quote": null,
+      "receipt_number": null,
+      "rendering": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "starting_balance": 0,
+      "statement_descriptor": null,
+      "status": "paid",
+      "status_transitions": {
+        "finalized_at": 1744653603,
+        "marked_uncollectible_at": null,
+        "paid_at": 1744653606,
+        "voided_at": null
+      },
+      "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp",
+      "subscription_details": {
+        "metadata": {}
+      },
+      "subtotal": 1800,
+      "subtotal_excluding_tax": 1800,
+      "tax": null,
+      "test_clock": null,
+      "total": 1800,
+      "total_discount_amounts": [],
+      "total_excluding_tax": 1800,
+      "total_pretax_credit_amounts": [],
+      "total_tax_amounts": [],
+      "total_taxes": [],
+      "transfer_data": null,
+      "webhooks_delivered_at": null
+    }
+  },
+  "id": "evt_1RDrIiPteJOX9ukrSm4BQOtX",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "2a91f3da-df3f-4d79-b52d-deb67552bb24"
+  },
+  "type": "invoice.paid"
+}
+2025-04-14 20:00:08,599 [INFO] 📦 Ricevuto evento Stripe: invoice.payment_succeeded
+2025-04-14 20:00:08,600 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1744653606,
+  "data": {
+    "object": {
+      "account_country": "IT",
+      "account_name": "Default sandbox",
+      "account_tax_ids": null,
+      "amount_due": 1800,
+      "amount_overpaid": 0,
+      "amount_paid": 1800,
+      "amount_remaining": 0,
+      "amount_shipping": 0,
+      "application": null,
+      "application_fee_amount": null,
+      "attempt_count": 1,
+      "attempted": true,
+      "auto_advance": false,
+      "automatic_tax": {
+        "disabled_reason": null,
+        "enabled": false,
+        "liability": null,
+        "status": null
+      },
+      "automatically_finalizes_at": null,
+      "billing_reason": "subscription_create",
+      "charge": "ch_3RDrIdPteJOX9ukr2p86U8zD",
+      "collection_method": "charge_automatically",
+      "created": 1744653603,
+      "currency": "eur",
+      "custom_fields": null,
+      "customer": "cus_S87X7YoKDi8O5t",
+      "customer_address": {
+        "city": null,
+        "country": "IT",
+        "line1": null,
+        "line2": null,
+        "postal_code": null,
+        "state": null
+      },
+      "customer_email": "quagliara.alessio@gmail.com",
+      "customer_name": "Ciao",
+      "customer_phone": null,
+      "customer_shipping": null,
+      "customer_tax_exempt": "none",
+      "customer_tax_ids": [],
+      "default_payment_method": null,
+      "default_source": null,
+      "default_tax_rates": [],
+      "description": null,
+      "discount": null,
+      "discounts": [],
+      "due_date": null,
+      "effective_at": 1744653603,
+      "ending_balance": 0,
+      "footer": null,
+      "from_invoice": null,
+      "hosted_invoice_url": "https://invoice.stripe.com/i/acct_1R8r8BPteJOX9ukr/test_YWNjdF8xUjhyOEJQdGVKT1g5dWtyLF9TODdYczh3Y3JZMW5CVERhZlFsTnRpa3Q0Vk5PVWdjLDEzNTE5NDQwOA02006U3BfD28?s=ap",
+      "id": "in_1RDrIdPteJOX9ukrIhxU2vrQ",
+      "invoice_pdf": "https://pay.stripe.com/invoice/acct_1R8r8BPteJOX9ukr/test_YWNjdF8xUjhyOEJQdGVKT1g5dWtyLF9TODdYczh3Y3JZMW5CVERhZlFsTnRpa3Q0Vk5PVWdjLDEzNTE5NDQwOA02006U3BfD28/pdf?s=ap",
+      "issuer": {
+        "type": "self"
+      },
+      "last_finalization_error": null,
+      "latest_revision": null,
+      "lines": {
+        "data": [
+          {
+            "amount": 1800,
+            "amount_excluding_tax": 1800,
+            "currency": "eur",
+            "description": "1 \u00d7 AllIsReady (at \u20ac18.00 / month)",
+            "discount_amounts": [],
+            "discountable": true,
+            "discounts": [],
+            "id": "il_1RDrIdPteJOX9ukrxWz7kI6N",
+            "invoice": "in_1RDrIdPteJOX9ukrIhxU2vrQ",
+            "livemode": false,
+            "metadata": {},
+            "object": "line_item",
+            "parent": {
+              "invoice_item_details": null,
+              "subscription_item_details": {
+                "invoice_item": null,
+                "proration": false,
+                "proration_details": {
+                  "credited_items": null
+                },
+                "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp",
+                "subscription_item": "si_S87XgTzPGBIcNl"
+              },
+              "type": "subscription_item_details"
+            },
+            "period": {
+              "end": 1747245603,
+              "start": 1744653603
+            },
+            "plan": {
+              "active": true,
+              "aggregate_usage": null,
+              "amount": 1800,
+              "amount_decimal": "1800",
+              "billing_scheme": "per_unit",
+              "created": 1744224021,
+              "currency": "eur",
+              "id": "price_1RC3XtPteJOX9ukrGj97iGom",
+              "interval": "month",
+              "interval_count": 1,
+              "livemode": false,
+              "metadata": {},
+              "meter": null,
+              "nickname": null,
+              "object": "plan",
+              "product": "prod_S6G45kGHtuOBye",
+              "tiers_mode": null,
+              "transform_usage": null,
+              "trial_period_days": null,
+              "usage_type": "licensed"
+            },
+            "pretax_credit_amounts": [],
+            "price": {
+              "active": true,
+              "billing_scheme": "per_unit",
+              "created": 1744224021,
+              "currency": "eur",
+              "custom_unit_amount": null,
+              "id": "price_1RC3XtPteJOX9ukrGj97iGom",
+              "livemode": false,
+              "lookup_key": null,
+              "metadata": {},
+              "nickname": null,
+              "object": "price",
+              "product": "prod_S6G45kGHtuOBye",
+              "recurring": {
+                "aggregate_usage": null,
+                "interval": "month",
+                "interval_count": 1,
+                "meter": null,
+                "trial_period_days": null,
+                "usage_type": "licensed"
+              },
+              "tax_behavior": "inclusive",
+              "tiers_mode": null,
+              "transform_quantity": null,
+              "type": "recurring",
+              "unit_amount": 1800,
+              "unit_amount_decimal": "1800"
+            },
+            "pricing": {
+              "price_details": {
+                "price": "price_1RC3XtPteJOX9ukrGj97iGom",
+                "product": "prod_S6G45kGHtuOBye"
+              },
+              "type": "price_details",
+              "unit_amount_decimal": "1800"
+            },
+            "proration": false,
+            "proration_details": {
+              "credited_items": null
+            },
+            "quantity": 1,
+            "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp",
+            "subscription_item": "si_S87XgTzPGBIcNl",
+            "tax_amounts": [],
+            "tax_rates": [],
+            "taxes": [],
+            "type": "subscription",
+            "unit_amount_excluding_tax": "1800"
+          }
+        ],
+        "has_more": false,
+        "object": "list",
+        "total_count": 1,
+        "url": "/v1/invoices/in_1RDrIdPteJOX9ukrIhxU2vrQ/lines"
+      },
+      "livemode": false,
+      "metadata": {},
+      "next_payment_attempt": null,
+      "number": "FD6214D7-0018",
+      "object": "invoice",
+      "on_behalf_of": null,
+      "paid": true,
+      "paid_out_of_band": false,
+      "parent": {
+        "quote_details": null,
+        "subscription_details": {
+          "metadata": {},
+          "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp"
+        },
+        "type": "subscription_details"
+      },
+      "payment_intent": "pi_3RDrIdPteJOX9ukr24XzDbY6",
+      "payment_settings": {
+        "default_mandate": null,
+        "payment_method_options": {
+          "acss_debit": null,
+          "bancontact": null,
+          "card": {
+            "request_three_d_secure": "automatic"
+          },
+          "customer_balance": null,
+          "konbini": null,
+          "sepa_debit": null,
+          "us_bank_account": null
+        },
+        "payment_method_types": [
+          "card"
+        ]
+      },
+      "period_end": 1744653603,
+      "period_start": 1744653603,
+      "post_payment_credit_notes_amount": 0,
+      "pre_payment_credit_notes_amount": 0,
+      "quote": null,
+      "receipt_number": null,
+      "rendering": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "starting_balance": 0,
+      "statement_descriptor": null,
+      "status": "paid",
+      "status_transitions": {
+        "finalized_at": 1744653603,
+        "marked_uncollectible_at": null,
+        "paid_at": 1744653606,
+        "voided_at": null
+      },
+      "subscription": "sub_1RDrIdPteJOX9ukrIk679FEp",
+      "subscription_details": {
+        "metadata": {}
+      },
+      "subtotal": 1800,
+      "subtotal_excluding_tax": 1800,
+      "tax": null,
+      "test_clock": null,
+      "total": 1800,
+      "total_discount_amounts": [],
+      "total_excluding_tax": 1800,
+      "total_pretax_credit_amounts": [],
+      "total_tax_amounts": [],
+      "total_taxes": [],
+      "transfer_data": null,
+      "webhooks_delivered_at": null
+    }
+  },
+  "id": "evt_1RDrIiPteJOX9ukrRLgwxD6Y",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "2a91f3da-df3f-4d79-b52d-deb67552bb24"
+  },
+  "type": "invoice.payment_succeeded"
+}
