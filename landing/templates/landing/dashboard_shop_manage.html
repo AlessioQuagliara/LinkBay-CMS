@@ -6,7 +6,7 @@
   {% if is_owner == has_access %}
       <div>
         <h4 class="mb-0">🛠️ Gestione Risorse</h4>
-        <p class="text-muted">Torna alla panoramica dei tuoi negozi.</p>
+        <a href="/dashboard/stores" class="text-muted">Torna alla panoramica dei tuoi negozi.</a>
       </div>
     </div>
     <div id="content9" class="content-pane">
@@ -54,36 +54,94 @@
         </div>
         {% endif %}
 
-        <!-- Plugin -->
-        <div class="col-md-6">
-          <div class="card shadow-sm border-0">
-            <div class="card-body">
-              <h5 class="card-title mb-2">🔌 Plugin & Integrazioni</h5>
-              <p>Aggiungi funzionalità come strumenti marketing, automazioni e API.</p>
-              <a href="/dashboard/plugins/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Vai ai Plugin</a>
+        <!-- Monitoraggio & Analytics -->
+        <hr>
+        <h5 class="text-muted mt-4 mb-3">📈 Monitoraggio & Analytics</h5>
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+              <div class="card-body">
+                <h6 class="card-title">🔍 Google Analytics</h6>
+                <p class="small text-muted">Collega il tuo account per monitorare il traffico.</p>
+                <a href="/dashboard/analytics/google_analytics/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Configura</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+              <div class="card-body">
+                <h6 class="card-title">📘 Facebook Pixel</h6>
+                <p class="small text-muted">Tieni traccia degli utenti da Facebook.</p>
+                <a href="/dashboard/analytics/facebook_pixel/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Configura</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+              <div class="card-body">
+                <h6 class="card-title">🎵 TikTok Pixel</h6>
+                <p class="small text-muted">Monitora conversioni dalle campagne TikTok.</p>
+                <a href="/dashboard/analytics/tiktok_pixel/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Configura</a>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Temi -->
-        <div class="col-md-6">
-          <div class="card shadow-sm border-0">
-            <div class="card-body">
-              <h5 class="card-title mb-2">🎨 Temi & Design</h5>
-              <p>Scegli o personalizza il tema del tuo negozio con il nostro editor.</p>
-              <a href="/dashboard/themes/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Vai ai Temi</a>
+        <!-- Integrazioni -->
+        <hr>
+        <h5 class="text-muted mt-4 mb-3">🔌 Integrazioni</h5>
+        <div class="row g-4">
+          {% for plugin in ['Aruba Fatturazione', 'Zapier', 'Mailchimp', 'Klaviyo', 'Zendesk', 'Twilio'] %}
+          <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+              <div class="card-body">
+                <h6 class="card-title">{{ plugin }}</h6>
+                <p class="small text-muted">Integra con {{ plugin }} per espandere le funzionalità.</p>
+                <a href="/dashboard/integrations/{{ plugin|lower|replace(' ', '_') }}/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Gestisci</a>
+              </div>
             </div>
           </div>
+          {% endfor %}
         </div>
 
-        <!-- Analisi -->
+        <!-- Metodi di Pagamento -->
+        <hr>
+        <h5 class="text-muted mt-4 mb-3">💳 Metodi di Pagamento</h5>
+        <div class="row g-4">
+          {% for metodo in ['Stripe', 'PayPal'] %}
+          <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+              <div class="card-body">
+                <h6 class="card-title">{{ metodo }}</h6>
+                <p class="small text-muted">Configura {{ metodo }} per ricevere pagamenti online.</p>
+                <a href="/dashboard/payments/{{ metodo|lower }}/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Imposta</a>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
         {% if subscription and subscription.plan_name == 'ProfessionalDesk' %}
-        <div class="col-md-6">
-          <div class="card shadow-sm border-0">
-            <div class="card-body">
-              <h5 class="card-title mb-2">📊 Analisi & Statistiche</h5>
-              <p>Accedi a dashboard dettagliate per monitorare vendite, traffico e performance.</p>
-              <a href="/dashboard/analytics/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Visualizza Analisi</a>
+        <!-- Analisi Intelligente -->
+        <hr>
+        <h5 class="text-muted mt-4 mb-3">🧠 Analisi con Intelligenza Artificiale</h5>
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+              <div class="card-body">
+                <h6 class="card-title">📊 Flusso Analitico Avanzato</h6>
+                <p class="small text-muted">Scopri pattern di comportamento e previsioni vendita.</p>
+                <a href="/dashboard/ai/analytics/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Visualizza Analisi</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+              <div class="card-body">
+                <h6 class="card-title">📢 Campagne Pubblicitarie</h6>
+                <p class="small text-muted">Crea e ottimizza campagne marketing con suggerimenti AI.</p>
+                <a href="/dashboard/ai/campaigns/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Gestisci Campagne</a>
+              </div>
             </div>
           </div>
         </div>

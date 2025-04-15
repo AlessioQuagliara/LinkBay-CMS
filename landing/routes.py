@@ -230,12 +230,6 @@ def dashboard_sales():
 
     return render_template('landing/dashboard_sell.html', user=get_user_from_session())
 
-@landing_bp.route('/dashboard/apps')
-def dashboard_apps():
-    if 'user_id' not in session:
-        return redirect(url_for('landing.login'))
-    return render_template('landing/dashboard_app.html', user=get_user_from_session())
-
 @landing_bp.route('/dashboard/themes')
 def dashboard_themes():
     if 'user_id' not in session:
@@ -535,6 +529,62 @@ def docs():
 def news():
     return render_template("landing/news.html")
 
+
+ # 📊 Google Analytics
+@landing_bp.route('/dashboard/analytics/google_analytics/<shop_name>')
+def dashboard_google_analytics(shop_name):
+    if 'user_id' not in session:
+        return redirect(url_for('landing.login'))
+    return render_template('landing/dashboard_google_analytics.html', user=get_user_from_session(), shop_name=shop_name)
+
+# 📘 Facebook Pixel
+@landing_bp.route('/dashboard/analytics/facebook_pixel/<shop_name>')
+def dashboard_facebook_pixel(shop_name):
+    if 'user_id' not in session:
+        return redirect(url_for('landing.login'))
+    return render_template('landing/dashboard_facebook_pixel.html', user=get_user_from_session(), shop_name=shop_name)
+
+# 🎵 TikTok Pixel
+@landing_bp.route('/dashboard/analytics/tiktok_pixel/<shop_name>')
+def dashboard_tiktok_pixel(shop_name):
+    if 'user_id' not in session:
+        return redirect(url_for('landing.login'))
+    return render_template('landing/dashboard_tiktok_pixel.html', user=get_user_from_session(), shop_name=shop_name)
+
+# 🔌 Plugin generici (fatturazione, zapier, ecc.)
+@landing_bp.route('/dashboard/integrations/<plugin>/<shop_name>')
+def dashboard_plugin_integration(plugin, shop_name):
+    if 'user_id' not in session:
+        return redirect(url_for('landing.login'))
+    return render_template('landing/dashboard_integration_plugin.html', user=get_user_from_session(), plugin=plugin, shop_name=shop_name)
+
+# 🧠 Analisi con AI
+@landing_bp.route('/dashboard/ai/analytics/<shop_name>')
+def dashboard_ai_analytics(shop_name):
+    if 'user_id' not in session:
+        return redirect(url_for('landing.login'))
+    return render_template('landing/dashboard_ai_analytics.html', user=get_user_from_session(), shop_name=shop_name)
+
+# 📢 Campagne con AI
+@landing_bp.route('/dashboard/ai/campaigns/<shop_name>')
+def dashboard_ai_campaigns(shop_name):
+    if 'user_id' not in session:
+        return redirect(url_for('landing.login'))
+    return render_template('landing/dashboard_ai_campaigns.html', user=get_user_from_session(), shop_name=shop_name)
+
+# 🌐 Gestione domini
+@landing_bp.route('/dashboard/domains/<shop_name>')
+def dashboard_manage_domains(shop_name):
+    if 'user_id' not in session:
+        return redirect(url_for('landing.login'))
+    return render_template('landing/dashboard_domains.html', user=get_user_from_session(), shop_name=shop_name)
+
+# 👥 Gestione utenti
+@landing_bp.route('/dashboard/users/<shop_name>')
+def dashboard_manage_users(shop_name):
+    if 'user_id' not in session:
+        return redirect(url_for('landing.login'))
+    return render_template('landing/dashboard_users.html', user=get_user_from_session(), shop_name=shop_name)
 
 @landing_bp.route('/sitemap.xml', methods=['GET'])
 def sitemap():
