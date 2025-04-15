@@ -1,0 +1,62 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-dark text-white">
+      <h5 class="mb-0"><i class="fa-solid fa-bullhorn me-2"></i>Campagne Pubblicitarie con AI</h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted">Analizza le performance e crea campagne ottimizzate con il supporto dell'intelligenza artificiale.</p>
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <div class="border rounded p-3 shadow-sm">
+            <h6>📊 Performance Recenti</h6>
+            <canvas id="adPerformanceChart" height="200"></canvas>
+          </div>
+        </div>
+        <div class="col-md-6 mb-4">
+          <div class="border rounded p-3 shadow-sm">
+            <h6>✨ Crea Nuova Campagna</h6>
+            <form>
+              <div class="mb-2">
+                <label class="form-label">Obiettivo</label>
+                <select class="form-select">
+                  <option>Traffico</option>
+                  <option>Vendite</option>
+                  <option>Lead</option>
+                </select>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Budget</label>
+                <input type="number" class="form-control" placeholder="€">
+              </div>
+              <button class="btn btn-danger mt-2" type="submit"><i class="fa-solid fa-robot me-1"></i> Suggerisci Strategia</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const ctx = document.getElementById('adPerformanceChart').getContext('2d');
+  const adPerformanceChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Campagna A', 'Campagna B', 'Campagna C'],
+      datasets: [{
+        label: 'Click',
+        data: [230, 190, 340],
+        backgroundColor: ['#ff5757', '#ffc107', '#28a745']
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+</script>
+{% endblock %}

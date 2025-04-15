@@ -1,0 +1,20 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-danger text-white">
+      <h5 class="mb-0"><i class="fa-brands fa-google me-2"></i>Google Analytics</h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted">Inserisci il tuo codice di tracciamento per collegare Google Analytics al tuo negozio.</p>
+      <form method="POST" action="/api/integrations/google_analytics/{{ shop_name }}">
+        <div class="mb-3">
+          <label for="ga_id" class="form-label">Codice Google Analytics (es. UA-XXXXXXXXX-X)</label>
+          <input type="text" class="form-control" id="ga_id" name="ga_id" placeholder="Inserisci il codice" required>
+        </div>
+        <button type="submit" class="btn btn-danger"><i class="fa-solid fa-link"></i> Salva Collegamento</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

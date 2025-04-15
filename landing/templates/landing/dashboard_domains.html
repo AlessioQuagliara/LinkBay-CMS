@@ -1,0 +1,38 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-danger text-white">
+      <h5 class="mb-0"><i class="fa-solid fa-globe me-2"></i>Gestione Domini</h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted">Aggiungi o modifica i domini associati al tuo shop.</p>
+
+      <form method="POST" action="/api/domains/add/{{ shop_name }}">
+        <div class="mb-3">
+          <label for="domain" class="form-label">Dominio personalizzato</label>
+          <input type="text" class="form-control" id="domain" name="domain" placeholder="www.tuodominio.com" required>
+        </div>
+        <button type="submit" class="btn btn-danger"><i class="fa-solid fa-plus"></i> Aggiungi Dominio</button>
+      </form>
+
+      <hr>
+
+      <h6 class="mt-4 mb-3">🌐 Domini Attuali</h6>
+      <ul class="list-group">
+        {% for domain in domains %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          {{ domain }}
+          <form method="POST" action="/api/domains/delete/{{ shop_name }}" class="m-0">
+            <input type="hidden" name="domain" value="{{ domain }}">
+            <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash-can"></i></button>
+          </form>
+        </li>
+        {% else %}
+        <li class="list-group-item text-muted">Nessun dominio associato</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

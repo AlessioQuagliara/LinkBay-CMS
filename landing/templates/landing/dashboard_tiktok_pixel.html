@@ -1,0 +1,20 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-sm border-0">
+    <div class="card-header text-white" style="background-color: #010101;">
+      <h5 class="mb-0"><i class="fa-brands fa-tiktok me-2"></i>TikTok Pixel</h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted">Inserisci l'ID del tuo TikTok Pixel per monitorare le conversioni del tuo shop.</p>
+      <form method="POST" action="/api/integrations/tiktok_pixel/{{ shop_name }}">
+        <div class="mb-3">
+          <label for="tt_pixel_id" class="form-label">ID TikTok Pixel</label>
+          <input type="text" class="form-control" id="tt_pixel_id" name="tt_pixel_id" placeholder="Es: ABC123XYZ" required>
+        </div>
+        <button type="submit" class="btn btn-dark"><i class="fa-solid fa-link"></i> Salva Collegamento</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

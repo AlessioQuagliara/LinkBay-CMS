@@ -1,0 +1,65 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-dark text-white">
+      <h5 class="mb-0"><i class="fa-solid fa-brain me-2"></i>Analisi Avanzate con AI</h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted">Qui puoi esplorare i dati del tuo shop con il supporto dell'intelligenza artificiale.</p>
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <div class="border rounded p-3 shadow-sm">
+            <h6>📈 Previsioni di Vendita</h6>
+            <p class="small text-muted">Visualizza l'andamento previsto delle vendite nel tempo.</p>
+            <canvas id="salesForecastChart" height="200"></canvas>
+          </div>
+        </div>
+        <div class="col-md-6 mb-4">
+          <div class="border rounded p-3 shadow-sm">
+            <h6>🛒 Prodotti più performanti</h6>
+            <p class="small text-muted">Classifica dei prodotti in base alla performance prevista.</p>
+            <ul id="topProductsAI" class="list-group list-group-flush small"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Script placeholder -->
+<script>
+  // Integrazione futura: recupero dati via API e visualizzazione con Chart.js
+  const ctx = document.getElementById('salesForecastChart').getContext('2d');
+  const salesForecastChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"],
+      datasets: [{
+        label: 'Vendite Previste',
+        data: [120, 150, 170, 180, 140, 200, 220],
+        fill: true,
+        borderColor: '#ff5757',
+        backgroundColor: 'rgba(255, 87, 87, 0.2)',
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+
+  // Esempio di prodotti
+  const topProducts = ["T-shirt basic", "Scarpe running", "Zaino impermeabile"];
+  const list = document.getElementById('topProductsAI');
+  topProducts.forEach(p => {
+    const li = document.createElement('li');
+    li.className = "list-group-item";
+    li.innerHTML = `<i class="fa-solid fa-star me-2 text-warning"></i>${p}`;
+    list.appendChild(li);
+  });
+</script>
+{% endblock %}

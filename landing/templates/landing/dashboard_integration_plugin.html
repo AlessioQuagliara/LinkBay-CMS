@@ -1,0 +1,22 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-secondary text-white">
+      <h5 class="mb-0">
+        <i class="fa-solid fa-plug me-2"></i>{{ plugin|title|replace('_', ' ') }}
+      </h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted">Configura l'integrazione con <strong>{{ plugin|title|replace('_', ' ') }}</strong> per il tuo shop <strong>{{ shop_name }}</strong>.</p>
+      <form method="POST" action="/api/integrations/{{ plugin }}/{{ shop_name }}">
+        <div class="mb-3">
+          <label for="config_value" class="form-label">Chiave o Token di configurazione</label>
+          <input type="text" class="form-control" id="config_value" name="config_value" placeholder="Inserisci la chiave/token" required>
+        </div>
+        <button type="submit" class="btn btn-secondary"><i class="fa-solid fa-link"></i> Salva Integrazione</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

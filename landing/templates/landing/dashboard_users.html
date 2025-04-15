@@ -1,0 +1,47 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-danger text-white">
+      <h5 class="mb-0"><i class="fa-solid fa-users me-2"></i>Gestione Utenti</h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted">Visualizza e gestisci gli utenti che hanno accesso al tuo shop.</p>
+
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>👤 Nome</th>
+              <th>📧 Email</th>
+              <th>📱 Telefono</th>
+              <th>🔐 Ruolo</th>
+              <th class="text-end">Azioni</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+            <tr>
+              <td>{{ u.nome }} {{ u.cognome }}</td>
+              <td>{{ u.email }}</td>
+              <td>{{ u.telefono or '—' }}</td>
+              <td>{{ u.role or 'Collaboratore' }}</td>
+              <td class="text-end">
+                <a href="/dashboard/users/edit/{{ u.id }}" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-pen"></i></a>
+                <form method="POST" action="/dashboard/users/delete/{{ u.id }}" style="display:inline-block;">
+                  <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
+                </form>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="5" class="text-center text-muted">Nessun utente trovato</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
