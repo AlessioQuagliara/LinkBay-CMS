@@ -270,6 +270,20 @@ def dashboard_payments():
         return redirect(url_for('landing.login'))
     return render_template('landing/dashboard_payments.html', user=get_user_from_session())
 
+# 💳 Stripe - Configurazione pagamento
+@landing_bp.route('/dashboard/payments/stripe/<shop_name>')
+def dashboard_payment_stripe(shop_name):
+    if 'user_id' not in session:
+        return redirect(url_for('landing.login'))
+    return render_template('landing/dashboard_payment_stripe.html', user=get_user_from_session(), shop_name=shop_name)
+
+# 💳 PayPal - Configurazione pagamento
+@landing_bp.route('/dashboard/payments/paypal/<shop_name>')
+def dashboard_payment_paypal(shop_name):
+    if 'user_id' not in session:
+        return redirect(url_for('landing.login'))
+    return render_template('landing/dashboard_payment_paypal.html', user=get_user_from_session(), shop_name=shop_name)
+
 @landing_bp.route('/dashboard/settings')
 def dashboard_settings():
     if 'user_id' not in session:
