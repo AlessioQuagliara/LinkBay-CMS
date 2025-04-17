@@ -1,0 +1,25 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0"><i class="fa-brands fa-paypal me-2"></i>Configurazione PayPal</h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted">Inserisci le credenziali per ricevere pagamenti con PayPal dal tuo shop <strong>{{ shop_name }}</strong>.</p>
+
+      <form method="POST" action="/api/payments/paypal/{{ shop_name }}">
+        <div class="mb-3">
+          <label for="paypal_client_id" class="form-label">🧾 Client ID</label>
+          <input type="text" class="form-control" id="paypal_client_id" name="paypal_client_id" placeholder="AXXXXXX..." required>
+        </div>
+        <div class="mb-3">
+          <label for="paypal_secret" class="form-label">🔐 Secret Key</label>
+          <input type="text" class="form-control" id="paypal_secret" name="paypal_secret" placeholder="EXXXXXX..." required>
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-link"></i> Salva Configurazione</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

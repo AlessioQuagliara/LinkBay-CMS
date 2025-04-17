@@ -1,0 +1,25 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-dark text-white">
+      <h5 class="mb-0"><i class="fa-brands fa-stripe me-2"></i>Configurazione Stripe</h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted">Collega il tuo account Stripe per ricevere pagamenti direttamente dal tuo shop <strong>{{ shop_name }}</strong>.</p>
+
+      <form method="POST" action="/api/payments/stripe/{{ shop_name }}">
+        <div class="mb-3">
+          <label for="stripe_pk" class="form-label">🔑 Stripe Public Key</label>
+          <input type="text" class="form-control" id="stripe_pk" name="stripe_pk" placeholder="pk_live_..." required>
+        </div>
+        <div class="mb-3">
+          <label for="stripe_sk" class="form-label">🛡️ Stripe Secret Key</label>
+          <input type="text" class="form-control" id="stripe_sk" name="stripe_sk" placeholder="sk_live_..." required>
+        </div>
+        <button type="submit" class="btn btn-dark"><i class="fa-solid fa-link"></i> Salva Configurazione</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
