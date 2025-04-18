@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify
+from flask import g
 from models.database import db
 from models.collections import Collection
 from models.page import Page
@@ -24,7 +25,7 @@ def render_dynamic_page(slug=None):
     """
     Renderizza una pagina dinamica basata sullo slug.
     """
-    shop_subdomain = request.host.split(".")[0]
+    shop_subdomain = g.shop_name
     page = load_page_content(slug, shop_subdomain)
 
     if page:
@@ -70,7 +71,7 @@ def render_collection(slug=None):
     """
     Renderizza la pagina di una collezione o la lista di tutte le collezioni.
     """
-    shop_subdomain = request.host.split('.')[0]
+    shop_subdomain = g.shop_name
 
     if slug:
         collection = Collection.query.filter_by(slug=slug, shop_name=shop_subdomain).first()
@@ -117,7 +118,7 @@ def render_product(slug):
     """
     Renderizza la pagina di un singolo prodotto basandosi sullo slug.
     """
-    shop_subdomain = request.host.split('.')[0]
+    shop_subdomain = g.shop_name
 
     # Recupera il prodotto
     product = Product.query.filter_by(slug=slug, shop_name=shop_subdomain).first()

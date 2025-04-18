@@ -591,7 +591,22 @@ def dashboard_ai_campaigns(shop_name):
 def dashboard_manage_domains(shop_name):
     if 'user_id' not in session:
         return redirect(url_for('landing.login'))
-    return render_template('landing/dashboard_domains.html', user=get_user_from_session(), shop_name=shop_name)
+
+    shop = ShopList.query.filter_by(shop_name=shop_name).first()
+    if not shop:
+        return redirect(url_for('landing.dashboard_stores'))
+
+    domains = Domain.query.filter_by(shop_id=shop.id).all()
+    domain_data = [d.__dict__ for d in domains]
+    
+    from config import Config
+    return render_template(
+        'landing/dashboard_domains.html',
+        user=get_user_from_session(),
+        shop_name=shop_name,
+        domains=domain_data,
+        stripe_pk=Config.STRIPE_PUBLISHABLE_KEY
+    )
 
 # 👥 Gestione utenti
 @landing_bp.route('/dashboard/users/<shop_name>')

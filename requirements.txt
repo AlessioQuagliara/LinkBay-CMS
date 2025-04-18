@@ -19,3 +19,4 @@ uwsgi
 certbot-dns-godaddy
 Authlib
 flask_wtf
+Flask-Mail
