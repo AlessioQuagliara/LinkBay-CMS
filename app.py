@@ -7,6 +7,7 @@ from logging.handlers import RotatingFileHandler
 import openai
 from dotenv import load_dotenv
 import json
+from extensions import mail
 
 # 📌 Carica le variabili d'ambiente dal file .env
 load_dotenv()
@@ -63,6 +64,9 @@ register_admin_blueprints(app)   # Blueprint per il pannello admin
 register_api_blueprints(app)  # Blueprint per le chiamate
 register_user_blueprints(app)    # Blueprint per la gestione utenti
 register_error_handlers(app)     # Gestione degli errori personalizzata
+
+# 📌 Configura Flask-Mail per l'invio della email
+mail.init_app(app)
 
 
 # 📌 Chiude la sessione del database al termine della richiesta per ottimizzare le risorse
@@ -126,6 +130,19 @@ def translate(key):
 
 # 🔁 Rendi disponibile la funzione translate nei template
 app.jinja_env.globals.update(translate=translate)
+
+@app.before_request
+def detect_shop():
+    hostname = request.host.split(':')[0].lower()
+
+    # 🔍 Cerca il dominio personalizzato
+    domain_entry = Domain.query.filter_by(domain=hostname).first()
+    if domain_entry:
+        g.shop = ShopList.query.get(domain_entry.shop_id)
+    else:
+        # 🔍 Fallback su sottodominio *.yoursite-linkbay-cms.com
+        subdomain = hostname.split('.')[0]
+        g.shop = ShopList.query.filter_by(shop_name=subdomain).first()
 
 # 📌 Avvio dell'applicazione Flask
 if __name__ == "__main__":

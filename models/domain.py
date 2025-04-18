@@ -14,16 +14,11 @@ class Domain(db.Model):
     shop_id = db.Column(db.Integer, db.ForeignKey("ShopList.id"), nullable=False)  # 🏪 Collegamento con ShopList
     domain = db.Column(db.String(255), unique=True, nullable=False)  # 🌍 Nome del dominio
     dns_provider = db.Column(db.String(255), nullable=True)  # 🖥️ Provider DNS (Cloudflare, GoDaddy, ecc.)
-    record_a = db.Column(db.String(255), nullable=True)  # 🔧 Record A (IP principale)
-    record_cname = db.Column(db.String(255), nullable=True)  # 🔗 CNAME (Alias)
-    record_mx = db.Column(db.String(255), nullable=True)  # 📬 Record MX (Mail Exchange)
-    record_txt = db.Column(db.String(255), nullable=True)  # 🔍 Record TXT (Verifica, SPF, DKIM)
-    record_ns = db.Column(db.String(255), nullable=True)  # 🏷️ Record NS (Nameserver)
-    record_aaaa = db.Column(db.String(255), nullable=True)  # 🌐 Record AAAA (IPv6)
-    record_srv = db.Column(db.String(255), nullable=True)  # 🔄 Record SRV (Servizi speciali)
     status = db.Column(db.String(50), nullable=False, default="pending")  # ⏳ Stato (active, pending, disabled)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 🕒 Data di creazione
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 🔄 Data di aggiornamento
+    renewal_enabled = db.Column(db.Boolean, nullable=False, default=True)  # 🔁 Rinnovo automatico attivo/disattivo
+    renewal_date = db.Column(db.DateTime, nullable=True)  # 📅 Prossima data di rinnovo
 
     def __repr__(self):
         return f"<Domain {self.domain} (Status: {self.status})>"

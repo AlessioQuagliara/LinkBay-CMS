@@ -28,13 +28,21 @@ class Config:
 
     # OpenAI API Key
     OPENAI_API_KEY = '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'
+
+    # Configurazione per l'invio di email
+    MAIL_SERVER = 'smtps.aruba.it'
+    MAIL_PORT = 465
+    MAIL_USE_TLS = True
+    MAIL_USERNAME = 'info@linkbay.it'
+    MAIL_PASSWORD = 'Spotexsrl@juanealessio2024'
+    MAIL_DEFAULT_SENDER = 'info@linkbay.it'
     
     if os.getenv('ENVIRONMENT') == 'development':
         # Altre configurazioni 
         SESSION_COOKIE_SECURE = False  # PER CHI MODIFICA = Sicuro solo su HTTPS, disabilitato in locale
         SESSION_PERMANENT = False  # PER CHI MODIFICA = Non mantenere la sessione dopo la chiusura del browser
         # Configurazioni GoDaddy API TEST
-        GODADDY_API_URL = 'https://api.ote-godaddy.com/v1/'
+        GODADDY_API_URL = 'https://api.ote-godaddy.com/v1'
         GODADDY_API_KEY = '3mM44WkB29Cg9H_GRJds69oVsyQQrUYFoeTyh'
         GODADDY_API_SECRET = '42FBcBbn8SZFWuGGsetaDF'
         # Configurazioni Stripe interne

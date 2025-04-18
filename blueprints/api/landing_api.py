@@ -11,6 +11,8 @@ from models.cmsaddon import CMSAddon
 from models.support_tickets import SupportTicket
 from models.storepayment import StorePayment
 from models.subscription import Subscription
+from models.domain import Domain
+from public.godaddy_api import GoDaddyAPI
 from public.stripe_connect import create_connect_account
 from sqlalchemy import func
 from flask import session
@@ -644,3 +646,283 @@ def update_profile():
         logger.error(f"Errore aggiornamento profilo: {e}")
         return jsonify(success=False, message="Errore durante l'aggiornamento"), 500
     
+#+ 🌍 Api per gestione Dominio ---------------------------------------------------------------------------------------------------
+
+    # 📌 Controlla l'esistenza di un dominio
+@landing_api.route('/domains/check', methods=['GET'])
+def check_domain_availability():
+    domain = request.args.get('domain', '').strip().lower()
+    if not domain:
+        return jsonify(success=False, message="Dominio non fornito"), 400
+
+    try:
+        api = GoDaddyAPI()
+        result = api.search_domain(domain)
+        if "error" in result:
+            return jsonify(success=False, message=result["error"]), 500
+
+        output = []
+
+        # Inserisce il dominio richiesto come primo elemento della lista
+        price = result.get("price", 1499000) / 1000000
+        output.append({
+            "domain": domain,
+            "available": result.get("available", False),
+            "price_eur": round(price + 5, 2)
+        })
+
+        # Aggiunge altri suggerimenti, se presenti
+        suggestions = result.get("domains", [])
+        for item in suggestions[:5]:
+            name = item.get("domain", "")
+            available = item.get("available", False)
+            price = item.get("price", 1499000) / 1000000
+            output.append({
+                "domain": name,
+                "available": available,
+                "price_eur": round(price + 5, 2)
+            })
+
+        return jsonify(success=True, results=output)
+    except Exception as e:
+        logger.error(f"Errore verifica dominio: {e}")
+        return jsonify(success=False, message="Errore nella verifica del dominio"), 500
+
+# 📌 Crea una sessione Stripe Checkout per acquistare un dominio
+@landing_api.route('/domains/checkout_session', methods=['POST'])
+def create_domain_checkout_session():
+    if 'user_id' not in session:
+        return jsonify(success=False, message="Utente non autenticato"), 401
+
+    data = request.get_json() or {}
+    domain = data.get("domain", "").strip().lower()
+    shop_name = data.get("shop_name", "").strip().lower()
+
+    if not domain or not shop_name:
+        return jsonify(success=False, message="Dati mancanti"), 400
+
+    user = User.query.get(session['user_id'])
+    shop = ShopList.query.filter_by(shop_name=shop_name).first()
+    if not shop or shop.user_id != user.id:
+        return jsonify(success=False, message="Accesso negato"), 403
+
+    try:
+        # Verifica disponibilità dominio
+        api = GoDaddyAPI()
+        check = api.search_domain(domain)
+        if not check.get("available"):
+            return jsonify(success=False, message="Dominio non disponibile"), 409
+
+        # Calcolo prezzo con margine
+        base_price = check.get("price", 1499000) / 1000000
+        final_price = round(base_price + 5, 2)
+
+        stripe.api_key = current_app.config["STRIPE_SECRET_KEY"]
+
+        session_stripe = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            mode="payment",
+            line_items=[{
+                "price_data": {
+                    "currency": "eur",
+                    "product_data": {
+                        "name": f"Acquisto dominio {domain}",
+                    },
+                    "unit_amount": int(final_price * 100),
+                },
+                "quantity": 1,
+            }],
+            metadata={
+                "domain": domain,
+                "shop_name": shop_name,
+                "user_id": str(user.id)
+            },
+            success_url=f"{request.host_url}dashboard/domains/{shop_name}?success=true&domain={domain}",
+            cancel_url=f"{request.host_url}dashboard/domains/{shop_name}?canceled=true&domain={domain}"
+        )
+
+        # ⚠️ Non salvare ancora nel DB, il dominio sarà salvato solo dopo il pagamento effettivo tramite webhook o endpoint separato
+        return jsonify(success=True, url=session_stripe.url)
+    except Exception as e:
+        logger.error(f"Errore creazione sessione Stripe per dominio: {e}")
+        return jsonify(success=False, message="Errore nella creazione del pagamento Stripe"), 500
+
+
+    # 📌 Aggiungi i record manualmente nel database
+@landing_api.route('/domains/manual', methods=['POST'])
+def add_manual_domain():
+    if 'user_id' not in session:
+        return jsonify(success=False, message="Utente non autenticato"), 401
+
+    data = request.get_json() or {}
+    domain = data.get("domain", "").strip().lower()
+    shop_name = data.get("shop_name", "").strip().lower()
+    provider = data.get("dns_provider", "").strip()
+
+    if not domain or not shop_name:
+        return jsonify(success=False, message="Dati incompleti"), 400
+
+    shop = ShopList.query.filter_by(shop_name=shop_name).first()
+    if not shop or shop.user_id != session['user_id']:
+        return jsonify(success=False, message="Accesso non autorizzato"), 403
+
+    if Domain.query.filter_by(domain=domain).first():
+        return jsonify(success=False, message="Dominio già presente"), 409
+
+    new_domain = Domain(
+        shop_id=shop.id,
+        domain=domain,
+        dns_provider=provider,
+        record_a=data.get("record_a"),
+        record_cname=data.get("record_cname"),
+        record_mx=data.get("record_mx"),
+        record_txt=data.get("record_txt"),
+        record_ns=data.get("record_ns"),
+        record_aaaa=data.get("record_aaaa"),
+        record_srv=data.get("record_srv"),
+        status="manual"
+    )
+
+    db.session.add(new_domain)
+    db.session.commit()
+    return jsonify(success=True, message="Dominio salvato manualmente", domain=domain)
+
+
+    # 📌 Acquista il nuovo dominio
+@landing_api.route('/domains/purchase', methods=['POST'])       
+def purchase_domain():
+    if 'user_id' not in session:
+        return jsonify(success=False, message="Utente non autenticato"), 401
+
+    data = request.get_json() or {}
+    domain = data.get("domain", "").strip().lower()
+    shop_name = data.get("shop_name", "").strip().lower()
+    stripe_token = data.get("payment_source")
+
+    if not domain or not shop_name or not stripe_token:
+        return jsonify(success=False, message="Dati mancanti"), 400
+
+    user = User.query.get(session['user_id'])
+    shop = ShopList.query.filter_by(shop_name=shop_name).first()
+    if not shop or shop.user_id != user.id:
+        return jsonify(success=False, message="Accesso negato"), 403
+
+    try:
+        # 🔍 Verifica disponibilità dominio
+        api = GoDaddyAPI()
+        check = api.search_domain(domain)
+        if not check.get("available"):
+            return jsonify(success=False, message="Dominio non disponibile"), 409
+
+        # 💰 Calcolo del prezzo totale con margine
+        price = check.get("price", 1499000) / 1000000
+        total_price = round(price + 5, 2)  # aggiungi il margine
+
+        # 💳 Pagamento con Stripe
+        stripe.api_key = current_app.config["STRIPE_SECRET_KEY"]
+        charge = stripe.Charge.create(
+            amount=int(total_price * 100),  # in centesimi
+            currency="eur",
+            description=f"Acquisto dominio {domain}",
+            source=stripe_token,
+            receipt_email=user.email
+        )
+
+        if not charge or charge.status != "succeeded":
+            return jsonify(success=False, message="Pagamento non riuscito"), 402
+
+        # ✅ Procedi con l'acquisto su GoDaddy
+        contact = {
+            "nameFirst": user.nome or "Utente",
+            "nameLast": user.cognome or "",
+            "email": user.email,
+            "phone": user.telefono or "+390000000000"
+        }
+
+        result = api.purchase_domain(domain, {
+            "domain": domain,
+            "consent": {
+                "agreementKeys": ["DNRA"],
+                "agreedBy": request.remote_addr or "127.0.0.1",
+                "agreedAt": datetime.utcnow().isoformat()
+            },
+            "contactAdmin": contact,
+            "contactRegistrant": contact,
+            "contactTech": contact
+        })
+
+        if "error" in result:
+            return jsonify(success=False, message=result["error"]), 500
+
+        # ℹ️ Salvataggio definitivo del dominio effettuato qui dopo il pagamento Stripe completato
+        new_domain = Domain(
+            shop_id=shop.id,
+            domain=domain,
+            dns_provider="GoDaddy",
+            status="active",
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow()
+        )
+        db.session.add(new_domain)
+        db.session.commit()
+
+        return jsonify(success=True, message="Dominio acquistato con successo", domain=domain)
+    except Exception as e:
+        logger.error(f"Errore acquisto dominio: {e}")
+        db.session.rollback()
+        return jsonify(success=False, message="Errore durante l'acquisto del dominio"), 500
+    
+    # 📌 Disattiva rinnovo dominio (soft delete)
+@landing_api.route('/domains/<int:domain_id>/disable-renewal', methods=['POST'])
+def disable_domain_renewal(domain_id):
+    if 'user_id' not in session:
+        return jsonify(success=False, message="Utente non autenticato"), 401
+
+    domain = Domain.query.get(domain_id)
+    if not domain:
+        return jsonify(success=False, message="Dominio non trovato"), 404
+
+    shop = ShopList.query.get(domain.shop_id)
+    if not shop or shop.user_id != session['user_id']:
+        return jsonify(success=False, message="Accesso negato"), 403
+
+    domain.renewal_enabled = False
+    db.session.commit()
+    return jsonify(success=True, message="Rinnovo disattivato correttamente.")
+
+# 📧 Invia una email di conferma acquisto dominio
+@landing_api.route('/domains/send-success-email', methods=['POST'])
+def send_success_email():
+    if 'user_id' not in session:
+        return jsonify(success=False, message="Utente non autenticato"), 401
+
+    data = request.get_json() or {}
+    domain = data.get("domain", "").strip().lower()
+
+    if not domain:
+        return jsonify(success=False, message="Dominio mancante"), 400
+
+    from flask_mail import Message
+    from extensions import mail
+    user = User.query.get(session['user_id'])
+
+    try:
+        msg = Message(
+            subject="✅ Dominio acquistato con successo",
+            sender="noreply@linkbay-cms.com",
+            recipients=[user.email]
+        )
+        msg.body = f"Ciao {user.nome},\n\nIl tuo dominio '{domain}' è stato acquistato con successo."
+        msg.html = f"""
+        <h2 style="color:#333;">Dominio acquistato con successo!</h2>
+        <p>Ciao {user.nome},</p>
+        <p>Il tuo dominio personalizzato <strong>{domain}</strong> è stato acquistato con successo e sarà configurato entro pochi minuti.</p>
+        <p>Grazie per aver scelto <strong>LinkBayCMS</strong>!</p>
+        <hr/>
+        <p>🔗 <a href="https://linkbay-cms.com">Visita LinkBayCMS</a></p>
+        """
+        mail.send(msg)
+        return jsonify(success=True, message="Email inviata con successo")
+    except Exception as e:
+        logger.error(f"Errore invio email dominio: {e}")
+        return jsonify(success=False, message="Errore durante l'invio della email"), 500

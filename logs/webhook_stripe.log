@@ -9000,3 +9000,3771 @@
   },
   "type": "invoice.payment_succeeded"
 }
+2025-04-18 21:05:30,840 [INFO] 📦 Ricevuto evento Stripe: charge.succeeded
+2025-04-18 21:05:30,841 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745003130,
+  "data": {
+    "object": {
+      "amount": 1569,
+      "amount_captured": 1569,
+      "amount_refunded": 0,
+      "application": null,
+      "application_fee": null,
+      "application_fee_amount": null,
+      "balance_transaction": null,
+      "billing_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "hh@gmail.com",
+        "name": "a g",
+        "phone": null,
+        "tax_id": null
+      },
+      "calculated_statement_descriptor": "DEFAULT SANDBOX",
+      "captured": true,
+      "created": 1745003129,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "destination": null,
+      "dispute": null,
+      "disputed": false,
+      "failure_balance_transaction": null,
+      "failure_code": null,
+      "failure_message": null,
+      "fraud_details": {},
+      "id": "ch_3RFKE9PteJOX9ukr1E0T3uiC",
+      "invoice": null,
+      "livemode": false,
+      "metadata": {},
+      "object": "charge",
+      "on_behalf_of": null,
+      "order": null,
+      "outcome": {
+        "advice_code": null,
+        "network_advice_code": null,
+        "network_decline_code": null,
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 17,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+      },
+      "paid": true,
+      "payment_intent": "pi_3RFKE9PteJOX9ukr1irrLGlP",
+      "payment_method": "pm_1RFKE8PteJOX9ukrBiGbzyZB",
+      "payment_method_details": {
+        "card": {
+          "amount_authorized": 1569,
+          "authorization_code": null,
+          "brand": "visa",
+          "checks": {
+            "address_line1_check": null,
+            "address_postal_code_check": null,
+            "cvc_check": "pass"
+          },
+          "country": "US",
+          "exp_month": 9,
+          "exp_year": 2028,
+          "extended_authorization": {
+            "status": "disabled"
+          },
+          "fingerprint": "mB6Pyp1GwuciRztS",
+          "funding": "credit",
+          "incremental_authorization": {
+            "status": "unavailable"
+          },
+          "installments": null,
+          "last4": "4242",
+          "mandate": null,
+          "multicapture": {
+            "status": "unavailable"
+          },
+          "network": "visa",
+          "network_token": {
+            "used": false
+          },
+          "network_transaction_id": "109665480121112",
+          "overcapture": {
+            "maximum_amount_capturable": 1569,
+            "status": "unavailable"
+          },
+          "regulated_status": "unregulated",
+          "three_d_secure": null,
+          "wallet": null
+        },
+        "type": "card"
+      },
+      "radar_options": {},
+      "receipt_email": null,
+      "receipt_number": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKPrEisAGMgYhWNOe3gE6LBYeaBMGxMIoygKNQWK9lSZnVEzKQAo7K5bM4ShjbB__j3aRX-u6uxattHs9",
+      "refunded": false,
+      "review": null,
+      "shipping": null,
+      "source": null,
+      "source_transfer": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFKE9PteJOX9ukr1A5AoUbQ",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "20ea1d79-3cf6-4353-ab65-5a007a19b5d7"
+  },
+  "type": "charge.succeeded"
+}
+2025-04-18 21:05:30,859 [INFO] 📦 Ricevuto evento Stripe: checkout.session.completed
+2025-04-18 21:05:30,859 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745003130,
+  "data": {
+    "object": {
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 1569,
+      "amount_total": 1569,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "cancel_url": "http://127.0.0.1:5000/dashboard/domains/passaporto?canceled=true&domain=passaporto-2.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": null,
+      "created": 1745003100,
+      "currency": "eur",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_creation": "if_required",
+      "customer_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "hh@gmail.com",
+        "name": "a g",
+        "phone": null,
+        "tax_exempt": "none",
+        "tax_ids": []
+      },
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1745089499,
+      "id": "cs_test_a1Bc4diDqPBs0Ez1iXBvzNwe5N11AgE10n9ciOkdVpYxYhzm2gcAzEXiOj",
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": false,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": null,
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": false,
+      "locale": null,
+      "metadata": {
+        "domain": "passaporto-2.com",
+        "shop_name": "passaporto",
+        "user_id": "3"
+      },
+      "mode": "payment",
+      "object": "checkout.session",
+      "payment_intent": "pi_3RFKE9PteJOX9ukr1irrLGlP",
+      "payment_link": null,
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "paid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": false
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": null,
+      "setup_intent": null,
+      "shipping_address_collection": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "complete",
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "http://127.0.0.1:5000/dashboard/domains/passaporto?success=true&domain=passaporto-2.com",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    }
+  },
+  "id": "evt_1RFKEAPteJOX9ukr0SIRn4oJ",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "checkout.session.completed"
+}
+2025-04-18 21:05:30,860 [INFO] 📋 Metadata presenti nella sessione: {
+  "domain": "passaporto-2.com",
+  "shop_name": "passaporto",
+  "user_id": "3"
+}
+2025-04-18 21:05:30,860 [INFO] 🧠 Metadata ricevuti: user_id=3, shop_name=passaporto, plan_name=None
+2025-04-18 21:05:30,903 [INFO] 📦 Ricevuto evento Stripe: payment_intent.succeeded
+2025-04-18 21:05:30,903 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745003130,
+  "data": {
+    "object": {
+      "amount": 1569,
+      "amount_capturable": 0,
+      "amount_details": {
+        "tip": {}
+      },
+      "amount_received": 1569,
+      "application": null,
+      "application_fee_amount": null,
+      "automatic_payment_methods": null,
+      "canceled_at": null,
+      "cancellation_reason": null,
+      "capture_method": "automatic_async",
+      "client_secret": "pi_3RFKE9PteJOX9ukr1irrLGlP_secret_J2FGwrVnXKTav9mmhxt84470M",
+      "confirmation_method": "automatic",
+      "created": 1745003129,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "id": "pi_3RFKE9PteJOX9ukr1irrLGlP",
+      "invoice": null,
+      "last_payment_error": null,
+      "latest_charge": "ch_3RFKE9PteJOX9ukr1E0T3uiC",
+      "livemode": false,
+      "metadata": {},
+      "next_action": null,
+      "object": "payment_intent",
+      "on_behalf_of": null,
+      "payment_method": "pm_1RFKE8PteJOX9ukrBiGbzyZB",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "installments": null,
+          "mandate_options": null,
+          "network": null,
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "processing": null,
+      "receipt_email": null,
+      "review": null,
+      "setup_future_usage": null,
+      "shipping": null,
+      "source": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFKE9PteJOX9ukr1XEOx0Vx",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "20ea1d79-3cf6-4353-ab65-5a007a19b5d7"
+  },
+  "type": "payment_intent.succeeded"
+}
+2025-04-18 21:05:31,012 [INFO] 📦 Ricevuto evento Stripe: payment_intent.created
+2025-04-18 21:05:31,012 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745003129,
+  "data": {
+    "object": {
+      "amount": 1569,
+      "amount_capturable": 0,
+      "amount_details": {
+        "tip": {}
+      },
+      "amount_received": 0,
+      "application": null,
+      "application_fee_amount": null,
+      "automatic_payment_methods": null,
+      "canceled_at": null,
+      "cancellation_reason": null,
+      "capture_method": "automatic_async",
+      "client_secret": "pi_3RFKE9PteJOX9ukr1irrLGlP_secret_J2FGwrVnXKTav9mmhxt84470M",
+      "confirmation_method": "automatic",
+      "created": 1745003129,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "id": "pi_3RFKE9PteJOX9ukr1irrLGlP",
+      "invoice": null,
+      "last_payment_error": null,
+      "latest_charge": null,
+      "livemode": false,
+      "metadata": {},
+      "next_action": null,
+      "object": "payment_intent",
+      "on_behalf_of": null,
+      "payment_method": null,
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "installments": null,
+          "mandate_options": null,
+          "network": null,
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "processing": null,
+      "receipt_email": null,
+      "review": null,
+      "setup_future_usage": null,
+      "shipping": null,
+      "source": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "requires_payment_method",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFKE9PteJOX9ukr16lIDfE8",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "20ea1d79-3cf6-4353-ab65-5a007a19b5d7"
+  },
+  "type": "payment_intent.created"
+}
+2025-04-18 21:05:31,629 [ERROR] ❌ Errore durante l'acquisto dominio: Failed to purchase domain
+2025-04-18 21:05:31,629 [INFO] ✅ Webhook completato per session ID: cs_test_a1Bc4diDqPBs0Ez1iXBvzNwe5N11AgE10n9ciOkdVpYxYhzm2gcAzEXiOj
+2025-04-18 21:05:33,102 [INFO] 📦 Ricevuto evento Stripe: charge.updated
+2025-04-18 21:05:33,102 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745003132,
+  "data": {
+    "object": {
+      "amount": 1569,
+      "amount_captured": 1569,
+      "amount_refunded": 0,
+      "application": null,
+      "application_fee": null,
+      "application_fee_amount": null,
+      "balance_transaction": "txn_3RFKE9PteJOX9ukr1vEmTBj3",
+      "billing_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "hh@gmail.com",
+        "name": "a g",
+        "phone": null,
+        "tax_id": null
+      },
+      "calculated_statement_descriptor": "DEFAULT SANDBOX",
+      "captured": true,
+      "created": 1745003129,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "destination": null,
+      "dispute": null,
+      "disputed": false,
+      "failure_balance_transaction": null,
+      "failure_code": null,
+      "failure_message": null,
+      "fraud_details": {},
+      "id": "ch_3RFKE9PteJOX9ukr1E0T3uiC",
+      "invoice": null,
+      "livemode": false,
+      "metadata": {},
+      "object": "charge",
+      "on_behalf_of": null,
+      "order": null,
+      "outcome": {
+        "advice_code": null,
+        "network_advice_code": null,
+        "network_decline_code": null,
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 17,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+      },
+      "paid": true,
+      "payment_intent": "pi_3RFKE9PteJOX9ukr1irrLGlP",
+      "payment_method": "pm_1RFKE8PteJOX9ukrBiGbzyZB",
+      "payment_method_details": {
+        "card": {
+          "amount_authorized": 1569,
+          "authorization_code": null,
+          "brand": "visa",
+          "checks": {
+            "address_line1_check": null,
+            "address_postal_code_check": null,
+            "cvc_check": "pass"
+          },
+          "country": "US",
+          "exp_month": 9,
+          "exp_year": 2028,
+          "extended_authorization": {
+            "status": "disabled"
+          },
+          "fingerprint": "mB6Pyp1GwuciRztS",
+          "funding": "credit",
+          "incremental_authorization": {
+            "status": "unavailable"
+          },
+          "installments": null,
+          "last4": "4242",
+          "mandate": null,
+          "multicapture": {
+            "status": "unavailable"
+          },
+          "network": "visa",
+          "network_token": {
+            "used": false
+          },
+          "network_transaction_id": "109665480121112",
+          "overcapture": {
+            "maximum_amount_capturable": 1569,
+            "status": "unavailable"
+          },
+          "regulated_status": "unregulated",
+          "three_d_secure": null,
+          "wallet": null
+        },
+        "type": "card"
+      },
+      "radar_options": {},
+      "receipt_email": null,
+      "receipt_number": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKPzEisAGMgaFJgu0uas6LBanzY2m-Q39LD_iqZrSrM1UxFIAhvr8qssV5Lfyp5s3R8v27ktBbAN8WBWJ",
+      "refunded": false,
+      "review": null,
+      "shipping": null,
+      "source": null,
+      "source_transfer": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    },
+    "previous_attributes": {
+      "balance_transaction": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKPzEisAGMgYaPR6zzQI6LBZuE77DPpQZpyGuOPkdjV1QyjNmrdzqhGzteI88DRHBFBuqHBDWDGU9EH-3"
+    }
+  },
+  "id": "evt_3RFKE9PteJOX9ukr11hlocJW",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "charge.updated"
+}
+2025-04-18 21:09:32,254 [INFO] 📦 Ricevuto evento Stripe: charge.succeeded
+2025-04-18 21:09:32,255 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745003371,
+  "data": {
+    "object": {
+      "amount": 1569,
+      "amount_captured": 1569,
+      "amount_refunded": 0,
+      "application": null,
+      "application_fee": null,
+      "application_fee_amount": null,
+      "balance_transaction": null,
+      "billing_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "78787@gmail.com",
+        "name": "a c",
+        "phone": null,
+        "tax_id": null
+      },
+      "calculated_statement_descriptor": "DEFAULT SANDBOX",
+      "captured": true,
+      "created": 1745003371,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "destination": null,
+      "dispute": null,
+      "disputed": false,
+      "failure_balance_transaction": null,
+      "failure_code": null,
+      "failure_message": null,
+      "fraud_details": {},
+      "id": "ch_3RFKI3PteJOX9ukr2ugXQHG8",
+      "invoice": null,
+      "livemode": false,
+      "metadata": {},
+      "object": "charge",
+      "on_behalf_of": null,
+      "order": null,
+      "outcome": {
+        "advice_code": null,
+        "network_advice_code": null,
+        "network_decline_code": null,
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 59,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+      },
+      "paid": true,
+      "payment_intent": "pi_3RFKI3PteJOX9ukr2pP8QL4m",
+      "payment_method": "pm_1RFKI2PteJOX9ukr6G2zJlcw",
+      "payment_method_details": {
+        "card": {
+          "amount_authorized": 1569,
+          "authorization_code": null,
+          "brand": "visa",
+          "checks": {
+            "address_line1_check": null,
+            "address_postal_code_check": null,
+            "cvc_check": "pass"
+          },
+          "country": "US",
+          "exp_month": 4,
+          "exp_year": 2031,
+          "extended_authorization": {
+            "status": "disabled"
+          },
+          "fingerprint": "mB6Pyp1GwuciRztS",
+          "funding": "credit",
+          "incremental_authorization": {
+            "status": "unavailable"
+          },
+          "installments": null,
+          "last4": "4242",
+          "mandate": null,
+          "multicapture": {
+            "status": "unavailable"
+          },
+          "network": "visa",
+          "network_token": {
+            "used": false
+          },
+          "network_transaction_id": "109665480121112",
+          "overcapture": {
+            "maximum_amount_capturable": 1569,
+            "status": "unavailable"
+          },
+          "regulated_status": "unregulated",
+          "three_d_secure": null,
+          "wallet": null
+        },
+        "type": "card"
+      },
+      "radar_options": {},
+      "receipt_email": null,
+      "receipt_number": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKOzGisAGMgauBqsalZ06LBZhEL_5RLoIT813CJ3aOYsLdaBWn5ifOxFyZLIGE8wQc65-K4Baxxihlzmo",
+      "refunded": false,
+      "review": null,
+      "shipping": null,
+      "source": null,
+      "source_transfer": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFKI3PteJOX9ukr2ygVYYh3",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "25979324-e9d8-4542-b57c-22392c46820d"
+  },
+  "type": "charge.succeeded"
+}
+2025-04-18 21:09:32,256 [INFO] ✅ Webhook completato per evento: charge.succeeded
+2025-04-18 21:09:32,308 [INFO] 📦 Ricevuto evento Stripe: payment_intent.succeeded
+2025-04-18 21:09:32,308 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745003371,
+  "data": {
+    "object": {
+      "amount": 1569,
+      "amount_capturable": 0,
+      "amount_details": {
+        "tip": {}
+      },
+      "amount_received": 1569,
+      "application": null,
+      "application_fee_amount": null,
+      "automatic_payment_methods": null,
+      "canceled_at": null,
+      "cancellation_reason": null,
+      "capture_method": "automatic_async",
+      "client_secret": "pi_3RFKI3PteJOX9ukr2pP8QL4m_secret_T7NchETqY4WwE1Q8AA9bl3l2z",
+      "confirmation_method": "automatic",
+      "created": 1745003371,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "id": "pi_3RFKI3PteJOX9ukr2pP8QL4m",
+      "invoice": null,
+      "last_payment_error": null,
+      "latest_charge": "ch_3RFKI3PteJOX9ukr2ugXQHG8",
+      "livemode": false,
+      "metadata": {},
+      "next_action": null,
+      "object": "payment_intent",
+      "on_behalf_of": null,
+      "payment_method": "pm_1RFKI2PteJOX9ukr6G2zJlcw",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "installments": null,
+          "mandate_options": null,
+          "network": null,
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "processing": null,
+      "receipt_email": null,
+      "review": null,
+      "setup_future_usage": null,
+      "shipping": null,
+      "source": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFKI3PteJOX9ukr2NMo7pTE",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "25979324-e9d8-4542-b57c-22392c46820d"
+  },
+  "type": "payment_intent.succeeded"
+}
+2025-04-18 21:09:32,309 [INFO] ✅ Webhook completato per evento: payment_intent.succeeded
+2025-04-18 21:09:32,353 [INFO] 📦 Ricevuto evento Stripe: payment_intent.created
+2025-04-18 21:09:32,354 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745003371,
+  "data": {
+    "object": {
+      "amount": 1569,
+      "amount_capturable": 0,
+      "amount_details": {
+        "tip": {}
+      },
+      "amount_received": 0,
+      "application": null,
+      "application_fee_amount": null,
+      "automatic_payment_methods": null,
+      "canceled_at": null,
+      "cancellation_reason": null,
+      "capture_method": "automatic_async",
+      "client_secret": "pi_3RFKI3PteJOX9ukr2pP8QL4m_secret_T7NchETqY4WwE1Q8AA9bl3l2z",
+      "confirmation_method": "automatic",
+      "created": 1745003371,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "id": "pi_3RFKI3PteJOX9ukr2pP8QL4m",
+      "invoice": null,
+      "last_payment_error": null,
+      "latest_charge": null,
+      "livemode": false,
+      "metadata": {},
+      "next_action": null,
+      "object": "payment_intent",
+      "on_behalf_of": null,
+      "payment_method": null,
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "installments": null,
+          "mandate_options": null,
+          "network": null,
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "processing": null,
+      "receipt_email": null,
+      "review": null,
+      "setup_future_usage": null,
+      "shipping": null,
+      "source": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "requires_payment_method",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFKI3PteJOX9ukr2IMf2iLp",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "25979324-e9d8-4542-b57c-22392c46820d"
+  },
+  "type": "payment_intent.created"
+}
+2025-04-18 21:09:32,354 [INFO] ✅ Webhook completato per evento: payment_intent.created
+2025-04-18 21:09:32,432 [INFO] 📦 Ricevuto evento Stripe: checkout.session.completed
+2025-04-18 21:09:32,433 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745003372,
+  "data": {
+    "object": {
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 1569,
+      "amount_total": 1569,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "cancel_url": "http://127.0.0.1:5000/dashboard/domains/passaporto?canceled=true&domain=passaporto-2.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": null,
+      "created": 1745003329,
+      "currency": "eur",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_creation": "if_required",
+      "customer_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "78787@gmail.com",
+        "name": "a c",
+        "phone": null,
+        "tax_exempt": "none",
+        "tax_ids": []
+      },
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1745089729,
+      "id": "cs_test_a1dPrJebruIORj89Dk6JopqJWb41OLK84chNywh4FZUnzGO91GiozacPvI",
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": false,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": null,
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": false,
+      "locale": null,
+      "metadata": {
+        "domain": "passaporto-2.com",
+        "shop_name": "passaporto",
+        "user_id": "3"
+      },
+      "mode": "payment",
+      "object": "checkout.session",
+      "payment_intent": "pi_3RFKI3PteJOX9ukr2pP8QL4m",
+      "payment_link": null,
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "paid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": false
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": null,
+      "setup_intent": null,
+      "shipping_address_collection": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "complete",
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "http://127.0.0.1:5000/dashboard/domains/passaporto?success=true&domain=passaporto-2.com",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    }
+  },
+  "id": "evt_1RFKI4PteJOX9ukrpJlBPwTu",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "checkout.session.completed"
+}
+2025-04-18 21:09:32,433 [INFO] 📋 Metadata presenti nella sessione: {
+  "domain": "passaporto-2.com",
+  "shop_name": "passaporto",
+  "user_id": "3"
+}
+2025-04-18 21:09:32,433 [INFO] 🧠 Metadata ricevuti: user_id=3, shop_name=passaporto, plan_name=None
+2025-04-18 21:09:33,232 [ERROR] ❌ Errore durante l'acquisto dominio: Failed to purchase domain
+2025-04-18 21:09:33,233 [INFO] ✅ Webhook completato per session ID: cs_test_a1dPrJebruIORj89Dk6JopqJWb41OLK84chNywh4FZUnzGO91GiozacPvI
+2025-04-18 21:09:34,720 [INFO] 📦 Ricevuto evento Stripe: charge.updated
+2025-04-18 21:09:34,721 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745003374,
+  "data": {
+    "object": {
+      "amount": 1569,
+      "amount_captured": 1569,
+      "amount_refunded": 0,
+      "application": null,
+      "application_fee": null,
+      "application_fee_amount": null,
+      "balance_transaction": "txn_3RFKI3PteJOX9ukr2vXt5mzG",
+      "billing_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "78787@gmail.com",
+        "name": "a c",
+        "phone": null,
+        "tax_id": null
+      },
+      "calculated_statement_descriptor": "DEFAULT SANDBOX",
+      "captured": true,
+      "created": 1745003371,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "destination": null,
+      "dispute": null,
+      "disputed": false,
+      "failure_balance_transaction": null,
+      "failure_code": null,
+      "failure_message": null,
+      "fraud_details": {},
+      "id": "ch_3RFKI3PteJOX9ukr2ugXQHG8",
+      "invoice": null,
+      "livemode": false,
+      "metadata": {},
+      "object": "charge",
+      "on_behalf_of": null,
+      "order": null,
+      "outcome": {
+        "advice_code": null,
+        "network_advice_code": null,
+        "network_decline_code": null,
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 59,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+      },
+      "paid": true,
+      "payment_intent": "pi_3RFKI3PteJOX9ukr2pP8QL4m",
+      "payment_method": "pm_1RFKI2PteJOX9ukr6G2zJlcw",
+      "payment_method_details": {
+        "card": {
+          "amount_authorized": 1569,
+          "authorization_code": null,
+          "brand": "visa",
+          "checks": {
+            "address_line1_check": null,
+            "address_postal_code_check": null,
+            "cvc_check": "pass"
+          },
+          "country": "US",
+          "exp_month": 4,
+          "exp_year": 2031,
+          "extended_authorization": {
+            "status": "disabled"
+          },
+          "fingerprint": "mB6Pyp1GwuciRztS",
+          "funding": "credit",
+          "incremental_authorization": {
+            "status": "unavailable"
+          },
+          "installments": null,
+          "last4": "4242",
+          "mandate": null,
+          "multicapture": {
+            "status": "unavailable"
+          },
+          "network": "visa",
+          "network_token": {
+            "used": false
+          },
+          "network_transaction_id": "109665480121112",
+          "overcapture": {
+            "maximum_amount_capturable": 1569,
+            "status": "unavailable"
+          },
+          "regulated_status": "unregulated",
+          "three_d_secure": null,
+          "wallet": null
+        },
+        "type": "card"
+      },
+      "radar_options": {},
+      "receipt_email": null,
+      "receipt_number": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKO7GisAGMgbzkOBWexg6LBY1Nir2xfEoYB2ZhgPnWsOrBNlA88Ewk2TsO5waoZq8GBUwuAJrnjmVLAY1",
+      "refunded": false,
+      "review": null,
+      "shipping": null,
+      "source": null,
+      "source_transfer": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    },
+    "previous_attributes": {
+      "balance_transaction": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKO7GisAGMgaqhj680xo6LBYEkVbjeJYKEp_4SlzPLzgcUoqc2zAWfdlCjtfGbYCOdRMDqXDpx8ccLg2k"
+    }
+  },
+  "id": "evt_3RFKI3PteJOX9ukr25mvUdjd",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "charge.updated"
+}
+2025-04-18 21:09:34,721 [INFO] ✅ Webhook completato per evento: charge.updated
+2025-04-18 21:16:47,830 [INFO] 📦 Ricevuto evento Stripe: charge.succeeded
+2025-04-18 21:16:47,831 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745003807,
+  "data": {
+    "object": {
+      "amount": 1569,
+      "amount_captured": 1569,
+      "amount_refunded": 0,
+      "application": null,
+      "application_fee": null,
+      "application_fee_amount": null,
+      "balance_transaction": null,
+      "billing_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "apapapa@gmail.com",
+        "name": "a",
+        "phone": null,
+        "tax_id": null
+      },
+      "calculated_statement_descriptor": "DEFAULT SANDBOX",
+      "captured": true,
+      "created": 1745003806,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "destination": null,
+      "dispute": null,
+      "disputed": false,
+      "failure_balance_transaction": null,
+      "failure_code": null,
+      "failure_message": null,
+      "fraud_details": {},
+      "id": "ch_3RFKP4PteJOX9ukr2TcWH2hz",
+      "invoice": null,
+      "livemode": false,
+      "metadata": {},
+      "object": "charge",
+      "on_behalf_of": null,
+      "order": null,
+      "outcome": {
+        "advice_code": null,
+        "network_advice_code": null,
+        "network_decline_code": null,
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 40,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+      },
+      "paid": true,
+      "payment_intent": "pi_3RFKP4PteJOX9ukr2FJIu3mo",
+      "payment_method": "pm_1RFKP4PteJOX9ukrOHrwJb9C",
+      "payment_method_details": {
+        "card": {
+          "amount_authorized": 1569,
+          "authorization_code": null,
+          "brand": "visa",
+          "checks": {
+            "address_line1_check": null,
+            "address_postal_code_check": null,
+            "cvc_check": "pass"
+          },
+          "country": "US",
+          "exp_month": 8,
+          "exp_year": 2026,
+          "extended_authorization": {
+            "status": "disabled"
+          },
+          "fingerprint": "mB6Pyp1GwuciRztS",
+          "funding": "credit",
+          "incremental_authorization": {
+            "status": "unavailable"
+          },
+          "installments": null,
+          "last4": "4242",
+          "mandate": null,
+          "multicapture": {
+            "status": "unavailable"
+          },
+          "network": "visa",
+          "network_token": {
+            "used": false
+          },
+          "network_transaction_id": "109665480121112",
+          "overcapture": {
+            "maximum_amount_capturable": 1569,
+            "status": "unavailable"
+          },
+          "regulated_status": "unregulated",
+          "three_d_secure": null,
+          "wallet": null
+        },
+        "type": "card"
+      },
+      "radar_options": {},
+      "receipt_email": null,
+      "receipt_number": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKJ_KisAGMgbl8TpWAq86LBYfH9aii0BtQ6Dfl9wSArBbSv-YsfIQPlXWEDXvxtg1ZzERh-0LFQ2OMyAy",
+      "refunded": false,
+      "review": null,
+      "shipping": null,
+      "source": null,
+      "source_transfer": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFKP4PteJOX9ukr2IzWklbx",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "57ffce18-6efb-444b-91ad-356243968b48"
+  },
+  "type": "charge.succeeded"
+}
+2025-04-18 21:16:47,831 [INFO] ✅ Webhook completato per evento: charge.succeeded
+2025-04-18 21:16:47,912 [INFO] 📦 Ricevuto evento Stripe: payment_intent.succeeded
+2025-04-18 21:16:47,913 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745003807,
+  "data": {
+    "object": {
+      "amount": 1569,
+      "amount_capturable": 0,
+      "amount_details": {
+        "tip": {}
+      },
+      "amount_received": 1569,
+      "application": null,
+      "application_fee_amount": null,
+      "automatic_payment_methods": null,
+      "canceled_at": null,
+      "cancellation_reason": null,
+      "capture_method": "automatic_async",
+      "client_secret": "pi_3RFKP4PteJOX9ukr2FJIu3mo_secret_lsoHNxnPulj3WveJrT6e2FoX7",
+      "confirmation_method": "automatic",
+      "created": 1745003806,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "id": "pi_3RFKP4PteJOX9ukr2FJIu3mo",
+      "invoice": null,
+      "last_payment_error": null,
+      "latest_charge": "ch_3RFKP4PteJOX9ukr2TcWH2hz",
+      "livemode": false,
+      "metadata": {},
+      "next_action": null,
+      "object": "payment_intent",
+      "on_behalf_of": null,
+      "payment_method": "pm_1RFKP4PteJOX9ukrOHrwJb9C",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "installments": null,
+          "mandate_options": null,
+          "network": null,
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "processing": null,
+      "receipt_email": null,
+      "review": null,
+      "setup_future_usage": null,
+      "shipping": null,
+      "source": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFKP4PteJOX9ukr2lKnJ0cO",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "57ffce18-6efb-444b-91ad-356243968b48"
+  },
+  "type": "payment_intent.succeeded"
+}
+2025-04-18 21:16:47,913 [INFO] ✅ Webhook completato per evento: payment_intent.succeeded
+2025-04-18 21:16:47,932 [INFO] 📦 Ricevuto evento Stripe: checkout.session.completed
+2025-04-18 21:16:47,932 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745003807,
+  "data": {
+    "object": {
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 1569,
+      "amount_total": 1569,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "cancel_url": "http://127.0.0.1:5000/dashboard/domains/passaporto?canceled=true&domain=passaporto-2.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": null,
+      "created": 1745003741,
+      "currency": "eur",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_creation": "if_required",
+      "customer_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "apapapa@gmail.com",
+        "name": "a",
+        "phone": null,
+        "tax_exempt": "none",
+        "tax_ids": []
+      },
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1745090141,
+      "id": "cs_test_a15GBvlRDJmYzhmjd65dZzPYFzFoBIdM2vXjGBnTFOlfrcvt5AjivmCkj0",
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": false,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": null,
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": false,
+      "locale": null,
+      "metadata": {
+        "domain": "passaporto-2.com",
+        "shop_name": "passaporto",
+        "user_id": "3"
+      },
+      "mode": "payment",
+      "object": "checkout.session",
+      "payment_intent": "pi_3RFKP4PteJOX9ukr2FJIu3mo",
+      "payment_link": null,
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "paid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": false
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": null,
+      "setup_intent": null,
+      "shipping_address_collection": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "complete",
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "http://127.0.0.1:5000/dashboard/domains/passaporto?success=true&domain=passaporto-2.com",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    }
+  },
+  "id": "evt_1RFKP5PteJOX9ukrbNeN3FVj",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "checkout.session.completed"
+}
+2025-04-18 21:16:47,933 [INFO] 📋 Metadata presenti nella sessione: {
+  "domain": "passaporto-2.com",
+  "shop_name": "passaporto",
+  "user_id": "3"
+}
+2025-04-18 21:16:47,933 [INFO] 🧠 Metadata ricevuti: user_id=3, shop_name=passaporto, plan_name=None
+2025-04-18 21:16:48,037 [INFO] 📦 Ricevuto evento Stripe: payment_intent.created
+2025-04-18 21:16:48,037 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745003806,
+  "data": {
+    "object": {
+      "amount": 1569,
+      "amount_capturable": 0,
+      "amount_details": {
+        "tip": {}
+      },
+      "amount_received": 0,
+      "application": null,
+      "application_fee_amount": null,
+      "automatic_payment_methods": null,
+      "canceled_at": null,
+      "cancellation_reason": null,
+      "capture_method": "automatic_async",
+      "client_secret": "pi_3RFKP4PteJOX9ukr2FJIu3mo_secret_lsoHNxnPulj3WveJrT6e2FoX7",
+      "confirmation_method": "automatic",
+      "created": 1745003806,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "id": "pi_3RFKP4PteJOX9ukr2FJIu3mo",
+      "invoice": null,
+      "last_payment_error": null,
+      "latest_charge": null,
+      "livemode": false,
+      "metadata": {},
+      "next_action": null,
+      "object": "payment_intent",
+      "on_behalf_of": null,
+      "payment_method": null,
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "installments": null,
+          "mandate_options": null,
+          "network": null,
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "processing": null,
+      "receipt_email": null,
+      "review": null,
+      "setup_future_usage": null,
+      "shipping": null,
+      "source": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "requires_payment_method",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFKP4PteJOX9ukr2gBtRM2f",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "57ffce18-6efb-444b-91ad-356243968b48"
+  },
+  "type": "payment_intent.created"
+}
+2025-04-18 21:16:48,037 [INFO] ✅ Webhook completato per evento: payment_intent.created
+2025-04-18 21:16:49,083 [ERROR] ❌ Errore durante l'acquisto dominio: Failed to purchase domain
+2025-04-18 21:16:49,083 [INFO] ✅ Webhook completato per session ID: cs_test_a15GBvlRDJmYzhmjd65dZzPYFzFoBIdM2vXjGBnTFOlfrcvt5AjivmCkj0
+2025-04-18 21:16:50,187 [INFO] 📦 Ricevuto evento Stripe: charge.updated
+2025-04-18 21:16:50,188 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745003809,
+  "data": {
+    "object": {
+      "amount": 1569,
+      "amount_captured": 1569,
+      "amount_refunded": 0,
+      "application": null,
+      "application_fee": null,
+      "application_fee_amount": null,
+      "balance_transaction": "txn_3RFKP4PteJOX9ukr28avpl70",
+      "billing_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "apapapa@gmail.com",
+        "name": "a",
+        "phone": null,
+        "tax_id": null
+      },
+      "calculated_statement_descriptor": "DEFAULT SANDBOX",
+      "captured": true,
+      "created": 1745003806,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "destination": null,
+      "dispute": null,
+      "disputed": false,
+      "failure_balance_transaction": null,
+      "failure_code": null,
+      "failure_message": null,
+      "fraud_details": {},
+      "id": "ch_3RFKP4PteJOX9ukr2TcWH2hz",
+      "invoice": null,
+      "livemode": false,
+      "metadata": {},
+      "object": "charge",
+      "on_behalf_of": null,
+      "order": null,
+      "outcome": {
+        "advice_code": null,
+        "network_advice_code": null,
+        "network_decline_code": null,
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 40,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+      },
+      "paid": true,
+      "payment_intent": "pi_3RFKP4PteJOX9ukr2FJIu3mo",
+      "payment_method": "pm_1RFKP4PteJOX9ukrOHrwJb9C",
+      "payment_method_details": {
+        "card": {
+          "amount_authorized": 1569,
+          "authorization_code": null,
+          "brand": "visa",
+          "checks": {
+            "address_line1_check": null,
+            "address_postal_code_check": null,
+            "cvc_check": "pass"
+          },
+          "country": "US",
+          "exp_month": 8,
+          "exp_year": 2026,
+          "extended_authorization": {
+            "status": "disabled"
+          },
+          "fingerprint": "mB6Pyp1GwuciRztS",
+          "funding": "credit",
+          "incremental_authorization": {
+            "status": "unavailable"
+          },
+          "installments": null,
+          "last4": "4242",
+          "mandate": null,
+          "multicapture": {
+            "status": "unavailable"
+          },
+          "network": "visa",
+          "network_token": {
+            "used": false
+          },
+          "network_transaction_id": "109665480121112",
+          "overcapture": {
+            "maximum_amount_capturable": 1569,
+            "status": "unavailable"
+          },
+          "regulated_status": "unregulated",
+          "three_d_secure": null,
+          "wallet": null
+        },
+        "type": "card"
+      },
+      "radar_options": {},
+      "receipt_email": null,
+      "receipt_number": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKKHKisAGMgZDFbfFpsg6LBbL5vzzjJA6IRAG7CPA9F5JCt_wcTqY9Bfr8Ni7CyykhIeUNj6UW1jNDcJ9",
+      "refunded": false,
+      "review": null,
+      "shipping": null,
+      "source": null,
+      "source_transfer": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    },
+    "previous_attributes": {
+      "balance_transaction": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKKHKisAGMgZLTgTxa2Y6LBZhQeCC7C96_yR656msl_gfJ94Fu5a2u6QiIRSz9sBiyX27nDWcGbDS-yAn"
+    }
+  },
+  "id": "evt_3RFKP4PteJOX9ukr2pC91WMH",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "charge.updated"
+}
+2025-04-18 21:16:50,188 [INFO] ✅ Webhook completato per evento: charge.updated
+2025-04-18 21:20:19,722 [INFO] 📦 Ricevuto evento Stripe: charge.succeeded
+2025-04-18 21:20:19,723 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745004019,
+  "data": {
+    "object": {
+      "amount": 5299,
+      "amount_captured": 5299,
+      "amount_refunded": 0,
+      "application": null,
+      "application_fee": null,
+      "application_fee_amount": null,
+      "balance_transaction": null,
+      "billing_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "as@dasda.com",
+        "name": "a a",
+        "phone": null,
+        "tax_id": null
+      },
+      "calculated_statement_descriptor": "DEFAULT SANDBOX",
+      "captured": true,
+      "created": 1745004018,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "destination": null,
+      "dispute": null,
+      "disputed": false,
+      "failure_balance_transaction": null,
+      "failure_code": null,
+      "failure_message": null,
+      "fraud_details": {},
+      "id": "ch_3RFKSUPteJOX9ukr1Kn3XNBp",
+      "invoice": null,
+      "livemode": false,
+      "metadata": {},
+      "object": "charge",
+      "on_behalf_of": null,
+      "order": null,
+      "outcome": {
+        "advice_code": null,
+        "network_advice_code": null,
+        "network_decline_code": null,
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 30,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+      },
+      "paid": true,
+      "payment_intent": "pi_3RFKSUPteJOX9ukr1SLVRIss",
+      "payment_method": "pm_1RFKSTPteJOX9ukr8UsoFePR",
+      "payment_method_details": {
+        "card": {
+          "amount_authorized": 5299,
+          "authorization_code": null,
+          "brand": "visa",
+          "checks": {
+            "address_line1_check": null,
+            "address_postal_code_check": null,
+            "cvc_check": "pass"
+          },
+          "country": "US",
+          "exp_month": 3,
+          "exp_year": 2029,
+          "extended_authorization": {
+            "status": "disabled"
+          },
+          "fingerprint": "mB6Pyp1GwuciRztS",
+          "funding": "credit",
+          "incremental_authorization": {
+            "status": "unavailable"
+          },
+          "installments": null,
+          "last4": "4242",
+          "mandate": null,
+          "multicapture": {
+            "status": "unavailable"
+          },
+          "network": "visa",
+          "network_token": {
+            "used": false
+          },
+          "network_transaction_id": "109665480121112",
+          "overcapture": {
+            "maximum_amount_capturable": 5299,
+            "status": "unavailable"
+          },
+          "regulated_status": "unregulated",
+          "three_d_secure": null,
+          "wallet": null
+        },
+        "type": "card"
+      },
+      "radar_options": {},
+      "receipt_email": null,
+      "receipt_number": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKPPLisAGMgasFMDWXGM6LBYiHFc7Gjn_EG5-ffEG7PmTgkoUR2VqZVcfxdTSmKQ_2uh3qq6qWXMT5d9J",
+      "refunded": false,
+      "review": null,
+      "shipping": null,
+      "source": null,
+      "source_transfer": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFKSUPteJOX9ukr1cYvfBa7",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "f1a6eebe-0a66-4b93-aa4f-f3461b725028"
+  },
+  "type": "charge.succeeded"
+}
+2025-04-18 21:20:19,723 [INFO] ✅ Webhook completato per evento: charge.succeeded
+2025-04-18 21:20:19,766 [INFO] 📦 Ricevuto evento Stripe: checkout.session.completed
+2025-04-18 21:20:19,767 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745004019,
+  "data": {
+    "object": {
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 5299,
+      "amount_total": 5299,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "cancel_url": "http://127.0.0.1:5000/dashboard/domains/passaporto?canceled=true&domain=dioporco.shop",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": null,
+      "created": 1745003998,
+      "currency": "eur",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_creation": "if_required",
+      "customer_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "as@dasda.com",
+        "name": "a a",
+        "phone": null,
+        "tax_exempt": "none",
+        "tax_ids": []
+      },
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1745090398,
+      "id": "cs_test_a1azg7QdLm2Kqbwic3gv2Qx0qVFcaYdsP6pXcacdmgeMc6QgSHQWJc5gZ2",
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": false,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": null,
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": false,
+      "locale": null,
+      "metadata": {
+        "domain": "dioporco.shop",
+        "shop_name": "passaporto",
+        "user_id": "3"
+      },
+      "mode": "payment",
+      "object": "checkout.session",
+      "payment_intent": "pi_3RFKSUPteJOX9ukr1SLVRIss",
+      "payment_link": null,
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "paid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": false
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": null,
+      "setup_intent": null,
+      "shipping_address_collection": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "complete",
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "http://127.0.0.1:5000/dashboard/domains/passaporto?success=true&domain=dioporco.shop",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    }
+  },
+  "id": "evt_1RFKSVPteJOX9ukrcRYHASGo",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "checkout.session.completed"
+}
+2025-04-18 21:20:19,767 [INFO] 📋 Metadata presenti nella sessione: {
+  "domain": "dioporco.shop",
+  "shop_name": "passaporto",
+  "user_id": "3"
+}
+2025-04-18 21:20:19,767 [INFO] 🧠 Metadata ricevuti: user_id=3, shop_name=passaporto, plan_name=None
+2025-04-18 21:20:19,796 [INFO] 📦 Ricevuto evento Stripe: payment_intent.succeeded
+2025-04-18 21:20:19,796 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745004019,
+  "data": {
+    "object": {
+      "amount": 5299,
+      "amount_capturable": 0,
+      "amount_details": {
+        "tip": {}
+      },
+      "amount_received": 5299,
+      "application": null,
+      "application_fee_amount": null,
+      "automatic_payment_methods": null,
+      "canceled_at": null,
+      "cancellation_reason": null,
+      "capture_method": "automatic_async",
+      "client_secret": "pi_3RFKSUPteJOX9ukr1SLVRIss_secret_iiD49KWrvAW7cvColYtGnctxY",
+      "confirmation_method": "automatic",
+      "created": 1745004018,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "id": "pi_3RFKSUPteJOX9ukr1SLVRIss",
+      "invoice": null,
+      "last_payment_error": null,
+      "latest_charge": "ch_3RFKSUPteJOX9ukr1Kn3XNBp",
+      "livemode": false,
+      "metadata": {},
+      "next_action": null,
+      "object": "payment_intent",
+      "on_behalf_of": null,
+      "payment_method": "pm_1RFKSTPteJOX9ukr8UsoFePR",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "installments": null,
+          "mandate_options": null,
+          "network": null,
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "processing": null,
+      "receipt_email": null,
+      "review": null,
+      "setup_future_usage": null,
+      "shipping": null,
+      "source": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFKSUPteJOX9ukr1NrfZpFv",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "f1a6eebe-0a66-4b93-aa4f-f3461b725028"
+  },
+  "type": "payment_intent.succeeded"
+}
+2025-04-18 21:20:19,797 [INFO] ✅ Webhook completato per evento: payment_intent.succeeded
+2025-04-18 21:20:19,867 [INFO] 📦 Ricevuto evento Stripe: payment_intent.created
+2025-04-18 21:20:19,868 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745004018,
+  "data": {
+    "object": {
+      "amount": 5299,
+      "amount_capturable": 0,
+      "amount_details": {
+        "tip": {}
+      },
+      "amount_received": 0,
+      "application": null,
+      "application_fee_amount": null,
+      "automatic_payment_methods": null,
+      "canceled_at": null,
+      "cancellation_reason": null,
+      "capture_method": "automatic_async",
+      "client_secret": "pi_3RFKSUPteJOX9ukr1SLVRIss_secret_iiD49KWrvAW7cvColYtGnctxY",
+      "confirmation_method": "automatic",
+      "created": 1745004018,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "id": "pi_3RFKSUPteJOX9ukr1SLVRIss",
+      "invoice": null,
+      "last_payment_error": null,
+      "latest_charge": null,
+      "livemode": false,
+      "metadata": {},
+      "next_action": null,
+      "object": "payment_intent",
+      "on_behalf_of": null,
+      "payment_method": null,
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "installments": null,
+          "mandate_options": null,
+          "network": null,
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "processing": null,
+      "receipt_email": null,
+      "review": null,
+      "setup_future_usage": null,
+      "shipping": null,
+      "source": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "requires_payment_method",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFKSUPteJOX9ukr1G54LDQB",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "f1a6eebe-0a66-4b93-aa4f-f3461b725028"
+  },
+  "type": "payment_intent.created"
+}
+2025-04-18 21:20:19,868 [INFO] ✅ Webhook completato per evento: payment_intent.created
+2025-04-18 21:20:20,467 [ERROR] ❌ Errore durante l'acquisto dominio: Failed to purchase domain
+2025-04-18 21:20:20,467 [INFO] ✅ Webhook completato per session ID: cs_test_a1azg7QdLm2Kqbwic3gv2Qx0qVFcaYdsP6pXcacdmgeMc6QgSHQWJc5gZ2
+2025-04-18 21:20:21,974 [INFO] 📦 Ricevuto evento Stripe: charge.updated
+2025-04-18 21:20:21,975 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745004021,
+  "data": {
+    "object": {
+      "amount": 5299,
+      "amount_captured": 5299,
+      "amount_refunded": 0,
+      "application": null,
+      "application_fee": null,
+      "application_fee_amount": null,
+      "balance_transaction": "txn_3RFKSUPteJOX9ukr1Se65WsC",
+      "billing_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "as@dasda.com",
+        "name": "a a",
+        "phone": null,
+        "tax_id": null
+      },
+      "calculated_statement_descriptor": "DEFAULT SANDBOX",
+      "captured": true,
+      "created": 1745004018,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "destination": null,
+      "dispute": null,
+      "disputed": false,
+      "failure_balance_transaction": null,
+      "failure_code": null,
+      "failure_message": null,
+      "fraud_details": {},
+      "id": "ch_3RFKSUPteJOX9ukr1Kn3XNBp",
+      "invoice": null,
+      "livemode": false,
+      "metadata": {},
+      "object": "charge",
+      "on_behalf_of": null,
+      "order": null,
+      "outcome": {
+        "advice_code": null,
+        "network_advice_code": null,
+        "network_decline_code": null,
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 30,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+      },
+      "paid": true,
+      "payment_intent": "pi_3RFKSUPteJOX9ukr1SLVRIss",
+      "payment_method": "pm_1RFKSTPteJOX9ukr8UsoFePR",
+      "payment_method_details": {
+        "card": {
+          "amount_authorized": 5299,
+          "authorization_code": null,
+          "brand": "visa",
+          "checks": {
+            "address_line1_check": null,
+            "address_postal_code_check": null,
+            "cvc_check": "pass"
+          },
+          "country": "US",
+          "exp_month": 3,
+          "exp_year": 2029,
+          "extended_authorization": {
+            "status": "disabled"
+          },
+          "fingerprint": "mB6Pyp1GwuciRztS",
+          "funding": "credit",
+          "incremental_authorization": {
+            "status": "unavailable"
+          },
+          "installments": null,
+          "last4": "4242",
+          "mandate": null,
+          "multicapture": {
+            "status": "unavailable"
+          },
+          "network": "visa",
+          "network_token": {
+            "used": false
+          },
+          "network_transaction_id": "109665480121112",
+          "overcapture": {
+            "maximum_amount_capturable": 5299,
+            "status": "unavailable"
+          },
+          "regulated_status": "unregulated",
+          "three_d_secure": null,
+          "wallet": null
+        },
+        "type": "card"
+      },
+      "radar_options": {},
+      "receipt_email": null,
+      "receipt_number": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKPXLisAGMgaSh_Hc3eo6LBa7iMKYM5L-dzjJdq2MYYa-Kh2sIgy1UQp1U-2_ing6kUPoxsiIYwGN0gjE",
+      "refunded": false,
+      "review": null,
+      "shipping": null,
+      "source": null,
+      "source_transfer": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    },
+    "previous_attributes": {
+      "balance_transaction": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKPXLisAGMgYwlwrm5pI6LBaEZXUUdUPo-Yq_7nigyW9tqbjyzKead5bSYaVZZK7siGyGDZXhLWkFoEgy"
+    }
+  },
+  "id": "evt_3RFKSUPteJOX9ukr1HuckIgd",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "charge.updated"
+}
+2025-04-18 21:20:21,975 [INFO] ✅ Webhook completato per evento: charge.updated
+2025-04-18 21:25:24,860 [INFO] 📦 Ricevuto evento Stripe: charge.succeeded
+2025-04-18 21:25:24,861 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745004324,
+  "data": {
+    "object": {
+      "amount": 1569,
+      "amount_captured": 1569,
+      "amount_refunded": 0,
+      "application": null,
+      "application_fee": null,
+      "application_fee_amount": null,
+      "balance_transaction": null,
+      "billing_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "quasa@gmail.com",
+        "name": "Alessio Quagliara",
+        "phone": null,
+        "tax_id": null
+      },
+      "calculated_statement_descriptor": "DEFAULT SANDBOX",
+      "captured": true,
+      "created": 1745004324,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "destination": null,
+      "dispute": null,
+      "disputed": false,
+      "failure_balance_transaction": null,
+      "failure_code": null,
+      "failure_message": null,
+      "fraud_details": {},
+      "id": "ch_3RFKXPPteJOX9ukr1s2jrHa8",
+      "invoice": null,
+      "livemode": false,
+      "metadata": {},
+      "object": "charge",
+      "on_behalf_of": null,
+      "order": null,
+      "outcome": {
+        "advice_code": null,
+        "network_advice_code": null,
+        "network_decline_code": null,
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 50,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+      },
+      "paid": true,
+      "payment_intent": "pi_3RFKXPPteJOX9ukr1tkFT1Qc",
+      "payment_method": "pm_1RFKXPPteJOX9ukrduNpKixL",
+      "payment_method_details": {
+        "card": {
+          "amount_authorized": 1569,
+          "authorization_code": null,
+          "brand": "visa",
+          "checks": {
+            "address_line1_check": null,
+            "address_postal_code_check": null,
+            "cvc_check": "pass"
+          },
+          "country": "US",
+          "exp_month": 3,
+          "exp_year": 2029,
+          "extended_authorization": {
+            "status": "disabled"
+          },
+          "fingerprint": "mB6Pyp1GwuciRztS",
+          "funding": "credit",
+          "incremental_authorization": {
+            "status": "unavailable"
+          },
+          "installments": null,
+          "last4": "4242",
+          "mandate": null,
+          "multicapture": {
+            "status": "unavailable"
+          },
+          "network": "visa",
+          "network_token": {
+            "used": false
+          },
+          "network_transaction_id": "109665480121112",
+          "overcapture": {
+            "maximum_amount_capturable": 1569,
+            "status": "unavailable"
+          },
+          "regulated_status": "unregulated",
+          "three_d_secure": null,
+          "wallet": null
+        },
+        "type": "card"
+      },
+      "radar_options": {},
+      "receipt_email": null,
+      "receipt_number": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKKTOisAGMga8Mpx7xV86LBZn1TRPWCUI_6zuesZhOf6zf7VbROmSKddvyLH0q0WM4GQEJpyjfFz_qzJJ",
+      "refunded": false,
+      "review": null,
+      "shipping": null,
+      "source": null,
+      "source_transfer": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFKXPPteJOX9ukr1znHLCgH",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "887fc5a4-e620-49f4-aae6-6ea97d3da92a"
+  },
+  "type": "charge.succeeded"
+}
+2025-04-18 21:25:24,862 [INFO] ✅ Webhook completato per evento: charge.succeeded
+2025-04-18 21:25:24,910 [INFO] 📦 Ricevuto evento Stripe: payment_intent.succeeded
+2025-04-18 21:25:24,911 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745004324,
+  "data": {
+    "object": {
+      "amount": 1569,
+      "amount_capturable": 0,
+      "amount_details": {
+        "tip": {}
+      },
+      "amount_received": 1569,
+      "application": null,
+      "application_fee_amount": null,
+      "automatic_payment_methods": null,
+      "canceled_at": null,
+      "cancellation_reason": null,
+      "capture_method": "automatic_async",
+      "client_secret": "pi_3RFKXPPteJOX9ukr1tkFT1Qc_secret_tJajtzn00OQFh9yXBjIIUUIx9",
+      "confirmation_method": "automatic",
+      "created": 1745004323,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "id": "pi_3RFKXPPteJOX9ukr1tkFT1Qc",
+      "invoice": null,
+      "last_payment_error": null,
+      "latest_charge": "ch_3RFKXPPteJOX9ukr1s2jrHa8",
+      "livemode": false,
+      "metadata": {},
+      "next_action": null,
+      "object": "payment_intent",
+      "on_behalf_of": null,
+      "payment_method": "pm_1RFKXPPteJOX9ukrduNpKixL",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "installments": null,
+          "mandate_options": null,
+          "network": null,
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "processing": null,
+      "receipt_email": null,
+      "review": null,
+      "setup_future_usage": null,
+      "shipping": null,
+      "source": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFKXPPteJOX9ukr1sV14Oaf",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "887fc5a4-e620-49f4-aae6-6ea97d3da92a"
+  },
+  "type": "payment_intent.succeeded"
+}
+2025-04-18 21:25:24,911 [INFO] ✅ Webhook completato per evento: payment_intent.succeeded
+2025-04-18 21:25:25,012 [INFO] 📦 Ricevuto evento Stripe: checkout.session.completed
+2025-04-18 21:25:25,012 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745004324,
+  "data": {
+    "object": {
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 1569,
+      "amount_total": 1569,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "cancel_url": "http://127.0.0.1:5000/dashboard/domains/passaporto?canceled=true&domain=passaporto-2.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": null,
+      "created": 1745004300,
+      "currency": "eur",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_creation": "if_required",
+      "customer_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "quasa@gmail.com",
+        "name": "Alessio Quagliara",
+        "phone": null,
+        "tax_exempt": "none",
+        "tax_ids": []
+      },
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1745090699,
+      "id": "cs_test_a1wvNAyX2YoYBSD0DYO65hu3cIJURB9zawGlj5NQJttjLOxIi0UMVeEZb4",
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": false,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": null,
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": false,
+      "locale": null,
+      "metadata": {
+        "domain": "passaporto-2.com",
+        "shop_name": "passaporto",
+        "user_id": "3"
+      },
+      "mode": "payment",
+      "object": "checkout.session",
+      "payment_intent": "pi_3RFKXPPteJOX9ukr1tkFT1Qc",
+      "payment_link": null,
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "paid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": false
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": null,
+      "setup_intent": null,
+      "shipping_address_collection": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "complete",
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "http://127.0.0.1:5000/dashboard/domains/passaporto?success=true&domain=passaporto-2.com",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    }
+  },
+  "id": "evt_1RFKXQPteJOX9ukr2Tbo0FbK",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "checkout.session.completed"
+}
+2025-04-18 21:25:25,013 [INFO] 📋 Metadata presenti nella sessione: {
+  "domain": "passaporto-2.com",
+  "shop_name": "passaporto",
+  "user_id": "3"
+}
+2025-04-18 21:25:25,013 [INFO] 🧠 Metadata ricevuti: user_id=3, shop_name=passaporto, plan_name=None
+2025-04-18 21:25:25,021 [INFO] 📦 Ricevuto evento Stripe: payment_intent.created
+2025-04-18 21:25:25,022 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745004323,
+  "data": {
+    "object": {
+      "amount": 1569,
+      "amount_capturable": 0,
+      "amount_details": {
+        "tip": {}
+      },
+      "amount_received": 0,
+      "application": null,
+      "application_fee_amount": null,
+      "automatic_payment_methods": null,
+      "canceled_at": null,
+      "cancellation_reason": null,
+      "capture_method": "automatic_async",
+      "client_secret": "pi_3RFKXPPteJOX9ukr1tkFT1Qc_secret_tJajtzn00OQFh9yXBjIIUUIx9",
+      "confirmation_method": "automatic",
+      "created": 1745004323,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "id": "pi_3RFKXPPteJOX9ukr1tkFT1Qc",
+      "invoice": null,
+      "last_payment_error": null,
+      "latest_charge": null,
+      "livemode": false,
+      "metadata": {},
+      "next_action": null,
+      "object": "payment_intent",
+      "on_behalf_of": null,
+      "payment_method": null,
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "installments": null,
+          "mandate_options": null,
+          "network": null,
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "processing": null,
+      "receipt_email": null,
+      "review": null,
+      "setup_future_usage": null,
+      "shipping": null,
+      "source": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "requires_payment_method",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFKXPPteJOX9ukr1sFVSBhB",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "887fc5a4-e620-49f4-aae6-6ea97d3da92a"
+  },
+  "type": "payment_intent.created"
+}
+2025-04-18 21:25:25,023 [INFO] ✅ Webhook completato per evento: payment_intent.created
+2025-04-18 21:25:27,137 [INFO] 📦 Ricevuto evento Stripe: charge.updated
+2025-04-18 21:25:27,138 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745004326,
+  "data": {
+    "object": {
+      "amount": 1569,
+      "amount_captured": 1569,
+      "amount_refunded": 0,
+      "application": null,
+      "application_fee": null,
+      "application_fee_amount": null,
+      "balance_transaction": "txn_3RFKXPPteJOX9ukr1C6UxfSE",
+      "billing_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "quasa@gmail.com",
+        "name": "Alessio Quagliara",
+        "phone": null,
+        "tax_id": null
+      },
+      "calculated_statement_descriptor": "DEFAULT SANDBOX",
+      "captured": true,
+      "created": 1745004324,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "destination": null,
+      "dispute": null,
+      "disputed": false,
+      "failure_balance_transaction": null,
+      "failure_code": null,
+      "failure_message": null,
+      "fraud_details": {},
+      "id": "ch_3RFKXPPteJOX9ukr1s2jrHa8",
+      "invoice": null,
+      "livemode": false,
+      "metadata": {},
+      "object": "charge",
+      "on_behalf_of": null,
+      "order": null,
+      "outcome": {
+        "advice_code": null,
+        "network_advice_code": null,
+        "network_decline_code": null,
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 50,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+      },
+      "paid": true,
+      "payment_intent": "pi_3RFKXPPteJOX9ukr1tkFT1Qc",
+      "payment_method": "pm_1RFKXPPteJOX9ukrduNpKixL",
+      "payment_method_details": {
+        "card": {
+          "amount_authorized": 1569,
+          "authorization_code": null,
+          "brand": "visa",
+          "checks": {
+            "address_line1_check": null,
+            "address_postal_code_check": null,
+            "cvc_check": "pass"
+          },
+          "country": "US",
+          "exp_month": 3,
+          "exp_year": 2029,
+          "extended_authorization": {
+            "status": "disabled"
+          },
+          "fingerprint": "mB6Pyp1GwuciRztS",
+          "funding": "credit",
+          "incremental_authorization": {
+            "status": "unavailable"
+          },
+          "installments": null,
+          "last4": "4242",
+          "mandate": null,
+          "multicapture": {
+            "status": "unavailable"
+          },
+          "network": "visa",
+          "network_token": {
+            "used": false
+          },
+          "network_transaction_id": "109665480121112",
+          "overcapture": {
+            "maximum_amount_capturable": 1569,
+            "status": "unavailable"
+          },
+          "regulated_status": "unregulated",
+          "three_d_secure": null,
+          "wallet": null
+        },
+        "type": "card"
+      },
+      "radar_options": {},
+      "receipt_email": null,
+      "receipt_number": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKKbOisAGMgZNdJRtZDA6LBaSGZjO4qKN7KRWgd2Hp0pp32UxJdWToSO-YWVh9_uAwTx_OZNAwWJ3n3oA",
+      "refunded": false,
+      "review": null,
+      "shipping": null,
+      "source": null,
+      "source_transfer": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    },
+    "previous_attributes": {
+      "balance_transaction": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKKbOisAGMgbnZ2V5ZH06LBZtmXU1t7RP_aYI38GjBTzdK0PKZ_PQcj3jiBwuDo9ShDUA8K9pNjOBOfjO"
+    }
+  },
+  "id": "evt_3RFKXPPteJOX9ukr1XKKizbu",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "charge.updated"
+}
+2025-04-18 21:25:27,138 [INFO] ✅ Webhook completato per evento: charge.updated
+2025-04-18 21:25:44,911 [INFO] 📥 Salvataggio dominio nel database: passaporto-2.com
+2025-04-18 21:25:44,924 [INFO] ✅ Dominio 'passaporto-2.com' registrato nel database con shop_id=3
+2025-04-18 21:25:44,924 [INFO] ✅ Webhook completato per session ID: cs_test_a1wvNAyX2YoYBSD0DYO65hu3cIJURB9zawGlj5NQJttjLOxIi0UMVeEZb4
+2025-04-18 22:49:32,313 [INFO] 📦 Ricevuto evento Stripe: charge.succeeded
+2025-04-18 22:49:32,314 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745009371,
+  "data": {
+    "object": {
+      "amount": 1998,
+      "amount_captured": 1998,
+      "amount_refunded": 0,
+      "application": null,
+      "application_fee": null,
+      "application_fee_amount": null,
+      "balance_transaction": null,
+      "billing_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "diocane@gmail.com",
+        "name": "a q",
+        "phone": null,
+        "tax_id": null
+      },
+      "calculated_statement_descriptor": "DEFAULT SANDBOX",
+      "captured": true,
+      "created": 1745009371,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "destination": null,
+      "dispute": null,
+      "disputed": false,
+      "failure_balance_transaction": null,
+      "failure_code": null,
+      "failure_message": null,
+      "fraud_details": {},
+      "id": "ch_3RFLqpPteJOX9ukr0bY28YvB",
+      "invoice": null,
+      "livemode": false,
+      "metadata": {},
+      "object": "charge",
+      "on_behalf_of": null,
+      "order": null,
+      "outcome": {
+        "advice_code": null,
+        "network_advice_code": null,
+        "network_decline_code": null,
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 23,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+      },
+      "paid": true,
+      "payment_intent": "pi_3RFLqpPteJOX9ukr0OmSjRiO",
+      "payment_method": "pm_1RFLqoPteJOX9ukraP7b8Nm3",
+      "payment_method_details": {
+        "card": {
+          "amount_authorized": 1998,
+          "authorization_code": null,
+          "brand": "visa",
+          "checks": {
+            "address_line1_check": null,
+            "address_postal_code_check": null,
+            "cvc_check": "pass"
+          },
+          "country": "US",
+          "exp_month": 2,
+          "exp_year": 2029,
+          "extended_authorization": {
+            "status": "disabled"
+          },
+          "fingerprint": "mB6Pyp1GwuciRztS",
+          "funding": "credit",
+          "incremental_authorization": {
+            "status": "unavailable"
+          },
+          "installments": null,
+          "last4": "4242",
+          "mandate": null,
+          "multicapture": {
+            "status": "unavailable"
+          },
+          "network": "visa",
+          "network_token": {
+            "used": false
+          },
+          "network_transaction_id": "109665480121112",
+          "overcapture": {
+            "maximum_amount_capturable": 1998,
+            "status": "unavailable"
+          },
+          "regulated_status": "unregulated",
+          "three_d_secure": null,
+          "wallet": null
+        },
+        "type": "card"
+      },
+      "radar_options": {},
+      "receipt_email": null,
+      "receipt_number": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKNz1isAGMgYqA53NBp86LBbRMC5S9HKI28JGbq4lis3KH5T65kFfbN6p3Ah8NLwb7RpZc-Z5MdDW8RXo",
+      "refunded": false,
+      "review": null,
+      "shipping": null,
+      "source": null,
+      "source_transfer": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFLqpPteJOX9ukr0i1S8MyN",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "478fa139-1693-4066-b470-ede0cac55945"
+  },
+  "type": "charge.succeeded"
+}
+2025-04-18 22:49:32,315 [INFO] ✅ Webhook completato per evento: charge.succeeded
+2025-04-18 22:49:32,362 [INFO] 📦 Ricevuto evento Stripe: payment_intent.succeeded
+2025-04-18 22:49:32,362 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745009371,
+  "data": {
+    "object": {
+      "amount": 1998,
+      "amount_capturable": 0,
+      "amount_details": {
+        "tip": {}
+      },
+      "amount_received": 1998,
+      "application": null,
+      "application_fee_amount": null,
+      "automatic_payment_methods": null,
+      "canceled_at": null,
+      "cancellation_reason": null,
+      "capture_method": "automatic_async",
+      "client_secret": "pi_3RFLqpPteJOX9ukr0OmSjRiO_secret_DhojVwVatmvWRwwRNrMBFbxr4",
+      "confirmation_method": "automatic",
+      "created": 1745009371,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "id": "pi_3RFLqpPteJOX9ukr0OmSjRiO",
+      "invoice": null,
+      "last_payment_error": null,
+      "latest_charge": "ch_3RFLqpPteJOX9ukr0bY28YvB",
+      "livemode": false,
+      "metadata": {},
+      "next_action": null,
+      "object": "payment_intent",
+      "on_behalf_of": null,
+      "payment_method": "pm_1RFLqoPteJOX9ukraP7b8Nm3",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "installments": null,
+          "mandate_options": null,
+          "network": null,
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "processing": null,
+      "receipt_email": null,
+      "review": null,
+      "setup_future_usage": null,
+      "shipping": null,
+      "source": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFLqpPteJOX9ukr0raONtF7",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "478fa139-1693-4066-b470-ede0cac55945"
+  },
+  "type": "payment_intent.succeeded"
+}
+2025-04-18 22:49:32,362 [INFO] ✅ Webhook completato per evento: payment_intent.succeeded
+2025-04-18 22:49:32,469 [INFO] 📦 Ricevuto evento Stripe: payment_intent.created
+2025-04-18 22:49:32,470 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745009371,
+  "data": {
+    "object": {
+      "amount": 1998,
+      "amount_capturable": 0,
+      "amount_details": {
+        "tip": {}
+      },
+      "amount_received": 0,
+      "application": null,
+      "application_fee_amount": null,
+      "automatic_payment_methods": null,
+      "canceled_at": null,
+      "cancellation_reason": null,
+      "capture_method": "automatic_async",
+      "client_secret": "pi_3RFLqpPteJOX9ukr0OmSjRiO_secret_DhojVwVatmvWRwwRNrMBFbxr4",
+      "confirmation_method": "automatic",
+      "created": 1745009371,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "id": "pi_3RFLqpPteJOX9ukr0OmSjRiO",
+      "invoice": null,
+      "last_payment_error": null,
+      "latest_charge": null,
+      "livemode": false,
+      "metadata": {},
+      "next_action": null,
+      "object": "payment_intent",
+      "on_behalf_of": null,
+      "payment_method": null,
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "installments": null,
+          "mandate_options": null,
+          "network": null,
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "processing": null,
+      "receipt_email": null,
+      "review": null,
+      "setup_future_usage": null,
+      "shipping": null,
+      "source": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "requires_payment_method",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFLqpPteJOX9ukr08jKpAvB",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "478fa139-1693-4066-b470-ede0cac55945"
+  },
+  "type": "payment_intent.created"
+}
+2025-04-18 22:49:32,470 [INFO] ✅ Webhook completato per evento: payment_intent.created
+2025-04-18 22:49:32,489 [INFO] 📦 Ricevuto evento Stripe: checkout.session.completed
+2025-04-18 22:49:32,489 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745009372,
+  "data": {
+    "object": {
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 1998,
+      "amount_total": 1998,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "cancel_url": "http://127.0.0.1:5000/dashboard/domains/passaporto?canceled=true&domain=passaporto-2.es",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": null,
+      "created": 1745009330,
+      "currency": "eur",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_creation": "if_required",
+      "customer_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "diocane@gmail.com",
+        "name": "a q",
+        "phone": null,
+        "tax_exempt": "none",
+        "tax_ids": []
+      },
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1745095730,
+      "id": "cs_test_a1TbNUdMv9KAjaL9CyNOekBN8XEA6b42qV7dImgD1vYMFe9dXhdhSelMKc",
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": false,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": null,
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": false,
+      "locale": null,
+      "metadata": {
+        "domain": "passaporto-2.es",
+        "shop_name": "passaporto",
+        "user_id": "3"
+      },
+      "mode": "payment",
+      "object": "checkout.session",
+      "payment_intent": "pi_3RFLqpPteJOX9ukr0OmSjRiO",
+      "payment_link": null,
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "paid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": false
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": null,
+      "setup_intent": null,
+      "shipping_address_collection": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "complete",
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "http://127.0.0.1:5000/dashboard/domains/passaporto?success=true&domain=passaporto-2.es",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    }
+  },
+  "id": "evt_1RFLqqPteJOX9ukrgfhDwz4H",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "checkout.session.completed"
+}
+2025-04-18 22:49:32,490 [INFO] 📋 Metadata presenti nella sessione: {
+  "domain": "passaporto-2.es",
+  "shop_name": "passaporto",
+  "user_id": "3"
+}
+2025-04-18 22:49:32,490 [INFO] 🧠 Metadata ricevuti: user_id=3, shop_name=passaporto, plan_name=None
+2025-04-18 22:49:33,258 [ERROR] ❌ Errore durante l'acquisto dominio: Failed to purchase domain
+2025-04-18 22:49:33,258 [INFO] ✅ Webhook completato per session ID: cs_test_a1TbNUdMv9KAjaL9CyNOekBN8XEA6b42qV7dImgD1vYMFe9dXhdhSelMKc
+2025-04-18 22:49:34,718 [INFO] 📦 Ricevuto evento Stripe: charge.updated
+2025-04-18 22:49:34,718 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745009374,
+  "data": {
+    "object": {
+      "amount": 1998,
+      "amount_captured": 1998,
+      "amount_refunded": 0,
+      "application": null,
+      "application_fee": null,
+      "application_fee_amount": null,
+      "balance_transaction": "txn_3RFLqpPteJOX9ukr0h7meYEM",
+      "billing_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "diocane@gmail.com",
+        "name": "a q",
+        "phone": null,
+        "tax_id": null
+      },
+      "calculated_statement_descriptor": "DEFAULT SANDBOX",
+      "captured": true,
+      "created": 1745009371,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "destination": null,
+      "dispute": null,
+      "disputed": false,
+      "failure_balance_transaction": null,
+      "failure_code": null,
+      "failure_message": null,
+      "fraud_details": {},
+      "id": "ch_3RFLqpPteJOX9ukr0bY28YvB",
+      "invoice": null,
+      "livemode": false,
+      "metadata": {},
+      "object": "charge",
+      "on_behalf_of": null,
+      "order": null,
+      "outcome": {
+        "advice_code": null,
+        "network_advice_code": null,
+        "network_decline_code": null,
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 23,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+      },
+      "paid": true,
+      "payment_intent": "pi_3RFLqpPteJOX9ukr0OmSjRiO",
+      "payment_method": "pm_1RFLqoPteJOX9ukraP7b8Nm3",
+      "payment_method_details": {
+        "card": {
+          "amount_authorized": 1998,
+          "authorization_code": null,
+          "brand": "visa",
+          "checks": {
+            "address_line1_check": null,
+            "address_postal_code_check": null,
+            "cvc_check": "pass"
+          },
+          "country": "US",
+          "exp_month": 2,
+          "exp_year": 2029,
+          "extended_authorization": {
+            "status": "disabled"
+          },
+          "fingerprint": "mB6Pyp1GwuciRztS",
+          "funding": "credit",
+          "incremental_authorization": {
+            "status": "unavailable"
+          },
+          "installments": null,
+          "last4": "4242",
+          "mandate": null,
+          "multicapture": {
+            "status": "unavailable"
+          },
+          "network": "visa",
+          "network_token": {
+            "used": false
+          },
+          "network_transaction_id": "109665480121112",
+          "overcapture": {
+            "maximum_amount_capturable": 1998,
+            "status": "unavailable"
+          },
+          "regulated_status": "unregulated",
+          "three_d_secure": null,
+          "wallet": null
+        },
+        "type": "card"
+      },
+      "radar_options": {},
+      "receipt_email": null,
+      "receipt_number": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKN71isAGMgbHsk4weKo6LBYs7BA_cVih9IBJeX3zU4UAG4cA0oKi2VYOZCHBqkBUhOc8yzHJ7rYZ9ffx",
+      "refunded": false,
+      "review": null,
+      "shipping": null,
+      "source": null,
+      "source_transfer": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    },
+    "previous_attributes": {
+      "balance_transaction": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKN71isAGMgY-atF4tsE6LBYaAR8_kedIhel09NP9vrZlZUNNEygFpPoU4Jj_2slLa6hmaREw03Vevjxn"
+    }
+  },
+  "id": "evt_3RFLqpPteJOX9ukr0WBcL1Es",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "charge.updated"
+}
+2025-04-18 22:49:34,719 [INFO] ✅ Webhook completato per evento: charge.updated
+2025-04-18 22:52:11,945 [INFO] 📦 Ricevuto evento Stripe: charge.succeeded
+2025-04-18 22:52:11,946 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745009531,
+  "data": {
+    "object": {
+      "amount": 1798,
+      "amount_captured": 1798,
+      "amount_refunded": 0,
+      "application": null,
+      "application_fee": null,
+      "application_fee_amount": null,
+      "balance_transaction": null,
+      "billing_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "a@gmail.com",
+        "name": "Alessio Q",
+        "phone": null,
+        "tax_id": null
+      },
+      "calculated_statement_descriptor": "DEFAULT SANDBOX",
+      "captured": true,
+      "created": 1745009531,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "destination": null,
+      "dispute": null,
+      "disputed": false,
+      "failure_balance_transaction": null,
+      "failure_code": null,
+      "failure_message": null,
+      "fraud_details": {},
+      "id": "ch_3RFLtOPteJOX9ukr2HFcAiWL",
+      "invoice": null,
+      "livemode": false,
+      "metadata": {},
+      "object": "charge",
+      "on_behalf_of": null,
+      "order": null,
+      "outcome": {
+        "advice_code": null,
+        "network_advice_code": null,
+        "network_decline_code": null,
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 25,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+      },
+      "paid": true,
+      "payment_intent": "pi_3RFLtOPteJOX9ukr2LvBHISR",
+      "payment_method": "pm_1RFLtOPteJOX9ukrZLk7pbFT",
+      "payment_method_details": {
+        "card": {
+          "amount_authorized": 1798,
+          "authorization_code": null,
+          "brand": "visa",
+          "checks": {
+            "address_line1_check": null,
+            "address_postal_code_check": null,
+            "cvc_check": "pass"
+          },
+          "country": "US",
+          "exp_month": 3,
+          "exp_year": 2029,
+          "extended_authorization": {
+            "status": "disabled"
+          },
+          "fingerprint": "mB6Pyp1GwuciRztS",
+          "funding": "credit",
+          "incremental_authorization": {
+            "status": "unavailable"
+          },
+          "installments": null,
+          "last4": "4242",
+          "mandate": null,
+          "multicapture": {
+            "status": "unavailable"
+          },
+          "network": "visa",
+          "network_token": {
+            "used": false
+          },
+          "network_transaction_id": "109665480121112",
+          "overcapture": {
+            "maximum_amount_capturable": 1798,
+            "status": "unavailable"
+          },
+          "regulated_status": "unregulated",
+          "three_d_secure": null,
+          "wallet": null
+        },
+        "type": "card"
+      },
+      "radar_options": {},
+      "receipt_email": null,
+      "receipt_number": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKPv2isAGMgZa9ioVgG06LBaRX8ASFh6jTepaEj1P1x_EZleg3gscHcBLbDrsAjjjQCPrgdYlV5mbKugP",
+      "refunded": false,
+      "review": null,
+      "shipping": null,
+      "source": null,
+      "source_transfer": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFLtOPteJOX9ukr2O2NsykT",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "b1fe1a5a-fbb3-42da-9351-e1ed286e24a0"
+  },
+  "type": "charge.succeeded"
+}
+2025-04-18 22:52:11,946 [INFO] ✅ Webhook completato per evento: charge.succeeded
+2025-04-18 22:52:12,019 [INFO] 📦 Ricevuto evento Stripe: payment_intent.succeeded
+2025-04-18 22:52:12,019 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745009531,
+  "data": {
+    "object": {
+      "amount": 1798,
+      "amount_capturable": 0,
+      "amount_details": {
+        "tip": {}
+      },
+      "amount_received": 1798,
+      "application": null,
+      "application_fee_amount": null,
+      "automatic_payment_methods": null,
+      "canceled_at": null,
+      "cancellation_reason": null,
+      "capture_method": "automatic_async",
+      "client_secret": "pi_3RFLtOPteJOX9ukr2LvBHISR_secret_yTugVeu2he9Rd1lfogG64yTm2",
+      "confirmation_method": "automatic",
+      "created": 1745009530,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "id": "pi_3RFLtOPteJOX9ukr2LvBHISR",
+      "invoice": null,
+      "last_payment_error": null,
+      "latest_charge": "ch_3RFLtOPteJOX9ukr2HFcAiWL",
+      "livemode": false,
+      "metadata": {},
+      "next_action": null,
+      "object": "payment_intent",
+      "on_behalf_of": null,
+      "payment_method": "pm_1RFLtOPteJOX9ukrZLk7pbFT",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "installments": null,
+          "mandate_options": null,
+          "network": null,
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "processing": null,
+      "receipt_email": null,
+      "review": null,
+      "setup_future_usage": null,
+      "shipping": null,
+      "source": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFLtOPteJOX9ukr2rc5CJ8M",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "b1fe1a5a-fbb3-42da-9351-e1ed286e24a0"
+  },
+  "type": "payment_intent.succeeded"
+}
+2025-04-18 22:52:12,019 [INFO] ✅ Webhook completato per evento: payment_intent.succeeded
+2025-04-18 22:52:12,081 [INFO] 📦 Ricevuto evento Stripe: checkout.session.completed
+2025-04-18 22:52:12,081 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745009531,
+  "data": {
+    "object": {
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 1798,
+      "amount_total": 1798,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "cancel_url": "http://127.0.0.1:5000/dashboard/domains/passaporto?canceled=true&domain=passaporto-2.net",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": null,
+      "created": 1745009511,
+      "currency": "eur",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_creation": "if_required",
+      "customer_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "a@gmail.com",
+        "name": "Alessio Q",
+        "phone": null,
+        "tax_exempt": "none",
+        "tax_ids": []
+      },
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1745095911,
+      "id": "cs_test_a1p1AdeNZRI87l9Dpn6znUIwDvgHr8Sud6h4UcdMtnLNYoQPiLBPI37gck",
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": false,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": null,
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": false,
+      "locale": null,
+      "metadata": {
+        "domain": "passaporto-2.net",
+        "shop_name": "passaporto",
+        "user_id": "3"
+      },
+      "mode": "payment",
+      "object": "checkout.session",
+      "payment_intent": "pi_3RFLtOPteJOX9ukr2LvBHISR",
+      "payment_link": null,
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "paid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": false
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": null,
+      "setup_intent": null,
+      "shipping_address_collection": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "complete",
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "http://127.0.0.1:5000/dashboard/domains/passaporto?success=true&domain=passaporto-2.net",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    }
+  },
+  "id": "evt_1RFLtPPteJOX9ukrVmNyDiqB",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "checkout.session.completed"
+}
+2025-04-18 22:52:12,082 [INFO] 📋 Metadata presenti nella sessione: {
+  "domain": "passaporto-2.net",
+  "shop_name": "passaporto",
+  "user_id": "3"
+}
+2025-04-18 22:52:12,082 [INFO] 🧠 Metadata ricevuti: user_id=3, shop_name=passaporto, plan_name=None
+2025-04-18 22:52:12,096 [INFO] 📦 Ricevuto evento Stripe: payment_intent.created
+2025-04-18 22:52:12,097 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745009530,
+  "data": {
+    "object": {
+      "amount": 1798,
+      "amount_capturable": 0,
+      "amount_details": {
+        "tip": {}
+      },
+      "amount_received": 0,
+      "application": null,
+      "application_fee_amount": null,
+      "automatic_payment_methods": null,
+      "canceled_at": null,
+      "cancellation_reason": null,
+      "capture_method": "automatic_async",
+      "client_secret": "pi_3RFLtOPteJOX9ukr2LvBHISR_secret_yTugVeu2he9Rd1lfogG64yTm2",
+      "confirmation_method": "automatic",
+      "created": 1745009530,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "id": "pi_3RFLtOPteJOX9ukr2LvBHISR",
+      "invoice": null,
+      "last_payment_error": null,
+      "latest_charge": null,
+      "livemode": false,
+      "metadata": {},
+      "next_action": null,
+      "object": "payment_intent",
+      "on_behalf_of": null,
+      "payment_method": null,
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "installments": null,
+          "mandate_options": null,
+          "network": null,
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "processing": null,
+      "receipt_email": null,
+      "review": null,
+      "setup_future_usage": null,
+      "shipping": null,
+      "source": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "requires_payment_method",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "id": "evt_3RFLtOPteJOX9ukr2e1O9aZy",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "b1fe1a5a-fbb3-42da-9351-e1ed286e24a0"
+  },
+  "type": "payment_intent.created"
+}
+2025-04-18 22:52:12,097 [INFO] ✅ Webhook completato per evento: payment_intent.created
+2025-04-18 22:52:14,311 [INFO] 📦 Ricevuto evento Stripe: charge.updated
+2025-04-18 22:52:14,312 [INFO] 📨 Payload ricevuto: {
+  "api_version": "2025-02-24.acacia",
+  "created": 1745009534,
+  "data": {
+    "object": {
+      "amount": 1798,
+      "amount_captured": 1798,
+      "amount_refunded": 0,
+      "application": null,
+      "application_fee": null,
+      "application_fee_amount": null,
+      "balance_transaction": "txn_3RFLtOPteJOX9ukr2HnSNG4m",
+      "billing_details": {
+        "address": {
+          "city": null,
+          "country": "IT",
+          "line1": null,
+          "line2": null,
+          "postal_code": null,
+          "state": null
+        },
+        "email": "a@gmail.com",
+        "name": "Alessio Q",
+        "phone": null,
+        "tax_id": null
+      },
+      "calculated_statement_descriptor": "DEFAULT SANDBOX",
+      "captured": true,
+      "created": 1745009531,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "destination": null,
+      "dispute": null,
+      "disputed": false,
+      "failure_balance_transaction": null,
+      "failure_code": null,
+      "failure_message": null,
+      "fraud_details": {},
+      "id": "ch_3RFLtOPteJOX9ukr2HFcAiWL",
+      "invoice": null,
+      "livemode": false,
+      "metadata": {},
+      "object": "charge",
+      "on_behalf_of": null,
+      "order": null,
+      "outcome": {
+        "advice_code": null,
+        "network_advice_code": null,
+        "network_decline_code": null,
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 25,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+      },
+      "paid": true,
+      "payment_intent": "pi_3RFLtOPteJOX9ukr2LvBHISR",
+      "payment_method": "pm_1RFLtOPteJOX9ukrZLk7pbFT",
+      "payment_method_details": {
+        "card": {
+          "amount_authorized": 1798,
+          "authorization_code": null,
+          "brand": "visa",
+          "checks": {
+            "address_line1_check": null,
+            "address_postal_code_check": null,
+            "cvc_check": "pass"
+          },
+          "country": "US",
+          "exp_month": 3,
+          "exp_year": 2029,
+          "extended_authorization": {
+            "status": "disabled"
+          },
+          "fingerprint": "mB6Pyp1GwuciRztS",
+          "funding": "credit",
+          "incremental_authorization": {
+            "status": "unavailable"
+          },
+          "installments": null,
+          "last4": "4242",
+          "mandate": null,
+          "multicapture": {
+            "status": "unavailable"
+          },
+          "network": "visa",
+          "network_token": {
+            "used": false
+          },
+          "network_transaction_id": "109665480121112",
+          "overcapture": {
+            "maximum_amount_capturable": 1798,
+            "status": "unavailable"
+          },
+          "regulated_status": "unregulated",
+          "three_d_secure": null,
+          "wallet": null
+        },
+        "type": "card"
+      },
+      "radar_options": {},
+      "receipt_email": null,
+      "receipt_number": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKP72isAGMgacH5BqqJc6LBacDt5g4Huyy1pHj5JN4S79pN5Ae8qxRvedZGLigG2eGWzhQYTe5RzTx2tR",
+      "refunded": false,
+      "review": null,
+      "shipping": null,
+      "source": null,
+      "source_transfer": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    },
+    "previous_attributes": {
+      "balance_transaction": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUjhyOEJQdGVKT1g5dWtyKP72isAGMgaPz5B9w8M6LBbLyFGFV5dkTSW1EIOtcfsLHX0zOTbyaeK7rA23q_Mlv40zdPGJ960yYGcP"
+    }
+  },
+  "id": "evt_3RFLtOPteJOX9ukr2h8HjHpV",
+  "livemode": false,
+  "object": "event",
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "charge.updated"
+}
+2025-04-18 22:52:14,312 [INFO] ✅ Webhook completato per evento: charge.updated
+2025-04-18 22:52:33,592 [INFO] 📥 Salvataggio dominio nel database: passaporto-2.net
+2025-04-18 22:52:33,601 [ERROR] ⚠️ Errore durante la configurazione DNS per passaporto-2.net: 'GoDaddyAPI' object has no attribute 'set_dns_records'
+2025-04-18 22:52:33,644 [ERROR] ⚠️ Errore durante l'esecuzione dello script setup_custom_domain.py: Command '['python3', '/var/www/CMS_DEF/scripts/setup_custom_domain.py', 'passaporto-2.net']' returned non-zero exit status 2.
+2025-04-18 22:52:33,646 [INFO] ✅ Dominio 'passaporto-2.net' registrato nel database con shop_id=3
+2025-04-18 22:52:33,646 [INFO] ✅ Webhook completato per session ID: cs_test_a1p1AdeNZRI87l9Dpn6znUIwDvgHr8Sud6h4UcdMtnLNYoQPiLBPI37gck

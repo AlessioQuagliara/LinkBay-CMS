@@ -1,38 +1,169 @@
 {% extends 'landing/base.html' %}
 {% block content %}
+{% if request.args.get('success') == 'true' and request.args.get('domain') %}
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const domain = "{{ request.args.get('domain') }}";
+      let seconds = 10;
+      const alert = document.createElement("div");
+      alert.className = "alert alert-success";
+      alert.innerHTML = `
+        ✅ Dominio <strong>${domain}</strong> acquistato con successo!<br>
+        Verifica in corso... ricarico la pagina tra <strong id="countdown">${seconds}</strong> secondi.
+      `;
+      document.querySelector(".card-body").prepend(alert);
+
+      const countdownEl = document.getElementById("countdown");
+      const interval = setInterval(() => {
+        seconds--;
+        countdownEl.textContent = seconds;
+        if (seconds <= 0) {
+          clearInterval(interval);
+          location.reload();
+        }
+      }, 1000);
+    });
+  </script>
+{% endif %}
+<div id="stripe-data"
+     data-stripe-pk="{{ stripe_pk }}"
+     data-shop-name="{{ shop_name }}">
+</div>
 <div class="container py-4">
   <div class="card shadow-sm border-0">
     <div class="card-header bg-danger text-white">
       <h5 class="mb-0"><i class="fa-solid fa-globe me-2"></i>Gestione Domini</h5>
     </div>
     <div class="card-body">
-      <p class="text-muted">Aggiungi o modifica i domini associati al tuo shop.</p>
+      <p class="text-muted">Aggiungi o gestisci domini personalizzati per il tuo shop.</p>
 
-      <form method="POST" action="/api/domains/add/{{ shop_name }}">
-        <div class="mb-3">
-          <label for="domain" class="form-label">Dominio personalizzato</label>
-          <input type="text" class="form-control" id="domain" name="domain" placeholder="www.tuodominio.com" required>
+      <div class="card mb-4">
+        <div class="card-body">
+          <h6><i class="fa-solid fa-cart-shopping me-2"></i>Acquista un dominio da GoDaddy</h6>
+          <div class="row align-items-end g-3">
+            <div class="col-md-6">
+              <label class="form-label">Dominio da cercare</label>
+              <input type="text" id="search-domain-input" class="form-control" placeholder="es. linkbay.it">
+            </div>
+            <div class="col-md-3">
+              <button id="check-domain-btn" class="btn btn-danger w-100"><i class="fa fa-search me-1"></i> Verifica</button>
+            </div>
+            <div class="col-md-3" id="purchase-col" style="display: none;">
+              <button id="purchase-domain-btn" class="btn btn-success w-100"><i class="fa fa-credit-card me-1"></i> Acquista</button>
+            </div>
+          </div>
+          <div id="domain-result" class="small text-muted mt-2"></div>
+
+          <div id="payment-section" class="mt-4" style="display: none;">
+            <label class="form-label">Pagamento (Stripe)</label>
+            <div id="stripe-card-element" class="form-control mb-2"></div>
+            <div id="card-errors" class="text-danger small mt-1"></div>
+          </div>
         </div>
-        <button type="submit" class="btn btn-danger"><i class="fa-solid fa-plus"></i> Aggiungi Dominio</button>
-      </form>
+      </div>
 
       <hr>
-
       <h6 class="mt-4 mb-3">🌐 Domini Attuali</h6>
-      <ul class="list-group">
-        {% for domain in domains %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          {{ domain }}
-          <form method="POST" action="/api/domains/delete/{{ shop_name }}" class="m-0">
-            <input type="hidden" name="domain" value="{{ domain }}">
-            <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash-can"></i></button>
-          </form>
-        </li>
-        {% else %}
-        <li class="list-group-item text-muted">Nessun dominio associato</li>
-        {% endfor %}
-      </ul>
+      <div class="table-responsive">
+        <style>
+          .table thead th:first-child,
+          .table tbody td:first-child {
+            border-top-left-radius: 2rem;
+          }
+ 
+          .table thead th:last-child,
+          .table tbody td:last-child {
+            border-top-right-radius: 2rem;
+          }
+ 
+          .table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 2rem;
+          }
+ 
+          .table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 2rem;
+          }
+        </style>
+        <table class="table table-bordered align-middle rounded shadow-sm overflow-hidden">
+          <thead class="table-light">
+            <tr>
+              <th>🌍 Dominio</th>
+              <th>🔧 Provider DNS</th>
+              <th>♻️ Rinnovo</th>
+              <th>⚙️ Stato</th>
+              <th class="text-end">Azioni</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for domain in domains %}
+            <tr>
+              <td>{{ domain.domain }}</td>
+              <td>{{ domain.dns_provider or "—" }}</td>
+              <td>
+                {% if domain.renewal_enabled %}
+                  <span class="badge bg-success"><i class="fa-solid fa-rotate"></i> Auto</span><br>
+                {% else %}
+                  <span class="badge bg-secondary"><i class="fa-solid fa-hand"></i> Manuale</span><br>
+                {% endif %}
+                {% if domain.renewal_date %}
+                  <small class="text-muted">
+                    <i class="fa-regular fa-calendar-days me-1"></i>
+                    Rinnovo: {{ domain.renewal_date.strftime('%d/%m/%Y') }}
+                  </small>
+                {% else %}
+                  <small class="text-muted">—</small>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge bg-{{ 'success' if domain.status == 'active' else 'warning' }}">
+                  <i class="fa-solid fa-circle-dot me-1"></i>{{ domain.status.capitalize() }}
+                </span>
+              </td>
+              <td class="text-end">
+                <button class="btn btn-outline-danger btn-sm" onclick="disableRenewal('{{ domain.id }}')">
+                  <i class="fa fa-trash-alt"></i> Disattiva rinnovo
+                </button>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="5" class="text-muted text-center">Nessun dominio associato</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
+
+<script src="/static/js/superadmin/domains.js" ></script>
+<script src="https://js.stripe.com/v3/"></script>
+<script src="/static/js/superadmin/domains_stripe.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get('success');
+    const domain = urlParams.get('domain');
+
+    if (success === 'true' && domain) {
+      fetch('/api/domains/send-success-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ domain: domain })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          console.log("📧 Email inviata con successo");
+        } else {
+          console.warn("⚠️ Problema con l'invio email:", data.message);
+        }
+      })
+      .catch(err => console.error("Errore durante l'invio email:", err));
+    }
+  });
+</script>
 {% endblock %}

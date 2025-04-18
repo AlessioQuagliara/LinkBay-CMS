@@ -88,7 +88,95 @@ def handle_stripe_webhook():
             db.session.rollback()
             current_app.logger.error(f"🔥 Errore durante l'aggiornamento dell'abbonamento: {e}")
 
-    webhook_logger.info(f"✅ Webhook completato per session ID: {session.get('id')}")
+        # 👉 GESTIONE DOMINIO ACQUISTATO (senza toccare le subscription)
+        domain = metadata.get('domain')
+        if domain:
+            from models.user import User
+            from models.shoplist import ShopList
+            from models.domain import Domain
+            from public.godaddy_api import GoDaddyAPI  # Adattato secondo struttura indicata
+
+            try:
+                user = User.query.get(user_id)
+                shop = ShopList.query.filter_by(shop_name=shop_name).first()
+
+                if not (user and shop and shop.user_id == user.id):
+                    webhook_logger.warning(f"❌ Dati non validi per salvataggio dominio: user={user}, shop={shop}")
+                else:
+                    contact = {
+                        "nameFirst": user.nome or "Utente",
+                        "nameLast": user.cognome or "",
+                        "email": user.email,
+                        "phone": "+39.3333333333",
+                        "addressMailing": {
+                            "address1": "Via Generica 123",
+                            "city": "Roma",
+                            "state": "RM",
+                            "postalCode": "00100",
+                            "country": "IT"
+                        }
+                    }
+
+                    api = GoDaddyAPI()
+                    result = api.purchase_domain(domain, {
+                        "domain": domain,
+                        "consent": {
+                            "agreementKeys": ["DNRA"],
+                            "agreedBy": request.remote_addr or "127.0.0.1",
+                            "agreedAt": datetime.utcnow().isoformat() + "Z"
+                        },
+                        "contactAdmin": contact,
+                        "contactRegistrant": contact,
+                        "contactTech": contact,
+                        "contactBilling": contact
+                    })
+
+                    if "error" in result:
+                        webhook_logger.error(f"❌ Errore durante l'acquisto dominio: {result['error']}")
+                    else:
+                        webhook_logger.info(f"📥 Salvataggio dominio nel database: {domain}")
+                        new_domain = Domain(
+                            shop_id=shop.id,
+                            domain=domain,
+                            dns_provider="GoDaddy",
+                            status="active",
+                            renewal_enabled=True,
+                            renewal_date=datetime.utcnow() + timedelta(days=365)
+                        )
+                        db.session.add(new_domain)
+                        db.session.commit()
+
+                        # Aggiunta record DNS per puntare all'IP del server
+                        try:
+                            api.set_dns_records(domain, [
+                                {
+                                    "type": "A",
+                                    "name": "@",
+                                    "data": "103.240.147.13",
+                                    "ttl": 600
+                                }
+                            ])
+                            webhook_logger.info(f"🌍 DNS A record aggiunto per {domain} -> 103.240.147.13")
+                        except Exception as dns_err:
+                            webhook_logger.error(f"⚠️ Errore durante la configurazione DNS per {domain}: {dns_err}")
+
+                        # 🔧 Esegui configurazione Nginx + Certbot per dominio acquistato
+                        try:
+                            import subprocess
+                            subprocess.run(["python3", "/var/www/CMS_DEF/scripts/setup_custom_domain.py", domain], check=True)
+                            webhook_logger.info(f"🛠️ Script setup_custom_domain.py eseguito per: {domain}")
+                        except Exception as e:
+                            webhook_logger.error(f"⚠️ Errore durante l'esecuzione dello script setup_custom_domain.py: {e}")
+
+                        webhook_logger.info(f"✅ Dominio '{domain}' registrato nel database con shop_id={shop.id}")
+            except Exception as e:
+                db.session.rollback()
+                webhook_logger.error(f"🔥 Errore durante gestione dominio via webhook: {e}")
+
+    if event['type'] == 'checkout.session.completed':
+        webhook_logger.info(f"✅ Webhook completato per session ID: {session.get('id')}")
+    else:
+        webhook_logger.info(f"✅ Webhook completato per evento: {event['type']}")
     return '', 200
 
 @stripe_webhook_bp.route('/webhook/debug/subscriptions', methods=['GET'])
@@ -105,4 +193,3 @@ def debug_subscriptions():
             "renewal_date": sub.renewal_date.strftime('%Y-%m-%d') if sub.renewal_date else None
         })
     return {"subscriptions": result}
-
