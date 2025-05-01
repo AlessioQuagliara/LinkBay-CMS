@@ -13,6 +13,7 @@ from models.storepayment import StorePayment
 from models.subscription import Subscription
 from models.domain import Domain
 from public.godaddy_api import GoDaddyAPI
+from models.websettings import WebSettings
 from public.stripe_connect import create_connect_account
 from sqlalchemy import func
 from flask import session
@@ -926,3 +927,23 @@ def send_success_email():
     except Exception as e:
         logger.error(f"Errore invio email dominio: {e}")
         return jsonify(success=False, message="Errore durante l'invio della email"), 500
+    
+
+#+ 📢 Api per gestione Rotte Analytics ---------------------------------------------------------------------------------------------------
+
+    # 📌 Salvataggio Google Analytics
+@landing_api.route('/integrations/google_analytics/<shop_name>', methods=['POST'])
+def saveGoogle(shop_name):
+    if 'user_id' not in session:
+        return jsonify(success=False, message="Utente non autenticato"), 401
+    
+    websettings = WebSettings.query.filter_by(shop_name=shop_name)
+    
+    try:
+        db.session.commit()
+        return jsonify(success=True, message="Google aggiornato con successo")
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Errore aggiornamento Google: {e}")
+        return jsonify(success=False, message="Errore durante l'aggiornamento"), 500
+    

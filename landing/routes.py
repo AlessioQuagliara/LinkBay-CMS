@@ -11,6 +11,7 @@ from models.cmsaddon import CMSAddon
 from models.cmsaddon import ShopAddon
 from models.site_visits import SiteVisit
 from models.stores_info import StoreInfo
+from models.websettings import WebSettings
 from models.domain import Domain
 from models.improvement_suggestion import ImprovementSuggestion
 from sqlalchemy import func
@@ -549,7 +550,10 @@ def news():
 def dashboard_google_analytics(shop_name):
     if 'user_id' not in session:
         return redirect(url_for('landing.login'))
-    return render_template('landing/dashboard_google_analytics.html', user=get_user_from_session(), shop_name=shop_name)
+    
+    websettings = WebSettings.query.filter_by(shop_name=shop_name).all()
+
+    return render_template('landing/dashboard_google_analytics.html', user=get_user_from_session(), shop_name=shop_name, websettings=websettings)
 
 # 📘 Facebook Pixel
 @landing_bp.route('/dashboard/analytics/facebook_pixel/<shop_name>')
@@ -592,6 +596,8 @@ def dashboard_manage_domains(shop_name):
     if 'user_id' not in session:
         return redirect(url_for('landing.login'))
 
+    subscription = Subscription.query.filter_by(shop_name=shop_name).first()
+
     shop = ShopList.query.filter_by(shop_name=shop_name).first()
     if not shop:
         return redirect(url_for('landing.dashboard_stores'))
@@ -613,7 +619,10 @@ def dashboard_manage_domains(shop_name):
 def dashboard_manage_users(shop_name):
     if 'user_id' not in session:
         return redirect(url_for('landing.login'))
-    return render_template('landing/dashboard_users.html', user=get_user_from_session(), shop_name=shop_name)
+    
+    subscription = Subscription.query.filter_by(shop_name=shop_name).first()
+
+    return render_template('landing/dashboard_users.html', user=get_user_from_session(), shop_name=shop_name, subscription=subscription)
 
 @landing_bp.route('/sitemap.xml', methods=['GET'])
 def sitemap():

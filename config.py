@@ -33,9 +33,9 @@ class Config:
     MAIL_SERVER = 'smtps.aruba.it'
     MAIL_PORT = 465
     MAIL_USE_TLS = True
-    MAIL_USERNAME = 'info@linkbay.it'
-    MAIL_PASSWORD = 'Spotexsrl@juanealessio2024'
-    MAIL_DEFAULT_SENDER = 'info@linkbay.it'
+    MAIL_USERNAME = 'noreply@linkbay-cms-support.com'
+    MAIL_PASSWORD = 'WtQ5i8h20@'
+    MAIL_DEFAULT_SENDER = 'noreply@linkbay-cms-support.com'
     
     if os.getenv('ENVIRONMENT') == 'development':
         # Altre configurazioni 

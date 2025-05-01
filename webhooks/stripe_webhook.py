@@ -146,17 +146,14 @@ def handle_stripe_webhook():
                         db.session.add(new_domain)
                         db.session.commit()
 
+                        from godaddypy import Client, Account
+                        account_godaddy = Account(api_key=current_app.config['GODADDY_API_KEY'], api_secret=current_app.config['GODADDY_API_SECRET'])
+                        client = Client(account_godaddy)
+ 
                         # Aggiunta record DNS per puntare all'IP del server
                         try:
-                            api.set_dns_records(domain, [
-                                {
-                                    "type": "A",
-                                    "name": "@",
-                                    "data": "103.240.147.13",
-                                    "ttl": 600
-                                }
-                            ])
-                            webhook_logger.info(f"🌍 DNS A record aggiunto per {domain} -> 103.240.147.13")
+                            client.update_ip('103.240.147.13', domains=[domain])
+                            webhook_logger.info(f"🌍 DNS A record aggiornato per {domain} -> 103.240.147.13")
                         except Exception as dns_err:
                             webhook_logger.error(f"⚠️ Errore durante la configurazione DNS per {domain}: {dns_err}")
 
