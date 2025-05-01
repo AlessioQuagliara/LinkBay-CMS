@@ -40,8 +40,20 @@
             {% endfor %}
           </tbody>
         </table>
+        {% if subscription.plan_name == 'AllIsReady' %}
+        <button class="btn btn-danger">
+          <i class="fa-solid fa-plus"></i> Aggiungi
+        </button>
+        {% elif subscription.plan_name == 'ProfessionalDesk' %}
+        <button class="btn btn-danger">
+          <i class="fa-solid fa-plus"></i> Aggiungi
+        </button>
+        {% else %}
+        <p>Non puoi aggiungere utenti</p>
+        {% endif %}
       </div>
     </div>
   </div>
 </div>
+
 {% endblock %}

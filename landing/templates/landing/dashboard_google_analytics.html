@@ -7,14 +7,36 @@
     </div>
     <div class="card-body">
       <p class="text-muted">Inserisci il tuo codice di tracciamento per collegare Google Analytics al tuo negozio.</p>
-      <form method="POST" action="/api/integrations/google_analytics/{{ shop_name }}">
+      <form id="updateGoogleForm" class="row g-3" enctype="multipart/form-data">
         <div class="mb-3">
-          <label for="ga_id" class="form-label">Codice Google Analytics (es. UA-XXXXXXXXX-X)</label>
-          <input type="text" class="form-control" id="ga_id" name="ga_id" placeholder="Inserisci il codice" required>
+          <label for="google_analytics" class="form-label">Codice Google Analytics (es. UA-XXXXXXXXX-X)</label>
+          <input type="text" class="form-control" id="google_analytics" name="google_analytics" value="{{ websettings.google_analytics }}" placeholder="Inserisci il codice" required>
         </div>
-        <button type="submit" class="btn btn-danger"><i class="fa-solid fa-link"></i> Salva Collegamento</button>
+        <button type="submit" class="btn btn-danger" onclick="saveGoogle()"><i class="fa-solid fa-link"></i> Salva Collegamento</button>
       </form>
     </div>
   </div>
 </div>
+<script>
+  document.getElementById('updateGoogleForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  const formData = new FormData(this);
+  
+  fetch('/api/integrations/google_analytics/{{ shop_name }}', {
+    method: 'POST',
+    body: formData
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        Swal.fire('✅ Success', data.message, 'success');
+      } else {
+        Swal.fire('❌ Error', data.message, 'error');
+      }
+    })
+    .catch(err => {
+      Swal.fire('❌ Error', 'Errore durante l\'invio della richiesta', 'error');
+    });
+  });
+</script>
 {% endblock %}

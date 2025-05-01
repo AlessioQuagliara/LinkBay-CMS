@@ -4,12 +4,12 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const domain = "{{ request.args.get('domain') }}";
-      let seconds = 10;
+      let seconds = 30;
       const alert = document.createElement("div");
       alert.className = "alert alert-success";
       alert.innerHTML = `
         ✅ Dominio <strong>${domain}</strong> acquistato con successo!<br>
-        Verifica in corso... ricarico la pagina tra <strong id="countdown">${seconds}</strong> secondi.
+        Verifica in corso... inserisco nel sistema il dominio, attendi: <strong id="countdown">${seconds}</strong> secondi.
       `;
       document.querySelector(".card-body").prepend(alert);
 
@@ -19,7 +19,7 @@
         countdownEl.textContent = seconds;
         if (seconds <= 0) {
           clearInterval(interval);
-          location.reload();
+            window.location.href = `/dashboard/domains/${domain}`;
         }
       }, 1000);
     });
