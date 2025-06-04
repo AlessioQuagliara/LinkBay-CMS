@@ -1,4 +1,9 @@
 from flask import render_template, request, jsonify, redirect, url_for, session, Response, flash
+from flask import current_app
+from flask_mail import Message
+from extensions import mail
+from models.request import uRequests, create_request
+from datetime import datetime
 from . import landing_bp
 from models.database import db
 from models.user import User
@@ -617,13 +622,255 @@ def dashboard_manage_domains(shop_name):
 # 👥 Gestione utenti
 @landing_bp.route('/dashboard/users/<shop_name>')
 def dashboard_manage_users(shop_name):
+    """
+    Pagina di gestione degli utenti autorizzati a un negozio.
+
+    1. Verifica che l'utente sia loggato.
+    2. Recupera lo store tramite shop_name o restituisce 404.
+    3. Consente l’accesso solo al proprietario o a chi ha access_level = 'admin'.
+    4. Costruisce la lista di tutti gli utenti abilitati (owner + collaboratori) e
+       la passa al template come `authorized_users`.
+    """
+    # ✅ Utente loggato
     if 'user_id' not in session:
         return redirect(url_for('landing.login'))
-    
+
+    # 🔎 Recupero negozio
+    shop = ShopList.query.filter_by(shop_name=shop_name).first_or_404()
+
+    # 👮‍♂️ Permessi: proprietario oppure admin nello store
+    current_user_id = session['user_id']
+    is_owner = shop.user_id == current_user_id
+    admin_entry = UserStoreAccess.query.filter_by(
+        shop_id=shop.id,
+        user_id=current_user_id,
+        access_level='admin'
+    ).first()
+
+    if not is_owner and not admin_entry:
+        flash("Non hai i permessi per gestire gli utenti di questo store.", "warning")
+        return redirect(url_for('landing.dashboard_stores'))
+
+    # 💳 Abbonamento corrente dello store
     subscription = Subscription.query.filter_by(shop_name=shop_name).first()
 
-    return render_template('landing/dashboard_users.html', user=get_user_from_session(), shop_name=shop_name, subscription=subscription)
+    # 👥 Tutti i collaboratori presenti in UserStoreAccess
+    collaborator_rows = (
+        db.session.query(User, UserStoreAccess.access_level)
+        .join(UserStoreAccess, User.id == UserStoreAccess.user_id)
+        .filter(UserStoreAccess.shop_id == shop.id)
+        .all()
+    )
 
+    authorized_users = [
+        {
+            "id": u.id,
+            "nome": u.nome,
+            "cognome": u.cognome,
+            "email": u.email,
+            "profilo_foto": u.profilo_foto,
+            "access_level": lvl,
+        }
+        for u, lvl in collaborator_rows
+    ]
+
+    # ➕ Aggiunge il proprietario se non già presente
+    if not any(u["id"] == shop.user_id for u in authorized_users):
+        owner = User.query.get(shop.user_id)
+        authorized_users.insert(
+            0,
+            {
+                "id": owner.id,
+                "nome": owner.nome,
+                "cognome": owner.cognome,
+                "email": owner.email,
+                "profilo_foto": owner.profilo_foto,
+                "access_level": "admin",
+            },
+        )
+
+    return render_template(
+        'landing/dashboard_users.html',
+        user=get_user_from_session(),
+        shop_name=shop_name,
+        subscription=subscription,
+        authorized_users=authorized_users,
+        is_owner=is_owner
+    )
+
+#
+# --------------------------------------------------------------------------------------------
+# Helper funzioni per inviti / richieste
+# --------------------------------------------------------------------------------------------
+def _extract_shop_from_referrer(ref):
+    """Restituisce lo shop_name dall'URL /dashboard/users/<shop_name> presente nel referrer."""
+    if not ref:
+        return None
+    marker = '/dashboard/users/'
+    if marker in ref:
+        tail = ref.split(marker, 1)[-1]
+        return tail.split('?')[0].split('#')[0]
+    return None
+
+
+def _user_is_owner_or_admin(user_id, shop):
+    """True se user_id è proprietario o admin nello shop."""
+    if shop.user_id == user_id:
+        return True
+    return UserStoreAccess.query.filter_by(
+        shop_id=shop.id, user_id=user_id, access_level='admin'
+    ).first() is not None
+
+
+# --------------------------------------------------------------------------------------------
+# ➕ Invia invito / richiesta collaborazione
+# --------------------------------------------------------------------------------------------
+@landing_bp.route('/dashboard/users/add', methods=['POST'])
+def add_shop_user():
+    """
+    Endpoint AJAX chiamato dal popup SweetAlert2.
+
+    • Se l'email è già di un utente registrato → crea Request + messaggio interno.
+    • Se non esiste → crea Request + manda e‑mail di invito a registrarsi.
+    """
+    if 'user_id' not in session:
+        return jsonify(success=False, message="Utente non autenticato"), 401
+
+    data = request.get_json(silent=True) or request.form.to_dict()
+    email = (data.get('email') or '').strip().lower()
+    access_level = (data.get('access_level') or 'viewer').strip().lower()
+
+    shop_name = (data.get('shop_name') or
+                 request.args.get('shop_name') or
+                 _extract_shop_from_referrer(request.referrer))
+
+    if not email or not shop_name:
+        return jsonify(success=False, message="Parametri mancanti"), 400
+
+    shop = ShopList.query.filter_by(shop_name=shop_name).first()
+    if not shop:
+        return jsonify(success=False, message="Negozio non trovato"), 404
+
+    if not _user_is_owner_or_admin(session['user_id'], shop):
+        return jsonify(success=False, message="Permessi insufficienti"), 403
+
+    # ------------------------------------------------------------
+    # Genera o recupera utente destinatario
+    # ------------------------------------------------------------
+    target_user = User.query.filter_by(email=email).first()
+
+    # Crea record Request
+    req_id = create_request({
+        "sender_id": session['user_id'],
+        "recipient_id": target_user.id if target_user else None,
+        "recipient_email": email,
+        "shop_id": shop.id,
+        "request_type": "collaboration",
+        "access_level": access_level,
+        "message": data.get('personal_message'),
+        "expires_in_days": 3
+    })
+    if not req_id:
+        return jsonify(success=False, message="Errore interno"), 500
+
+    # Recupera il token appena creato
+    req = uRequests.query.get(req_id)
+    invite_link = url_for('landing.accept_invite', token=req.token, _external=True)
+
+    # ------------------------------------------------------------
+    # CASO 1: Utente registrato → messaggistica interna
+    # ------------------------------------------------------------
+    if target_user:
+        # TODO: integrare con sistema chat/notifiche
+        # send_chat_message(sender_id=session['user_id'],
+        #                   recipient_id=target_user.id,
+        #                   text=f"Hai ricevuto un invito a collaborare sullo shop {shop.shop_name}.",
+        #                   link=invite_link)
+        return jsonify(success=True, message="Invito inviato tramite messaggistica interna")
+
+    # ------------------------------------------------------------
+    # CASO 2: Utente non registrato → invio e‑mail
+    # ------------------------------------------------------------
+    try:
+        msg = Message(
+            subject=f"Invito a collaborare sullo shop {shop.shop_name}",
+            recipients=[email],
+            html=f"""
+                <p>Ciao!</p>
+                <p>Sei stato invitato ad accedere allo shop <strong>{shop.shop_name}</strong>
+                come <strong>{access_level}</strong>.</p>
+                <p>Clicca sul link per accettare l'invito e registrarti:</p>
+                <p><a href="{invite_link}">{invite_link}</a></p>
+                <p>Il link scade tra 3 giorni.</p>
+            """
+        )
+        mail.send(msg)
+        return jsonify(success=True, message="Invito inviato via email")
+    except Exception:
+        current_app.logger.exception("Errore invio email")
+        return jsonify(success=False, message="Impossibile inviare l'invito"), 500
+
+
+# --------------------------------------------------------------------------------------------
+# ✔️ Accetta invito
+# --------------------------------------------------------------------------------------------
+@landing_bp.route('/accept-invite/<token>', methods=['GET', 'POST'])
+def accept_invite(token):
+    """
+    1. Verifica token e richiesta pendente.
+    2. Se POST → registra (o logga) l'utente, concede permesso e marca accepted.
+    3. Se GET  → mostra form di registrazione/accettazione.
+    """
+    req = uRequests.query.filter_by(token=token, status='pending').first()
+    if not req or datetime.utcnow() > req.expires_at:
+        flash("Invito non valido o scaduto", "danger")
+        return redirect(url_for('landing.login'))
+
+    email = req.recipient_email
+    shop = ShopList.query.get(req.shop_id)
+
+    if request.method == 'POST':
+        # Se l'utente è già loggato, usa sessione; altrimenti crea account
+        if 'user_id' in session:
+            new_user = User.query.get(session['user_id'])
+        else:
+            password = request.form.get('password')
+            nome = request.form.get('nome')
+            cognome = request.form.get('cognome')
+            if not all([password, nome, cognome]):
+                flash("Compila tutti i campi.", "warning")
+                return render_template('landing/accept_invite.html', email=email)
+
+            if User.query.filter_by(email=email).first():
+                flash("Email già registrata, effettua il login.", "info")
+                return redirect(url_for('landing.login'))
+
+            new_user = User(email=email, nome=nome, cognome=cognome)
+            new_user.set_password(password)
+            db.session.add(new_user)
+            db.session.commit()
+
+        # Concede accesso
+        if not UserStoreAccess.query.filter_by(user_id=new_user.id, shop_id=shop.id).first():
+            db.session.add(UserStoreAccess(
+                user_id=new_user.id,
+                shop_id=shop.id,
+                access_level=req.access_level
+            ))
+            db.session.commit()
+
+        req.status = 'accepted'
+        req.recipient_id = new_user.id
+        db.session.commit()
+
+        flash("Invito accettato! Ora puoi accedere al negozio.", "success")
+        return redirect(url_for('landing.login'))
+
+    return render_template('landing/accept_invite.html', email=email, shop_name=shop.shop_name)
+
+# --------------------------------------------------------------------------------------------
+# 🗺️ SITEMAP
+# --------------------------------------------------------------------------------------------
 @landing_bp.route('/sitemap.xml', methods=['GET'])
 def sitemap():
     from flask import current_app

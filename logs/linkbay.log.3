@@ -1,37 +1,4 @@
-[2025-04-12 13:44:34,242] [ERROR] in app: Exception on /landing/admin/login [GET]
-Traceback (most recent call last):
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/admin/routes_admin.py", line 68, in admin_login
-    return render_template("landing/admin/login.html")
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 149, in render_template
-    template = app.jinja_env.get_or_select_template(template_name_or_list)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
-    return self.get_template(template_name_or_list, parent, globals)
-           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 1016, in get_template
-    return self._load_template(name, globals)
-           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 975, in _load_template
-    template = self.loader.load(self, name, self.make_globals(globals))
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/loaders.py", line 126, in load
-    source, filename, uptodate = self.get_source(environment, name)
-                                 ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 65, in get_source
-    return self._get_source_fast(environment, template)
-           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 99, in _get_source_fast
-    raise TemplateNotFound(template)
-jinja2.exceptions.TemplateNotFound: landing/admin/login.html
-[2025-04-12 13:48:20,052] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 13:48:44,289] [ERROR] in app: Exception on /landing/admin/dashboard [GET]
+[2025-04-12 13:51:07,177] [ERROR] in app: Exception on /landing/admin/dashboard [GET]
 Traceback (most recent call last):
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -54,16 +21,18 @@ Traceback (most recent call last):
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
     raise rewrite_traceback_stack(source=source)
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/admin/templates/landing/admin/dashboard.html", line 1, in top-level template code
-    {% extends "admin/admin_base.html" %}
+    {% extends "admin_base.html" %}
     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/admin/templates/landing/admin/admin_base.html", line 21, in top-level template code
+    {% include "admin/sidebar.html" %}
+    ^^^^^^^^^^^^^^^^^^^^^
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 65, in get_source
     return self._get_source_fast(environment, template)
            ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 99, in _get_source_fast
     raise TemplateNotFound(template)
-jinja2.exceptions.TemplateNotFound: admin/admin_base.html
-[2025-04-12 13:49:26,961] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 13:49:28,082] [ERROR] in app: Exception on /landing/admin/dashboard [GET]
+jinja2.exceptions.TemplateNotFound: admin/sidebar.html
+[2025-04-12 13:51:27,570] [ERROR] in app: Exception on /landing/admin/dashboard [GET]
 Traceback (most recent call last):
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -86,12 +55,70 @@ Traceback (most recent call last):
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
     raise rewrite_traceback_stack(source=source)
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/admin/templates/landing/admin/dashboard.html", line 1, in top-level template code
-    {% extends "landing/admin/admin_base.html" %}
+    {% extends "admin_base.html" %}
     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/admin/templates/landing/admin/admin_base.html", line 21, in top-level template code
+    {% include "admin/sidebar.html" %}
+    ^^^^^^^^^^^^^^^^^^^^^
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 65, in get_source
     return self._get_source_fast(environment, template)
            ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 99, in _get_source_fast
     raise TemplateNotFound(template)
-jinja2.exceptions.TemplateNotFound: landing/admin/admin_base.html
-[2025-04-12 13:51:03,942] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+jinja2.exceptions.TemplateNotFound: admin/sidebar.html
+[2025-04-12 13:51:58,851] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 13:53:47,149] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 13:57:45,361] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 13:58:48,048] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 13:59:14,945] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 13:59:41,158] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:08:39,055] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:09:51,311] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:10:08,311] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:12:58,539] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:13:23,834] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:15:03,606] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:16:51,958] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:17:35,041] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:17:52,589] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:20:11,597] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:22:19,935] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:22:55,996] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:24:04,191] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:25:05,708] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:26:16,236] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:28:50,821] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:31:00,287] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:31:45,540] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:32:18,335] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:33:39,193] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:35:16,917] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:36:07,696] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:36:37,670] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:37:30,045] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:37:53,301] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:38:05,470] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:38:16,988] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:38:30,495] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:41:22,140] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:44:00,091] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:46:55,310] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-12 14:47:57,912] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-13 11:56:16,145] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-13 11:56:26,223] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-13 11:56:26,836] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-13 11:58:27,870] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-13 12:00:45,815] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-13 12:00:51,751] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-13 12:00:58,443] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-13 12:01:07,430] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-13 12:01:13,809] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-13 12:01:23,905] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-13 12:01:26,174] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-13 12:01:26,737] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-13 12:46:17,180] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-13 12:46:17,197] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-13 12:46:25,371] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-13 12:46:25,409] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-13 12:46:27,370] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-04-13 12:46:27,415] [INFO] in app: ✅ LinkBayCMS avviato correttamente.

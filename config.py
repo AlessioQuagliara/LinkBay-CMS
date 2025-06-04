@@ -32,7 +32,8 @@ class Config:
     # Configurazione per l'invio di email
     MAIL_SERVER = 'smtps.aruba.it'
     MAIL_PORT = 465
-    MAIL_USE_TLS = True
+    MAIL_USE_TLS = False
+    MAIL_USE_SSL = True
     MAIL_USERNAME = 'noreply@linkbay-cms-support.com'
     MAIL_PASSWORD = 'WtQ5i8h20@'
     MAIL_DEFAULT_SENDER = 'noreply@linkbay-cms-support.com'

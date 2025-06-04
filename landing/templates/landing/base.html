@@ -98,6 +98,39 @@
     {% block head %}{% endblock %}
 </head>
 <body>
+  <!-- Modal: Aggiungi Utente -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addUserLabel">Aggiungi Utente</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" id="addEmail" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Ruolo</label>
+          <select id="addLevel" class="form-select">
+            <option value="viewer">Viewer</option>
+            <option value="editor">Editor</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Messaggio (opzionale)</label>
+          <textarea id="addMessage" class="form-control" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+        <button type="submit" class="btn btn-danger">Invia invito</button>
+      </div>
+    </form>
+  </div>
+</div>
     <!-- Mobile Toggle Button -->
     {% if '/dashboard/themes/upload' in request.path %}
       <a href="/dashboard/themes/explore" class="btn ms-auto d-md-none m-2">
