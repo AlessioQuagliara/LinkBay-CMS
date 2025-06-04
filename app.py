@@ -48,7 +48,7 @@ from models import (
     Category, Brand, ProductImage, ProductAttribute, Product, Collection, CollectionImage, CollectionProduct, Order, OrderItem, 
     Payment, PaymentMethod, Shipping, ShippingMethod, Page, NavbarLink, CMSAddon, ShopAddon, 
     ImprovementSuggestion, Contact, SupportTicket, TicketMessage, SuperAdmin, SuperPages, 
-    SuperMedia, SuperInvoice, SuperMessages, SuperSupport, ChatMessage
+    SuperMedia, SuperInvoice, SuperMessages, SuperSupport, ChatMessage, uRequests
 )
 
 # 📌 Registrazione dei Blueprint (Modularizzazione delle route)

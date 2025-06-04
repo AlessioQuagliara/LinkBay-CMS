@@ -1,0 +1,53 @@
+{% extends "landing/base.html" %}
+
+{% block title %}Accetta invito – {{ shop_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 600px;">
+  <h2 class="mb-4 text-center">Invito a collaborare</h2>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <p class="lead">Stai per accettare l’invito per lo shop:</p>
+      <h4 class="text-primary">{{ shop_name }}</h4>
+      <hr>
+
+      {# Se l'utente è loggato (passato dal controller) non serve registrazione #}
+      {% if session.user_id %}
+        <p class="mb-4">Sei loggato come <strong>{{ session.email }}</strong>.</p>
+        <form method="POST">
+          <button type="submit" class="btn btn-success w-100">Accetta Invito</button>
+        </form>
+      {% else %}
+        <p class="mb-3">Per accettare l’invito, completa la registrazione:</p>
+        <form method="POST">
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email"
+                   id="email"
+                   name="email"
+                   class="form-control"
+                   value="{{ email }}"
+                   disabled>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="nome" class="form-label">Nome</label>
+              <input type="text" id="nome" name="nome" class="form-control" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="cognome" class="form-label">Cognome</label>
+              <input type="text" id="cognome" name="cognome" class="form-control" required>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" name="password" class="form-control" required minlength="8">
+          </div>
+          <button type="submit" class="btn btn-success w-100">Registra e accetta invito</button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

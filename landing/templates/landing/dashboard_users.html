@@ -20,16 +20,25 @@
             </tr>
           </thead>
           <tbody>
-            {% for u in users %}
+            {% for u in authorized_users %}
             <tr>
               <td>{{ u.nome }} {{ u.cognome }}</td>
               <td>{{ u.email }}</td>
               <td>{{ u.telefono or '—' }}</td>
-              <td>{{ u.role or 'Collaboratore' }}</td>
+              <td>{{ u.access_level|capitalize }}</td>
               <td class="text-end">
-                <a href="/dashboard/users/edit/{{ u.id }}" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-pen"></i></a>
-                <form method="POST" action="/dashboard/users/delete/{{ u.id }}" style="display:inline-block;">
-                  <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
+                <button class="btn btn-sm btn-outline-primary edit-user-btn"
+                        data-bs-toggle="modal" data-bs-target="#editUserModal"
+                        data-user-id="{{ u.id }}"
+                        data-user-email="{{ u.email }}"
+                        data-user-name="{{ u.nome }} {{ u.cognome }}"
+                        data-access-level="{{ u.access_level }}">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+                <form method="POST" action="/dashboard/users/delete/{{ u.id }}?shop_name={{ shop_name }}" style="display:inline-block;">
+                  <button type="button" class="btn btn-sm btn-outline-danger delete-user-btn">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
                 </form>
               </td>
             </tr>
@@ -41,11 +50,11 @@
           </tbody>
         </table>
         {% if subscription.plan_name == 'AllIsReady' %}
-        <button class="btn btn-danger">
+        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addUserModal">
           <i class="fa-solid fa-plus"></i> Aggiungi
         </button>
         {% elif subscription.plan_name == 'ProfessionalDesk' %}
-        <button class="btn btn-danger">
+        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addUserModal">
           <i class="fa-solid fa-plus"></i> Aggiungi
         </button>
         {% else %}
@@ -55,5 +64,149 @@
     </div>
   </div>
 </div>
+
+
+
+<!-- Modal: Modifica Utente -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editUserLabel">Modifica Utente</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p id="editUserName" class="fw-bold mb-3"></p>
+        <div class="mb-3">
+          <label class="form-label">Ruolo</label>
+          <select id="editLevel" class="form-select">
+            <option value="viewer">Viewer</option>
+            <option value="editor">Editor</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Messaggio (opzionale)</label>
+          <textarea id="editMessage" class="form-control" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+        <button type="submit" class="btn btn-primary">Salva</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Conferma Eliminazione -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteLabel">Conferma eliminazione</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        Sei sicuro di voler rimuovere questo utente dallo shop?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+        <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Elimina</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block scripts %}
+  {{ super() }}
+  <script>
+    // ------------------------------------------------------------------
+    // variabile shop_name dal backend (per query‑string)
+    // ------------------------------------------------------------------
+    const SHOP_NAME = "{{ shop_name }}";
+
+    // ------------------------------------------------------------------
+    // apre e prepara il modal Aggiungi
+    // ------------------------------------------------------------------
+    const addModal = document.getElementById('addUserModal');
+    addModal.addEventListener('show.bs.modal', () => {
+      addModal.querySelector('#addEmail').value = '';
+      addModal.querySelector('#addLevel').value = 'viewer';
+      addModal.querySelector('#addMessage').value = '';
+    });
+
+    // submit Aggiungi
+    addModal.querySelector('form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const payload = {
+        email: addModal.querySelector('#addEmail').value,
+        access_level: addModal.querySelector('#addLevel').value,
+        personal_message: addModal.querySelector('#addMessage').value
+      };
+      fetch(`/dashboard/users/add?shop_name=${SHOP_NAME}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(r => r.json())
+      .then(d => {
+        bootstrap.Modal.getInstance(addModal).hide();
+        if (d.success) location.reload();
+        else alert(d.message || 'Errore');
+      })
+      .catch(() => alert('Impossibile contattare il server'));
+    });
+
+    // ------------------------------------------------------------------
+    // apre e prepara il modal Edit
+    // ------------------------------------------------------------------
+    const editModal = document.getElementById('editUserModal');
+    document.querySelectorAll('.edit-user-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        editModal.querySelector('#editUserName').textContent = btn.dataset.userName;
+        editModal.querySelector('#editLevel').value           = btn.dataset.accessLevel;
+        editModal.dataset.userid = btn.dataset.userId;
+        bootstrap.Modal.getOrCreateInstance(editModal).show();
+      });
+    });
+
+    // submit Edit
+    editModal.querySelector('form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const userId  = editModal.dataset.userid;
+      const payload = {
+        access_level: editModal.querySelector('#editLevel').value,
+        personal_message: editModal.querySelector('#editMessage').value
+      };
+      fetch(`/dashboard/users/edit/${userId}?shop_name=${SHOP_NAME}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(r => r.json())
+      .then(d => {
+        bootstrap.Modal.getInstance(editModal).hide();
+        if (d.success) location.reload();
+        else alert(d.message || 'Errore');
+      })
+      .catch(() => alert('Impossibile contattare il server'));
+    });
+
+    // ------------------------------------------------------------------
+    // delete confirmation (modal)
+    // ------------------------------------------------------------------
+    const delModal = document.getElementById('deleteUserModal');
+    let delForm = null;
+    document.querySelectorAll('.delete-user-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        delForm = btn.closest('form');
+        bootstrap.Modal.getOrCreateInstance(delModal).show();
+      });
+    });
+    delModal.querySelector('#confirmDeleteBtn').addEventListener('click', () => {
+      if (delForm) delForm.submit();
+    });
+  </script>
+{% endblock %}
 
 {% endblock %}

@@ -947,3 +947,133 @@ def saveGoogle(shop_name):
         logger.error(f"Errore aggiornamento Google: {e}")
         return jsonify(success=False, message="Errore durante l'aggiornamento"), 500
     
+#+ 📢 Api per gestione Utenti ---------------------------------------------------------------------------------------------------
+
+    # 📌 Aggiunta collaboratore
+@landing_api.route('/dashboard/users/add', methods=['POST'])
+def add_shop_user():
+    """Aggiunge un utente esistente a uno shop come collaboratore."""
+    if 'user_id' not in session:
+        return jsonify(success=False, message="Utente non autenticato"), 401
+
+    data = request.get_json(silent=True) or request.form.to_dict()
+    email = (data.get('email') or '').strip().lower()
+    access_level = (data.get('access_level') or 'viewer').strip().lower()
+    shop_name = (data.get('shop_name')
+                 or request.args.get('shop_name')
+                 or _extract_shop_from_referrer(request.referrer))
+
+    if not email or not shop_name:
+        return jsonify(success=False, message="Parametri mancanti"), 400
+
+    shop = ShopList.query.filter_by(shop_name=shop_name).first()
+    if not shop:
+        return jsonify(success=False, message="Negozio non trovato"), 404
+
+    if not _user_is_owner_or_admin(session['user_id'], shop):
+        return jsonify(success=False, message="Permessi insufficienti"), 403
+
+    target_user = User.query.filter_by(email=email).first()
+    if not target_user:
+        return jsonify(success=False, message="Utente non trovato"), 404
+
+    if UserStoreAccess.query.filter_by(user_id=target_user.id, shop_id=shop.id).first():
+        return jsonify(success=False, message="Utente già autorizzato"), 409
+
+    try:
+        db.session.add(UserStoreAccess(
+            user_id=target_user.id,
+            shop_id=shop.id,
+            access_level=access_level,
+        ))
+        db.session.commit()
+        return jsonify(success=True, message="Utente aggiunto con successo")
+    except Exception:
+        db.session.rollback()
+        return jsonify(success=False, message="Errore interno"), 500
+    
+    # 📌 Modifica permessi collaboratore
+@landing_api.route('/dashboard/users/edit/<int:user_id>', methods=['POST'])
+def edit_shop_user(user_id):
+    """Aggiorna il livello di accesso di un collaboratore."""
+    if 'user_id' not in session:
+        return jsonify(success=False, message="Utente non autenticato"), 401
+
+    data = request.get_json(silent=True) or request.form.to_dict()
+    new_level = (data.get('access_level') or '').strip().lower()
+    if new_level not in ('viewer', 'editor', 'admin'):
+        return jsonify(success=False, message="Ruolo non valido"), 400
+
+    shop_name = (data.get('shop_name')
+                 or request.args.get('shop_name')
+                 or _extract_shop_from_referrer(request.referrer))
+    if not shop_name:
+        return jsonify(success=False, message="shop_name mancante"), 400
+
+    shop = ShopList.query.filter_by(shop_name=shop_name).first()
+    if not shop:
+        return jsonify(success=False, message="Negozio non trovato"), 404
+
+    if not _user_is_owner_or_admin(session['user_id'], shop):
+        return jsonify(success=False, message="Permessi insufficienti"), 403
+
+    access_row = UserStoreAccess.query.filter_by(user_id=user_id, shop_id=shop.id).first()
+    if not access_row:
+        return jsonify(success=False, message="Accesso non trovato"), 404
+
+    access_row.access_level = new_level
+    db.session.commit()
+    return jsonify(success=True, message="Permessi aggiornati")
+
+    # 📌 Rimozione collaboratore
+@landing_api.route('/dashboard/users/delete/<int:user_id>', methods=['POST'])
+def delete_shop_user(user_id):
+    """Rimuove un collaboratore dallo shop."""
+    if 'user_id' not in session:
+        return jsonify(success=False, message="Utente non autenticato"), 401
+
+    shop_name = (request.form.get('shop_name')
+                 or request.args.get('shop_name')
+                 or _extract_shop_from_referrer(request.referrer))
+    if not shop_name:
+        return jsonify(success=False, message="shop_name mancante"), 400
+
+    shop = ShopList.query.filter_by(shop_name=shop_name).first()
+    if not shop:
+        return jsonify(success=False, message="Negozio non trovato"), 404
+
+    if not _user_is_owner_or_admin(session['user_id'], shop):
+        return jsonify(success=False, message="Permessi insufficienti"), 403
+
+    if shop.user_id == user_id:
+        return jsonify(success=False, message="Impossibile rimuovere il proprietario"), 409
+
+    access_row = UserStoreAccess.query.filter_by(user_id=user_id, shop_id=shop.id).first()
+    if not access_row:
+        return jsonify(success=False, message="Accesso non trovato"), 404
+
+    db.session.delete(access_row)
+    db.session.commit()
+    return jsonify(success=True, message="Utente rimosso con successo")
+
+# --------------------------------------------------------------------------------------------
+# Helper
+# --------------------------------------------------------------------------------------------
+def _extract_shop_from_referrer(ref):
+    """Estrae lo shop_name dall'URL /dashboard/users/<shop_name> presente nel referrer."""
+    if not ref:
+        return None
+    marker = '/dashboard/users/'
+    if marker in ref:
+        tail = ref.split(marker, 1)[-1]
+        return tail.split('?')[0].split('#')[0]
+    return None
+
+
+def _user_is_owner_or_admin(user_id, shop):
+    """True se user_id è il proprietario o admin per quello shop."""
+    if shop.user_id == user_id:
+        return True
+    return UserStoreAccess.query.filter_by(
+        shop_id=shop.id, user_id=user_id, access_level='admin'
+    ).first() is not None
