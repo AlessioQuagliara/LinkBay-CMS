@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinkBay AI Analysis</title>
+    <title>Analisi Intelligente LinkBay</title>
     {% include 'admin/cms/heading/admin_head.html' %}
 
     <style>
         body {
             background-image: url('https://www.linkbay.it/static/image/background.webp');
+            background-color: #99002b;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -110,79 +111,90 @@
 <body>
     <div class="card">
         <img class="mb-4" src="https://www.linkbay.it/static/image/lb-logo.svg" width="230px" alt="Logo LinkBay">
-        <h1 class="h3 mb-3">LinkBay AI Setup</h1>
-        <div class="progress mb-3">
-            <div class="progress-bar" id="progressBar" style="width: 33%;"></div>
+        <h1 class="h3 mb-3">Configurazione Intelligente LinkBay</h1>
+
+        <!-- Bottone di avvio -->
+        <div class="text-center mt-5">
+          <button id="start-analysis-btn" class="btn btn-lg btn-danger">Continua</button>
         </div>
 
-        <!-- STEP 1: IA Presentazione -->
-        <div class="step active" id="step-1">
-            <p class="typing">I am LinkBay AI, and I am here to help grow your business.</p>
-            <br><br>
-            <button class="btn btn-danger w-100" onclick="nextStep(2)">Next</button>
-        </div>
-
-        <!-- STEP 2: Analisi dello Store -->
-        <div class="step" id="step-2">
-            <h6>Store Analysis</h6>
-            <p id="ai-advice" class="typing">Analyzing store data...</p>
-            <div class="loading-bar" id="loadingBar"></div>
-            <button class="btn btn-danger w-100 mt-3" id="next-btn" onclick="nextStep(3)" disabled>Next</button>
-        </div>
-
-        <!-- STEP 3: Passaggio alla Scelta del Tema -->
-        <div class="step" id="step-3">
-            <h3>Customize Your Store</h3>
-            <p>Choose a theme that best represents your brand.</p>
-            <a href="{{ url_for('ui.theme_selection') }}" class="btn btn-danger w-100">Go to Theme Selection</a>
+        <!-- Card con analisi AI -->
+        <div id="ai-analysis-card" class="container my-5" style="display:none;">
+          <div class="card shadow-lg border-dark" style="max-height: 80vh; overflow-y: auto;">
+            <div class="card-body p-4">
+              <h4 class="card-title text-center mb-4 fw-bold">Analisi AI del tuo negozio</h4>
+              <pre id="animated-text" class="text-start" style="white-space: pre-wrap; font-size: 1rem;"></pre>
+              <div class="text-end mt-4">
+                <button id="download-pdf-btn" class="btn btn-danger">📄 Scarica Report e Inizia</button>
+              </div>
+            </div>
+          </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-        let currentStep = 1;
-        function nextStep(step) {
-            // Aggiunge una transizione fluida rimuovendo e aggiungendo la classe active
-            document.getElementById(`step-${currentStep}`).classList.remove('active');
-            document.getElementById(`step-${step}`).classList.add('active');
-            currentStep = step;
-            updateProgressBar();
+      document.getElementById("start-analysis-btn").addEventListener("click", async () => {
+        Swal.fire({
+          title: "Analisi in corso...",
+          text: "Attendi qualche secondo mentre elaboriamo i tuoi dati.",
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading()
+        });
 
-            // Se si passa allo step 2, avvia l'analisi AI con loading bar dinamica
-            if (step === 2) {
-                document.getElementById('loadingBar').style.display = "block";
-                fetch('/api/analyze-store')
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('loadingBar').style.display = "none";
-                        typeText("ai-advice", data.suggestion, () => {
-                            document.getElementById('next-btn').disabled = false;
-                        });
-                    });
-            }
-        }
+        try {
+          const res = await fetch("/api/analyze-store");
+          const data = await res.json();
+          Swal.close();
 
-        function updateProgressBar() {
-            // Calcola la percentuale in base allo step corrente
-            let progressPercentage = (currentStep - 1) * 50;
-            document.getElementById('progressBar').style.width = `${progressPercentage}%`;
-        }
+          if (!data.suggestion) throw new Error("Risposta AI non valida");
 
-        function typeText(elementId, text, callback) {
-            let i = 0;
-            let speed = 30;
-            let elem = document.getElementById(elementId);
-            elem.innerHTML = "";
-            function type() {
-                if (i < text.length) {
-                    elem.innerHTML += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                } else if (callback) {
-                    callback();
-                }
-            }
-            type();
+          // Nascondi la card iniziale e mostra quella nuova
+          document.getElementById("start-analysis-btn").style.display = "none";
+          const container = document.getElementById("ai-analysis-card");
+          container.style.display = "block";
+
+          const animatedText = document.getElementById("animated-text");
+          animatedText.innerHTML = "";
+          animateText(data.suggestion, animatedText);
+
+          // Setup bottone download PDF
+          document.getElementById("download-pdf-btn").addEventListener("click", () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const lines = doc.splitTextToSize(data.suggestion, 180);
+            doc.text(lines, 15, 20);
+            doc.save("analisi_ai.pdf");
+            Swal.fire({
+              title: 'Preparazione CMS...',
+              text: 'Stiamo configurando il tuo ambiente personalizzato.',
+              allowOutsideClick: false,
+              didOpen: () => {
+                Swal.showLoading();
+              }
+            });
+            setTimeout(() => {
+              window.location.href = "{{ url_for('ui.theme_selection') }}";
+            }, 5000);
+          });
+        } catch (err) {
+          Swal.fire("Errore", "Impossibile completare l’analisi. Riprova più tardi.", "error");
         }
+      });
+
+      function animateText(text, element) {
+        let index = 0;
+        const speed = 15;
+        const interval = setInterval(() => {
+          if (index < text.length) {
+            element.innerHTML += text.charAt(index);
+            index++;
+          } else {
+            clearInterval(interval);
+          }
+        }, speed);
+      }
     </script>
 </body>
 </html>

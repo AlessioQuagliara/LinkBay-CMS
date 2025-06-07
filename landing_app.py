@@ -97,7 +97,7 @@ if not os.path.exists('logs'):
 if os.getenv('ENVIRONMENT') == 'development':
     file_handler = RotatingFileHandler('logs/linkbay.log', maxBytes=10240, backupCount=5)
 else:
-    file_handler = RotatingFileHandler('/var/www/CMS_DEF/logs/linkbay.log', maxBytes=10240, backupCount=5)
+    file_handler = RotatingFileHandler('logs/linkbay.log', maxBytes=10240, backupCount=5)
 file_handler.setFormatter(logging.Formatter(
     '[%(asctime)s] [%(levelname)s] in %(module)s: %(message)s'
 ))

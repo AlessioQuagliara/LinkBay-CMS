@@ -54,7 +54,7 @@ def signin():
             logging.error(f"❌ Error signing up user: {str(e)}")
             flash('An error occurred. Please try again.', 'danger')
 
-    return render_template('/admin/sign-in.html', title='LinkBay - Sign-in')
+    return render_template('/admin/sign-in.html', title='LinkBayCMS - Sign-in')
 
 # 🔹 **Middleware per il debug delle sessioni**
 @user_bp.before_request
@@ -140,4 +140,4 @@ def logout():
 # 🔹 **Rotta per il ripristino della password**
 @user_bp.route('/admin/restore')
 def restore():
-    return render_template('/admin/restore.html', title='LinkBay - Restore')
+    return render_template('/admin/restore.html', title='LinkBayCMS - Restore')
