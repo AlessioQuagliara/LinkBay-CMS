@@ -9,6 +9,7 @@
     <style>
         body {
             background-image: url('https://www.linkbay.it/static/image/background.webp');
+            background-color: #99002b;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -56,71 +57,73 @@
     <div class="card" data-aos="fade-up">
         <main class="form-setup">
             <form method="POST" action="{{ url_for('ui.setup_store') }}">
-                <img class="mb-4" src="https://www.linkbay.it/static/image/lb-logo.svg" width="230px" alt="Logo LinkBay">
-                <h1 class="h3 mb-3 fw-normal">Store Setup</h1>
-                <p>Complete your store setup to continue</p>
+            <img class="mb-4" src="https://www.linkbay.it/static/image/lb-logo.svg" width="230px" alt="Logo LinkBay">
+            <h1 class="h3 mb-3 fw-normal">Configurazione Negozio</h1>
+            <p>Completa la configurazione del tuo negozio per continuare</p>
 
-                <div class="progress">
-                    <div class="progress-bar" id="progressBar"></div>
-                </div>
+            <div class="progress">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
 
-                <!-- STEP 1: Store Information -->
-                <div class="form-step active" id="step-1">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="owner_name" name="owner_name" placeholder="Owner Name" required>
-                        <label for="owner_name">Owner Name</label>
-                    </div>
-                    <div class="form-floating">
-                        <input type="email" class="form-control" id="email" name="email" placeholder="Email for Customers" required>
-                        <label for="email">Email for Customers</label>
-                    </div>
-                    <div class="btn-group mt-3">
-                        <button type="button" class="btn btn-danger w-100" onclick="nextStep(2)">Next</button>
-                    </div>
+            <!-- STEP 1: Store Information -->
+            <div class="form-step active" id="step-1">
+                <div class="form-floating">
+                <input type="text" class="form-control" id="owner_name" name="owner_name" placeholder="Nome Proprietario" required>
+                <label for="owner_name">Nome Proprietario</label>
                 </div>
+                <div class="form-floating">
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email per i Clienti" required>
+                <label for="email">Email per i Clienti</label>
+                </div>
+                <div class="btn-group mt-3">
+                <button type="button" class="btn btn-danger w-100" onclick="nextStep(2)">Avanti</button>
+                </div>
+            </div>
 
-                <!-- STEP 2: Business Details -->
-                <div class="form-step" id="step-2">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="phone" name="phone" placeholder="Phone Number for Customers">
-                        <label for="phone">Phone Number for Customers</label>
-                    </div>
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="industry" name="industry" placeholder="Industry">
-                        <label for="industry">Industry</label>
-                    </div>
-                    <div class="form-floating">
-                        <textarea class="form-control" id="description" name="description" placeholder="Be as descriptive as possible, these data will be analyzed to propose growth plans"></textarea>
-                        <label for="description">Store Description</label>
-                        <p class="lead">Be as descriptive as possible, these data will be analyzed to propose growth plans</p>
-                    </div>
-                    <div class="btn-group mt-3">
-                        <button type="button" class="btn btn-secondary" onclick="prevStep(1)">Back</button>
-                        <button type="button" class="btn btn-danger" onclick="nextStep(3)">Next</button>
-                    </div>
+            <!-- STEP 2: Business Details -->
+            <div class="form-step" id="step-2">
+                <div class="form-floating">
+                <input type="text" class="form-control" id="phone" name="phone" placeholder="Numero di Telefono per i Clienti">
+                <label for="phone">Numero di Telefono per i Clienti</label>
                 </div>
+                <div class="form-floating">
+                <input type="text" class="form-control" id="industry" name="industry" placeholder="Settore">
+                <label for="industry">Settore</label>
+                </div>
+                <div class="form-floating">
+                <textarea class="form-control" id="description" name="description" placeholder="Sii il più descrittivo possibile, questi dati saranno analizzati per proporre piani di crescita"></textarea>
+                <label for="description">Descrizione del Negozio</label>
+                <p class="lead">Sii il più descrittivo possibile, questi dati saranno analizzati per proporre piani di crescita</p>
+                </div>
+                <div class="btn-group mt-3">
+                <button type="button" class="btn btn-secondary" onclick="prevStep(1)">Indietro</button>
+                <button type="button" class="btn btn-danger" onclick="nextStep(3)">Avanti</button>
+                </div>
+            </div>
 
-                <!-- STEP 3: Financial Info -->
-                <div class="form-step" id="step-3">
-                    <div class="form-floating">
-                        <input type="url" class="form-control" id="website_url" name="website_url" placeholder="Website URL">
-                        <label for="website_url">Competitor's Website URL</label>
-                    </div>
-                    <div class="form-floating">
-                        <input type="number" class="form-control" id="revenue" name="revenue" placeholder="Estimated Revenue" step="0.01">
-                        <label for="revenue">Estimated Revenue</label>
-                    </div>
-                    <div class="btn-group mt-3">
-                        <button type="button" class="btn btn-secondary" onclick="prevStep(2)">Back</button>
-                        <button type="submit" class="btn btn-success">Go to Next Setup</button>
-                    </div>
+            <!-- STEP 3: Financial Info -->
+            <div class="form-step" id="step-3">
+                <div class="form-floating">
+                <input type="url" class="form-control" id="website_url" name="website_url" placeholder="URL Sito Web Concorrente">
+                <label for="website_url">URL Sito Web Concorrente</label>
                 </div>
+                <div class="form-floating">
+                <input type="number" class="form-control" id="revenue" name="revenue" placeholder="Fatturato Stimato" step="0.01">
+                <label for="revenue">Fatturato Stimato</label>
+                </div>
+                <div class="btn-group mt-3">
+                <button type="button" class="btn btn-secondary" onclick="prevStep(2)">Indietro</button>
+                <button type="button" class="btn btn-success" id="finalStepBtn">Vai al Prossimo Passaggio</button>
+                </div>
+            </div>
             </form>
+            <p style="text-align: center; margin-top: 32px; color: #555;">
+                Potrai modificare successivamente queste informazioni
+            </p>
         </main>
     </div>
 
     {% include 'admin/cms/footing/admin_footing.html' %}
-
     <script>
         let currentStep = 1;
         function nextStep(step) {
@@ -142,5 +145,74 @@
             document.getElementById('progressBar').style.width = `${progressPercentage}%`;
         }
     </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Validazione step 1 → 2
+    function validateStep1() {
+        const ownerName = document.getElementById("owner_name").value.trim();
+        const email = document.getElementById("email").value.trim();
+
+        if (!ownerName || !email) {
+            Swal.fire("Campi obbligatori", "Compila tutti i campi prima di procedere.", "warning");
+            return false;
+        }
+        return true;
+    }
+
+    // Validazione step 2 → 3
+    function validateStep2() {
+        const description = document.getElementById("description").value.trim();
+        if (!description) {
+            Swal.fire("Descrizione necessaria", "Inserisci una descrizione dettagliata del negozio.", "warning");
+            return false;
+        }
+        return true;
+    }
+
+    // Validazione step 3 e invio del form
+    function validateStep3() {
+        const revenue = document.getElementById("revenue").value.trim();
+        const websiteUrl = document.getElementById("website_url").value.trim();
+
+        if (!revenue || isNaN(revenue)) {
+            Swal.fire("Dati mancanti", "Inserisci un valore numerico per il fatturato.", "warning");
+            return false;
+        }
+
+        return true;
+    }
+
+    document.getElementById("finalStepBtn").addEventListener("click", function () {
+        if (validateStep3()) {
+            Swal.fire({
+                title: "Conferma Invio",
+                text: "Sei sicuro di voler procedere con questi dati?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Sì, continua",
+                cancelButtonText: "Annulla"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.querySelector("form").submit();
+                }
+            });
+        }
+    });
+
+    // Blocco invio form via Enter
+    document.querySelector("form").addEventListener("keydown", function(e) {
+        if (e.key === "Enter") e.preventDefault();
+    });
+
+    // Intercetta i click su Avanti
+    document.querySelector('[onclick="nextStep(2)"]').onclick = function () {
+        if (validateStep1()) nextStep(2);
+    };
+
+    document.querySelector('[onclick="nextStep(3)"]').onclick = function () {
+        if (validateStep2()) nextStep(3);
+    };
+</script>
+
 </body>
 </html>

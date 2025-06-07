@@ -9,6 +9,7 @@
     <style>
         body {
             background-image: url('https://www.linkbay.it/static/image/background.webp');
+            background-color: #99002b;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -118,7 +119,7 @@
                         <button class="btn btn-primary btn-lg w-100 mb-2" onclick="applyTheme('{{ theme.name }}')">
                             <i class="fa-solid fa-brush me-1"></i> Applica Tema
                         </button>
-                        <button class="btn btn-outline-secondary btn-lg w-100" onclick="previewTheme('{{ theme.name }}')">
+                        <button class="btn btn-outline-secondary btn-lg w-100" onclick="previewTheme('{{ theme.name | lower }}')">
                             <i class="fa-solid fa-eye me-1"></i> Anteprima
                         </button>
                     </div>
@@ -174,14 +175,26 @@
         }
 
         function previewTheme(themeName) {
-            Swal.fire({
-                title: 'Anteprima Tema',
-                html: `<iframe src="/preview-theme/${themeName}" style="width:100%;height:700px;border:none;"></iframe>`,
-                width: '100%',
-                padding: '0.5em',
-                showCloseButton: true,
-                showConfirmButton: false
-            });
+            fetch(`/preview-theme/${themeName}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Il tema non è stato trovato o è danneggiato.");
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    Swal.fire({
+                        title: 'Anteprima Tema',
+                        html: `<iframe srcdoc="${html}" style="width:100%;height:700px;border:none;"></iframe>`,
+                        width: '100%',
+                        padding: '0.5em',
+                        showCloseButton: true,
+                        showConfirmButton: false
+                    });
+                })
+                .catch(error => {
+                    Swal.fire("Errore", error.message, "error");
+                });
         }
     </script>
 

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}LinkBay{% endblock %}</title>
-    <meta name="description" content="{% block description %}LinkBay CMS - Dashboard{% endblock %}">
+    <meta name="description" content="{% block description %}LinkBayCMS - Dashboard{% endblock %}">
     <meta name="author" content="Quagliara Alessio">
     <link rel="shortcut icon" href="/static/images/superadmin/favicon.ico" type="image/x-icon">
     <!-- Bootstrap CSS -->
@@ -131,6 +131,43 @@
     </form>
   </div>
 </div>
+<!-- MODALE PER LA CREAZIONE DEL NEGOZIO CON STEP -->
+    <div class="modal fade" id="createShopModal" tabindex="-1" aria-labelledby="createShopModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <form id="createShopForm">
+            <div class="modal-header">
+              <h5 class="modal-title" id="createShopModalLabel">Crea Nuovo Negozio</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+            </div>
+            <div class="modal-body">
+              <!-- Step 1: Nome negozio + Tipologia -->
+              <div id="step1">
+                <div class="mb-3">
+                  <label for="shop_name" class="form-label">Nome Negozio</label>
+                  <input type="text" class="form-control" id="shop_name" name="shop_name" placeholder="es. erboristeria-digitale" required>
+                  <div id="shopNameHelp" class="invalid-feedback d-none">Nome già in uso o non valido. Usa solo lettere, numeri e trattini (-).</div>
+                </div>
+                <div class="mb-3">
+                  <label for="shop_type" class="form-label">Tipologia</label>
+                  <select class="form-select" id="shop_type" name="shop_type" required>
+                    <option value="" disabled selected>Seleziona una tipologia</option>
+                    <option value="ecommerce">Negozio Online</option>
+                    <option value="platform">Piattaforma Online</option>
+                    <option value="website">Sito Web</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-end">
+              <button type="button" class="btn btn-success" id="finalCreateBtn" onclick="creaNegozioPerUtente()">
+                <i class="fa-solid fa-plus me-1"></i> Crea Negozio
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
     <!-- Mobile Toggle Button -->
     {% if '/dashboard/themes/upload' in request.path %}
       <a href="/dashboard/themes/explore" class="btn ms-auto d-md-none m-2">
@@ -143,7 +180,7 @@
     {% else %}
       <button class="btn d-md-none m-2" id="sidebarToggle">
       <i class="fas fa-bars"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <img src="/static/images/superadmin/linkbay_logo.png" alt="LinkBay Logo" width="140">
+      <img src="/static/images/superadmin/linkbay_logo.png" alt="LinkBayCMS Logo" width="140">
       </button>
     {% endif %}
 
@@ -152,7 +189,7 @@
         <div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 bg-light border-end min-vh-100">
           <div>
             <a href="#" class="brand d-flex align-items-center mb-4">
-              <img src="/static/images/superadmin/linkbay_logo.png" alt="LinkBay Logo" width="140">
+              <img src="/static/images/superadmin/linkbay_logo.png" alt="LinkBayCMS Logo" width="140">
             </a>
             <nav class="nav flex-column">
               <a href="/dashboard" class="nav-link {% if request.path == '/dashboard' %}active{% endif %}"><i class="fa-solid fa-house me-2"></i> Home</a>

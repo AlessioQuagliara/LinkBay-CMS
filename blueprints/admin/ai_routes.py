@@ -45,7 +45,7 @@ def assistant():
         prompt = (
             f"Sei un assistente AI specializzato nel CMS LinkBay. Il negozio '{shop_name}' opera nel settore '{industry}'.\n"
             f"Descrizione: '{description}'. Il competitor segnalato è: {website_url}.\n\n"
-            f"LinkBay è un CMS multitenant per e-commerce, con funzionalità avanzate:\n"
+            f"LinkBayCMS è un CMS multitenant per e-commerce, con funzionalità avanzate:\n"
             f"  • /products: Gestione prodotti, immagini, prezzi, categorie, tag.\n"
             f"  • /orders: Gestione ordini, tracking spedizioni, pagamenti.\n"
             f"  • /customers: Analisi clienti, storico acquisti, preferenze.\n"
@@ -95,7 +95,14 @@ def analyze_store():
         description = store_info.description or "No description available"
         website_url = store_info.website_url or "No competitor provided"
 
-        prompt = f"Analizza il negozio '{shop_name}' nel settore '{industry}', lo store ha come descrizione '{description}',  il competitors è '{website_url}' e fornisci sicurezza e spiega cos'è l'ecommerce e la vendita online nel suo settore, fornisci un testo di massimo 4 righe."
+        prompt = (
+            f"Sei un esperto di strategia di marketing. Analizza il negozio '{shop_name}', che opera nel settore '{industry}'.\n"
+            f"Descrizione del negozio: {description}.\n"
+            f"Competitor: {website_url}.\n\n"
+            f"1. Elabora un'analisi SWOT (Punti di Forza, Debolezza, Opportunità, Minacce).\n"
+            f"2. Fornisci una breve analisi del Marketing Mix (Prodotto, Prezzo, Punto vendita, Promozione).\n\n"
+            f"Sii preciso, pratico, professionale e sintetico."
+        )
 
         # **Aggiungi la chiave API direttamente al client**
         client = openai.OpenAI(api_key=Config.OPENAI_API_KEY)

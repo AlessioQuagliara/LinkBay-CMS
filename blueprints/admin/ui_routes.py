@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, session, render_template, redirect, url_for, flash
+from flask import Blueprint, request, jsonify, session, render_template, redirect, url_for, flash, Response, current_app
 from models.database import db  # Importiamo il database SQLAlchemy
 from models.stores_info import StoreInfo  # Modello per le informazioni del negozio
 from models.shoplist import ShopList  # Modello per la gestione dei negozi
@@ -154,3 +154,62 @@ def theme_selection():
         themes=theme_data,
         shop_name=shop_name
     )
+
+@ui_bp.route('/preview-theme/<theme_name>')
+def preview_theme(theme_name):
+
+    # Path assoluto della cartella Themes
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    themes_dir = os.path.abspath(os.path.join(base_dir, '..', 'themes'))
+    theme_path = os.path.join(themes_dir, f'{theme_name.lower()}.json')
+
+    # Se il tema non esiste
+    if not os.path.exists(theme_path):
+        return f"Tema '{theme_name}' non trovato.", 404
+
+    try:
+        with open(theme_path, 'r', encoding='utf-8') as f:
+            theme_data = json.load(f)
+
+        head = theme_data.get('head', '')
+        foot = theme_data.get('foot', '')
+        script = theme_data.get('script', '')
+        pages = theme_data.get('pages', [])
+
+        # Recupera le pagine 'home', 'navbar' e 'footer'
+        page_home = next((p for p in pages if p.get('slug') == 'home'), None)
+        page_navbar = next((p for p in pages if p.get('slug') == 'navbar'), None)
+        page_footer = next((p for p in pages if p.get('slug') == 'footer'), None)
+
+        if not page_home:
+            return "La pagina 'home' non è presente nel tema.", 404
+
+        html = f"""
+        <!DOCTYPE html>
+        <html lang="{page_home.get('language', 'en')}">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>{page_home.get('title')}</title>
+          {head}
+          <style>{page_home.get('styles', '')}</style>
+        </head>
+        <body>
+          {page_navbar.get('content') if page_navbar else ''}
+          <main>
+            {page_home.get('content')}
+          </main>
+          {page_footer.get('content') if page_footer else ''}
+          {foot}
+          <script>{script}</script>
+          <script>AOS.init();</script>
+        </body>
+        </html>
+        """
+        return Response(html, mimetype='text/html')
+
+    except Exception as e:
+        # Mostra l’errore dettagliato in dev, generico in prod
+        if current_app.config.get("ENVIRONMENT") == "development":
+            return f"Errore nella visualizzazione del tema: {str(e)}", 500
+        return "Errore durante la visualizzazione del tema.", 500

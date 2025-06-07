@@ -27,6 +27,9 @@ from flask import g
 import os
 from datetime import datetime, timedelta
 from flask import send_file
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def load_release_notes(language="it"):
     try:
@@ -144,10 +147,14 @@ def dashboard_stores():
         else:
             shop['visits_left'] = None
 
+    # Aggiungo la variabile di sviluppo
+    variable = os.getenv('ENVIRONMENT')
+
     return render_template(
         'landing/dashboard_shop.html',
         user=get_user_from_session(),
-        shops=list(all_shops.values())
+        shops=list(all_shops.values()),
+        variable=variable,  # Variabile di ambiente per sviluppo
     )
 
 @landing_bp.route('/dashboard/chats')
@@ -348,15 +355,11 @@ def dashboard_support_chat(ticket_id):
 
 @landing_bp.route('/preview-theme/<theme_name>')
 def preview_theme(theme_name):
-    import os
-    from flask import current_app
-    from flask import Response
-    import json
 
     # Path assoluto della cartella Themes
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    themes_dir = os.path.join(base_dir, '..', 'themes')
-    theme_path = os.path.join(themes_dir, f'{theme_name}.json')
+    themes_dir = os.path.abspath(os.path.join(base_dir, '..', 'themes'))
+    theme_path = os.path.join(themes_dir, f'{theme_name.lower()}.json')
 
     # Se il tema non esiste
     if not os.path.exists(theme_path):
@@ -912,5 +915,3 @@ def sitemap():
     sitemap_xml += '</urlset>\n'
 
     return Response(sitemap_xml, mimetype='application/xml')
-
-

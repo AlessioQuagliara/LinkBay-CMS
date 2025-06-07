@@ -1,2 +1,2 @@
 # CMS_DEF
- LinkBay CMS
+ LinkBayCMS
