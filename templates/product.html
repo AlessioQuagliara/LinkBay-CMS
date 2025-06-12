@@ -1,46 +1,35 @@
-    <!DOCTYPE html>
-    <html lang="{{ language }}">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{{ product.name }}</title>
-        <meta name="description" content="{{ product.short_description }}">
-        <meta name="keywords" content="{{ product.keywords | join(', ') }}">
-        {% include 'head.html' %}
-        <!-- Include head scripts dinamicamente -->
-        {{ head | safe }}
-    </head>
-    <body>
-        <!-- Include la navbar -->
+<!DOCTYPE html>
+<html lang="{{ language }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <meta name="description" content="{{ description }}">
+    <meta name="keywords" content="{{ keywords }}">
+    {% include 'head.html' %}
+    <!-- Include head scripts dinamicamente -->
+    {{ head | safe }}  <!-- Questo carica gli script personalizzati nella testa -->
+</head>
+<body>
+    <!-- Include la navbar -->
+    {{ navbar | safe }}  <!-- Stampa il contenuto della navbar -->
 
-        <nav>
-            {{ navbar | safe }}
-        </nav>
+    <!-- Contenuto della pagina -->
+    {{ content | safe }}
 
-        <!-- Include il contenuto dinamico della pagina -->
+    <!-- Carica cookie personalizzati -->
+    {{ cookie_policy_banner | safe }}  <!-- Questo carica i cookie personalizzati -->
 
-        {{ page | safe }}
+    <!-- Include il footer -->
+    {{ footer | safe }}  <!-- Stampa il contenuto del footer -->
 
-        <!-- Carica cookie personalizzati -->
+    <!-- Carica script personalizzati -->
+    {{ script | safe }}  <!-- Questo carica gli script personalizzati nel body -->
 
-        {{ cookie_policy_banner | safe }}  <!-- Questo carica i cookie personalizzati -->
+    <!-- Carica gli script del footer -->
+    {{ foot | safe }}  <!-- Questo carica gli script specifici per il footer -->
 
-        <!-- Include il footer -->
-
-        <footer>
-            {{ footer | safe }}
-        </footer>
-        
-        <!-- Carica script personalizzati -->
-
-        {{ script | safe }}
-        
-        <!-- Carica gli script del footer impostati dall'utente -->
-
-        {{ foot | safe }}
-
-        <!-- Carica gli script predefiniti da sistema -->
-
-        {% include 'content_after_body.html' %}
-    </body>
-    </html>
+    <!-- Carica gli script predefiniti da sistema -->
+    {% include 'content_after_body.html' %}
+</body>
+</html>

@@ -2,11 +2,13 @@ from flask import Blueprint, request, jsonify, session, render_template, redirec
 from models.database import db  # Importiamo il database SQLAlchemy
 from models.stores_info import StoreInfo  # Modello per le informazioni del negozio
 from models.shoplist import ShopList  # Modello per la gestione dei negozi
-from models.cmsaddon import CMSAddon  # Modello per gli add-on (temi)
 from helpers import check_user_authentication
 import logging
 import os
 import json
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 

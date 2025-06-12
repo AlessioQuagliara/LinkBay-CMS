@@ -1,11 +1,3 @@
-<!-- Include la logica del carrello a seconda del tema -->
-
-{% if selected_theme_ui %}
-    {% include 'themes/cart/' ~ selected_theme_ui.name ~ '.html' %}
-{% else %}
-    {% include 'themes/cart/norman.html' %}
-{% endif %}
-
 <!-- Include gli script funzionali -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {

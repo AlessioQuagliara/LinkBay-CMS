@@ -1,124 +1,124 @@
-[2025-04-12 13:51:07,177] [ERROR] in app: Exception on /landing/admin/dashboard [GET]
-Traceback (most recent call last):
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/admin/routes_admin.py", line 25, in admin_dashboard
-    return render_template("dashboard.html")
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
-    return _render(app, template, context)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
-    rv = template.render(context)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/admin/templates/landing/admin/dashboard.html", line 1, in top-level template code
-    {% extends "admin_base.html" %}
-    ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/admin/templates/landing/admin/admin_base.html", line 21, in top-level template code
-    {% include "admin/sidebar.html" %}
-    ^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 65, in get_source
-    return self._get_source_fast(environment, template)
-           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 99, in _get_source_fast
-    raise TemplateNotFound(template)
-jinja2.exceptions.TemplateNotFound: admin/sidebar.html
-[2025-04-12 13:51:27,570] [ERROR] in app: Exception on /landing/admin/dashboard [GET]
-Traceback (most recent call last):
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/admin/routes_admin.py", line 25, in admin_dashboard
-    return render_template("dashboard.html")
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
-    return _render(app, template, context)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
-    rv = template.render(context)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/admin/templates/landing/admin/dashboard.html", line 1, in top-level template code
-    {% extends "admin_base.html" %}
-    ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/admin/templates/landing/admin/admin_base.html", line 21, in top-level template code
-    {% include "admin/sidebar.html" %}
-    ^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 65, in get_source
-    return self._get_source_fast(environment, template)
-           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 99, in _get_source_fast
-    raise TemplateNotFound(template)
-jinja2.exceptions.TemplateNotFound: admin/sidebar.html
-[2025-04-12 13:51:58,851] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 13:53:47,149] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 13:57:45,361] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 13:58:48,048] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 13:59:14,945] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 13:59:41,158] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:08:39,055] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:09:51,311] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:10:08,311] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:12:58,539] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:13:23,834] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:15:03,606] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:16:51,958] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:17:35,041] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:17:52,589] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:20:11,597] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:22:19,935] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:22:55,996] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:24:04,191] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:25:05,708] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:26:16,236] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:28:50,821] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:31:00,287] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:31:45,540] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:32:18,335] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:33:39,193] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:35:16,917] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:36:07,696] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:36:37,670] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:37:30,045] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:37:53,301] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:38:05,470] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:38:16,988] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:38:30,495] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:41:22,140] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:44:00,091] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:46:55,310] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-12 14:47:57,912] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-13 11:56:16,145] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-13 11:56:26,223] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-13 11:56:26,836] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-13 11:58:27,870] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-13 12:00:45,815] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-13 12:00:51,751] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-13 12:00:58,443] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-13 12:01:07,430] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-13 12:01:13,809] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-13 12:01:23,905] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-13 12:01:26,174] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-13 12:01:26,737] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-13 12:46:17,180] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-13 12:46:17,197] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-13 12:46:25,371] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-13 12:46:25,409] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-13 12:46:27,370] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-04-13 12:46:27,415] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:28:00,230] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:28:04,225] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:28:04,252] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:32:39,455] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:32:39,485] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:33:01,308] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:33:01,344] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:33:34,761] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:33:56,663] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:33:56,693] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:34:07,273] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:37:49,002] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:37:49,038] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:39:07,313] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:39:07,343] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:39:10,966] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:41:46,366] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:41:46,386] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:41:52,534] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:42:07,167] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:42:07,199] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:42:08,703] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:44:05,262] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:44:05,291] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:44:19,704] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:48:22,872] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:48:22,887] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:48:25,228] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:49:45,342] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:49:45,378] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:49:48,761] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:56:19,035] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:56:19,051] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:56:27,227] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:56:27,270] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:56:30,456] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:57:48,766] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:57:48,783] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:59:48,181] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:59:48,198] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 22:59:49,930] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 23:07:23,057] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 23:12:57,754] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 23:12:57,768] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 23:16:54,639] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 23:16:54,677] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 23:18:36,978] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 23:18:37,005] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 23:23:01,054] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-05 23:23:01,080] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-06 23:48:14,263] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-06 23:48:14,281] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-06 23:48:14,831] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-06 23:48:14,881] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-07 00:07:27,995] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-07 00:07:39,273] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-07 00:07:47,570] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-07 00:07:47,584] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-07 00:07:48,142] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-07 00:07:48,197] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-07 00:08:42,586] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-07 00:08:42,602] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-07 00:09:16,075] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-05-07 00:09:16,115] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-06 13:51:02,922] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-06 13:51:19,246] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 00:40:36,589] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 00:40:37,283] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 00:43:09,022] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 00:43:09,662] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 00:45:40,283] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 00:45:40,901] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 00:46:22,355] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 00:46:22,919] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 00:49:47,550] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 00:49:48,165] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 01:01:33,112] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 01:01:33,123] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 15:03:23,974] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 15:03:24,635] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 15:03:32,751] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 15:03:33,324] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 15:06:08,965] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 15:06:09,149] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 15:10:13,970] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 15:10:13,993] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 15:10:42,114] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 15:10:42,138] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 15:11:16,629] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 15:11:16,645] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 15:11:31,752] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 15:11:32,327] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 15:15:37,329] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 15:15:37,348] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 15:15:43,477] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 15:15:43,514] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 18:49:39,051] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 18:49:39,672] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 18:49:40,803] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 18:49:41,377] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 18:52:28,114] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 18:52:28,129] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 18:54:47,236] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 18:54:47,281] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 19:09:41,515] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 19:09:41,534] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 19:15:02,215] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 19:15:02,231] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 19:16:54,639] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 19:16:55,253] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 19:16:59,166] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 19:16:59,738] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 19:40:12,496] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 19:40:12,513] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 19:45:58,543] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 19:45:58,588] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 19:46:00,485] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 19:46:00,540] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 23:00:38,243] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 23:00:38,872] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 23:00:45,063] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 23:00:45,621] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 23:19:54,237] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-06-07 23:19:54,397] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.

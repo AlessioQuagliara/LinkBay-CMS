@@ -11,7 +11,6 @@ from .subscription import Subscription
 
 # 📌 Tabelle delle agenzie e dipendenti
 from .agency import Agency
-from .userstoreaccess import UserStoreAccess
 from .agency import AgencyStoreAccess
 from .agency import AgencyEmployee
 
@@ -28,14 +27,8 @@ from .site_visit_intern import SiteVisitIntern
 from .storepayment import StorePayment
 
 # 📌 Tabelle relative alla gestione delle categorie e prodotti
-from .categories import Category
-from .products import Brand
-from .products import ProductImage
-from .products import ProductAttribute
-from .products import Product
-from .collections import Collection
-from .collections import CollectionImage
-from .collections import CollectionProduct
+from .products import Product, ProductVariant, ProductImage, Category, Collection, CollectionImage, CollectionProduct
+from .warehouse import Inventory
 
 # 📌 Tabelle per gli ordini e pagamenti
 from .orders import Order

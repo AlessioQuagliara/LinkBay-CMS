@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify
 from flask import g
 from models.database import db
-from models.collections import Collection
+from models.products import Collection, CollectionProduct
 from models.page import Page
 from models.products import Product, ProductImage
 from models.cookiepolicy import CookiePolicy
@@ -11,6 +11,7 @@ from helpers import (
     render_theme_styles
 )
 import logging
+from models.websettings import WebSettings
 
 # 📌 Configurazione del logger
 logging.basicConfig(level=logging.INFO)
@@ -44,6 +45,9 @@ def render_dynamic_page(slug=None):
         web_settings = get_web_settings(shop_subdomain)
         cookie_policy_banner = get_cookie_policy_content(shop_subdomain)
 
+        web_settings = WebSettings.query.filter_by(shop_name=g.shop_name).first()
+        theme_name = web_settings.theme_name if web_settings and web_settings.theme_name else 'default'
+
         return render_template(
             "index.html",
             title=page.title,
@@ -60,107 +64,159 @@ def render_dynamic_page(slug=None):
             head=web_settings.head if web_settings else "",
             script=web_settings.script if web_settings else "",
             foot=web_settings.foot if web_settings else "",
+            theme_name=theme_name,
         )
 
     return render_template("errors/404.html"), 404
 
-# 🔹 **Rotta per le collezioni**
-@main_bp.route('/collections/<slug>', methods=['GET'])
-@main_bp.route('/collections', defaults={'slug': None}, methods=['GET'])
-def render_collection(slug=None):
-    """
-    Renderizza la pagina di una collezione o la lista di tutte le collezioni.
-    """
+# 🔹 **Rotta per le Collezioni**
+@main_bp.route("/collections")
+def render_collections():
     shop_subdomain = g.shop_name
+    language = get_language()
 
-    if slug:
-        collection = Collection.query.filter_by(slug=slug, shop_name=shop_subdomain).first()
-        if not collection:
-            return render_template('errors/404.html'), 404
+    collections = Collection.query.filter_by(shop_name=shop_subdomain, is_active=True).all()
 
-        products_in_collection = Product.query.filter(Product.collections.any(id=collection.id)).all()
-    else:
-        collection = None
-        products_in_collection = Product.query.filter_by(shop_name=shop_subdomain).all()
+    # Navbar
+    navbar_page = load_page_content("navbar", shop_subdomain)
+    navbar_content = navbar_page.content if navbar_page else ""
+    navbar_styles = navbar_page.styles if navbar_page and navbar_page.styles else ""
 
-    # Recupera immagini dei prodotti
-    product_ids = [product.id for product in products_in_collection]
-    product_images = ProductImage.query.filter(ProductImage.product_id.in_(product_ids)).all()
+    # Footer
+    footer_page = load_page_content("footer", shop_subdomain)
+    footer_content = footer_page.content if footer_page else ""
+    footer_styles = footer_page.styles if footer_page and footer_page.styles else ""
 
-    # Assegna immagini ai prodotti
-    product_image_map = {img.product_id: img.image_url for img in product_images}
-    for product in products_in_collection:
-        product.image_url = product_image_map.get(product.id, None)
-
-    # Recupera i contenuti del negozio
-    navbar_content = get_navbar_content(shop_subdomain)
-    footer_content = get_footer_content(shop_subdomain)
-    render_theme = render_theme_styles(shop_subdomain)
     web_settings = get_web_settings(shop_subdomain)
+    cookie_policy_banner = get_cookie_policy_content(shop_subdomain)
 
     return render_template(
-        'collection.html',
-        title=collection.name if collection else 'All Collections',
-        description=collection.description if collection else 'Browse our collections and products.',
-        collection=collection,
-        products=products_in_collection,
+        "collections.html",
+        title="Collections",
+        description="All collections",
+        keywords="collections",
+        collections=collections,
         navbar=navbar_content,
-        render_theme=render_theme,
+        navbar_styles=navbar_styles,
         footer=footer_content,
-        head=web_settings.get('head', ''),
-        script=web_settings.get('script', ''),
-        foot=web_settings.get('foot', '')
+        footer_styles=footer_styles,
+        cookie_policy_banner=cookie_policy_banner,
+        language=language,
+        head=web_settings.get("head", ""),
+        script=web_settings.get("script", ""),
+        foot=web_settings.get("foot", "")
     )
 
-# 🔹 **Rotta per la pagina di un singolo prodotto**
-@main_bp.route('/products/<slug>', methods=['GET'])
-def render_product(slug):
-    """
-    Renderizza la pagina di un singolo prodotto basandosi sullo slug.
-    """
+# 🔹 **Rotta per i Prodotti**
+@main_bp.route("/products")
+def render_products():
     shop_subdomain = g.shop_name
+    language = get_language()
 
-    # Recupera il prodotto
+    products = Product.query.filter_by(shop_name=shop_subdomain, is_active=True).all()
+
+    # Navbar
+    navbar_page = load_page_content("navbar", shop_subdomain)
+    navbar_content = navbar_page.content if navbar_page else ""
+    navbar_styles = navbar_page.styles if navbar_page and navbar_page.styles else ""
+
+    # Footer
+    footer_page = load_page_content("footer", shop_subdomain)
+    footer_content = footer_page.content if footer_page else ""
+    footer_styles = footer_page.styles if footer_page and footer_page.styles else ""
+
+    web_settings = get_web_settings(shop_subdomain)
+    cookie_policy_banner = get_cookie_policy_content(shop_subdomain)
+
+    return render_template(
+        "products.html",
+        title="Products",
+        description="All products",
+        keywords="products",
+        products=products,
+        navbar=navbar_content,
+        navbar_styles=navbar_styles,
+        footer=footer_content,
+        footer_styles=footer_styles,
+        cookie_policy_banner=cookie_policy_banner,
+        language=language,
+        head=web_settings.get("head", ""),
+        script=web_settings.get("script", ""),
+        foot=web_settings.get("foot", "")
+    )
+
+# 🔹 **Rotta per il singolo Prodotto**
+@main_bp.route("/product/<slug>")
+def render_single_product(slug):
+    shop_subdomain = g.shop_name
+    language = get_language()
+
     product = Product.query.filter_by(slug=slug, shop_name=shop_subdomain).first()
 
     if not product:
-        return render_template('errors/404.html'), 404
+        return render_template("errors/404.html"), 404
 
-    # Recupera le immagini associate al prodotto
-    product_images = ProductImage.query.filter_by(product_id=product.id).all()
+    # Navbar
+    navbar_page = load_page_content("navbar", shop_subdomain)
+    navbar_content = navbar_page.content if navbar_page else ""
+    navbar_styles = navbar_page.styles if navbar_page and navbar_page.styles else ""
 
-    # Recupera i contenuti della pagina 'products'
-    page = Page.query.filter_by(slug='products', shop_name=shop_subdomain).first()
+    # Footer
+    footer_page = load_page_content("footer", shop_subdomain)
+    footer_content = footer_page.content if footer_page else ""
+    footer_styles = footer_page.styles if footer_page and footer_page.styles else ""
 
-    # Recupera i contenuti del negozio
-    navbar_content = get_navbar_content(shop_subdomain)
-    footer_content = get_footer_content(shop_subdomain)
-    render_theme = render_theme_styles(shop_subdomain)
     web_settings = get_web_settings(shop_subdomain)
-
-    # Verifica il contenuto della pagina, se esiste
-    page_content = page.content if page else ""
-
-    # Sostituzione dinamica dei placeholder
-    if page_content:
-        page_content = page_content.replace('{{ product.name }}', product.name)
-        page_content = page_content.replace('{{ product.price }}', str(product.price))
-        page_content = page_content.replace('{{ product.short_description }}', product.short_description or "")
-        page_content = page_content.replace('{{ product.description }}', product.description or "")
-        page_content = page_content.replace('{{ product.stock_quantity }}', str(product.stock_quantity))
-        page_content = page_content.replace('{{ product.discount_price }}', str(product.discount_price) if product.discount_price else '')
+    cookie_policy_banner = get_cookie_policy_content(shop_subdomain)
 
     return render_template(
-        'product.html',
+        "product.html",
         title=product.name,
-        description=product.short_description,
+        description=product.description,
+        keywords=product.name,
         product=product,
-        page=page_content,  
-        images=product_images,
         navbar=navbar_content,
-        render_theme=render_theme,
+        navbar_styles=navbar_styles,
         footer=footer_content,
-        head=web_settings.get('head', ''),
-        script=web_settings.get('script', ''),
-        foot=web_settings.get('foot', '')
+        footer_styles=footer_styles,
+        cookie_policy_banner=cookie_policy_banner,
+        language=language,
+        head=web_settings.get("head", ""),
+        script=web_settings.get("script", ""),
+        foot=web_settings.get("foot", "")
+    )
+
+# 🔹 **Rotta per il Carrello**
+@main_bp.route("/cart")
+def render_cart():
+    shop_subdomain = g.shop_name
+    language = get_language()
+
+    # Navbar
+    navbar_page = load_page_content("navbar", shop_subdomain)
+    navbar_content = navbar_page.content if navbar_page else ""
+    navbar_styles = navbar_page.styles if navbar_page and navbar_page.styles else ""
+
+    # Footer
+    footer_page = load_page_content("footer", shop_subdomain)
+    footer_content = footer_page.content if footer_page else ""
+    footer_styles = footer_page.styles if footer_page and footer_page.styles else ""
+
+    web_settings = get_web_settings(shop_subdomain)
+    cookie_policy_banner = get_cookie_policy_content(shop_subdomain)
+
+    return render_template(
+        "cart.html",
+        title="Your Cart",
+        description="Items in your cart",
+        keywords="cart",
+        navbar=navbar_content,
+        navbar_styles=navbar_styles,
+        footer=footer_content,
+        footer_styles=footer_styles,
+        cookie_policy_banner=cookie_policy_banner,
+        language=language,
+        head=web_settings.get("head", ""),
+        script=web_settings.get("script", ""),
+        foot=web_settings.get("foot", "")
     )
