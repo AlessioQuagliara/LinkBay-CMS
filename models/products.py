@@ -1,113 +1,13 @@
 from models.database import db
+from datetime import datetime
 import logging
 from functools import wraps
-from datetime import datetime
-import uuid
+from sqlalchemy import UniqueConstraint, Index
 
 # Configurazione del logging (da spostare nel file principale dell'app)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# 🔹 **Modello per i Prodotti**
-class Product(db.Model):
-    __tablename__ = "products"
-
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 🔑 ID univoco
-    shop_name = db.Column(db.String(255), nullable=False)  # 🏪 Nome dello shop
-    name = db.Column(db.String(255), nullable=False)  # 📌 Nome del prodotto
-    description = db.Column(db.Text, nullable=True)  # 📝 Descrizione lunga
-    short_description = db.Column(db.Text, nullable=True)  # 📝 Descrizione breve
-    price = db.Column(db.Float, nullable=False)  # 💰 Prezzo
-    discount_price = db.Column(db.Float, nullable=True)  # 🏷️ Prezzo scontato
-    stock_quantity = db.Column(db.Integer, nullable=False, default=0)  # 📦 Quantità disponibile
-    sku = db.Column(db.String(255), unique=True, nullable=False)  # 🔖 Codice SKU
-    ean_code = db.Column(db.String(255), unique=True, nullable=True)  # 🔍 Codice EAN (può essere NULL)
-    category_id = db.Column(db.Integer, db.ForeignKey("categories.id", ondelete="SET NULL"), nullable=True)  # 📂 Categoria
-    brand_id = db.Column(db.Integer, db.ForeignKey("brands.id", ondelete="SET NULL"), nullable=True)  # 🏷️ Brand
-    weight = db.Column(db.Float, nullable=True)  # ⚖️ Peso
-    dimensions = db.Column(db.String(255), nullable=True)  # 📏 Dimensioni
-    color = db.Column(db.String(255), nullable=True)  # 🎨 Colore
-    material = db.Column(db.String(255), nullable=True)  # 🏗️ Materiale
-    slug = db.Column(db.String(255), unique=True, nullable=False)  # 🔗 Slug URL
-    is_active = db.Column(db.Boolean, default=True)  # ✅ Attivo o no
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 🕒 Creazione
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 🔄 Aggiornamento
-
-    # 🔗 Relazioni con altre tabelle
-    images = db.relationship("ProductImage", back_populates="product", cascade="all, delete-orphan")
-    attributes = db.relationship("ProductAttribute", back_populates="product", cascade="all, delete-orphan")
-    category = db.relationship("Category", backref="products", lazy=True)
-
-
-    def __repr__(self):
-        return f"<Product {self.id} - {self.name}>"
-# DIZIONARIO ---------------------------------------------------- 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "shop_name": self.shop_name,
-            "name": self.name,
-            "description": self.description,
-            "price": self.price,
-            "discount_price": self.discount_price,
-            "stock_quantity": self.stock_quantity,
-            "sku": self.sku,
-            "ean_code": self.ean_code,
-            "category_id": self.category_id,
-            "brand_id": self.brand_id,
-            "created_at": self.created_at.isoformat() if self.created_at else None,
-            "updated_at": self.updated_at.isoformat() if self.updated_at else None
-        }
-
-# 🔹 **Modello per le Immagini dei Prodotti**
-class ProductImage(db.Model):
-    __tablename__ = "product_images"
-    
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    product_id = db.Column(db.Integer, db.ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
-    image_url = db.Column(db.String(512), nullable=False)  # 🖼️ URL dell'immagine
-    is_main = db.Column(db.Boolean, default=False)  # ⭐ Indica se è l'immagine principale
-
-    product = db.relationship("Product", back_populates="images")  # 🔄 Relazione con `Product`
-
-    def __repr__(self):
-        return f"<ProductImage {self.id} - Product {self.product_id}>"
-
-
-# 🔹 **Modello per gli Attributi dei Prodotti (Varianti)**
-class ProductAttribute(db.Model):
-    __tablename__ = "product_attributes"
-    
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    product_id = db.Column(db.Integer, db.ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
-    attribute_name = db.Column(db.String(100), nullable=False)  # Es. "Size", "Color"
-    attribute_value = db.Column(db.String(100), nullable=False)  # Es. "Red", "XL"
-    price_modifier = db.Column(db.Float, default=0.0)  # 💰 Modifica del prezzo in base alla variante
-    stock_quantity = db.Column(db.Integer, nullable=False, default=0)  # 📦 Quantità disponibile della variante
-    variant_image_url = db.Column(db.String(512), nullable=True)  # 🖼️ Immagine della variante
-    ean_code = db.Column(db.String(255), unique=True, nullable=True)  # 🔍 Codice EAN della variante (può essere NULL)
-
-    product = db.relationship("Product", back_populates="attributes")  # 🔄 Relazione con `Product`
-
-    def __repr__(self):
-        return f"<ProductAttribute {self.id} - Product {self.product_id} - {self.attribute_name}: {self.attribute_value}>"
-
-
-# 🔹 **Modello per i Brands**    
-class Brand(db.Model):
-    __tablename__ = "brands"
-
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # ID univoco
-    name = db.Column(db.String(255), nullable=False, unique=True)  # Nome univoco del brand
-
-    # Relazione con prodotti (opzionale, se vuoi caricare i prodotti insieme ai brand)
-    products = db.relationship("Product", backref="brand", lazy=True)
-
-# DIZIONARIO ---------------------------------------------------- 
-    def to_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-
-
-# 🔄 **Decoratore per la gestione degli errori del database**
+# 🔄 Decoratore per la gestione degli errori del database
 def handle_db_errors(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -120,117 +20,470 @@ def handle_db_errors(func):
     return wrapper
 
 
-# ✅ **Crea un nuovo prodotto**
-@handle_db_errors
-def create_new_product(shop_subdomain):
-    new_product = Product(
-        name="New Product",
-        short_description="Short description",
-        description="Detailed description",
-        price=0.0,
-        discount_price=0.0,
-        stock_quantity=0,
-        sku=f"SKU-{uuid.uuid4().hex[:8]}",  # SKU univoco generato
-        category_id=None,  
-        brand_id=None,
-        weight=0.0,
-        dimensions="0x0x0",
-        color="Default color",
-        material="Default material",
-        slug=f"new-product-{uuid.uuid4().hex[:8]}",  # Slug univoco generato
-        is_active=False,
-        shop_name=shop_subdomain
+# 🔹 **Modello per le Categorie**
+class Category(db.Model):
+    __tablename__ = "categories"
+
+    id       = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name     = db.Column(db.String(255), nullable=False)
+    shop_id  = db.Column(db.Integer, db.ForeignKey("ShopList.id"), nullable=False)
+    parent_id= db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=True)
+
+    __table_args__ = (
+        UniqueConstraint('shop_id', 'name', name='ux_categories_shop_name'),
     )
 
-    db.session.add(new_product)
+    subcategories = db.relationship(
+        "Category",
+        backref=db.backref("parent", remote_side=[id]),
+        lazy=True
+    )
+
+    def __repr__(self):
+        return f"<Category {self.name} (ID: {self.id})>"
+
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+# 🔹 **Modello per le Collezioni**
+class Collection(db.Model):
+    __tablename__ = "collections"
+
+    id         = db.Column(db.Integer, primary_key=True, autoincrement=True)  
+    shop_id    = db.Column(db.Integer, db.ForeignKey("ShopList.id"), nullable=False)  
+    name       = db.Column(db.String(255), nullable=False)  
+    slug       = db.Column(db.String(255), nullable=False)  
+    description= db.Column(db.String(1024), nullable=True)  
+    image_url  = db.Column(db.String(512), nullable=True)  
+    is_active  = db.Column(db.Boolean, default=True)  
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  
+
+    __table_args__ = (
+        UniqueConstraint('shop_id', 'slug', name='ux_collections_shop_slug'),
+    )
+
+    images   = db.relationship("CollectionImage",   backref="collection", cascade="all, delete-orphan")
+    products = db.relationship(
+        "Product",
+        secondary="collection_products",
+        back_populates="collections",
+        lazy="dynamic"
+    )
+
+    def __repr__(self):
+        return f"<Collection {self.name} (ID: {self.id})>"
+
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+# 📸 **Modello per le Immagini delle Collezioni**
+class CollectionImage(db.Model):
+    __tablename__ = "collection_images"
+
+    id            = db.Column(db.Integer, primary_key=True, autoincrement=True)  
+    collection_id = db.Column(db.Integer, db.ForeignKey("collections.id"), nullable=False)  
+    url           = db.Column(db.String(512), nullable=False)  
+    is_main       = db.Column(db.Boolean, default=False)  
+    created_at    = db.Column(db.DateTime, default=datetime.utcnow)  
+    updated_at    = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  
+
+    __table_args__ = (
+        UniqueConstraint('collection_id', 'url', name='ux_coll_images_coll_url'),
+        Index('ix_coll_images_coll', 'collection_id'),
+    )
+
+    def __repr__(self):
+        return f"<CollectionImage {self.id} for Collection {self.collection_id}>"
+
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+# 🛒 **Tabella di associazione Collezione–Prodotto**
+class CollectionProduct(db.Model):
+    __tablename__ = "collection_products"
+
+    collection_id = db.Column(db.Integer, db.ForeignKey("collections.id"), primary_key=True)
+    product_id    = db.Column(db.Integer, db.ForeignKey("products.id"),    primary_key=True)
+
+    def __repr__(self):
+        return f"<CollectionProduct C:{self.collection_id} P:{self.product_id}>"
+
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+# 🔹 **Modello per i Prodotti**
+class Product(db.Model):
+    __tablename__ = "products"
+
+    id                = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    shop_id           = db.Column(db.Integer, db.ForeignKey("ShopList.id"), nullable=False)
+    name              = db.Column(db.String(255), nullable=False)
+    description       = db.Column(db.Text, nullable=True)
+    short_description = db.Column(db.Text, nullable=True)
+    price             = db.Column(db.Numeric(10,2), nullable=False)
+    discount_price    = db.Column(db.Numeric(10,2), nullable=True)
+    stock_quantity    = db.Column(db.Integer, default=0, nullable=False)
+    slug              = db.Column(db.String(255), nullable=False)
+    is_active         = db.Column(db.Boolean, default=True)
+    created_at        = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at        = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    category_id       = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=True)
+    is_digital        = db.Column(db.Boolean, default=False, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint('shop_id', 'slug', name='ux_products_shop_slug'),
+        Index('ix_products_shop_name', 'shop_id', 'name'),
+    )
+
+    variants    = db.relationship("ProductVariant", back_populates="product", cascade="all, delete-orphan")
+    images      = db.relationship("ProductImage",   back_populates="product", cascade="all, delete-orphan")
+    collections = db.relationship(
+        "Collection",
+        secondary="collection_products",
+        back_populates="products",
+        lazy="dynamic"
+    )
+    category    = db.relationship("Category", backref="products")
+    inventories = db.relationship("Inventory", backref="product", cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f"<Product {self.id} – {self.name}>"
+
+    def to_dict(self):
+        data = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        data['collections'] = [col.to_dict() for col in self.collections]
+        data['variants']    = [v.to_dict()   for v in self.variants]
+        return data
+
+
+# 🔹 **Modello per le Varianti di Prodotto**
+class ProductVariant(db.Model):
+    __tablename__ = "product_variants"
+
+    id             = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    product_id     = db.Column(db.Integer, db.ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
+    sku            = db.Column(db.String(255), nullable=False)
+    ean_code       = db.Column(db.String(255), nullable=True)
+    price_modifier = db.Column(db.Numeric(10,2), default=0)
+    stock_quantity = db.Column(db.Integer, default=0, nullable=False)
+    is_default     = db.Column(db.Boolean, default=False)
+
+    __table_args__ = (
+        UniqueConstraint('product_id', 'sku', name='ux_variants_prod_sku'),
+        Index('ix_variants_product', 'product_id'),
+    )
+
+    product = db.relationship("Product", back_populates="variants")
+
+    def __repr__(self):
+        return f"<Variant {self.id} of Product {self.product_id}: SKU={self.sku}>"
+
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+# 🔹 **Modello per le Immagini dei Prodotti**
+class ProductImage(db.Model):
+    __tablename__ = "product_images"
+
+    id         = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    product_id = db.Column(db.Integer, db.ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
+    url        = db.Column(db.String(512), nullable=False)
+    is_main    = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    __table_args__ = (
+        UniqueConstraint('product_id', 'url', name='ux_product_images_prod_url'),
+        Index('ix_product_images_prod', 'product_id'),
+    )
+
+    product = db.relationship("Product", back_populates="images")
+
+    def __repr__(self):
+        return f"<ProductImage {self.id} for Product {self.product_id}>"
+
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    
+# 🔄 **CRUD Functions for Category**
+@handle_db_errors
+def create_category(shop_id, name, parent_id=None):
+    cat = Category(shop_id=shop_id, name=name, parent_id=parent_id)
+    db.session.add(cat)
     db.session.commit()
+    logging.info(f"✅ Categoria '{name}' creata per Shop ID {shop_id}")
+    return cat.id
 
-    return {
-        'success': True,
-        'message': 'Product created successfully.',
-        'product_id': new_product.id
-    }
-
-
-# 🔍 **Recupera tutti i prodotti per un negozio**
 @handle_db_errors
-def get_all_products(shop_name):
-    products = Product.query.filter_by(shop_name=shop_name).all()
-    return [product_to_dict(p) for p in products]
+def get_all_categories(shop_id):
+    return Category.query.filter_by(shop_id=shop_id).all()
 
-
-# 🔍 **Recupera un prodotto per slug**
 @handle_db_errors
-def get_product_by_slug(slug, shop_name):
-    product = Product.query.filter_by(slug=slug, shop_name=shop_name).first()
-    return product_to_dict(product) if product else None
+def get_category_by_id(category_id):
+    return Category.query.get(category_id)
 
-
-# 🔄 **Aggiorna un prodotto**
 @handle_db_errors
-def update_product(product_id, data):
-    product = Product.query.filter_by(id=product_id).first()
-    if not product:
+def update_category(category_id, **kwargs):
+    cat = Category.query.get(category_id)
+    if not cat:
+        return None
+    for key, value in kwargs.items():
+        if hasattr(cat, key) and value is not None:
+            setattr(cat, key, value)
+    db.session.commit()
+    logging.info(f"✅ Categoria ID {category_id} aggiornata")
+    return cat
+
+@handle_db_errors
+def delete_category(category_id):
+    cat = Category.query.get(category_id)
+    if not cat:
         return False
-
-    for key, value in data.items():
-        if hasattr(product, key) and value is not None:
-            setattr(product, key, value)
-
-    product.updated_at = datetime.utcnow()
+    db.session.delete(cat)
     db.session.commit()
-    logging.info(f"✅ Prodotto '{product_id}' aggiornato con successo.")
+    logging.info(f"🗑️ Categoria ID {category_id} eliminata")
+    return True
+
+@handle_db_errors
+def get_subcategories(parent_id):
+    return Category.query.filter_by(parent_id=parent_id).all()
+
+
+# 🔄 **CRUD Functions for Collection**
+@handle_db_errors
+def create_collection(shop_id, name, slug, description=None, image_url=None, is_active=True):
+    col = Collection(
+        shop_id=shop_id, name=name, slug=slug,
+        description=description, image_url=image_url, is_active=is_active
+    )
+    db.session.add(col)
+    db.session.commit()
+    logging.info(f"✅ Collezione '{name}' creata per Shop ID {shop_id}")
+    return col.id
+
+@handle_db_errors
+def get_all_collections(shop_id):
+    return Collection.query.filter_by(shop_id=shop_id).all()
+
+@handle_db_errors
+def get_collection_by_slug(shop_id, slug):
+    return Collection.query.filter_by(shop_id=shop_id, slug=slug).first()
+
+@handle_db_errors
+def update_collection(collection_id, **kwargs):
+    col = Collection.query.get(collection_id)
+    if not col:
+        return None
+    for key, value in kwargs.items():
+        if hasattr(col, key) and value is not None:
+            setattr(col, key, value)
+    db.session.commit()
+    logging.info(f"✅ Collezione ID {collection_id} aggiornata")
+    return col
+
+@handle_db_errors
+def delete_collection(collection_id):
+    col = Collection.query.get(collection_id)
+    if not col:
+        return False
+    db.session.delete(col)
+    db.session.commit()
+    logging.info(f"🗑️ Collezione ID {collection_id} eliminata")
     return True
 
 
-# ❌ **Elimina un prodotto**
+# 🔄 **CRUD Functions for CollectionImage**
+@handle_db_errors
+def create_collection_image(collection_id, url, is_main=False):
+    img = CollectionImage(collection_id=collection_id, url=url, is_main=is_main)
+    db.session.add(img)
+    db.session.commit()
+    logging.info(f"✅ Immagine aggiunta a Collezione ID {collection_id}")
+    return img.id
+
+@handle_db_errors
+def get_collection_images(collection_id):
+    return CollectionImage.query.filter_by(collection_id=collection_id).all()
+
+@handle_db_errors
+def delete_collection_image(image_id):
+    img = CollectionImage.query.get(image_id)
+    if not img:
+        return False
+    db.session.delete(img)
+    db.session.commit()
+    logging.info(f"🗑️ Immagine ID {image_id} eliminata")
+    return True
+
+
+# 🔄 **CRUD Functions for CollectionProduct**
+@handle_db_errors
+def add_product_to_collection(collection_id, product_id):
+    rel = CollectionProduct(collection_id=collection_id, product_id=product_id)
+    db.session.add(rel)
+    db.session.commit()
+    logging.info(f"✅ Prodotto {product_id} aggiunto a Collezione ID {collection_id}")
+    return True
+
+@handle_db_errors
+def remove_product_from_collection(collection_id, product_id):
+    CollectionProduct.query.filter_by(collection_id=collection_id, product_id=product_id).delete()
+    db.session.commit()
+    logging.info(f"🗑️ Prodotto {product_id} rimosso da Collezione ID {collection_id}")
+    return True
+
+@handle_db_errors
+def get_products_in_collection(collection_id):
+    rels = CollectionProduct.query.filter_by(collection_id=collection_id).all()
+    return [r.product_id for r in rels]
+
+
+# 🔄 **CRUD Functions for Product**
+@handle_db_errors
+def create_product(shop_id, name, price, sku, slug, **kwargs):
+    prod = Product(
+        shop_id=shop_id, name=name, price=price, sku=sku, slug=slug,
+        **{k: kwargs.get(k) for k in [
+            'description', 'short_description', 'discount_price',
+            'stock_quantity', 'ean_code', 'category_id', 'brand_id',
+            'weight', 'dimensions', 'color', 'material', 'is_active'
+        ] if kwargs.get(k) is not None}
+    )
+    db.session.add(prod)
+    db.session.commit()
+    logging.info(f"✅ Prodotto '{name}' creato per Shop ID {shop_id}")
+    return prod.id
+
+@handle_db_errors
+def get_all_products(shop_id):
+    return Product.query.filter_by(shop_id=shop_id).all()
+
+@handle_db_errors
+def get_product_by_slug(shop_id, slug):
+    return Product.query.filter_by(shop_id=shop_id, slug=slug).first()
+
+@handle_db_errors
+def update_product(product_id, **kwargs):
+    prod = Product.query.get(product_id)
+    if not prod:
+        return None
+    for key, value in kwargs.items():
+        if hasattr(prod, key) and value is not None:
+            setattr(prod, key, value)
+    db.session.commit()
+    logging.info(f"✅ Prodotto ID {product_id} aggiornato")
+    return prod
+
 @handle_db_errors
 def delete_product(product_id):
-    product = Product.query.filter_by(id=product_id).first()
-    if not product:
+    prod = Product.query.get(product_id)
+    if not prod:
         return False
-
-    db.session.delete(product)
+    db.session.delete(prod)
     db.session.commit()
-    logging.info(f"🗑️ Prodotto '{product_id}' eliminato con successo.")
+    logging.info(f"🗑️ Prodotto ID {product_id} eliminato")
+    return True
+
+@handle_db_errors
+def get_products_by_category(shop_id, category_id):
+    return Product.query.filter_by(shop_id=shop_id, category_id=category_id).all()
+
+@handle_db_errors
+def get_products_by_brand(shop_id, brand_id):
+    return Product.query.filter_by(shop_id=shop_id, brand_id=brand_id).all()
+
+@handle_db_errors
+def search_products(shop_id, query_text):
+    return Product.query.filter(
+        Product.shop_id == shop_id,
+        Product.name.ilike(f"%{query_text}%")
+    ).all()
+
+@handle_db_errors
+def get_products_by_ids(product_ids):
+    return Product.query.filter(Product.id.in_(product_ids)).all()
+
+@handle_db_errors
+def get_first_product_by_shop(shop_id):
+    return Product.query.filter_by(shop_id=shop_id).order_by(Product.id.asc()).first()
+
+
+# 🔄 **CRUD Functions for ProductVariant**
+@handle_db_errors
+def create_variant(product_id, sku, **kwargs):
+    var = ProductVariant(product_id=product_id, sku=sku, **{
+        k: kwargs.get(k) for k in ['ean_code','price_modifier','stock_quantity','is_default']
+        if kwargs.get(k) is not None
+    })
+    db.session.add(var)
+    db.session.commit()
+    logging.info(f"✅ Variante SKU '{sku}' creata per Prodotto ID {product_id}")
+    return var.id
+
+@handle_db_errors
+def get_variants_by_product(product_id):
+    return ProductVariant.query.filter_by(product_id=product_id).all()
+
+@handle_db_errors
+def update_variant(variant_id, **kwargs):
+    var = ProductVariant.query.get(variant_id)
+    if not var:
+        return None
+    for key, value in kwargs.items():
+        if hasattr(var, key) and value is not None:
+            setattr(var, key, value)
+    db.session.commit()
+    logging.info(f"✅ Variante ID {variant_id} aggiornata")
+    return var
+
+@handle_db_errors
+def delete_variant(variant_id):
+    var = ProductVariant.query.get(variant_id)
+    if not var:
+        return False
+    db.session.delete(var)
+    db.session.commit()
+    logging.info(f"🗑️ Variante ID {variant_id} eliminata")
     return True
 
 
-# 🔍 **Recupera prodotti per categoria**
+# 🔄 **CRUD Functions for ProductImage**
 @handle_db_errors
-def get_products_by_category(category_id):
-    products = Product.query.filter_by(category_id=category_id).all()
-    return [product_to_dict(p) for p in products]
+def create_product_image(product_id, url, is_main=False):
+    img = ProductImage(product_id=product_id, url=url, is_main=is_main)
+    db.session.add(img)
+    db.session.commit()
+    logging.info(f"✅ Immagine '{url}' aggiunta a Prodotto ID {product_id}")
+    return img.id
 
-
-# 🔍 **Recupera prodotti per brand**
 @handle_db_errors
-def get_products_by_brand(brand_id):
-    products = Product.query.filter_by(brand_id=brand_id).all()
-    return [product_to_dict(p) for p in products]
+def get_images_by_product(product_id):
+    return ProductImage.query.filter_by(product_id=product_id).all()
 
-
-# 🔍 **Cerca prodotti per nome**
 @handle_db_errors
-def search_products(query_text, shop_name):
-    products = Product.query.filter(Product.name.ilike(f"%{query_text}%"), Product.shop_name == shop_name).all()
-    return [product_to_dict(p) for p in products]
+def update_product_image(image_id, **kwargs):
+    img = ProductImage.query.get(image_id)
+    if not img:
+        return None
+    for key, value in kwargs.items():
+        if hasattr(img, key) and value is not None:
+            setattr(img, key, value)
+    db.session.commit()
+    logging.info(f"✅ Immagine ID {image_id} aggiornata")
+    return img
 
-
-# 🔍 **Recupera prodotti per ID multipli**
 @handle_db_errors
-def get_products_by_ids(product_ids):
-    products = Product.query.filter(Product.id.in_(product_ids)).all()
-    return [product_to_dict(p) for p in products]
-
-
-# 🔍 **Recupera il primo prodotto di un negozio**
-@handle_db_errors
-def get_first_product_by_shop(shop_name):
-    product = Product.query.filter_by(shop_name=shop_name).order_by(Product.id.asc()).first()
-    return product_to_dict(product) if product else None
-
-
-# 📌 **Helper per convertire un prodotto in dizionario**
-def product_to_dict(product):
-    return {col.name: getattr(product, col.name) for col in Product.__table__.columns} if product else None
+def delete_product_image(image_id):
+    img = ProductImage.query.get(image_id)
+    if not img:
+        return False
+    db.session.delete(img)
+    db.session.commit()
+    logging.info(f"🗑️ Immagine ID {image_id} eliminata")
+    return True

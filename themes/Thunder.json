@@ -92,13 +92,37 @@
             "title": "Collections",
             "description": "Explore Our Exclusive Collections",
             "keywords": "collections, fashion, trends, style",
-            "slug": "catalogs",
+            "slug": "collections",
             "content": "<section class=\"container-fluid text-center\" id=\"ifkl\"><div class=\"container\"><h2 class=\"fw-bold\">Ready to Take the Next Step?</h2><p class=\"lead\">Join thousands of businesses using our platform today.</p><a href=\"#\" class=\"btn btn-dark\" id=\"ieri\">Get Started Now</a></div></section>",
             "styles": "* { box-sizing: border-box; } body {margin: 0;}#ifkl{background-color:#ffcc00;color:#1e1e1e;padding:80px 0;}#ieri{padding:12px 24px;border-radius:8px;font-size:18px;}",
             "theme_name": "Thunder",
             "paid": "Yes",
             "language": "en",
             "published": true
-          }
+          },
+          {
+          "title": "Product Page",
+          "description": "Discover the details of our premium product",
+          "keywords": "product, ecommerce, buy, details, online shop",
+          "slug": "product",
+          "content": "<section class=\"container-fluid\" id=\"product-section\"><div class=\"container\"><div class=\"row align-items-center\"><div class=\"col-lg-6\" data-aos=\"fade-right\"><img src=\"{{ product.image_url }}\" class=\"img-fluid rounded shadow\" alt=\"{{ product.name }}\"></div><div class=\"col-lg-6\" data-aos=\"fade-left\"><h2 class=\"fw-bold\">{{ product.name }}</h2><p class=\"lead\">{{ product.description }}</p><h4 class=\"text-warning\">€ {{ product.price }}</h4><div class=\"mb-3\"><input type=\"number\" class=\"form-control w-25 d-inline\" min=\"1\" value=\"1\" id=\"quantity\"><button class=\"btn btn-warning ms-2\" onclick=\"addToCart('{{ product.id }}')\">Add to Cart</button></div></div></div></div></section>",
+          "styles": "#product-section{background-color:#f8f9fb;padding:80px 0;}#product-section h2{color:#1e1e1e;}#product-section .lead{color:#555;}#product-section .btn-warning{background-color:#ffcc00;border:none;}",
+          "theme_name": "Thunder",
+          "paid": "Yes",
+          "language": "en",
+          "published": true
+        },
+        {
+          "title": "Shopping Cart",
+          "description": "View and manage items in your cart",
+          "keywords": "cart, shopping, ecommerce, checkout, products",
+          "slug": "cart",
+          "content": "<section class=\"container-fluid\" id=\"cart-section\"><div class=\"container\"><h2 class=\"fw-bold text-center mb-5\" data-aos=\"fade-down\">Your Shopping Cart</h2><div class=\"table-responsive\"><table class=\"table table-striped\"><thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Total</th><th></th></tr></thead><tbody id=\"cart-items\">{{ cart_items }}</tbody></table></div><div class=\"text-end\"><h4 class=\"fw-bold\">Total: € <span id=\"cart-total\">{{ cart_total }}</span></h4><a href=\"/checkout\" class=\"btn btn-warning btn-lg mt-3\">Proceed to Checkout</a></div></div></section>",
+          "styles": "#cart-section{background-color:#ffffff;padding:80px 0;}#cart-section h2{color:#1e1e1e;}#cart-section .btn-warning{background-color:#ffcc00;border:none;}#cart-section table{background-color:#fff;border-radius:5px;overflow:hidden;}",
+          "theme_name": "Thunder",
+          "paid": "Yes",
+          "language": "en",
+          "published": true
+        }
     ]
 }

@@ -1,0 +1,128 @@
+{
+    
+    "head": "<!-- Bootstrap CSS -->\n<link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css\" rel=\"stylesheet\">\n<!-- FontAwesome CSS -->\n<link rel=\"stylesheet\" href=\"https://Popper.jsudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css\">\n<!-- SweetAlert CSS -->\n<link href=\"https://cdn.jsdelivr.net/npm/sweetalert2@11.4.27/dist/sweetalert2.min.css\" rel=\"stylesheet\">\n<!-- AOS Animate -->\n<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css\">",
+    "foot": "<!-- AOS Animate -->\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js\"></script>\n<!-- jQuery -->\n<script src=\"https://code.jquery.com/jquery-3.6.0.min.js\"></script>\n<!-- Popper.js -->\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js\"></script>\n<!-- Bootstrap JS -->\n<script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js\"></script>\n<!-- FontAwesome JS -->\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js\"></script>\n<!-- SweetAlert JS -->\n<script src=\"https://cdn.jsdelivr.net/npm/sweetalert2@11.4.27/dist/sweetalert2.all.min.js\"></script>",
+    "script": "<script></script>",
+    "pages": [
+{
+  "title": "Navbar",
+  "description": "Main navigation bar for Bazaar theme",
+  "keywords": "navbar, navigation, menu, bazaar",
+  "slug": "navbar",
+  "content": "<nav class=\"navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top\" id=\"bazaar-navbar\">\n  <div class=\"container\">\n    <a class=\"navbar-brand fw-bold\" href=\"/\">Bazaar</a>\n    <button class=\"navbar-toggler\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#navbarNav\">\n      <span class=\"navbar-toggler-icon\"></span>\n    </button>\n    <div class=\"collapse navbar-collapse justify-content-end\" id=\"navbarNav\">\n      <div id=\"nav-links\"></div>\n      <div id=\"nav-controls\" class=\"d-flex align-items-center ms-3\"></div>\n    </div>\n  </div>\n</nav>",
+  "styles": "#bazaar-navbar { z-index: 999; } .navbar-brand { color: #e74c3c; font-size: 1.8rem; } .navbar-light .navbar-nav .nav-link { color: #333; font-weight: 500; margin-left: 15px; }",
+  "theme_name": "Bazaar",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "Footer",
+  "description": "Main footer for Bazaar theme",
+  "keywords": "footer, bazaar, copyright",
+  "slug": "footer",
+  "content": "<footer class=\"bg-dark text-white pt-5 pb-3 mt-5\" id=\"bazaar-footer\">\n  <div class=\"container text-center\">\n    <p class=\"mb-2\">&copy; 2025 Bazaar Market. All rights reserved.</p>\n    <ul class=\"list-inline\">\n      <li class=\"list-inline-item\"><a href=\"/about-us\" class=\"text-white\">About</a></li>\n      <li class=\"list-inline-item\"><a href=\"/contact\" class=\"text-white\">Contact</a></li>\n      <li class=\"list-inline-item\"><a href=\"/faq\" class=\"text-white\">FAQ</a></li>\n    </ul>\n  </div>\n</footer>",
+  "styles": "#bazaar-footer a:hover { text-decoration: underline; } #bazaar-footer ul { padding: 0; margin: 0; } #bazaar-footer ul li { margin: 0 10px; }",
+  "theme_name": "Bazaar",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "Home",
+  "description": "Welcome to Bazaar – Your Global Marketplace",
+  "keywords": "home, bazaar, ecommerce, marketplace",
+  "slug": "home",
+  "content": "<section class=\"container-fluid py-5\" id=\"bazaar-hero\">\n  <div class=\"container text-center\" data-aos=\"fade-up\">\n    <h1 class=\"display-4 fw-bold mb-3\">Welcome to Bazaar</h1>\n    <p class=\"lead mb-4\">Discover unique products from around the world, all in one place.</p>\n    <a href=\"/catalogs\" class=\"btn btn-danger btn-lg\">Start Exploring</a>\n  </div>\n</section>\n\n<section class=\"container py-5\" id=\"bazaar-featured\">\n  <div class=\"row text-center\">\n    <div class=\"col-md-4\" data-aos=\"zoom-in\">\n      <i class=\"fa-solid fa-globe fa-3x mb-3 text-danger\"></i>\n      <h4 class=\"fw-bold\">Worldwide Sellers</h4>\n      <p>Access exclusive items from every corner of the globe.</p>\n    </div>\n    <div class=\"col-md-4\" data-aos=\"zoom-in\" data-aos-delay=\"100\">\n      <i class=\"fa-solid fa-lock fa-3x mb-3 text-danger\"></i>\n      <h4 class=\"fw-bold\">Secure Payments</h4>\n      <p>Shop confidently with our trusted payment gateways.</p>\n    </div>\n    <div class=\"col-md-4\" data-aos=\"zoom-in\" data-aos-delay=\"200\">\n      <i class=\"fa-solid fa-truck-fast fa-3x mb-3 text-danger\"></i>\n      <h4 class=\"fw-bold\">Fast Shipping</h4>\n      <p>Get your products quickly and reliably at your door.</p>\n    </div>\n  </div>\n</section>\n\n<section class=\"container-fluid py-5 bg-light\" id=\"bazaar-categories\" data-aos=\"fade-up\">\n  <div class=\"container text-center\">\n    <h2 class=\"fw-bold mb-4\">Shop by Category</h2>\n    <div class=\"row\" id=\"category-cards\">\n      <!-- Dynamic categories -->\n    </div>\n  </div>\n</section>\n\n<section class=\"container py-5\" id=\"bazaar-testimonials\" data-aos=\"fade-up\">\n  <div class=\"text-center mb-4\">\n    <h2 class=\"fw-bold\">Customer Reviews</h2>\n    <p class=\"lead\">Real stories from happy shoppers</p>\n  </div>\n  <div class=\"row text-center\">\n    <div class=\"col-md-4\">\n      <blockquote class=\"blockquote\">\n        <p>“Bazaar helped me find authentic gifts that amazed my family.”</p>\n        <footer class=\"blockquote-footer\">Giulia, Firenze</footer>\n      </blockquote>\n    </div>\n    <div class=\"col-md-4\">\n      <blockquote class=\"blockquote\">\n        <p>“A beautiful mix of culture and commerce. I love it!”</p>\n        <footer class=\"blockquote-footer\">Marc, Paris</footer>\n      </blockquote>\n    </div>\n    <div class=\"col-md-4\">\n      <blockquote class=\"blockquote\">\n        <p>“Fast delivery and stunning items – highly recommended.”</p>\n        <footer class=\"blockquote-footer\">Lina, Berlin</footer>\n      </blockquote>\n    </div>\n  </div>\n</section>\n\n<section class=\"container-fluid py-5 bg-danger text-white text-center\" id=\"bazaar-cta\" data-aos=\"zoom-in\">\n  <h2 class=\"fw-bold mb-3\">Become a Seller</h2>\n  <p class=\"lead mb-4\">Join our global marketplace and grow your brand.</p>\n  <a href=\"/contact\" class=\"btn btn-light btn-lg\">Get Started</a>\n</section>",
+  "styles": "#bazaar-hero { background: linear-gradient(135deg, #f9e0d9, #fceabb); color: #333; } .btn-danger { background-color: #e74c3c; border: none; } #bazaar-featured i { color: #e74c3c; }",
+  "theme_name": "Bazaar",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "About Us",
+  "description": "Discover the story behind Bazaar, your multicultural marketplace.",
+  "keywords": "about us, bazaar, mission, values, our story",
+  "slug": "about-us",
+  "content": "<section class=\"container-fluid py-5\" id=\"bazaar-about-hero\">\n  <div class=\"container text-center text-white\" data-aos=\"fade-down\">\n    <h1 class=\"display-5 fw-bold\">Our Journey</h1>\n    <p class=\"lead\">From local markets to a global online bazaar</p>\n  </div>\n</section>\n\n<section class=\"container py-5\" id=\"bazaar-mission\" data-aos=\"fade-up\">\n  <div class=\"row align-items-center\">\n    <div class=\"col-md-6\">\n      <h2 class=\"fw-bold\">Our Mission</h2>\n      <p>To connect cultures and communities through unique products, empowering artisans and entrepreneurs worldwide.</p>\n    </div>\n    <div class=\"col-md-6\">\n      <img src=\"/static/images/about/mission.jpg\" class=\"img-fluid rounded shadow\" alt=\"Mission\">\n    </div>\n  </div>\n</section>\n\n<section class=\"container py-5\" id=\"bazaar-values\" data-aos=\"fade-up\">\n  <div class=\"text-center mb-4\">\n    <h2 class=\"fw-bold\">Our Values</h2>\n  </div>\n  <div class=\"row text-center\">\n    <div class=\"col-md-4\">\n      <i class=\"fa-solid fa-heart fa-2x mb-2 text-danger\"></i>\n      <h5>Authenticity</h5>\n      <p>We celebrate cultural identity and originality.</p>\n    </div>\n    <div class=\"col-md-4\">\n      <i class=\"fa-solid fa-hands-helping fa-2x mb-2 text-danger\"></i>\n      <h5>Empowerment</h5>\n      <p>We support small creators and ethical businesses.</p>\n    </div>\n    <div class=\"col-md-4\">\n      <i class=\"fa-solid fa-recycle fa-2x mb-2 text-danger\"></i>\n      <h5>Sustainability</h5>\n      <p>We believe in conscious consumption and eco values.</p>\n    </div>\n  </div>\n</section>",
+  "styles": "#bazaar-about-hero { background-color: #c0392b; color: white; padding: 80px 0; } #bazaar-values i { color: #e74c3c; }",
+  "theme_name": "Bazaar",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "Our Collections",
+  "description": "Explore curated collections from artisans around the world.",
+  "keywords": "collections, catalogs, bazaar, global, handmade, culture",
+  "slug": "collections",
+  "content": "<section class=\"container-fluid py-5\" id=\"bazaar-collections\">\n  <div class=\"container text-center\" data-aos=\"fade-up\">\n    <h2 class=\"fw-bold\">Browse Our Collections</h2>\n    <p class=\"lead\">Unique products inspired by cultural heritage and global creativity</p>\n    <div class=\"row mt-4\" id=\"collections-grid\">\n      <!-- I blocchi dinamici delle collezioni saranno popolati qui via JS/API -->\n    </div>\n  </div>\n</section>",
+  "styles": "#bazaar-collections { background-color: #fbeee0; color: #3d2c1e; } #collections-grid .card { border: none; transition: transform 0.3s; } #collections-grid .card:hover { transform: scale(1.03); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }",
+  "theme_name": "Bazaar",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "All Products",
+  "description": "Discover a world of handcrafted and exclusive products.",
+  "keywords": "products, items, bazaar, shop, handmade, exclusive",
+  "slug": "products",
+  "content": "<section class=\"container-fluid py-5\" id=\"bazaar-products\">\n  <div class=\"container\" data-aos=\"fade-up\">\n    <h2 class=\"text-center fw-bold mb-4\">Shop All Products</h2>\n    <div class=\"row\" id=\"products-grid\">\n      <!-- I prodotti dinamici verranno caricati qui -->\n    </div>\n  </div>\n</section>",
+  "styles": "#bazaar-products { background-color: #fffaf5; color: #2c2c2c; } #products-grid .card { border: none; background-color: #ffffff; transition: all 0.3s ease-in-out; } #products-grid .card:hover { transform: translateY(-5px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }",
+  "theme_name": "Bazaar",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "Product Detail",
+  "description": "View detailed information about this product.",
+  "keywords": "product, details, shop, bazaar, buy, ecommerce",
+  "slug": "product",
+  "content": "<section class=\"container-fluid py-5\" id=\"bazaar-product\">\n  <div class=\"container\" data-aos=\"fade-up\">\n    <div class=\"row\">\n      <div class=\"col-md-6 mb-4\">\n        <img id=\"product-image\" src=\"/static/images/placeholder.jpg\" class=\"img-fluid rounded shadow\" alt=\"Product Image\">\n      </div>\n      <div class=\"col-md-6\">\n        <h2 id=\"product-name\" class=\"fw-bold\">Product Name</h2>\n        <p id=\"product-description\" class=\"lead\">A short description of the product goes here.</p>\n        <h4 id=\"product-price\" class=\"text-success fw-semibold\">€49.99</h4>\n        <button class=\"btn btn-dark btn-lg mt-3\" onclick=\"addToCart()\">Add to Cart</button>\n      </div>\n    </div>\n  </div>\n</section>",
+  "styles": "#bazaar-product { background-color: #fefaf0; color: #333; } #bazaar-product img { border-radius: 8px; } #bazaar-product h2 { color: #b3541e; } .btn-dark { background-color: #b3541e; border: none; } .btn-dark:hover { background-color: #944313; }",
+  "theme_name": "Bazaar",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "Your Cart",
+  "description": "Review and manage the items in your shopping cart.",
+  "keywords": "cart, shopping cart, checkout, ecommerce, bazaar",
+  "slug": "cart",
+  "content": "<section class=\"container-fluid py-5\" id=\"bazaar-cart\">\n  <div class=\"container\" data-aos=\"fade-up\">\n    <h2 class=\"fw-bold text-center mb-4\">Shopping Cart</h2>\n    <div id=\"cart-items\">\n      <div class=\"row border-bottom py-3\">\n        <div class=\"col-md-2\">\n          <img src=\"/static/images/placeholder.jpg\" class=\"img-fluid rounded\" alt=\"Product\">\n        </div>\n        <div class=\"col-md-6 d-flex flex-column justify-content-center\">\n          <h5>Product Name</h5>\n          <small>Short description or variant</small>\n        </div>\n        <div class=\"col-md-2 d-flex align-items-center\">\n          <span class=\"fw-bold\">€49.99</span>\n        </div>\n        <div class=\"col-md-2 d-flex align-items-center justify-content-end\">\n          <button class=\"btn btn-outline-danger btn-sm\">Remove</button>\n        </div>\n      </div>\n    </div>\n    <div class=\"text-end mt-4\">\n      <h4>Total: €149.97</h4>\n      <a href=\"/checkout\" class=\"btn btn-dark btn-lg mt-2\">Proceed to Checkout</a>\n    </div>\n  </div>\n</section>",
+  "styles": "#bazaar-cart { background-color: #fff8f0; color: #3c3c3c; } #bazaar-cart img { max-height: 80px; } .btn-dark { background-color: #b3541e; border: none; } .btn-dark:hover { background-color: #944313; } .btn-outline-danger { border-color: #b3541e; color: #b3541e; } .btn-outline-danger:hover { background-color: #b3541e; color: white; }",
+  "theme_name": "Bazaar",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "Contact Us",
+  "description": "Get in touch with our support team",
+  "keywords": "contact, support, help, reach us",
+  "slug": "contact",
+  "content": "<section class=\"container-fluid py-5\" id=\"bazaar-contact\">\n  <div class=\"container\">\n    <h2 class=\"fw-bold text-center mb-4\" data-aos=\"fade-down\">We’d Love to Hear from You</h2>\n    <div class=\"row\">\n      <div class=\"col-md-6\" data-aos=\"fade-right\">\n        <p class=\"lead\">Need help or want to send us a message?</p>\n        <ul class=\"list-unstyled\">\n          <li><i class=\"fa-solid fa-phone\"></i> +39 0123 456789</li>\n          <li><i class=\"fa-solid fa-envelope\"></i> support@bazaarshop.com</li>\n          <li><i class=\"fa-solid fa-location-dot\"></i> Via del Commercio 12, Roma</li>\n        </ul>\n      </div>\n      <div class=\"col-md-6\" data-aos=\"fade-left\">\n        <form class=\"bg-light p-4 rounded shadow\">\n          <div class=\"mb-3\">\n            <input type=\"text\" class=\"form-control\" placeholder=\"Your Name\" required>\n          </div>\n          <div class=\"mb-3\">\n            <input type=\"email\" class=\"form-control\" placeholder=\"Your Email\" required>\n          </div>\n          <div class=\"mb-3\">\n            <textarea class=\"form-control\" rows=\"4\" placeholder=\"Your Message\" required></textarea>\n          </div>\n          <button type=\"submit\" class=\"btn btn-dark w-100\">Send Message</button>\n        </form>\n      </div>\n    </div>\n  </div>\n</section>",
+  "styles": "#bazaar-contact { background-color: #fff4ea; color: #3c3c3c; } .btn-dark { background-color: #b3541e; border: none; } .btn-dark:hover { background-color: #944313; }",
+  "theme_name": "Bazaar",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "Special Offer",
+  "description": "Don’t miss our exclusive event",
+  "keywords": "promotion, special, discount, event",
+  "slug": "landing",
+  "content": "<section class=\"container-fluid py-5 text-center\" id=\"bazaar-landing\">\n  <div class=\"container\" data-aos=\"zoom-in\">\n    <h1 class=\"display-4 fw-bold\">Exclusive Bazaar Event</h1>\n    <p class=\"lead\">Join us for an unforgettable shopping experience with discounts up to 50%.</p>\n    <a href=\"/catalogs\" class=\"btn btn-lg btn-dark mt-4\">Discover Deals</a>\n  </div>\n</section>",
+  "styles": "#bazaar-landing { background: linear-gradient(to right, #f3c98b, #fff8f0); color: #3c3c3c; } .btn-dark { background-color: #b3541e; border: none; } .btn-dark:hover { background-color: #944313; }",
+  "theme_name": "Bazaar",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+}
+    ]
+}

@@ -1,0 +1,346 @@
+{% extends "/admin/cms/interface/render.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header bg-dark text-white d-flex align-items-center">
+        <i class="fa-solid fa-arrow-left"></i>&nbsp;&nbsp;<i class="fa-solid fa-arrow-right"></i>&nbsp;&nbsp;<i class="fa-solid fa-rotate-right"></i>&nbsp;&nbsp;
+          <span class="input-group-text bg-white text-dark" style="border-top-left-radius: 8px; border-bottom-left-radius: 8px;">
+              <i class="fa-solid fa-circle-info"></i>&nbsp;&nbsp; https://{{ shop.shop_name }}.yoursite-linkbay-cms.com/prodotti/ <span id="slug-preview" class="ms-1">{{ product.slug or 'slug-del-prodotto' }}</span>
+              &nbsp;&nbsp;&nbsp;
+              <i class="fa-solid fa-star"></i>
+          </span>
+          <small class="text-white">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Anteprima&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <span id="preview-active-label" class="badge ms-3"></span>
+          </small>
+      </div>
+      <div class="card-body d-flex flex-column flex-md-row align-items-start gap-4" id="product-preview">
+        <div class="flex-shrink-0 text-center">
+            <img src="https://placehold.co/400x200?text=Immagine+Esempio" alt="Immagine di esempio" class="img-fluid mb-3 border rounded">
+        </div>
+        <div class="flex-grow-1">
+            <h4 id="preview-name" class="fw-bold mb-3">Nome prodotto</h4>
+            <div class="mb-2">
+                <span id="preview-price" class="text-dark fw-bold ms-2"></span>
+                <span id="preview-discount-price" class="text-success fw-bold ms-2"></span>
+            </div>
+            <div class="mb-2">
+                <span class="text-muted">Quantità disponibile:</span>
+                <span id="preview-stock" class="ms-2"></span>
+            </div>
+            <div class="mb-2">
+                <p id="preview-short" class="mb-1"></p>
+            </div>
+            <div class="mb-2">
+                <p id="preview-description" class="mb-1"></p>
+            </div>
+            <div class="mb-2">
+                <span id="preview-category" class="ms-2"></span>
+            </div>
+            <div class="mb-2">
+                <span class="text-muted">Stato prodotto:</span>
+                <span id="preview-active" class="ms-2"></span>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<style>
+    .step {
+        transition: all 0.3s ease-in-out;
+    }
+    .step-btn.active {
+        background-color: #343a40;
+        color: white;
+    }
+</style>
+
+<div class="container mt-4">
+    
+    <form id="edit-product-form" method="POST" action="{{ url_for('products.edit_product', product_id=product.id) }}">
+        <div id="stepper-container" class="card p-4 shadow-sm">
+
+            <div id="step-1" class="step">
+                <h5>Step 1: Inserisci il nome del prodotto</h5>
+
+                <!-- Progress bar -->
+                <div class="mb-4">
+                    <div class="progress" style="height: 10px;">
+                        <div id="progress-bar" class="progress-bar bg-dark" role="progressbar" style="width: 20%;" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="product-name" class="form-label">Nome Prodotto</label>
+                    <input type="text" class="form-control" name="name" id="product-name" value="{{product.name}}" required>
+                </div>
+                <input type="hidden" id="product-slug" name="slug" value="{{product.slug}}">
+            </div>
+
+            <div id="step-2" class="step d-none">
+                <h5>Step 2: Inserisci la descrizione breve e il prezzo</h5>
+
+                <!-- Progress bar -->
+                <div class="mb-4">
+                    <div class="progress" style="height: 10px;">
+                        <div id="progress-bar" class="progress-bar bg-dark" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="short_description" class="form-label">Descrizione Breve</label>
+                    <textarea class="form-control" name="short_description" id="short_description" rows="2" required>{{ product.short_description }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="price" class="form-label">Prezzo</label>
+                    <input type="number" class="form-control" name="price" id="price" step="0.01" value="{{product.price}}" required oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                </div>
+            </div>
+
+            <div id="step-3" class="step d-none">
+                <h5>Step 3: Prezzo scontato e quantità in magazzino</h5>
+
+                <!-- Progress bar -->
+                <div class="mb-4">
+                    <div class="progress" style="height: 10px;">
+                        <div id="progress-bar" class="progress-bar bg-dark" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="discount_price" class="form-label">Prezzo Scontato (opzionale)</label>
+                    <input type="number" class="form-control" name="discount_price" id="discount_price" value="{{product.discount_price}}" step="0.01" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                </div>
+                <div class="mb-3">
+                    <label for="stock_quantity" class="form-label">Quantità in Magazzino</label>
+                    <input type="number" class="form-control" name="stock_quantity" id="stock_quantity" value="{{product.stock_quantity}}" required oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                </div>
+            </div>
+
+            <div id="step-4" class="step d-none">
+                <h5>Step 4: Stato attivo</h5>
+
+                <!-- Progress bar -->
+                <div class="mb-4">
+                    <div class="progress" style="height: 10px;">
+                        <div id="progress-bar" class="progress-bar bg-dark" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="is_active" class="form-label">Attivo</label>
+                    <select name="is_active" class="form-select" id="is_active">
+                        <option value="true" {% if product.is_active %}selected{% endif %}>Sì</option>
+                        <option value="false" {% if not product.is_active %}selected{% endif %}>No</option>
+                    </select>
+                </div>
+                <small class="text-black">Selezionando sì il prodotto sarà visibile, al contrario selezionando no il prodotto non sarà visibile</small>
+            </div>
+
+            <div id="step-5" class="step d-none">
+                <h5>Step 5: Descrizione completa</h5>
+
+                <!-- Progress bar -->
+                <div class="mb-4">
+                    <div class="progress" style="height: 10px;">
+                        <div id="progress-bar" class="progress-bar bg-dark" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="description" class="form-label">Descrizione</label>
+                    <div id="product-description-editor" style="height: 200px;"></div>
+                    <input type="hidden" name="description" id="product-description">
+                </div>
+                <div class="mb-3 mt-4">
+                    <label for="is_digital" class="form-label">È un prodotto digitale?</label>
+                    <select name="is_digital" class="form-select" id="is_digital">
+                        <option value="false" selected>Prodotto fisico</option>
+                        <option value="true">Prodotto digitale</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <button type="button" id="prev-btn" class="btn btn-outline-secondary me-2" data-bs-toggle="tooltip" title="Torna allo step precedente">Indietro</button>
+                <button type="button" id="next-btn" class="btn btn-dark" data-bs-toggle="tooltip" title="Procedi allo step successivo">Avanti</button>
+                <button type="submit" id="submit-btn" class="btn btn-danger d-none"><i class="fa-solid fa-check"></i> Aggiorna Prodotto</button>
+            </div>
+        </div>
+    </form>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    let step = 1;
+
+    const steps = ["Nome", "Prezzo", "Quantità", "Categoria", "Contenuto"];
+
+    const showStep = (stepToShow) => {
+        document.querySelectorAll(".step").forEach(s => s.classList.add("d-none"));
+        document.querySelector(`#step-${stepToShow}`).classList.remove("d-none");
+
+        document.querySelectorAll(".step-btn").forEach(btn => btn.classList.remove("active"));
+        const currentBtn = document.querySelector(`.step-btn[data-step='${stepToShow}']`);
+        if (currentBtn) currentBtn.classList.add("active");
+
+        document.getElementById("prev-btn").disabled = stepToShow === 1;
+        document.getElementById("next-btn").classList.toggle("d-none", stepToShow === 5);
+        document.getElementById("submit-btn").classList.toggle("d-none", stepToShow !== 5);
+
+        updateProgressBar(stepToShow);
+    };
+
+    function updateProgressBar(step) {
+        const progressBar = document.getElementById("progress-bar");
+        const percent = (step / 5) * 100;
+        progressBar.style.width = `${percent}%`;
+        progressBar.setAttribute("aria-valuenow", percent);
+    }
+
+    function updatePreviewStepBadge(step) {
+        // No operation; logic moved to updateProgressBar
+    }
+
+    document.getElementById('product-name').addEventListener('input', function () {
+        const name = this.value;
+        const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+        document.getElementById('slug-preview').innerText = slug || 'slug-del-prodotto';
+        document.getElementById('product-slug').value = slug;
+        document.getElementById("preview-name").innerText = name || "Nome prodotto";
+    });
+
+    document.getElementById('short_description').addEventListener('input', function () {
+        const shortDesc = this.value;
+        document.getElementById('preview-short').innerText = shortDesc || 'Descrizione breve';
+    });
+
+    document.getElementById('price').addEventListener('input', function () {
+        const price = this.value;
+        document.getElementById('preview-price').innerHTML = price ? `<strong>Prezzo:</strong> €${parseFloat(price).toFixed(2)}` : '';
+    });
+
+    document.getElementById('discount_price').addEventListener('input', function () {
+        const discountPrice = this.value;
+        document.getElementById('preview-discount-price').innerText = discountPrice ? `Sconto: €${parseFloat(discountPrice).toFixed(2)}` : '';
+    });
+
+    document.getElementById('stock_quantity').addEventListener('input', function () {
+        const stockQuantity = this.value;
+        document.getElementById('preview-stock').innerText = stockQuantity || '';
+    });
+
+    document.getElementById('is_active').addEventListener('change', function () {
+        const isActive = this.value === 'true';
+        const previewActive = document.getElementById('preview-active');
+        previewActive.textContent = isActive ? 'Prodotto Attivo' : 'Prodotto Non Attivo';
+        // Aggiorna dinamicamente il badge nella card-header
+        const label = document.getElementById('preview-active-label');
+        if (label) {
+            if (isActive) {
+                label.textContent = 'Attivo';
+                label.className = 'badge bg-success';
+            } else {
+                label.textContent = 'Non Attivo';
+                label.className = 'badge bg-danger';
+            }
+        }
+    });
+
+    const quill = new Quill('#product-description-editor', {
+        theme: 'snow'
+    });
+    quill.root.innerHTML = `{{ product.description | safe }}`;
+    document.getElementById('product-description').value = `{{ product.description | safe }}`;
+    quill.on('text-change', function () {
+        const html = quill.root.innerHTML;
+        document.getElementById('product-description').value = html;
+        document.getElementById('preview-description').innerHTML = html || 'Descrizione del prodotto';
+    });
+
+    document.getElementById("next-btn").addEventListener("click", () => {
+        const currentStep = document.querySelector(`#step-${step}`);
+        const requiredInputs = currentStep.querySelectorAll("[required]");
+        let allFilled = true;
+
+        requiredInputs.forEach(input => {
+            if (!input.value.trim()) {
+                allFilled = false;
+            }
+        });
+
+        if (!allFilled) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campi obbligatori mancanti',
+                text: 'Per favore compila tutti i campi obbligatori prima di procedere allo step successivo.',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        }
+
+        if (step < 5) {
+            step++;
+            showStep(step);  // updateProgressBar è già chiamato all'interno di showStep
+        }
+    });
+
+    document.getElementById("prev-btn").addEventListener("click", () => {
+        if (step > 1) {
+            step--;
+            showStep(step);  // updateProgressBar è già chiamato all'interno di showStep
+        }
+    });
+
+    document.getElementById("submit-btn").addEventListener("click", function (e) {
+        e.preventDefault();
+
+        const requiredInputs = document.querySelectorAll("#edit-product-form [required]");
+        let allFilled = true;
+
+        requiredInputs.forEach(input => {
+            if (!input.value.trim()) {
+                allFilled = false;
+            }
+        });
+
+        if (!allFilled) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campi obbligatori mancanti',
+                text: 'Per favore compila tutti i campi obbligatori prima di creare il prodotto.',
+                confirmButtonText: 'Ok'
+            });
+        } else {
+            document.getElementById("edit-product-form").submit();
+        }
+    });
+
+    showStep(step);
+    // Inizializza lo stato del badge
+    const isActive = document.getElementById('is_active').value === 'true';
+    const label = document.getElementById('preview-active-label');
+    if (label) {
+        if (isActive) {
+            label.textContent = 'Attivo';
+            label.className = 'badge bg-success';
+        } else {
+            label.textContent = 'Non Attivo';
+            label.className = 'badge bg-danger';
+        }
+    }
+
+    // Inizializza la preview con i dati dal database (product.*), se presenti
+    document.getElementById('preview-name').innerText = document.getElementById('product-name').value || 'Nome prodotto';
+    document.getElementById('preview-short').innerText = document.getElementById('short_description').value || 'Descrizione breve';
+    document.getElementById('preview-price').innerHTML = document.getElementById('price').value ? `<strong>Prezzo:</strong> €${parseFloat(document.getElementById('price').value).toFixed(2)}` : '';
+    document.getElementById('preview-discount-price').innerText = document.getElementById('discount_price').value ? `Sconto: €${parseFloat(document.getElementById('discount_price').value).toFixed(2)}` : '';
+    document.getElementById('preview-stock').innerText = document.getElementById('stock_quantity').value || '';
+    document.getElementById('preview-description').innerHTML = document.getElementById('product-description').value || 'Descrizione del prodotto';
+});
+</script>
+
+{% endblock %}

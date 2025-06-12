@@ -15,6 +15,9 @@ load_dotenv()
 # 🔹 Inizializza l'app Flask
 app = Flask(__name__)
 
+# 📌 Aumenta il limite massimo
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10 MB
+
 # 📌 Configura le impostazioni dell'applicazione utilizzando il file config.py
 from config import Config
 app.config.from_object(Config)
@@ -41,15 +44,72 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 # 🔹 Importa i modelli per la gestione del database
-from models import (
-    User, ShopList, UserStoreAccess, WebSettings, CookiePolicy, Subscription, Agency, 
-    AgencyStoreAccess, AgencyEmployee, Opportunity, AgencyOpportunity, 
-    OpportunityMessage, StoreInfo, Domain, SiteVisit, SiteVisitIntern, StorePayment, 
-    Category, Brand, ProductImage, ProductAttribute, Product, Collection, CollectionImage, CollectionProduct, Order, OrderItem, 
-    Payment, PaymentMethod, Shipping, ShippingMethod, Page, NavbarLink, CMSAddon, ShopAddon, 
-    ImprovementSuggestion, Contact, SupportTicket, TicketMessage, SuperAdmin, SuperPages, 
-    SuperMedia, SuperInvoice, SuperMessages, SuperSupport, ChatMessage, uRequests
-)
+
+# 📌 Prima importiamo le tabelle fondamentali (User e ShopList) per evitare errori di riferimento
+from models.user import User
+from models.shoplist import ShopList
+
+# 📌 Tabelle collegate agli utenti e ai negozi
+from models.userstoreaccess import UserStoreAccess
+from models.websettings import WebSettings
+from models.cookiepolicy import CookiePolicy
+from models.subscription import Subscription
+
+# 📌 Tabelle delle agenzie e dipendenti
+from models.agency import Agency
+from models.agency import AgencyStoreAccess
+from models.agency import AgencyEmployee
+
+# 📌 Tabelle delle opportunità di lavoro
+from models.opportunities import Opportunity
+from models.opportunities import AgencyOpportunity
+from models.opportunities import OpportunityMessage
+
+# 📌 Tabelle relative ai negozi e ai servizi
+from models.stores_info import StoreInfo
+from models.domain import Domain
+from models.site_visits import SiteVisit
+from models.site_visit_intern import SiteVisitIntern
+from models.storepayment import StorePayment
+
+# 📌 Tabelle relative alla gestione delle categorie e prodotti
+from models.products import Product, ProductVariant, ProductImage, Category, Collection, CollectionImage, CollectionProduct
+from models.warehouse import Inventory
+
+# 📌 Tabelle per gli ordini e pagamenti
+from models.orders import Order
+from models.orders import OrderItem
+from models.payments import Payment
+from models.payment_methods import PaymentMethod
+
+# 📌 Tabelle relative alla gestione della spedizione
+from models.shipping import Shipping
+from models.shippingmethods import ShippingMethod
+
+# 📌 Tabelle per le pagine e il contenuto del CMS
+from models.page import Page
+from models.navbar import NavbarLink
+from models.cmsaddon import CMSAddon
+from models.cmsaddon import ShopAddon
+
+# 📌 Tabelle per suggerimenti di miglioramento e contatti
+from models.improvement_suggestion import ImprovementSuggestion
+from models.contacts import Contact
+
+# 📌 Tabelle per la gestione delle email, ticket di supporto e messaggi
+from models.support_tickets import SupportTicket
+from models.ticket_messages import TicketMessage
+from models.message import ChatMessage
+from models.request import uRequests
+
+# 📌 Tabelle per i superadmin
+from models.superadmin_models import SuperAdmin
+from models.superadmin_models import SuperPages
+from models.superadmin_models import SuperMedia
+from models.superadmin_models import SuperInvoice
+from models.superadmin_models import SuperMessages
+from models.superadmin_models import SuperSupport
+
 
 # 📌 Registrazione dei Blueprint (Modularizzazione delle route)
 from blueprints.admin import register_admin_blueprints
@@ -135,14 +195,18 @@ app.jinja_env.globals.update(translate=translate)
 def detect_shop():
     hostname = request.host.split(':')[0].lower()
 
-    # 🔍 Cerca il dominio personalizzato
-    domain_entry = Domain.query.filter_by(domain=hostname).first()
-    if domain_entry:
-        g.shop = ShopList.query.get(domain_entry.shop_id)
-    else:
-        # 🔍 Fallback su sottodominio *.yoursite-linkbay-cms.com
+    if hostname.endswith(".localhost") or hostname.endswith(".yoursite-linkbay-cms.com"):
         subdomain = hostname.split('.')[0]
+        g.shop_name = subdomain
         g.shop = ShopList.query.filter_by(shop_name=subdomain).first()
+    else:
+        domain_entry = Domain.query.filter_by(domain=hostname).first()
+        if domain_entry:
+            g.shop = ShopList.query.get(domain_entry.shop_id)
+            g.shop_name = g.shop.shop_name if g.shop else None
+        else:
+            g.shop = None
+            g.shop_name = None
 
 # 📌 Avvio dell'applicazione Flask
 if __name__ == "__main__":

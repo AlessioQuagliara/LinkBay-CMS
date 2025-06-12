@@ -1,0 +1,152 @@
+{
+    
+    "head": "<!-- Bootstrap CSS -->\n<link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css\" rel=\"stylesheet\">\n<!-- FontAwesome CSS -->\n<link rel=\"stylesheet\" href=\"https://Popper.jsudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css\">\n<!-- SweetAlert CSS -->\n<link href=\"https://cdn.jsdelivr.net/npm/sweetalert2@11.4.27/dist/sweetalert2.min.css\" rel=\"stylesheet\">\n<!-- AOS Animate -->\n<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css\">",
+    "foot": "<!-- AOS Animate -->\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js\"></script>\n<!-- jQuery -->\n<script src=\"https://code.jquery.com/jquery-3.6.0.min.js\"></script>\n<!-- Popper.js -->\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js\"></script>\n<!-- Bootstrap JS -->\n<script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js\"></script>\n<!-- FontAwesome JS -->\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js\"></script>\n<!-- SweetAlert JS -->\n<script src=\"https://cdn.jsdelivr.net/npm/sweetalert2@11.4.27/dist/sweetalert2.all.min.js\"></script>",
+    "script": "<script></script>",
+    "pages": [
+{
+  "title": "Navbar",
+  "description": "Aurora Theme Navbar",
+  "keywords": "navbar, aurora, menu, navigation",
+  "slug": "navbar",
+  "content": "<nav class=\"navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top\" id=\"aurora-navbar\">\n  <div class=\"container-fluid\">\n    <a class=\"navbar-brand fw-bold text-primary\" href=\"/\">Aurora</a>\n    <button class=\"navbar-toggler\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#navbarNav\">\n      <span class=\"navbar-toggler-icon\"></span>\n    </button>\n    <div class=\"collapse navbar-collapse justify-content-end\" id=\"navbarNav\">\n      <div id=\"nav-links\"></div>\n      <div id=\"nav-controls\" class=\"d-flex align-items-center ms-3\"></div>\n    </div>\n  </div>\n</nav>",
+  "styles": "#aurora-navbar { z-index: 9999; } .navbar-brand { font-size: 1.5rem; } .navbar-light .navbar-nav .nav-link { color: #0f172a; } .navbar-light .navbar-nav .nav-link:hover { color: #4f46e5; }",
+  "theme_name": "Aurora",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "Footer",
+  "description": "Aurora Theme Footer",
+  "keywords": "footer, aurora, copyright, contact",
+  "slug": "footer",
+  "content": "<footer class=\"bg-light text-center py-4\" id=\"aurora-footer\" data-aos=\"fade-up\">\n  <div class=\"container\">\n    <p class=\"mb-1\">&copy; 2025 Aurora. All rights reserved.</p>\n    <p class=\"small\">Crafted with ❤️ for modern eCommerce experiences.</p>\n  </div>\n</footer>",
+  "styles": "#aurora-footer { background-color: #f9fafb; color: #1f2937; } #aurora-footer p { margin-bottom: 0.25rem; }",
+  "theme_name": "Aurora",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "Home",
+  "description": "Discover Aurora – the CMS theme that blends elegance and performance.",
+  "keywords": "aurora, home, cms theme, ecommerce, modern, responsive",
+  "slug": "home",
+  "content": "<section class=\"container-fluid py-5\" id=\"aurora-hero\" data-aos=\"fade-up\">\n  <div class=\"container text-center\">\n    <h1 class=\"display-4 fw-bold mb-3\">Welcome to Aurora</h1>\n    <p class=\"lead mb-4\">Shine online with a sleek, responsive and beautifully animated CMS theme.</p>\n    <a href=\"/catalogs\" class=\"btn btn-primary btn-lg\">Start Exploring</a>\n  </div>\n</section>\n\n<section class=\"container py-5\" id=\"aurora-features\" data-aos=\"fade-up\">\n  <div class=\"text-center mb-4\">\n    <h2 class=\"fw-bold\">Powerful Features</h2>\n    <p class=\"lead\">All you need to grow your online store.</p>\n  </div>\n  <div class=\"row text-center\">\n    <div class=\"col-md-4\"><i class=\"fa-solid fa-bolt fa-2x mb-2 text-primary\"></i><h5>Fast Performance</h5><p>Optimized for speed and reliability.</p></div>\n    <div class=\"col-md-4\"><i class=\"fa-solid fa-paint-brush fa-2x mb-2 text-primary\"></i><h5>Customizable Design</h5><p>Make it truly yours with flexible styling.</p></div>\n    <div class=\"col-md-4\"><i class=\"fa-solid fa-shield fa-2x mb-2 text-primary\"></i><h5>Secure & Stable</h5><p>Built with security best practices.</p></div>\n  </div>\n</section>\n\n<section class=\"bg-light py-5\" id=\"aurora-testimonials\" data-aos=\"fade-up\">\n  <div class=\"container text-center\">\n    <h2 class=\"fw-bold mb-4\">What Our Users Say</h2>\n    <blockquote class=\"blockquote\">“Aurora changed the way we sell online!”<footer class=\"blockquote-footer mt-2\">Alex, Store Owner</footer></blockquote>\n  </div>\n</section>\n\n<section class=\"container-fluid bg-primary text-white py-5\" id=\"aurora-cta\" data-aos=\"fade-up\">\n  <div class=\"container text-center\">\n    <h2 class=\"fw-bold\">Ready to Launch Your Store?</h2>\n    <p class=\"lead mb-4\">Get started in minutes with Aurora.</p>\n    <a href=\"/register\" class=\"btn btn-light btn-lg\">Get Started Now</a>\n  </div>\n</section>\n\n<section class=\"container py-5\" id=\"aurora-latest-news\" data-aos=\"fade-up\">\n  <div class=\"text-center mb-4\">\n    <h2 class=\"fw-bold\">Latest News</h2>\n    <p class=\"lead\">Tips and stories from our team.</p>\n  </div>\n  <div class=\"row\">\n    <div class=\"col-md-4\">\n      <div class=\"card h-100 shadow-sm\">\n        <img src=\"/static/images/blog1.jpg\" class=\"card-img-top\" alt=\"Post\">\n        <div class=\"card-body\">\n          <h5 class=\"card-title\">How to Scale Your Store</h5>\n          <p class=\"card-text\">Simple techniques to drive more revenue.</p>\n          <a href=\"/blog\" class=\"btn btn-outline-primary\">Read More</a>\n        </div>\n      </div>\n    </div>\n  </div>\n</section>",
+  "styles": "#aurora-hero { background: linear-gradient(135deg, #dbeafe, #f0fdf4); color: #0f172a; } .btn-primary { background-color: #4f46e5; border: none; } .btn-primary:hover { background-color: #4338ca; }\n#aurora-features h5, #aurora-testimonials h2, #aurora-cta h2, #aurora-latest-news h2 {\n  color: #1f2937;\n}\n#aurora-cta {\n  background: linear-gradient(135deg, #4f46e5, #3b82f6);\n}\n#aurora-testimonials blockquote {\n  font-size: 1.25rem;\n  font-style: italic;\n}\n",
+  "theme_name": "Aurora",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "About Us",
+  "description": "Discover the story and values behind the Aurora brand.",
+  "keywords": "about us, our story, values, team, aurora",
+  "slug": "about-us",
+  "content": "<section class=\"container py-5\" id=\"aurora-about-hero\" data-aos=\"fade-up\">\n  <div class=\"text-center mb-4\">\n    <h1 class=\"fw-bold\">Our Story</h1>\n    <p class=\"lead\">Born from innovation, crafted for excellence.</p>\n  </div>\n  <div class=\"row align-items-center\">\n    <div class=\"col-lg-6\" data-aos=\"fade-right\">\n      <p>Aurora began with a simple mission: bring beauty, performance, and simplicity to every online store. Our platform blends cutting-edge technology with elegant design.</p>\n      <p>We believe in empowering entrepreneurs with tools that are intuitive, scalable, and beautiful.</p>\n    </div>\n    <div class=\"col-lg-6\" data-aos=\"fade-left\">\n      <img src=\"/static/images/about-story.jpg\" alt=\"Our team\" class=\"img-fluid rounded shadow\">\n    </div>\n  </div>\n</section>\n\n<section class=\"bg-light py-5\" id=\"aurora-about-values\" data-aos=\"fade-up\">\n  <div class=\"container\">\n    <h2 class=\"fw-bold text-center mb-4\">Our Values</h2>\n    <div class=\"row text-center\">\n      <div class=\"col-md-4\">\n        <h5>Integrity</h5>\n        <p>Transparent in our approach and honest with our users.</p>\n      </div>\n      <div class=\"col-md-4\">\n        <h5>Innovation</h5>\n        <p>Constantly improving to deliver the best CMS experience.</p>\n      </div>\n      <div class=\"col-md-4\">\n        <h5>Support</h5>\n        <p>Here for you, always. Your growth is our mission.</p>\n      </div>\n    </div>\n  </div>\n</section>",
+  "styles": "#aurora-about-hero h1 { color: #1e3a8a; } #aurora-about-hero p { color: #374151; } #aurora-about-values { background-color: #f9fafb; } #aurora-about-values h5 { color: #0f172a; } #aurora-about-values p { color: #4b5563; }",
+  "theme_name": "Aurora",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "Collections",
+  "description": "Browse our exclusive collections crafted for every style.",
+  "keywords": "collections, product catalogs, shop categories, explore",
+  "slug": "collections",
+  "content": "<section class=\"container py-5\" id=\"aurora-collections\" data-aos=\"fade-up\">\n  <div class=\"text-center mb-5\">\n    <h1 class=\"fw-bold\">Explore Our Collections</h1>\n    <p class=\"lead\">Find the perfect fit for your store's identity.</p>\n  </div>\n  <div class=\"row\" id=\"collections-container\">\n    <!-- Collection cards will be injected dynamically -->\n    <div class=\"col-md-4 mb-4\" data-aos=\"zoom-in\">\n      <div class=\"card h-100 shadow-sm\">\n        <img src=\"/static/images/sample-collection.jpg\" class=\"card-img-top\" alt=\"Sample Collection\">\n        <div class=\"card-body text-center\">\n          <h5 class=\"card-title\">Modern Elegance</h5>\n          <p class=\"card-text\">A curated selection of modern products.</p>\n          <a href=\"#\" class=\"btn btn-outline-primary\">View Collection</a>\n        </div>\n      </div>\n    </div>\n    <!-- More cards dynamically -->\n  </div>\n</section>",
+  "styles": "#aurora-collections { background-color: #ffffff; } #aurora-collections h1 { color: #1e3a8a; } #aurora-collections p { color: #4b5563; } .card-title { font-weight: 600; color: #1f2937; } .btn-outline-primary { border-color: #1e3a8a; color: #1e3a8a; } .btn-outline-primary:hover { background-color: #1e3a8a; color: white; }",
+  "theme_name": "Aurora",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "All Products",
+  "description": "Discover all available products in our store",
+  "keywords": "products, shop, all items, eCommerce",
+  "slug": "products",
+  "content": "<section class=\"container py-5\" id=\"aurora-products\" data-aos=\"fade-up\">\n  <div class=\"text-center mb-5\">\n    <h1 class=\"fw-bold\">All Products</h1>\n    <p class=\"lead\">Explore our full range of quality items curated just for you.</p>\n  </div>\n  <div class=\"row\" id=\"products-container\">\n    <!-- Product cards will be injected dynamically -->\n    <div class=\"col-md-4 mb-4\" data-aos=\"zoom-in\">\n      <div class=\"card h-100 shadow-sm\">\n        <img src=\"/static/images/sample-product.jpg\" class=\"card-img-top\" alt=\"Sample Product\">\n        <div class=\"card-body text-center\">\n          <h5 class=\"card-title\">Elegant Lamp</h5>\n          <p class=\"card-text\">Illuminate your home with this timeless piece.</p>\n          <span class=\"d-block fw-bold text-primary mb-2\">€59.99</span>\n          <a href=\"#\" class=\"btn btn-outline-dark\">View Product</a>\n        </div>\n      </div>\n    </div>\n    <!-- More cards dynamically -->\n  </div>\n</section>",
+  "styles": "#aurora-products { background-color: #f9fafb; } #aurora-products h1 { color: #111827; } #aurora-products p { color: #6b7280; } .card-title { font-weight: 600; color: #1f2937; } .btn-outline-dark { border-color: #111827; color: #111827; } .btn-outline-dark:hover { background-color: #111827; color: white; }",
+  "theme_name": "Aurora",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "Product Detail",
+  "description": "Detailed view of the selected product",
+  "keywords": "product, item, details, eCommerce, buy now",
+  "slug": "product",
+  "content": "<section class=\"container py-5\" id=\"aurora-product-detail\" data-aos=\"fade-up\">\n  <div class=\"row align-items-center\">\n    <div class=\"col-md-6 mb-4\">\n      <img src=\"/static/images/sample-product.jpg\" class=\"img-fluid rounded shadow\" alt=\"Product Image\">\n    </div>\n    <div class=\"col-md-6\">\n      <h2 class=\"fw-bold mb-3\">Elegant Lamp</h2>\n      <p class=\"lead text-muted mb-4\">Bring warmth and sophistication to any room with this beautifully crafted lamp.</p>\n      <h3 class=\"text-primary fw-bold mb-3\">€59.99</h3>\n      <div class=\"mb-3\">\n        <label for=\"quantity\" class=\"form-label\">Quantity</label>\n        <input type=\"number\" id=\"quantity\" class=\"form-control w-25\" value=\"1\" min=\"1\">\n      </div>\n      <button class=\"btn btn-warning btn-lg\"><i class=\"fa-solid fa-cart-plus me-2\"></i>Add to Cart</button>\n    </div>\n  </div>\n</section>\n\n<section class=\"container py-5\" data-aos=\"fade-up\">\n  <div class=\"row\">\n    <div class=\"col\">\n      <h4 class=\"fw-bold mb-3\">Product Description</h4>\n      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque ac lacus vel justo feugiat ullamcorper. Sed sit amet nulla sit amet leo efficitur tristique.</p>\n    </div>\n  </div>\n</section>",
+  "styles": "#aurora-product-detail { background-color: #ffffff; } h2, h3 { color: #1f2937; } .btn-warning { background-color: #facc15; border: none; } .btn-warning:hover { background-color: #eab308; }",
+  "theme_name": "Aurora",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "Your Cart",
+  "description": "Review your selected products before checkout",
+  "keywords": "cart, shopping cart, checkout, products",
+  "slug": "cart",
+  "content": "<section class=\"container py-5\" id=\"aurora-cart\" data-aos=\"fade-up\">\n  <h2 class=\"fw-bold mb-4 text-center\">Your Shopping Cart</h2>\n  <div class=\"table-responsive\">\n    <table class=\"table table-bordered align-middle\">\n      <thead class=\"table-dark\">\n        <tr>\n          <th scope=\"col\">Product</th>\n          <th scope=\"col\">Name</th>\n          <th scope=\"col\">Quantity</th>\n          <th scope=\"col\">Price</th>\n          <th scope=\"col\">Total</th>\n          <th scope=\"col\">Actions</th>\n        </tr>\n      </thead>\n      <tbody id=\"cart-items\">\n        <!-- JavaScript dynamically inserts rows here -->\n      </tbody>\n    </table>\n  </div>\n  <div class=\"text-end mt-4\">\n    <h4 class=\"fw-bold\">Subtotal: <span id=\"cart-subtotal\">€0.00</span></h4>\n    <a href=\"/checkout\" class=\"btn btn-success btn-lg mt-3\"><i class=\"fa-solid fa-credit-card me-2\"></i>Proceed to Checkout</a>\n  </div>\n</section>",
+  "styles": "#aurora-cart { background-color: #f8f9fb; } .btn-success { background-color: #10b981; border: none; } .btn-success:hover { background-color: #059669; }",
+  "theme_name": "Aurora",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "Contact Us",
+  "description": "Reach out to us for support or inquiries",
+  "keywords": "contact, customer support, help, email",
+  "slug": "contact",
+  "content": "<section class=\"container py-5\" id=\"aurora-contact\" data-aos=\"fade-up\">\n  <div class=\"text-center mb-5\">\n    <h2 class=\"fw-bold\">Get in Touch</h2>\n    <p class=\"lead\">We'd love to hear from you! Fill out the form below or use the contact info provided.</p>\n  </div>\n  <div class=\"row\">\n    <div class=\"col-lg-6 mb-4\">\n      <h5><i class=\"fa-solid fa-phone me-2\"></i> +1 234 567 890</h5>\n      <h5><i class=\"fa-solid fa-envelope me-2\"></i> contact@aurorastore.com</h5>\n      <h5><i class=\"fa-solid fa-map-marker-alt me-2\"></i> 123 Aurora Street, Dream City</h5>\n    </div>\n    <div class=\"col-lg-6\">\n      <form class=\"bg-light p-4 rounded shadow\">\n        <div class=\"mb-3\">\n          <input type=\"text\" class=\"form-control\" placeholder=\"Your Name\" required>\n        </div>\n        <div class=\"mb-3\">\n          <input type=\"email\" class=\"form-control\" placeholder=\"Your Email\" required>\n        </div>\n        <div class=\"mb-3\">\n          <textarea class=\"form-control\" rows=\"4\" placeholder=\"Your Message\" required></textarea>\n        </div>\n        <button type=\"submit\" class=\"btn btn-warning w-100\">Send Message</button>\n      </form>\n    </div>\n  </div>\n</section>",
+  "styles": "#aurora-contact h2 { color: #1e1e1e; } .btn-warning { background-color: #ffcc00; border: none; } .btn-warning:hover { background-color: #e6b800; }",
+  "theme_name": "Aurora",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "Aurora Event",
+  "description": "Special promotions and events from Aurora",
+  "keywords": "event, promotion, aurora, sale",
+  "slug": "landing",
+  "content": "<section class=\"container-fluid py-5\" id=\"aurora-landing\" style=\"background: linear-gradient(120deg, #1e3a8a, #3b82f6); color: white;\" data-aos=\"fade-up\">\n  <div class=\"container text-center\">\n    <h1 class=\"display-4 fw-bold mb-4\">Exclusive Aurora Event</h1>\n    <p class=\"lead mb-4\">Don’t miss our limited-time offer – only available this week!</p>\n    <a href=\"/products\" class=\"btn btn-light btn-lg\">Shop Now</a>\n  </div>\n</section>",
+  "styles": "#aurora-landing h1, #aurora-landing p { color: white; } .btn-light { background-color: #ffffff; color: #1e1e1e; border: none; } .btn-light:hover { background-color: #f3f4f6; }",
+  "theme_name": "Aurora",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "Blog",
+  "description": "Read our latest updates, tips, and news",
+  "keywords": "blog, articles, ecommerce tips, news",
+  "slug": "blog",
+  "content": "<section class=\"container py-5\" id=\"aurora-blog\" data-aos=\"fade-up\">\n  <div class=\"text-center mb-5\">\n    <h2 class=\"fw-bold\">Latest Articles</h2>\n    <p class=\"lead\">Insights, strategies, and stories from the Aurora team.</p>\n  </div>\n  <div class=\"row g-4\">\n    <div class=\"col-md-4\">\n      <div class=\"card h-100 shadow-sm\">\n        <img src=\"/static/images/blog1.jpg\" class=\"card-img-top\" alt=\"Blog Post 1\">\n        <div class=\"card-body\">\n          <h5 class=\"card-title\">Boost Your Sales with Seasonal Campaigns</h5>\n          <p class=\"card-text\">Learn how to maximize revenue during holidays and peak seasons.</p>\n          <a href=\"#\" class=\"btn btn-outline-dark\">Read More</a>\n        </div>\n      </div>\n    </div>\n    <div class=\"col-md-4\">\n      <div class=\"card h-100 shadow-sm\">\n        <img src=\"/static/images/blog2.jpg\" class=\"card-img-top\" alt=\"Blog Post 2\">\n        <div class=\"card-body\">\n          <h5 class=\"card-title\">Top 5 Tools for Ecommerce Automation</h5>\n          <p class=\"card-text\">Save time and increase productivity with these essential tools.</p>\n          <a href=\"#\" class=\"btn btn-outline-dark\">Read More</a>\n        </div>\n      </div>\n    </div>\n    <div class=\"col-md-4\">\n      <div class=\"card h-100 shadow-sm\">\n        <img src=\"/static/images/blog3.jpg\" class=\"card-img-top\" alt=\"Blog Post 3\">\n        <div class=\"card-body\">\n          <h5 class=\"card-title\">Design Trends for Modern Stores</h5>\n          <p class=\"card-text\">Stay ahead with these clean and impactful UI styles.</p>\n          <a href=\"#\" class=\"btn btn-outline-dark\">Read More</a>\n        </div>\n      </div>\n    </div>\n  </div>\n</section>",
+  "styles": "#aurora-blog h2 { color: #1e1e1e; } .card-title { font-weight: bold; } .btn-outline-dark:hover { background-color: #1e1e1e; color: white; }",
+  "theme_name": "Aurora",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+},
+{
+  "title": "FAQ",
+  "description": "Frequently Asked Questions about our CMS and store features",
+  "keywords": "faq, help, support, ecommerce, questions",
+  "slug": "faq",
+  "content": "<section class=\"container py-5\" id=\"aurora-faq\" data-aos=\"fade-up\">\n  <div class=\"text-center mb-5\">\n    <h2 class=\"fw-bold\">Frequently Asked Questions</h2>\n    <p class=\"lead\">Answers to the most common questions about our platform.</p>\n  </div>\n  <div class=\"accordion\" id=\"faqAccordion\">\n    <div class=\"accordion-item\">\n      <h2 class=\"accordion-header\" id=\"faq1\">\n        <button class=\"accordion-button\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#faqCollapse1\">\n          How do I customize my store theme?\n        </button>\n      </h2>\n      <div id=\"faqCollapse1\" class=\"accordion-collapse collapse show\" data-bs-parent=\"#faqAccordion\">\n        <div class=\"accordion-body\">\n          You can easily customize your store theme using our drag-and-drop builder inside the admin panel.\n        </div>\n      </div>\n    </div>\n    <div class=\"accordion-item\">\n      <h2 class=\"accordion-header\" id=\"faq2\">\n        <button class=\"accordion-button collapsed\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#faqCollapse2\">\n          Can I add my own domain?\n        </button>\n      </h2>\n      <div id=\"faqCollapse2\" class=\"accordion-collapse collapse\" data-bs-parent=\"#faqAccordion\">\n        <div class=\"accordion-body\">\n          Yes! You can purchase a domain or use your own and link it directly from the settings.\n        </div>\n      </div>\n    </div>\n    <div class=\"accordion-item\">\n      <h2 class=\"accordion-header\" id=\"faq3\">\n        <button class=\"accordion-button collapsed\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#faqCollapse3\">\n          Is there support available?\n        </button>\n      </h2>\n      <div id=\"faqCollapse3\" class=\"accordion-collapse collapse\" data-bs-parent=\"#faqAccordion\">\n        <div class=\"accordion-body\">\n          Absolutely! Our team is available via email or chat to assist you.\n        </div>\n      </div>\n    </div>\n  </div>\n</section>",
+  "styles": "#aurora-faq h2 { color: #1e1e1e; } .accordion-button { background-color: #f8f9fa; } .accordion-button:focus { box-shadow: none; }",
+  "theme_name": "Aurora",
+  "paid": "Yes",
+  "language": "en",
+  "published": true
+}
+    ]
+}

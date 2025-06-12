@@ -91,7 +91,7 @@ def online_content():
         )
     
     flash("La pagina home non è stata trovata. Verifica le impostazioni del tema.", "warning")
-    return redirect(url_for('cmsaddon.theme_ui'))  # ✅ Aggiunto flash per feedback all'utente
+    return redirect(url_for('ui.theme_selection'))  # ✅ Aggiunto flash per feedback all'utente
 
 @page_bp.route('/admin/cms/function/edit-code/<slug>')
 @handle_request_errors
@@ -165,9 +165,11 @@ def preview_theme(theme_name):
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>{page_home.get('title')}</title>
           {head}
-          <style>{page_home.get('styles', '')}</style>
         </head>
         <body>
+          <style>
+            {page_home.get('styles', '')}
+          </style>
           {page_navbar.get('content') if page_navbar else ''}
           <main>
             {page_home.get('content')}

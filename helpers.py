@@ -5,7 +5,7 @@ from models.websettings import WebSettings
 from models.page import Page
 from models.database import db
 from models.navbar import NavbarLink
-from models.collections import Collection
+from models.products import Collection
 from functools import lru_cache
 import logging
 from markupsafe import escape
