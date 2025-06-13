@@ -1,0 +1,81 @@
+{% extends "/admin/cms/interface/render.html" %}
+
+{% block content %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fa-solid fa-cubes"></i> Giacenze di Magazzino</h5>
+        <a href="{{ url_for('warehouse.create_inventory')}}" class="btn btn-dark shadow-sm">
+            <i class="fa-solid fa-plus text-white"></i> <span class="text-white">Nuovo</span>
+        </a>
+    </div>
+    <div class="card-body table-responsive">
+        <table class="table table-hover align-middle" id="inventory-table">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Prodotto</th>
+                    <th scope="col">Magazzino</th>
+                    <th scope="col">Ubicazione</th>
+                    <th scope="col">Quantità</th>
+                    <th scope="col">Riservato</th>
+                    <th scope="col">Ultimo aggiornamento</th>
+                    <th scope="col">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in inventory %}
+                <tr ondblclick="window.location.href='/admin/cms/warehouse/inventory/edit/{{ item.id }}'">
+                    <td>{{ item.id }}</td>
+                    <td>{{ product_map[item.product_id] }}</td>
+                    <td>{{ warehouse_map[item.warehouse_id] }}</td>
+                    <td>{{ location_map.get(item.location_id, '—') }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.reserved }}</td>
+                    <td>{{ item.updated_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('warehouse.delete_inventory', inventory_id=item.id) }}" class="d-inline delete-inventory-form">
+                            <button type="button" class="btn btn-sm btn-danger btn-delete-inventory">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <small class="text-black">Doppio click sulla riga per modificare</small>
+    </div>
+</div>
+
+<style>
+    #inventory-table th, #inventory-table td {
+        vertical-align: middle;
+    }
+
+    #inventory-table tr:hover {
+        background-color: #f1f1f1;
+        cursor: pointer;
+    }
+</style>
+<script>
+    document.querySelectorAll('.btn-delete-inventory').forEach(button => {
+        button.addEventListener('click', function () {
+            const form = this.closest('form');
+            Swal.fire({
+                title: 'Sei sicuro?',
+                text: "Questa operazione eliminerà definitivamente la giacenza selezionata.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sì, elimina',
+                cancelButtonText: 'Annulla'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

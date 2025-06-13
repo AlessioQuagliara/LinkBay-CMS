@@ -48,6 +48,7 @@ def render_products_table():
     try:
         page = request.args.get('page', 1, type=int)
         per_page = 10
+        # Product.query.filter_by(shop_id=shop.id) is compatible if Product model no longer has stock_quantity
         products = Product.query.filter_by(shop_id=shop.id).paginate(page=page, per_page=per_page)
         categories = Category.query.all()
         return render_template(
@@ -89,10 +90,11 @@ def create_product():
             short_description = request.form.get("short_description")
             price = request.form.get("price")
             discount_price = request.form.get("discount_price") or None
-            stock_quantity = request.form.get("stock_quantity")
             description = request.form.get("description")
             is_active = request.form.get("is_active") == "true"
             is_digital = request.form.get("is_digital") == "true"
+            sku = request.form.get("sku")
+            ean_code = request.form.get("ean_code")
 
             new_product = Product(
                 shop_id=shop.id,
@@ -101,10 +103,11 @@ def create_product():
                 short_description=short_description,
                 price=price,
                 discount_price=discount_price,
-                stock_quantity=stock_quantity,
                 description=description,
                 is_active=is_active,
-                is_digital=is_digital
+                is_digital=is_digital,
+                sku=sku,
+                ean_code=ean_code,
             )
 
             db.session.add(new_product)
@@ -150,10 +153,11 @@ def edit_product(product_id):
             product.short_description = request.form.get("short_description")
             product.price = request.form.get("price")
             product.discount_price = request.form.get("discount_price") or None
-            product.stock_quantity = request.form.get("stock_quantity")
             product.description = request.form.get("description")
             product.is_active = request.form.get("is_active") == "true"
             product.is_digital = request.form.get("is_digital") == "true"
+            product.sku = request.form.get("sku")
+            product.ean_code = request.form.get("ean_code")
 
             db.session.commit()
 
@@ -253,3 +257,63 @@ def upload_product_image(product_id):
     db.session.commit()
 
     return jsonify({"success": True, "images": uploaded_images})
+
+# GESTIONE VARIANTI PRODOTTO -------------------------------------------------------------------------------------------------------------
+
+@products_bp.route("/admin/cms/products/variants/<int:product_id>", methods=["GET", "POST"])
+def manage_product_variants(product_id):
+    username = check_user_authentication()
+
+    if not username:
+        flash("Sessione scaduta. Effettua nuovamente il login.", "warning")
+        return redirect(url_for('user.login'))
+
+    shop_subdomain = request.host.split('.')[0]
+    shop = db.session.query(ShopList).filter_by(shop_name=shop_subdomain).first()
+    if not shop:
+        flash("Negozio non trovato", "danger")
+        return redirect(url_for('ui.homepage'))
+
+    product = db.session.query(Product).filter_by(id=product_id, shop_id=shop.id).first()
+    if not product:
+        flash("Prodotto non trovato", "danger")
+        return redirect(url_for("products.render_products_table"))
+
+    if request.method == "POST":
+        try:
+            sku = request.form.get("sku")
+            name = request.form.get("name")
+            ean_code = request.form.get("ean_code")
+            price_modifier = request.form.get("price_modifier", 0)
+            is_default = request.form.get("is_default") == "true"
+
+            # Se viene impostata una variante come default, rimuovi il flag dalle altre
+            if is_default:
+                ProductVariant.query.filter_by(product_id=product.id).update({"is_default": False})
+
+            new_variant = ProductVariant(
+                product_id=product.id,
+                name=name,
+                sku=sku,
+                ean_code=ean_code,
+                price_modifier=price_modifier,
+                is_default=is_default
+            )
+            db.session.add(new_variant)
+            db.session.commit()
+            flash("Variante aggiunta con successo!", "success")
+            return redirect(url_for("products.manage_product_variants", product_id=product.id))
+        except Exception as e:
+            logging.error(f"❌ Errore durante la creazione variante: {str(e)}")
+            db.session.rollback()
+            flash("Errore durante la creazione della variante.", "danger")
+
+    variants = ProductVariant.query.filter_by(product_id=product.id).all()
+    return render_template(
+        "admin/cms/products/manage_variants.html",
+        title="Gestione Varianti",
+        product=product,
+        variants=variants,
+        username=username,
+        shop=shop
+    )

@@ -1,0 +1,143 @@
+{% extends "/admin/cms/interface/render.html" %}
+
+{% block content %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fa-solid fa-warehouse"></i> Magazzini</h5>
+        <a href="/admin/cms/warehouse/create" class="btn btn-dark shadow-sm">
+            <i class="fa-solid fa-plus text-white"></i> <span class="text-white">Nuovo</span>
+        </a>
+    </div>
+    <div class="card-body table-responsive">
+        <table class="table table-hover align-middle" id="warehouses-table">
+            <thead>
+                <tr>
+                    <th scope="col"><input type="checkbox" id="select-all"></th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Indirizzo</th>
+                    <th scope="col">Creato il</th>
+                    <th scope="col">Aggiornato il</th>
+                    <th scope="col">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for warehouse in warehouses %}
+                <tr data-id="{{ warehouse.id }}" class="clickable-row">
+                    <td><input type="checkbox" class="row-checkbox"></td>
+                    <td>{{ warehouse.name }}</td>
+                    <td>{{ warehouse.address or "—" }}</td>
+                    <td>{{ warehouse.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>{{ warehouse.updated_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>
+                        <form action="{{ url_for('warehouse.delete_warehouse_view', warehouse_id=warehouse.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <small class="text-black">Doppio click sulla riga per modificare</small>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    let clickTimer = null;
+
+    document.querySelectorAll("#warehouses-table tbody tr").forEach(function(row) {
+        const warehouseId = row.dataset.id;
+
+        row.addEventListener("click", function (e) {
+            if (!e.target.closest("input, a, button, i")) {
+                if (clickTimer === null) {
+                    clickTimer = setTimeout(() => {
+                        const checkbox = row.querySelector(".row-checkbox");
+                        checkbox.checked = !checkbox.checked;
+                        row.classList.toggle("selected", checkbox.checked);
+                        clickTimer = null;
+                    }, 250);
+                } else {
+                    clearTimeout(clickTimer);
+                    clickTimer = null;
+                    window.location.href = `/admin/cms/warehouse/edit/${warehouseId}`;
+                }
+            }
+        });
+    });
+
+    const selectAllCheckbox = document.getElementById("select-all");
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener("change", function () {
+            const isChecked = this.checked;
+            document.querySelectorAll(".row-checkbox").forEach(function (checkbox) {
+                const row = checkbox.closest("tr");
+                checkbox.checked = isChecked;
+                row.classList.toggle("selected", isChecked);
+            });
+        });
+    }
+
+    document.querySelectorAll('form[action*="delete"]').forEach(function(form) {
+        form.addEventListener("submit", function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Sei sicuro?',
+                text: "Verranno eliminate anche le ubicazioni e le giacenze collegate a questo magazzino!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sì, elimina!',
+                cancelButtonText: 'Annulla'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Custom submit logic to avoid double submit or event issues
+                    const hiddenForm = document.createElement('form');
+                    hiddenForm.method = 'POST';
+                    hiddenForm.action = form.action;
+
+                    const csrfTokenInput = form.querySelector('input[name=csrf_token]');
+                    if (csrfTokenInput) {
+                        const clonedInput = csrfTokenInput.cloneNode();
+                        hiddenForm.appendChild(clonedInput);
+                    }
+
+                    document.body.appendChild(hiddenForm);
+                    hiddenForm.submit();
+                }
+            });
+        });
+    });
+});
+</script>
+
+<style>
+    #warehouses-table th, #warehouses-table td {
+        vertical-align: middle;
+    }
+
+    .clickable-row {
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .clickable-row:hover {
+        background-color: #f1f1f1;
+    }
+
+    .clickable-row.selected {
+        background-color: #d1e7dd !important;
+    }
+
+    input[type="checkbox"]:checked {
+        accent-color: #ff5758;
+    }
+
+    .btn i {
+        margin-right: 4px;
+    }
+</style>
+{% endblock %}

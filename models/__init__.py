@@ -28,7 +28,7 @@ from .storepayment import StorePayment
 
 # 📌 Tabelle relative alla gestione delle categorie e prodotti
 from .products import Product, ProductVariant, ProductImage, Category, Collection, CollectionImage, CollectionProduct
-from .warehouse import Inventory
+from .warehouse import Warehouse, Inventory, Location, InventoryMovement
 
 # 📌 Tabelle per gli ordini e pagamenti
 from .orders import Order

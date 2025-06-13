@@ -1,0 +1,62 @@
+
+
+{% extends "/admin/cms/interface/render.html" %}
+
+{% block content %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fa-solid fa-arrow-right-arrow-left"></i> Movimenti di Magazzino</h5>
+    </div>
+    <div class="card-body table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Prodotto</th>
+                    <th>Variante</th>
+                    <th>Tipo</th>
+                    <th>Quantità</th>
+                    <th>Motivo</th>
+                    <th>Fonte</th>
+                    <th>Costo Unitario</th>
+                    <th>Utente</th>
+                    <th>Creato il</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for movement in movements %}
+                <tr>
+                    <td>{{ movement.id }}</td>
+                    <td>{{ movement.product_id }}</td>
+                    <td>{{ movement.variant_id if movement.variant_id else "—" }}</td>
+                    <td>
+                        {% if movement.movement_type == 'ingresso' %}
+                            <span class="badge bg-success">Ingresso</span>
+                        {% elif movement.movement_type == 'uscita' %}
+                            <span class="badge bg-danger">Uscita</span>
+                        {% elif movement.movement_type == 'rettifica' %}
+                            <span class="badge bg-warning text-dark">Rettifica</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ movement.movement_type }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ movement.quantity }}</td>
+                    <td>{{ movement.reason or "—" }}</td>
+                    <td>{{ movement.source or "—" }}</td>
+                    <td>
+                        {% if movement.cost_per_unit %}
+                            €{{ "{:.2f}".format(movement.cost_per_unit) }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>{{ movement.user_id or "—" }}</td>
+                    <td>{{ movement.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <small class="text-muted">Elenco aggiornato dei movimenti di magazzino.</small>
+    </div>
+</div>
+{% endblock %}

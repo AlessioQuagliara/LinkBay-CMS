@@ -1,0 +1,93 @@
+{% extends "/admin/cms/interface/render.html" %}
+
+{% block content %}
+<!-- Tabella interattiva ubicazioni -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fa-solid fa-location-dot"></i> Ubicazioni</h5>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ url_for('warehouse.create_location_view')}}" class="btn btn-dark shadow-sm">
+                <i class="fa-solid fa-plus text-white"></i> <span class="text-white">Nuova</span>
+            </a>
+        </div>
+    </div>
+    <div class="card-body table-responsive">
+        <table class="table table-hover align-middle" id="locations-table">
+            <thead>
+                <tr>
+                    <th scope="col"><input type="checkbox" id="select-all"></th>
+                    <th scope="col" hidden>ID</th>
+                    <th scope="col">Codice</th>
+                    <th scope="col">Descrizione</th>
+                    <th scope="col">Magazzino</th>
+                    <th scope="col">Creato il</th>
+                    <th scope="col">Aggiornato il</th>
+                    <th scope="col">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for location in locations %}
+                <tr data-id="{{ location.id }}" class="clickable-row">
+                    <td><input type="checkbox" class="row-checkbox"></td>
+                    <td hidden>{{ location.id }}</td>
+                    <td>{{ location.code }}</td>
+                    <td>{{ location.description or '—' }}</td>
+                    <td>{{ location.warehouse.name }}</td>
+                    <td>{{ location.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>{{ location.updated_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger delete-location-btn" data-id="{{ location.id }}">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <small class="text-black">Doppio click sulla riga per modificare</small>
+    </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      document.querySelectorAll("#locations-table tbody tr").forEach(function(row) {
+          row.addEventListener("dblclick", function () {
+              const locationId = row.dataset.id;
+              window.location.href = `/admin/cms/warehouse/location/edit/${locationId}`;
+          });
+      });
+
+      document.querySelectorAll(".delete-location-btn").forEach(function(button) {
+          button.addEventListener("click", function () {
+              const locationId = button.dataset.id;
+              Swal.fire({
+                  title: 'Sei sicuro?',
+                  text: "L'ubicazione verrà eliminata definitivamente.",
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#d33',
+                  cancelButtonColor: '#6c757d',
+                  confirmButtonText: 'Sì, elimina!',
+                  cancelButtonText: 'Annulla'
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                      fetch(`/admin/cms/warehouse/location/delete/${locationId}`, {
+                          method: "POST",
+                          headers: {
+                              "Content-Type": "application/json",
+                              "X-Requested-With": "XMLHttpRequest"
+                          }
+                      }).then(response => {
+                          if (response.redirected) {
+                              window.location.href = response.url;
+                          } else {
+                              Swal.fire("Errore", "Non è stato possibile eliminare l'ubicazione.", "error");
+                          }
+                      });
+                  }
+              });
+          });
+      });
+  });
+</script>
+{% endblock %}

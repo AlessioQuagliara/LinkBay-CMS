@@ -97,6 +97,14 @@
                     <label for="price" class="form-label">Prezzo</label>
                     <input type="number" class="form-control" name="price" id="price" step="0.01" value="{{product.price}}" required oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
                 </div>
+                <div class="mb-3">
+                    <label for="sku" class="form-label">SKU</label>
+                    <input type="text" class="form-control" name="sku" id="sku" value="{{ product.sku or '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="ean_code" class="form-label">Codice EAN</label>
+                    <input type="text" class="form-control" name="ean_code" id="ean_code" value="{{ product.ean_code or '' }}">
+                </div>
             </div>
 
             <div id="step-3" class="step d-none">
@@ -112,10 +120,6 @@
                 <div class="mb-3">
                     <label for="discount_price" class="form-label">Prezzo Scontato (opzionale)</label>
                     <input type="number" class="form-control" name="discount_price" id="discount_price" value="{{product.discount_price}}" step="0.01" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
-                </div>
-                <div class="mb-3">
-                    <label for="stock_quantity" class="form-label">Quantità in Magazzino</label>
-                    <input type="number" class="form-control" name="stock_quantity" id="stock_quantity" value="{{product.stock_quantity}}" required oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
                 </div>
             </div>
 
@@ -228,10 +232,6 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('preview-discount-price').innerText = discountPrice ? `Sconto: €${parseFloat(discountPrice).toFixed(2)}` : '';
     });
 
-    document.getElementById('stock_quantity').addEventListener('input', function () {
-        const stockQuantity = this.value;
-        document.getElementById('preview-stock').innerText = stockQuantity || '';
-    });
 
     document.getElementById('is_active').addEventListener('change', function () {
         const isActive = this.value === 'true';
@@ -338,8 +338,9 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('preview-short').innerText = document.getElementById('short_description').value || 'Descrizione breve';
     document.getElementById('preview-price').innerHTML = document.getElementById('price').value ? `<strong>Prezzo:</strong> €${parseFloat(document.getElementById('price').value).toFixed(2)}` : '';
     document.getElementById('preview-discount-price').innerText = document.getElementById('discount_price').value ? `Sconto: €${parseFloat(document.getElementById('discount_price').value).toFixed(2)}` : '';
-    document.getElementById('preview-stock').innerText = document.getElementById('stock_quantity').value || '';
+    document.getElementById('preview-stock').innerText = "{{ product.total_stock }}";
     document.getElementById('preview-description').innerHTML = document.getElementById('product-description').value || 'Descrizione del prodotto';
+    // Non c'è preview live per SKU/EAN, quindi non serve JS aggiuntivo qui al momento.
 });
 </script>
 

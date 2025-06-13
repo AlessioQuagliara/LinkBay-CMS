@@ -50,7 +50,7 @@
                 <i class="fa-solid fa-arrow-left"></i>&nbsp; Torna a Gestione Prodotti
             </a>
         </li>
-        {% elif title in ['Modifica Prodotto', 'Immagini Prodotto' ]%}
+        {% elif title in ['Modifica Prodotto', 'Immagini Prodotto', 'Gestione Varianti' ]%}
         <li class="nav-item mb-2">
             <a href="{{ url_for('products.render_products_table') }}" class="nav-link {% if title == 'Gestione Prodotti' %}active{% endif %} text-white">
                 <i class="fa-solid fa-arrow-left"></i>&nbsp; Torna a Gestione Prodotti
@@ -66,6 +66,11 @@
                 <i class="fa-solid fa-image {% if title == 'Immagini Prodotto' %}fa-bounce{% endif %}"></i>&nbsp; Modifica Immagini Prodotto
             </a>
         </li>
+        <li>
+            <a href="{{ url_for('products.manage_product_variants', product_id=product.id) }}" class="nav-link {% if title == 'Gestione Varianti' %}active{% endif %} text-white">
+                <i class="fa-solid fa-clone {% if title == 'Gestione Varianti' %}fa-bounce{% endif %}"></i>&nbsp; Gestisci Varianti
+            </a>
+        </li>
         {% else %}
         <li class="nav-item">
             <a href="{{ url_for('ui.homepage') }}" class="nav-link {% if title == 'HomePage' %}active{% endif %} text-white">
@@ -75,6 +80,11 @@
         <li class="nav-item">
             <a href="{{ url_for('products.render_products_table') }}" class="nav-link {% if title == 'Gestione Prodotti' %}active{% endif %} text-white">
                 <i class="fa-solid fa-box {% if title == 'Gestione Prodotti' %}fa-bounce{% endif %}"></i>&nbsp; Prodotti
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ url_for('warehouse.warehouse_dashboard') }}" class="nav-link {% if title == 'Dashboard Magazzino' %}active{% endif %} text-white">
+                <i class="fa-solid fa-warehouse {% if title == 'Dashboard Magazzino' %}fa-bounce{% endif %}"></i>&nbsp; Gestione Magazzino
             </a>
         </li>
         <li>

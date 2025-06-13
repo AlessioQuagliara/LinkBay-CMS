@@ -53,7 +53,7 @@
                     <td>{{ product.short_description }}</td>
                     <td>€{{ "{:.2f}".format(product.price) }}</td>
                     <td>€{{ "{:.2f}".format(product.discount_price) if product.discount_price else "—" }}</td>
-                    <td>{{ product.stock_quantity }}</td>
+                    <td>{{ product.total_stock }}</td>
                     <td hidden>{{ product.slug }}</td>
                     <td>
                         {% if product.is_active %}

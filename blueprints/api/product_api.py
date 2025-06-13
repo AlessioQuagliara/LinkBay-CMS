@@ -44,7 +44,6 @@ def copy_products():
                     short_description=product.short_description,
                     price=product.price,
                     discount_price=product.discount_price,
-                    stock_quantity=product.stock_quantity,
                     slug=f"{product.slug}-copy-{datetime.utcnow().timestamp()}",
                     is_active=False,
                     category_id=product.category_id,
@@ -155,3 +154,48 @@ def delete_image(image_id):
     except Exception as e:
         logging.error(f"Errore eliminazione immagine: {str(e)}")
         return jsonify({"success": False, "error": "Errore server"}), 500
+    
+
+# Assicurati che check_user_authentication sia disponibile
+def check_user_authentication():
+    return session.get("username")
+
+@product_api.route("/set_default_variant/<int:variant_id>", methods=["PATCH"])
+def set_default_variant(variant_id):
+    username = check_user_authentication()
+    if not username:
+        return jsonify({"success": False, "error": "Sessione scaduta."}), 401
+
+    variant = ProductVariant.query.get(variant_id)
+    if not variant:
+        return jsonify({"success": False, "error": "Variante non trovata."}), 404
+
+    try:
+        # Rimuove il default da tutte le varianti dello stesso prodotto
+        ProductVariant.query.filter_by(product_id=variant.product_id).update({"is_default": False})
+        variant.is_default = True
+        db.session.commit()
+        return jsonify({"success": True, "message": "Variante impostata come predefinita."})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@product_api.route("/delete_variant/<int:variant_id>", methods=["DELETE"])
+def delete_variant(variant_id):
+    username = check_user_authentication()
+    if not username:
+        return jsonify({"success": False, "error": "Sessione scaduta."}), 401
+
+    variant = ProductVariant.query.get(variant_id)
+    if not variant:
+        return jsonify({"success": False, "error": "Variante non trovata."}), 404
+
+    try:
+        db.session.delete(variant)
+        db.session.commit()
+        return jsonify({"success": True, "message": "Variante eliminata con successo."})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
+    

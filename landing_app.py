@@ -69,7 +69,7 @@ from models.storepayment import StorePayment
 
 # 📌 Tabelle relative alla gestione delle categorie e prodotti
 from models.products import Product, ProductVariant, ProductImage, Category, Collection, CollectionImage, CollectionProduct
-from models.warehouse import Inventory
+from models.warehouse import Warehouse, Inventory, Location, InventoryMovement
 
 # 📌 Tabelle per gli ordini e pagamenti
 from models.orders import Order

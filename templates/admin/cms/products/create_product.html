@@ -30,6 +30,14 @@
                 <span id="preview-stock" class="ms-2"></span>
             </div>
             <div class="mb-2">
+                <span class="text-muted">SKU:</span>
+                <span id="preview-sku" class="ms-2"></span>
+            </div>
+            <div class="mb-2">
+                <span class="text-muted">EAN:</span>
+                <span id="preview-ean_code" class="ms-2"></span>
+            </div>
+            <div class="mb-2">
                 <p id="preview-short" class="mb-1"></p>
             </div>
             <div class="mb-2">
@@ -100,7 +108,7 @@
             </div>
 
             <div id="step-3" class="step d-none">
-                <h5>Step 3: Prezzo scontato e quantità in magazzino</h5>
+                <h5>Step 3: Prezzo scontato e Codici per magazzino</h5>
 
                 <!-- Progress bar -->
                 <div class="mb-4">
@@ -114,8 +122,12 @@
                     <input type="number" class="form-control" name="discount_price" id="discount_price" step="0.01" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
                 </div>
                 <div class="mb-3">
-                    <label for="stock_quantity" class="form-label">Quantità in Magazzino</label>
-                    <input type="number" class="form-control" name="stock_quantity" id="stock_quantity" required oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                    <label for="sku" class="form-label">SKU</label>
+                    <input type="text" class="form-control" name="sku" id="sku">
+                </div>
+                <div class="mb-3">
+                    <label for="ean_code" class="form-label">Codice EAN</label>
+                    <input type="text" class="form-control" name="ean_code" id="ean_code">
                 </div>
             </div>
 
@@ -233,22 +245,6 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('preview-price').innerHTML = priceText + ' €';
     }
 
-    document.getElementById('discount_price').addEventListener('input', function () {
-        updatePreviewQuantity();
-    });
-
-    document.getElementById('stock_quantity').addEventListener('input', function () {
-        updatePreviewQuantity();
-    });
-
-    function updatePreviewQuantity() {
-        const discountPrice = document.getElementById('discount_price').value;
-        const stockQuantity = document.getElementById('stock_quantity').value;
-        let discountText = discountPrice ? `Prezzo scontato: €${parseFloat(discountPrice).toFixed(2)}` : '';
-        let quantityText = stockQuantity ? `Quantità in magazzino: ${stockQuantity}` : '';
-        let combinedText = [discountText, quantityText].filter(Boolean).join(' | ');
-        document.getElementById('preview-quantity').textContent = combinedText;
-    }
 
     // Categoria rimossa: nessun event listener per la categoria
 
@@ -339,9 +335,10 @@ document.addEventListener("DOMContentLoaded", function () {
         slug: document.querySelector('input[name="slug"]'),
         price: document.querySelector('input[name="price"]'),
         discount_price: document.querySelector('input[name="discount_price"]'),
-        stock_quantity: document.querySelector('input[name="stock_quantity"]'),
         short_description: document.querySelector('textarea[name="short_description"]'),
-        description: document.querySelector('textarea[name="description"]')
+        description: document.querySelector('textarea[name="description"]'),
+        sku: document.querySelector('input[name="sku"]'),
+        ean_code: document.querySelector('input[name="ean_code"]')
     };
 
     const preview = {
@@ -349,9 +346,10 @@ document.addEventListener("DOMContentLoaded", function () {
         slug: document.getElementById("preview-slug"),
         price: document.getElementById("preview-price"),
         discount_price: document.getElementById("preview-discount-price"),
-        stock_quantity: document.getElementById("preview-stock"),
         short_description: document.getElementById("preview-short"),
-        description: document.getElementById("preview-description")
+        description: document.getElementById("preview-description"),
+        sku: document.getElementById("preview-sku"),
+        ean_code: document.getElementById("preview-ean_code")
     };
 
     for (const [key, input] of Object.entries(inputs)) {

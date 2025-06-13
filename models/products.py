@@ -1,6 +1,7 @@
 from models.database import db
 from datetime import datetime
 import logging
+from .warehouse import Inventory
 from functools import wraps
 from sqlalchemy import UniqueConstraint, Index
 
@@ -124,10 +125,18 @@ class Product(db.Model):
     shop_id           = db.Column(db.Integer, db.ForeignKey("ShopList.id"), nullable=False)
     name              = db.Column(db.String(255), nullable=False)
     description       = db.Column(db.Text, nullable=True)
+    sku               = db.Column(db.String(255), nullable=True)
+    ean_code          = db.Column(db.String(255), nullable=True)
     short_description = db.Column(db.Text, nullable=True)
     price             = db.Column(db.Numeric(10,2), nullable=False)
     discount_price    = db.Column(db.Numeric(10,2), nullable=True)
-    stock_quantity    = db.Column(db.Integer, default=0, nullable=False)
+
+
+    @property
+    def total_stock(self):
+        return db.session.query(
+            db.func.sum(Inventory.quantity)
+        ).filter_by(product_id=self.id).scalar() or 0
     slug              = db.Column(db.String(255), nullable=False)
     is_active         = db.Column(db.Boolean, default=True)
     created_at        = db.Column(db.DateTime, default=datetime.utcnow)
@@ -138,6 +147,7 @@ class Product(db.Model):
     __table_args__ = (
         UniqueConstraint('shop_id', 'slug', name='ux_products_shop_slug'),
         Index('ix_products_shop_name', 'shop_id', 'name'),
+        db.Index('ix_products_sku', 'sku'),
     )
 
     variants    = db.relationship("ProductVariant", back_populates="product", cascade="all, delete-orphan")
@@ -167,6 +177,7 @@ class ProductVariant(db.Model):
 
     id             = db.Column(db.Integer, primary_key=True, autoincrement=True)
     product_id     = db.Column(db.Integer, db.ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
+    name           = db.Column(db.String(255), nullable=False)
     sku            = db.Column(db.String(255), nullable=False)
     ean_code       = db.Column(db.String(255), nullable=True)
     price_modifier = db.Column(db.Numeric(10,2), default=0)
@@ -487,3 +498,10 @@ def delete_product_image(image_id):
     db.session.commit()
     logging.info(f"🗑️ Immagine ID {image_id} eliminata")
     return True
+    inventories = db.relationship("Inventory", backref="variant", cascade="all, delete-orphan")
+
+    @property
+    def total_stock(self):
+        return db.session.query(
+            db.func.sum(Inventory.quantity)
+        ).filter_by(variant_id=self.id).scalar() or 0
