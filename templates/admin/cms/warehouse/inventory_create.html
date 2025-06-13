@@ -1,0 +1,62 @@
+
+
+{% extends "/admin/cms/interface/render.html" %}
+{% block content %}
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fa-solid fa-plus"></i> Crea Nuova Giacenza</h5>
+            <a href="{{ url_for('warehouse.list_inventory') }}" class="btn btn-light btn-sm">
+                <i class="fa-solid fa-arrow-left"></i> Torna indietro
+            </a>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="product_id" class="form-label">Prodotto <span class="text-danger">*</span></label>
+                    <select class="form-select" id="product_id" name="product_id" required>
+                        {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="warehouse_id" class="form-label">Magazzino <span class="text-danger">*</span></label>
+                    <select class="form-select" id="warehouse_id" name="warehouse_id" required>
+                        {% for warehouse in warehouses %}
+                            <option value="{{ warehouse.id }}">{{ warehouse.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="location_id" class="form-label">Ubicazione (facoltativa)</label>
+                    <select class="form-select" id="location_id" name="location_id">
+                        <option value="">-- Nessuna --</option>
+                        {% for location in locations %}
+                            <option value="{{ location.id }}">{{ location.code }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="quantity" class="form-label">Quantità disponibile <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="quantity" name="quantity" required min="0" placeholder="Inserisci la quantità disponibile">
+                </div>
+
+                <div class="mb-3">
+                    <label for="reserved" class="form-label">Quantità riservata</label>
+                    <input type="number" class="form-control" id="reserved" name="reserved" value="0" min="0">
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-dark">
+                        <i class="fa-solid fa-save"></i> Salva Giacenza
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

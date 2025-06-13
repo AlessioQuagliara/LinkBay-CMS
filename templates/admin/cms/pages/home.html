@@ -4,7 +4,7 @@
 
 <!-- Pulsante per personalizzare la homepage -->
 <button id="customize-homepage-btn" class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#customizationHomepageModal">
-    <i class="fa-solid fa-cog"></i> Customize Homepage
+    <i class="fa-solid fa-cog"></i> Personalizza Dashboard
 </button>
 
 <style>
@@ -86,17 +86,19 @@
     <!-- AI Assistant -->
     <div id="assistant-container" class="col-md-6 mb-3">
         <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white text-center">
+                <i class="fa-solid fa-robot me-2"></i> Assistente AI
+            </div>
             <div class="card-body text-center">
                 <img class="mb-3" src="https://www.linkbay.it/static/image/lb-logo.svg" width="120px" alt="Logo LinkBay">
-                <h5 class="card-title">AI Assistant</h5>
                 
                 <div id="chat-box" class="border rounded p-3 mb-3" style="height: 280px; overflow-y: auto; background: #f8f9fa;">
-                    <!-- Chat messages will be added here -->
+                    <!-- I messaggi della chat saranno aggiunti qui -->
                 </div>
 
                 <div class="input-group">
-                    <input type="text" id="user-input" class="form-control" placeholder="Ask anything...">
-                    <button id="send-btn" class="btn btn-danger">Send</button>
+                    <input type="text" id="user-input" class="form-control" placeholder="Scrivi una domanda...">
+                    <button id="send-btn" class="btn btn-dark">Invia</button>
                 </div>
             </div>
         </div>
@@ -105,31 +107,31 @@
     <!-- Subscription Status -->
     <div id="subscription-status" class="col-md-6 mb-3">
         <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white text-center">
+                <i class="fa-solid fa-gem fa-2x text-primary"></i>
+                <h5 class="mt-2 mb-1 fw-bold">Il tuo abbonamento</h5>
+                <p class="text-muted mb-2">Monitora e gestisci il tuo piano</p>
+            </div>
             <div class="card-body text-center p-4">
-                <div class="mb-3">
-                    <i class="fa-solid fa-gem fa-2x text-primary"></i>
-                    <h5 class="mt-2 mb-1 fw-bold">Your Subscription</h5>
-                    <p class="text-muted mb-2">Monitor and manage your plan</p>
-                </div>
                 <ul class="list-group list-group-flush mb-3">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><i class="fa-solid fa-user-tag me-2 text-secondary"></i>Plan</span>
+                        <span><i class="fa-solid fa-user-tag me-2 text-secondary"></i>Piano</span>
                         <strong id="plan-name">Loading...</strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><i class="fa-solid fa-calendar-day me-2 text-secondary"></i>Renewal</span>
+                        <span><i class="fa-solid fa-calendar-day me-2 text-secondary"></i>Rinnovo</span>
                         <strong id="renewal-date">Loading...</strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><i class="fa-solid fa-circle-info me-2 text-secondary"></i>Status</span>
+                        <span><i class="fa-solid fa-circle-info me-2 text-secondary"></i>Stato</span>
                         <strong id="subscription-status-text">Loading...</strong>
                     </li>
                 </ul>
                 <div id="subscription-alert" class="alert alert-warning d-none mt-3">
                     <i class="fa-solid fa-triangle-exclamation"></i>
-                    Your subscription is expiring soon! <br>
-                    <button id="renew-subscription" class="btn btn-outline-danger btn-sm mt-2">
-                        <i class="fa-solid fa-rotate"></i> Renew Now
+                    Il tuo abbonamento sta per scadere! <br>
+                    <button id="renew-subscription" class="btn btn-dark btn-sm mt-2">
+                        <i class="fa-solid fa-rotate"></i> Rinnova ora
                     </button>
                 </div>
             </div>
@@ -139,12 +141,14 @@
     <!-- 🌍 Track Visitors -->
     <div id="visitor-map" class="col-md-6 mb-3">
         <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="card-title"><i class="fa-solid fa-globe"></i> Mappa Visitatori</h5>
+            </div>
             <div class="card-body">
-                <h5 class="card-title"><i class="fa-solid fa-globe"></i> Visitor Map</h5>
                 <div id="map-container"></div>
                 <p class="text-muted text-center mt-2">
-                    <i class="fa-regular fa-circle-dot text-danger"></i> <strong id="active-visitors">0</strong> Active Visitors
-                    <br><small id="last-update">Waiting for update...</small>
+                    <i class="fa-regular fa-circle-dot text-danger"></i> <strong id="active-visitors">0</strong> Visitatori attivi
+                    <br><small id="last-update">In attesa di aggiornamento...</small>
                 </p>
             </div>
         </div>
@@ -153,8 +157,10 @@
         <!-- Sales Chart -->
         <div id="sales-chart" class="col-md-6 mb-3">
             <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title"><i class="fa-solid fa-chart-line"></i> Grafico Vendite</h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title"><i class="fa-solid fa-chart-line"></i> Sales Chart</h5>
                     <div style="height: 300px;">
                         <canvas id="salesChart"></canvas>
                     </div>
@@ -165,8 +171,10 @@
         <!-- Latest Orders -->
         <div id="latest-orders" class="col-md-6 mb-3">
             <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title"><i class="fa-solid fa-clipboard-list"></i> Ultimi Ordini</h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title"><i class="fa-solid fa-clipboard-list"></i> Latest Orders</h5>
                     <ul class="list-group list-group-flush" id="latestOrdersList">
                         <li class="list-group-item">Loading...</li>
                     </ul>
@@ -177,8 +185,10 @@
         <!-- Recent Customers -->
         <div id="recent-customers" class="col-md-6 mb-3">
             <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title"><i class="fa-solid fa-users"></i> Clienti Recenti</h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title"><i class="fa-solid fa-users"></i> Recent Customers</h5>
                     <ul class="list-group list-group-flush" id="recentCustomersList">
                         <li class="list-group-item">Loading...</li>
                     </ul>
@@ -189,8 +199,10 @@
         <!-- Activity Feed -->
         <div id="activity-feed" class="col-md-6 mb-3">
             <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title"><i class="fa-solid fa-bell"></i> Attività Recenti</h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title"><i class="fa-solid fa-bell"></i> Activity Feed</h5>
                     <ul class="list-group list-group-flush" id="activityFeedList">
                         <li class="list-group-item">Loading...</li>
                     </ul>
@@ -201,8 +213,10 @@
         <!-- Best Selling Products -->
         <div id="best-selling-products" class="col-md-6 mb-3">
             <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title"><i class="fa-solid fa-star"></i> Prodotti più Venduti</h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title"><i class="fa-solid fa-star"></i> Best Selling Products</h5>
                     <ul class="list-group list-group-flush" id="bestSellingProductsList">
                         <li class="list-group-item">Loading...</li>
                     </ul>
@@ -219,11 +233,11 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="customizationHomepageModalLabel">Customize Homepage Layout</h5>
+                <h5 class="modal-title" id="customizationHomepageModalLabel">Personalizza il tuo Layout</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <h6>Drag & Drop to Reorder Sections</h6>
+                <h6>Prendi e trascina i riquadri</h6>
                 <div id="sortable-sections-grid" class="grid-container">
                     <!-- Sezioni della homepage generate dinamicamente -->
                 </div>

@@ -1,170 +1,113 @@
 {% extends "/admin/cms/interface/render.html" %}
 
 {% block content %}
-<div class="row" data-aos="fade-up">
-    <div class="col-md-8 mb-3"> <!-- Restringi la larghezza della prima colonna -->
-        <style>
-            .store-banner {
-                position: relative;
-                height: 300px; /* Altezza leggermente ridotta */
-                background-image: url('https://www.linkbay.it/static/image/store_image.webp');
-                background-size: cover;
-                background-position: center;
-                filter: brightness(50%);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                border-radius: 15px;
-            }
-            
-            .store-overlay {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                text-align: center;
-                color: white;
-                border-radius: 15px;
-            }
-
-            .store-title {
-                font-size: 2rem;
-                font-weight: bold;
-                text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
-            }
-
-            .card-footer {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                border-radius: 15px;
-            }
-
-            .card {
-                border-radius: 15px;
-            }
-
-            .card-body {
-                border-radius: 15px;
-            }
-
-            .card img {
-                border-radius: 15px;
-            }
-
-            .btn {
-                border-radius: 15px;
-            }
-        </style>
-
-        <div class="store-banner">
-            <div class="store-overlay">
-                <h2 class="store-title">{{ shop['shop_name'] }}</h2>
-            </div>
+<div class="row g-3 mb-4">
+  <div class="col-md-8">
+    <div class="card shadow-sm   bg-dark text-white">
+      <div class="card-body d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <i class="fa-solid fa-store fa-2x me-3"></i>
+          <h5 class="mb-0">{{ shop['shop_name'] }}</h5>
         </div>
+        <span class="badge bg-secondary">Negozio attivo</span>
+      </div>
     </div>
+  </div>
 
-    <!-- Card per le impostazioni del sito -->
-    <div class="col-md-4"> <!-- Colonna accanto alla prima per le impostazioni -->
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Site Settings</h5>
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
-                    <label class="form-check-label" for="flexSwitchCheckChecked">Website Published</label>
-                </div>
-                <a href="/export/pages?shop_name={{ shop['shop_name'] }}" class="btn btn-outline-dark btn-sm mt-3 w-100">
-                    <i class="fa-solid fa-file-export me-2"></i> Esporta Design
-                </a>
-            </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-3"><i class="fa-solid fa-gear me-2"></i>Impostazioni Rapide</h6>
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
+          <label class="form-check-label" for="flexSwitchCheckChecked">Sito Pubblicato</label>
         </div>
+        <a href="/export/pages?shop_name={{ shop['shop_name'] }}" class="btn btn-outline-dark btn-sm w-100">
+          <i class="fa-solid fa-file-export me-2"></i>Esporta Design
+        </a>
+      </div>
     </div>
+  </div>
 </div>
 
-
-
-<h5 class="mt-4 text-center" data-aos="fade-up">More Options</h5>
-
-<div class="row row-cols-1 row-cols-md-3 g-4" data-aos="fade-up">
-    <div class="col">
-        <div class="theme-card card text-white" style="background-image: url(https://www.linkbay.it/static/image/navlink.png); background-size: cover;">
-            <div class="card-body mt-4">
-                <h5 class="card-title">Customize Navigation Menu</h5>
-                <p class="card-text">Customize Navigation Menu, Organize and edit your store’s main menu items</p>
-                <a href="{{ url_for('page.navbar_settings') }}" class="btn btn-danger btn-small">Edit Nav</a>
+<div class="row g-4" data-aos="fade-up">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm h-100  ">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fa-solid fa-bars fa-2x text-dark me-3"></i>
+                    <div>
+                        <h5 class="card-title mb-1">Menu di Navigazione</h5>
+                        <p class="card-text small text-muted">Organizza e modifica le voci del menu principale del sito</p>
+                    </div>
+                </div>
+                <a href="{{ url_for('page.navbar_settings') }}" class="btn btn-dark w-100 mt-auto">Modifica Navigazione</a>
             </div>
         </div>
     </div>
 
-<!-- Altre cards  -->
-
-    <div class="col">
-        <div class="theme-card card text-light" style="background-image: url(https://www.linkbay.it/static/image/store_image.webp); background-size: cover;">
-            <div class="card-body mt-4">
-                <h5 class="card-title">Edit Site Drag&Drop</h5>
-                <p class="card-text"><span class="badge text-bg-secondary">Theme in use<strong>: {{ shop['themeOptions'] }}</strong></span></p>
-                <p class="card-text"><small>Last Theme Edit: <span class="badge text-bg-secondary"><strong>{{ minutes_ago }}</strong> minutes ago</span></small></p>
-                <a href="{{ url_for('page.editor_interface') }}" class="btn btn-danger btn-small">Edit Site</a>
-                <a href="../../../" target="_blank" class="btn btn-dark btn-small">View Online</a>
-                <!--<a href="" id="capture-screenshot-btn" class="btn btn-dark btn-small"><i class="fa-solid fa-arrows-rotate"></i></a>-->
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm h-100  ">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fa-solid fa-pencil fa-2x text-dark me-3"></i>
+                    <div>
+                        <h5 class="card-title mb-1">Modifica Sito Drag&Drop</h5>
+                        <p class="card-text small text-muted">Ultima modifica tema: <strong>{{ minutes_ago }}</strong> minuti fa</p>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('page.editor_interface') }}" class="btn btn-dark w-100">Modifica Sito</a>
+                    <a href="../../../" target="_blank" class="btn btn-secondary w-100">Visualizza Online</a>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col">
-        <div class="theme-card card text-white" style="background-image: url(https://www.linkbay.it/static/image/codeeditor.png); background-size: cover;">
-            <div class="card-body mt-4">
-                <h5 class="card-title">Edit Code</h5>
-                <p class="card-text">Easily edit the Bootstrap 5.3.3 code of your site for customization.</p>
-                <a href="{{ url_for('page.edit_code_page', slug='home') }}" class="btn btn-danger btn-small">Edit Code</a>
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm h-100  ">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fa-solid fa-code fa-2x text-dark me-3"></i>
+                    <div>
+                        <h5 class="card-title mb-1">Modifica Codice</h5>
+                        <p class="card-text small text-muted">Modifica facilmente il codice Bootstrap 5.3.3 del sito per personalizzazioni.</p>
+                    </div>
+                </div>
+                <a href="{{ url_for('page.edit_code_page', slug='home') }}" class="btn btn-dark w-100 mt-auto">Modifica Codice</a>
             </div>
         </div>
     </div>
 
-    <div class="col">
-        <div class="theme-card card text-white" style="background-image: url(https://www.linkbay.it/static/image/scripteditor.png); background-size: cover;">
-            <div class="card-body mt-4">
-                <h5 class="card-title">Add Personal Script</h5>
-                <p class="card-text">Create your own custom script and integrate it into your site seamlessly.</p>
-                <a href="/admin/web_settings/edit" class="btn btn-danger btn-small">Edit Store</a>
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm h-100  ">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fa-solid fa-file-code fa-2x text-dark me-3"></i>
+                    <div>
+                        <h5 class="card-title mb-1">Aggiungi Script Personale</h5>
+                        <p class="card-text small text-muted">Crea e integra script personalizzati nel tuo sito in modo semplice.</p>
+                    </div>
+                </div>
+                <a href="/admin/web_settings/edit" class="btn btn-dark w-100 mt-auto">Modifica Negozio</a>
             </div>
         </div>
     </div>
 
-    <div class="col">
-        <div class="theme-card card text-white" style="background-image: url(https://www.linkbay.it/static/image/cookieeditor.png); background-size: cover;">
-            <div class="card-body mt-4">
-                <h5 class="card-title">Add Cookie Bar</h5>
-                <p class="card-text">Add a customizable cookie bar to your site for privacy compliance and a clean design.</p>
-                <a href="/admin/cms/function/cookie-policy" class="btn btn-danger btn-small">Add Cookie Bar</a>
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm h-100  ">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fa-solid fa-cookie-bite fa-2x text-dark me-3"></i>
+                    <div>
+                        <h5 class="card-title mb-1">Aggiungi Barra Cookie</h5>
+                        <p class="card-text small text-muted">Aggiungi una barra cookie personalizzabile per la conformità alla privacy.</p>
+                    </div>
+                </div>
+                <a href="/admin/cms/function/cookie-policy" class="btn btn-dark w-100 mt-auto">Aggiungi Barra Cookie</a>
             </div>
         </div>
     </div>
-<!--
-    <div class="col">
-        <div class="theme-card card" style="background-image: url(https://via.placeholder.com/300x200); background-size: cover;">
-            <div class="card-body mt-4">
-                <h5 class="card-title">Add Captcha</h5>
-                <p class="card-text">Integrate a Captcha system to protect your site from spam and automated abuse.</p>
-                <button class="btn btn-danger btn-small" onclick="CustomScript()">Add Captcha</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="col">
-        <div class="theme-card card" style="background-image: url(https://via.placeholder.com/300x200); background-size: cover;">
-            <div class="card-body mt-4">
-                <h5 class="card-title">Add Pop-Up</h5>
-                <p class="card-text">Create engaging pop-ups for your site to increase user interaction and conversions.</p>
-                <button class="btn btn-danger btn-small" onclick="CustomScript()">Add Pop-Up</button>
-            </div>
-        </div>
-    </div>
-    -->
 </div>
 
 {% endblock %}

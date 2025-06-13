@@ -30,6 +30,12 @@ class Warehouse(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 🕒 Data di creazione
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 🔄 Ultimo aggiornamento
     inventories = db.relationship("Inventory", backref="warehouse", lazy="dynamic")
+    locations = db.relationship(
+        "Location",
+        back_populates="warehouse",
+        lazy="dynamic",
+        cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         return f"<Warehouse {self.name} (Shop ID: {self.shop_id})>"
@@ -92,6 +98,7 @@ class Location(db.Model):
     description = db.Column(db.String(255), nullable=True)  # 📝 Descrizione dell'ubicazione
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 🕒 Data di creazione
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 🔄 Ultimo aggiornamento
+    warehouse = db.relationship("Warehouse", back_populates="locations", lazy=True)
 
     __table_args__ = (
         UniqueConstraint('warehouse_id', 'code', name='ux_locations_warehouse_code'),
@@ -112,9 +119,13 @@ class Inventory(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)  # 🔗 ID del prodotto
     warehouse_id = db.Column(db.Integer, db.ForeignKey("warehouses.id"), nullable=False)  # 🔗 ID del magazzino
     location_id = db.Column(db.Integer, db.ForeignKey("locations.id"), nullable=True)  # 🔗 ID dell'ubicazione
+    variant_id = db.Column(db.Integer, db.ForeignKey("product_variants.id"), nullable=True)  # 🔗 ID della variante prodotto (opzionale)
     quantity = db.Column(db.Integer, nullable=False, default=0)  # 📦 Quantità disponibile
     reserved = db.Column(db.Integer, nullable=False, default=0)  # 🔒 Quantità riservata
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 🔄 Ultimo aggiornamento
+
+    # Relazione verso ProductVariant (backref inventories già presente in ProductVariant)
+    variant = db.relationship("ProductVariant", backref="inventories")
 
     __table_args__ = (
         UniqueConstraint('shop_id', 'product_id', 'warehouse_id', 'location_id', name='ux_inventory_shop_prod_wh_loc'),
@@ -238,6 +249,9 @@ class InventoryMovement(db.Model):
     movement_type = db.Column(db.String(50), nullable=False)  # es. 'ingresso', 'uscita', 'rettifica'
     quantity      = db.Column(db.Integer, nullable=False)
     reason        = db.Column(db.String(255), nullable=True)
+    cost_per_unit = db.Column(db.Numeric(10, 2), nullable=True)
+    user_id       = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
+    source        = db.Column(db.String(100), nullable=True)
     created_at    = db.Column(db.DateTime, default=datetime.utcnow)
 
     __table_args__ = (
@@ -249,3 +263,35 @@ class InventoryMovement(db.Model):
 
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+@handle_db_errors
+def create_inventory_movement(shop_id, product_id, variant_id=None, movement_type='ingresso', quantity=0, reason=None, cost_per_unit=None, user_id=None, source='manual'):
+    movement = InventoryMovement(
+        shop_id=shop_id,
+        product_id=product_id,
+        variant_id=variant_id,
+        movement_type=movement_type,
+        quantity=quantity,
+        reason=reason,
+        cost_per_unit=cost_per_unit,
+        user_id=user_id,
+        source=source
+    )
+    db.session.add(movement)
+
+    # Aggiorna giacenza
+    inv = Inventory.query.filter_by(shop_id=shop_id, product_id=product_id).first()
+    if not inv:
+        inv = Inventory(shop_id=shop_id, product_id=product_id, warehouse_id=1, quantity=0)
+        db.session.add(inv)
+
+    if movement_type == 'ingresso':
+        inv.quantity += quantity
+    elif movement_type == 'uscita':
+        inv.quantity -= quantity
+    elif movement_type == 'rettifica':
+        inv.quantity = quantity
+
+    db.session.commit()
+    logging.info(f"📦 Movimento '{movement_type}' registrato per Prodotto {product_id} (Variante: {variant_id})")
+    return movement.id
