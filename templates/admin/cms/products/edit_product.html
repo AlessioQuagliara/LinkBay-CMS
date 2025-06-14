@@ -97,14 +97,6 @@
                     <label for="price" class="form-label">Prezzo</label>
                     <input type="number" class="form-control" name="price" id="price" step="0.01" value="{{product.price}}" required oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
                 </div>
-                <div class="mb-3">
-                    <label for="sku" class="form-label">SKU</label>
-                    <input type="text" class="form-control" name="sku" id="sku" value="{{ product.sku or '' }}">
-                </div>
-                <div class="mb-3">
-                    <label for="ean_code" class="form-label">Codice EAN</label>
-                    <input type="text" class="form-control" name="ean_code" id="ean_code" value="{{ product.ean_code or '' }}">
-                </div>
             </div>
 
             <div id="step-3" class="step d-none">

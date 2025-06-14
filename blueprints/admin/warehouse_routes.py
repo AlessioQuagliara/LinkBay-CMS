@@ -1,11 +1,13 @@
-from flask import Blueprint, request, render_template, redirect, url_for, flash
+from flask import Blueprint, request, render_template, redirect, url_for, flash, jsonify
 from models.database import db
 from models.warehouse import Warehouse, Inventory, Location, InventoryMovement
+from models.products import ProductVariant
 from models.products import Product
 from models.shoplist import ShopList
 from helpers import check_user_authentication
 from sqlalchemy.exc import SQLAlchemyError
 import logging
+from sqlalchemy.orm import joinedload
 
 warehouse_bp = Blueprint("warehouse", __name__)
 
@@ -229,11 +231,15 @@ def list_inventory():
         flash('Nessun negozio trovato per questo nome.', 'warning')
         return redirect(url_for('ui.homepage'))
 
-    inventory = Inventory.query.filter_by(shop_id=shop.id).all()
+    inventory = Inventory.query.filter_by(shop_id=shop.id).options(joinedload(Inventory.variant).joinedload(ProductVariant.product)).all()
     # Mapping IDs to names for display
     warehouse_map = {w.id: w.name for w in Warehouse.query.filter_by(shop_id=shop.id).all()}
     location_map = {l.id: l.code for l in Location.query.join(Warehouse).filter(Warehouse.shop_id == shop.id).all()}
-    product_map = {p.id: p.name for p in Product.query.filter_by(shop_id=shop.id).all()}
+    product_map = {
+        i.id: f"{i.variant.product.name} – {i.variant.name} (SKU: {i.variant.sku})"
+        for i in inventory
+    }
+    # Pass supplier_cost, min_stock, reorder_point in inventory objects (already included if model has these fields)
     return render_template(
         "admin/cms/warehouse/inventory.html",
         username=username,
@@ -242,10 +248,10 @@ def list_inventory():
         warehouse_map=warehouse_map,
         location_map=location_map,
         product_map=product_map
+        # supplier_cost, min_stock, reorder_point are available in inventory
     )
 
-
-# Crea una nuova Giacenza ------------------------------------------------------------------------------------------
+# Crea una Giacenza ------------------------------------------------------------------------------------------
 @warehouse_bp.route("/admin/cms/warehouse/inventory/create", methods=["GET", "POST"])
 def create_inventory():
     username = check_user_authentication()
@@ -259,31 +265,57 @@ def create_inventory():
         flash("Nessun negozio trovato per questo nome.", "warning")
         return redirect(url_for("ui.homepage"))
 
-    products = Product.query.filter_by(shop_id=shop.id).all()
+    variants = db.session.query(ProductVariant)\
+        .join(Product)\
+        .options(joinedload(ProductVariant.product))\
+        .filter(Product.shop_id == shop.id).all()
     warehouses = Warehouse.query.filter_by(shop_id=shop.id).all()
     locations = Location.query.join(Warehouse).filter(Warehouse.shop_id == shop.id).all()
 
     if request.method == "POST":
-        product_id = request.form.get("product_id")
+        variant_id = request.form.get("variant_id")
         warehouse_id = request.form.get("warehouse_id")
         location_id = request.form.get("location_id") or None
         quantity = int(request.form.get("quantity") or 0)
         reserved = int(request.form.get("reserved") or 0)
+        supplier_cost = request.form.get("supplier_cost") or None
+        min_stock = request.form.get("min_stock") or None
+        reorder_point = request.form.get("reorder_point") or None
+
+        duplicate = Inventory.query.filter_by(
+            shop_id=shop.id,
+            variant_id=variant_id,
+            warehouse_id=warehouse_id,
+            location_id=location_id
+        ).first()
+        if duplicate:
+            flash("Esiste già una giacenza per questa combinazione di variante, magazzino e ubicazione.", "danger")
+            return redirect(request.url)
 
         inventory = Inventory(
             shop_id=shop.id,
-            product_id=product_id,
+            variant_id=variant_id,
             warehouse_id=warehouse_id,
             location_id=location_id,
             quantity=quantity,
-            reserved=reserved
+            reserved=reserved,
+            supplier_cost=supplier_cost,
+            min_stock=min_stock,
+            reorder_point=reorder_point
         )
         db.session.add(inventory)
         db.session.commit()
         flash("Giacenza creata con successo!", "success")
         return redirect(url_for("warehouse.list_inventory"))
 
-    return render_template("admin/cms/warehouse/inventory_create.html", username=username, shop=shop, products=products, warehouses=warehouses, locations=locations)
+    return render_template(
+        "admin/cms/warehouse/inventory_create.html",
+        username=username,
+        shop=shop,
+        variants=variants,
+        warehouses=warehouses,
+        locations=locations
+    )
 
 
 # Modifica una Giacenza ------------------------------------------------------------------------------------------
@@ -302,16 +334,22 @@ def edit_inventory(inventory_id):
 
     inventory = Inventory.query.get_or_404(inventory_id)
 
-    products = Product.query.filter_by(shop_id=shop.id).all()
+    variants = db.session.query(ProductVariant)\
+        .join(Product)\
+        .options(joinedload(ProductVariant.product))\
+        .filter(Product.shop_id == shop.id).all()
     warehouses = Warehouse.query.filter_by(shop_id=shop.id).all()
     locations = Location.query.join(Warehouse).filter(Warehouse.shop_id == shop.id).all()
 
     if request.method == "POST":
-        inventory.product_id = request.form.get("product_id")
+        inventory.variant_id = request.form.get("variant_id")
         inventory.warehouse_id = request.form.get("warehouse_id")
         inventory.location_id = request.form.get("location_id") or None
         inventory.quantity = int(request.form.get("quantity") or 0)
         inventory.reserved = int(request.form.get("reserved") or 0)
+        inventory.supplier_cost = request.form.get("supplier_cost") or None
+        inventory.min_stock = request.form.get("min_stock") or None
+        inventory.reorder_point = request.form.get("reorder_point") or None
 
         db.session.commit()
         flash("Giacenza aggiornata con successo!", "success")
@@ -322,11 +360,10 @@ def edit_inventory(inventory_id):
         username=username,
         inventory=inventory,
         shop=shop,
-        products=products,
+        variants=variants,
         warehouses=warehouses,
         locations=locations
     )
-
 
 # Elimina una Giacenza ------------------------------------------------------------------------------------------
 @warehouse_bp.route("/admin/cms/warehouse/inventory/delete/<int:inventory_id>", methods=["POST"])
@@ -357,5 +394,18 @@ def list_inventory_movements():
         flash('Nessun negozio trovato per questo nome.', 'warning')
         return redirect(url_for('ui.homepage'))
 
-    movements = InventoryMovement.query.filter_by(shop_id=shop.id).order_by(InventoryMovement.created_at.desc()).all()
-    return render_template("admin/cms/warehouse/movements.html", username=username, shop=shop, movements=movements)
+    movements = InventoryMovement.query\
+        .filter_by(shop_id=shop.id)\
+        .options(
+            joinedload(InventoryMovement.inventory)
+            .joinedload(Inventory.variant)
+            .joinedload(ProductVariant.product)
+        )\
+        .order_by(InventoryMovement.created_at.desc()).all()
+
+    inventory_map = {
+        m.id: f"{m.inventory.variant.product.name} – {m.inventory.variant.name} (SKU: {m.inventory.variant.sku})"
+        for m in movements if m.inventory and m.inventory.variant and m.inventory.variant.product
+    }
+
+    return render_template("admin/cms/warehouse/movements.html", username=username, shop=shop, movements=movements, inventory_map=inventory_map)

@@ -1,8 +1,8 @@
 """Reset completo DB
 
-Revision ID: e6de1d8afdb1
+Revision ID: 964470b75239
 Revises: 
-Create Date: 2025-06-13 14:30:47.934594
+Create Date: 2025-06-15 00:20:42.772272
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'e6de1d8afdb1'
+revision = '964470b75239'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -592,8 +592,6 @@ def upgrade():
     sa.Column('shop_id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('description', sa.Text(), nullable=True),
-    sa.Column('sku', sa.String(length=255), nullable=True),
-    sa.Column('ean_code', sa.String(length=255), nullable=True),
     sa.Column('short_description', sa.Text(), nullable=True),
     sa.Column('price', sa.Numeric(precision=10, scale=2), nullable=False),
     sa.Column('discount_price', sa.Numeric(precision=10, scale=2), nullable=True),
@@ -610,7 +608,6 @@ def upgrade():
     )
     with op.batch_alter_table('products', schema=None) as batch_op:
         batch_op.create_index('ix_products_shop_name', ['shop_id', 'name'], unique=False)
-        batch_op.create_index('ix_products_sku', ['sku'], unique=False)
 
     op.create_table('shipping',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -690,24 +687,19 @@ def upgrade():
     op.create_table('inventory',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('shop_id', sa.Integer(), nullable=False),
-    sa.Column('product_id', sa.Integer(), nullable=False),
+    sa.Column('variant_id', sa.Integer(), nullable=False),
     sa.Column('warehouse_id', sa.Integer(), nullable=False),
     sa.Column('location_id', sa.Integer(), nullable=True),
-    sa.Column('variant_id', sa.Integer(), nullable=True),
     sa.Column('quantity', sa.Integer(), nullable=False),
     sa.Column('reserved', sa.Integer(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['location_id'], ['locations.id'], ),
-    sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
     sa.ForeignKeyConstraint(['shop_id'], ['ShopList.id'], ),
     sa.ForeignKeyConstraint(['variant_id'], ['product_variants.id'], ),
     sa.ForeignKeyConstraint(['warehouse_id'], ['warehouses.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('shop_id', 'product_id', 'warehouse_id', 'location_id', name='ux_inventory_shop_prod_wh_loc')
+    sa.UniqueConstraint('shop_id', 'variant_id', 'warehouse_id', 'location_id', name='ux_inventory_shop_variant_wh_loc')
     )
-    with op.batch_alter_table('inventory', schema=None) as batch_op:
-        batch_op.create_index('ix_inventory_shop_product', ['shop_id', 'product_id'], unique=False)
-
     op.create_table('inventory_movements',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('shop_id', sa.Integer(), nullable=False),
@@ -738,9 +730,6 @@ def downgrade():
         batch_op.drop_index('ix_movements_shop_product')
 
     op.drop_table('inventory_movements')
-    with op.batch_alter_table('inventory', schema=None) as batch_op:
-        batch_op.drop_index('ix_inventory_shop_product')
-
     op.drop_table('inventory')
     with op.batch_alter_table('product_variants', schema=None) as batch_op:
         batch_op.drop_index('ix_variants_product')
@@ -755,7 +744,6 @@ def downgrade():
     op.drop_table('ticket_messages')
     op.drop_table('shipping')
     with op.batch_alter_table('products', schema=None) as batch_op:
-        batch_op.drop_index('ix_products_sku')
         batch_op.drop_index('ix_products_shop_name')
 
     op.drop_table('products')

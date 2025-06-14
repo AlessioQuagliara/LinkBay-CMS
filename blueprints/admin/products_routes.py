@@ -50,6 +50,11 @@ def render_products_table():
         per_page = 10
         # Product.query.filter_by(shop_id=shop.id) is compatible if Product model no longer has stock_quantity
         products = Product.query.filter_by(shop_id=shop.id).paginate(page=page, per_page=per_page)
+        from models.warehouse import Inventory
+        for product in products.items:
+            variant_ids = [variant.id for variant in product.variants]
+            total_stock = db.session.query(db.func.sum(Inventory.quantity)).filter(Inventory.variant_id.in_(variant_ids)).scalar() or 0
+            product.total_stock = total_stock
         categories = Category.query.all()
         return render_template(
             "admin/cms/pages/products.html", 
@@ -93,8 +98,6 @@ def create_product():
             description = request.form.get("description")
             is_active = request.form.get("is_active") == "true"
             is_digital = request.form.get("is_digital") == "true"
-            sku = request.form.get("sku")
-            ean_code = request.form.get("ean_code")
 
             new_product = Product(
                 shop_id=shop.id,
@@ -106,8 +109,6 @@ def create_product():
                 description=description,
                 is_active=is_active,
                 is_digital=is_digital,
-                sku=sku,
-                ean_code=ean_code,
             )
 
             db.session.add(new_product)
@@ -125,7 +126,6 @@ def create_product():
 
 
 # MODIFICA PRODOTTI -------------------------------------------------------------------------------------------------------------
-
 
 @products_bp.route("/admin/cms/products/edit/<int:product_id>", methods=["GET", "POST"])
 def edit_product(product_id):
@@ -156,8 +156,6 @@ def edit_product(product_id):
             product.description = request.form.get("description")
             product.is_active = request.form.get("is_active") == "true"
             product.is_digital = request.form.get("is_digital") == "true"
-            product.sku = request.form.get("sku")
-            product.ean_code = request.form.get("ean_code")
 
             db.session.commit()
 
@@ -207,7 +205,6 @@ def manage_product_images(product_id):
 
 
 # AGGIUNTA IMMAGINI PRODOTTI -------------------------------------------------------------------------------------------------------------
-
 
 @products_bp.route("/admin/cms/products/upload_image/<int:product_id>", methods=["POST"])
 def upload_product_image(product_id):
