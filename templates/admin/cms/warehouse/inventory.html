@@ -18,6 +18,9 @@
                     <th scope="col">Ubicazione</th>
                     <th scope="col">Quantità</th>
                     <th scope="col">Riservato</th>
+                    <th scope="col">Costo fornitore</th>
+                    <th scope="col">Scorta minima</th>
+                    <th scope="col">Punto di riordino</th>
                     <th scope="col">Ultimo aggiornamento</th>
                     <th scope="col">Azioni</th>
                 </tr>
@@ -26,11 +29,14 @@
                 {% for item in inventory %}
                 <tr ondblclick="window.location.href='/admin/cms/warehouse/inventory/edit/{{ item.id }}'">
                     <td>{{ item.id }}</td>
-                    <td>{{ product_map[item.product_id] }}</td>
+                    <td>{{ item.variant.product.name }} – {{ item.variant.name }} (SKU: {{ item.variant.sku }})</td>
                     <td>{{ warehouse_map[item.warehouse_id] }}</td>
                     <td>{{ location_map.get(item.location_id, '—') }}</td>
                     <td>{{ item.quantity }}</td>
                     <td>{{ item.reserved }}</td>
+                    <td>{{ item.supplier_cost or '—' }}</td>
+                    <td>{{ item.min_stock or '—' }}</td>
+                    <td>{{ item.reorder_point or '—' }}</td>
                     <td>{{ item.updated_at.strftime('%d/%m/%Y %H:%M') }}</td>
                     <td>
                         <form method="POST" action="{{ url_for('warehouse.delete_inventory', inventory_id=item.id) }}" class="d-inline delete-inventory-form">

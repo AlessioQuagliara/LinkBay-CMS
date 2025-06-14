@@ -1,5 +1,3 @@
-
-
 {% extends "/admin/cms/interface/render.html" %}
 {% block content %}
 <div class="container py-4">
@@ -12,13 +10,17 @@
         </div>
         <div class="card-body">
             <form method="POST">
-                <div class="mb-3">
-                    <label for="product_id" class="form-label">Prodotto <span class="text-danger">*</span></label>
-                    <select class="form-select" id="product_id" name="product_id" required>
-                        {% for product in products %}
-                            <option value="{{ product.id }}">{{ product.name }}</option>
-                        {% endfor %}
+                <div class="row g-3 mb-3">
+                  <!-- Selettore variante -->
+                  <div class="col-md-12">
+                    <label for="variant_id" class="form-label">Variante di Prodotto</label>
+                    <select id="variant_id" name="variant_id" class="form-select" required>
+                      <option value="">Seleziona Prodotto</option>
+                      {% for variant in variants %}
+                        <option value="{{ variant.id }}">{{ variant.product.name }} — {{ variant.name }} — SKU: {{ variant.sku }}</option>
+                      {% endfor %}
                     </select>
+                  </div>
                 </div>
 
                 <div class="mb-3">
@@ -45,9 +47,25 @@
                     <input type="number" class="form-control" id="quantity" name="quantity" required min="0" placeholder="Inserisci la quantità disponibile">
                 </div>
 
+
                 <div class="mb-3">
                     <label for="reserved" class="form-label">Quantità riservata</label>
                     <input type="number" class="form-control" id="reserved" name="reserved" value="0" min="0">
+                </div>
+
+                <div class="mb-3">
+                    <label for="supplier_cost" class="form-label">Costo Fornitore (€)</label>
+                    <input type="number" step="0.01" class="form-control" id="supplier_cost" name="supplier_cost" placeholder="Inserisci il costo per unità">
+                </div>
+
+                <div class="mb-3">
+                    <label for="min_stock" class="form-label">Scorta minima</label>
+                    <input type="number" class="form-control" id="min_stock" name="min_stock" min="0" placeholder="Inserisci la scorta minima">
+                </div>
+
+                <div class="mb-3">
+                    <label for="reorder_point" class="form-label">Punto di riordino</label>
+                    <input type="number" class="form-control" id="reorder_point" name="reorder_point" min="0" placeholder="Inserisci il punto di riordino">
                 </div>
 
                 <div class="text-end">

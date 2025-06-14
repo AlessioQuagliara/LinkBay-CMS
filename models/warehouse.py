@@ -4,6 +4,11 @@ import logging
 from functools import wraps
 from sqlalchemy import UniqueConstraint, Index
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    pass  # Evita import diretto per circolarità
+
+
 # Configurazione del logging (da spostare nel file principale dell'app)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -42,6 +47,8 @@ class Warehouse(db.Model):
 
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    
+    
 
 # 🔄 **CRUD Functions for Warehouse**
 
@@ -116,27 +123,30 @@ class Inventory(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 🔑 ID univoco della giacenza
     shop_id = db.Column(db.Integer, db.ForeignKey("ShopList.id"), nullable=False)  # 🔗 ID dello shop
-    product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)  # 🔗 ID del prodotto
+    variant_id = db.Column(db.Integer, db.ForeignKey("product_variants.id"), nullable=False)  # 🔗 ID della variante prodotto
     warehouse_id = db.Column(db.Integer, db.ForeignKey("warehouses.id"), nullable=False)  # 🔗 ID del magazzino
     location_id = db.Column(db.Integer, db.ForeignKey("locations.id"), nullable=True)  # 🔗 ID dell'ubicazione
-    variant_id = db.Column(db.Integer, db.ForeignKey("product_variants.id"), nullable=True)  # 🔗 ID della variante prodotto (opzionale)
     quantity = db.Column(db.Integer, nullable=False, default=0)  # 📦 Quantità disponibile
     reserved = db.Column(db.Integer, nullable=False, default=0)  # 🔒 Quantità riservata
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 🔄 Ultimo aggiornamento
 
-    # Relazione verso ProductVariant (backref inventories già presente in ProductVariant)
-    variant = db.relationship("ProductVariant", backref="inventories")
+    supplier_cost = db.Column(db.Numeric(10,2), nullable=True)
+    min_stock     = db.Column(db.Integer, nullable=True)
+    reorder_point = db.Column(db.Integer, nullable=True)
+
+    # Relazione verso ProductVariant (evita import diretto per circolarità)
+    variant = db.relationship("ProductVariant", back_populates="inventories")
 
     __table_args__ = (
-        UniqueConstraint('shop_id', 'product_id', 'warehouse_id', 'location_id', name='ux_inventory_shop_prod_wh_loc'),
-        Index('ix_inventory_shop_product', 'shop_id', 'product_id'),
+        UniqueConstraint('shop_id', 'variant_id', 'warehouse_id', 'location_id', name='ux_inventory_shop_variant_wh_loc'),
     )
 
     def __repr__(self):
-        return f"<Inventory Shop {self.shop_id} - Product {self.product_id} @ Warehouse {self.warehouse_id} Location {self.location_id}>"
+        return f"<Inventory Shop {self.shop_id} - Variant {self.variant_id} @ Warehouse {self.warehouse_id} Location {self.location_id}>"
 
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    
 
 # 🔄 **CRUD Functions for Location**
 
@@ -186,11 +196,11 @@ def delete_location(location_id):
 # 🔄 **CRUD Functions for Inventory**
 
 @handle_db_errors
-def create_inventory(shop_id, product_id, warehouse_id, location_id=None, quantity=0, reserved=0):
+def create_inventory(shop_id, variant_id, warehouse_id, location_id=None, quantity=0, reserved=0):
     """Crea una nuova giacenza."""
     inv = Inventory(
         shop_id=shop_id,
-        product_id=product_id,
+        variant_id=variant_id,
         warehouse_id=warehouse_id,
         location_id=location_id,
         quantity=quantity,
@@ -198,7 +208,7 @@ def create_inventory(shop_id, product_id, warehouse_id, location_id=None, quanti
     )
     db.session.add(inv)
     db.session.commit()
-    logging.info(f"✅ Inventory creato per Shop ID {shop_id}, Product ID {product_id}")
+    logging.info(f"✅ Inventory creato per Shop ID {shop_id}, Variant ID {variant_id}")
     return inv.id
 
 @handle_db_errors
@@ -207,9 +217,9 @@ def get_inventory_by_shop(shop_id):
     return Inventory.query.filter_by(shop_id=shop_id).all()
 
 @handle_db_errors
-def get_inventory_by_product(shop_id, product_id):
-    """Recupera le giacenze di un prodotto in uno shop."""
-    return Inventory.query.filter_by(shop_id=shop_id, product_id=product_id).all()
+def get_inventory_by_variant(shop_id, variant_id):
+    """Recupera le giacenze di una variante in uno shop."""
+    return Inventory.query.filter_by(shop_id=shop_id, variant_id=variant_id).all()
 
 @handle_db_errors
 def update_inventory(inventory_id, **kwargs):
@@ -244,45 +254,45 @@ class InventoryMovement(db.Model):
 
     id            = db.Column(db.Integer, primary_key=True, autoincrement=True)
     shop_id       = db.Column(db.Integer, db.ForeignKey("ShopList.id"), nullable=False)
-    product_id    = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
+    inventory_id  = db.Column(db.Integer, db.ForeignKey("inventory.id"), nullable=False)
     variant_id    = db.Column(db.Integer, db.ForeignKey("product_variants.id"), nullable=True)
     movement_type = db.Column(db.String(50), nullable=False)  # es. 'ingresso', 'uscita', 'rettifica'
     quantity      = db.Column(db.Integer, nullable=False)
     reason        = db.Column(db.String(255), nullable=True)
-    cost_per_unit = db.Column(db.Numeric(10, 2), nullable=True)
     user_id       = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
     source        = db.Column(db.String(100), nullable=True)
+    document_ref  = db.Column(db.String(100), nullable=True)
     created_at    = db.Column(db.DateTime, default=datetime.utcnow)
 
     __table_args__ = (
-        Index('ix_movements_shop_product', 'shop_id', 'product_id'),
+        Index('ix_movements_shop_inventory', 'shop_id', 'inventory_id'),
     )
 
     def __repr__(self):
-        return f"<InventoryMovement {self.id} – Product {self.product_id} – Type {self.movement_type}>"
+        return f"<InventoryMovement {self.id} – Inventory {self.inventory_id} – Type {self.movement_type}>"
 
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 @handle_db_errors
-def create_inventory_movement(shop_id, product_id, variant_id=None, movement_type='ingresso', quantity=0, reason=None, cost_per_unit=None, user_id=None, source='manual'):
+def create_inventory_movement(shop_id, inventory_id, variant_id=None, movement_type='ingresso', quantity=0, reason=None, user_id=None, source='manual', document_ref=None):
     movement = InventoryMovement(
         shop_id=shop_id,
-        product_id=product_id,
+        inventory_id=inventory_id,
         variant_id=variant_id,
         movement_type=movement_type,
         quantity=quantity,
         reason=reason,
-        cost_per_unit=cost_per_unit,
         user_id=user_id,
-        source=source
+        source=source,
+        document_ref=document_ref
     )
     db.session.add(movement)
 
     # Aggiorna giacenza
-    inv = Inventory.query.filter_by(shop_id=shop_id, product_id=product_id).first()
+    inv = Inventory.query.get(inventory_id)
     if not inv:
-        inv = Inventory(shop_id=shop_id, product_id=product_id, warehouse_id=1, quantity=0)
+        inv = Inventory(shop_id=shop_id, variant_id=variant_id, warehouse_id=1, quantity=0)
         db.session.add(inv)
 
     if movement_type == 'ingresso':
@@ -293,5 +303,5 @@ def create_inventory_movement(shop_id, product_id, variant_id=None, movement_typ
         inv.quantity = quantity
 
     db.session.commit()
-    logging.info(f"📦 Movimento '{movement_type}' registrato per Prodotto {product_id} (Variante: {variant_id})")
+    logging.info(f"📦 Movimento '{movement_type}' registrato per Variante {variant_id} (Inventory ID: {inventory_id})")
     return movement.id

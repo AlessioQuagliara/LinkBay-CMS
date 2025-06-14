@@ -15,7 +15,6 @@
             <th>SKU</th>
             <th>EAN</th>
             <th>Prezzo (+/-)</th>
-            <th>Quantità</th>
             <th>Default</th>
             <th>Elimina
             </th>
@@ -28,7 +27,6 @@
             <td>{{ v.sku }}</td>
             <td>{{ v.ean_code or '-' }}</td>
             <td>{{ v.price_modifier }} €</td>
-            <td>{{ v.stock_quantity }}</td>
             <td>
               {% if v.is_default %}
                 <i class="fa-solid fa-toggle-on"></i>
@@ -117,10 +115,6 @@
       <div class="col-md-4">
         <label for="price_modifier" class="form-label">Prezzo Aggiuntivo (€)</label>
         <input type="number" step="0.01" class="form-control" name="price_modifier" id="price_modifier">
-      </div>
-      <div class="col-md-4">
-        <label for="stock_quantity" class="form-label">Quantità in Magazzino</label>
-        <input type="number" class="form-control" name="stock_quantity" id="stock_quantity">
       </div>
       <div class="col-md-4 d-flex align-items-end">
         <div class="form-check">
