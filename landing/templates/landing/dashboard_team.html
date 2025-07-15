@@ -1,81 +1,88 @@
 {% extends 'landing/base.html' %}
 {% block content %}
 
-    <!-- CONTENUTI DINAMICI -->
-    <div id="content9" class="content-pane" data-aos="fade-up">
-
-      <div class="d-flex align-items-center mb-4">
-        <div>
-          <h3 class="mb-1 fw-bold text-danger">
-            <i class="fa-solid fa-ranking-star me-2"></i>Classifica Generale
-          </h3>
-          <p class="text-muted mb-0">Vedi i migliori utenti admin in base al fatturato generato nei loro store.</p>
-        </div>
-      </div>
-      
-      <div class="table-responsive">
-        <table class="table table-striped bg-white rounded shadow-sm overflow-hidden">
-          <thead class="table-danger text-dark">
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Avatar</th>
-              <th scope="col">Utente</th>
-              <th scope="col">Store Migliore</th>
-              <th scope="col">Fatturato</th>
-              <th scope="col">Ordini</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for item in leaderboard %}
-            <tr>
-              <th scope="row">{{ loop.index }}</th>
-              <td>
-                <img src="{{ item.profilo_foto }}" alt="Avatar" class="rounded-circle" width="40" height="40">
-              </td>
-              <td>
-                <a href="{{ url_for('landing.dashboard_user_profile', user_id=item.user_id) }}" class="text-decoration-none fw-bold text-dark">
-                  {{ item.nome }} {{ item.cognome }}
-                </a>
-              </td>
-              <td>
-                <span class="badge bg-light text-dark">
-                  {{ item.best_store or 'Nessun negozio' }}
-                </span>
-              </td>
-              <td>
-                <span class="fw-bold text-danger">€ {{ "%.2f"|format(item.total_revenue) }}</span>
-              </td>
-              <td>
-                <span class="badge bg-secondary">{{ item.total_orders }} ordini</span>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-
-      <nav class="mt-4">
-        <ul class="pagination justify-content-center">
-          {% if page > 1 %}
-            <li class="page-item">
-              <a class="page-link" href="{{ url_for('landing.dashboard_admin_leaderboard', page=page-1) }}">« Precedente</a>
-            </li>
-          {% endif %}
-          
-          {% for p in range(1, total_pages + 1) %}
-            <li class="page-item {% if p == page %}active{% endif %}">
-              <a class="page-link" href="{{ url_for('landing.dashboard_admin_leaderboard', page=p) }}">{{ p }}</a>
-            </li>
-          {% endfor %}
-          
-          {% if page < total_pages %}
-            <li class="page-item">
-              <a class="page-link" href="{{ url_for('landing.dashboard_admin_leaderboard', page=page+1) }}">Successivo »</a>
-            </li>
-          {% endif %}
-        </ul>
-      </nav>
-
+<div id="content9" class="content-pane" data-aos="fade-up">
+  <div class="d-flex align-items-center mb-4">
+    <div>
+      <h3 class="mb-1 fw-bold text-danger">
+        <i class="fa-solid fa-store me-2"></i>Lista Store
+      </h3>
+      <p class="text-muted mb-0">Tutti gli store presenti su LinkBay</p>
     </div>
+  </div>
+  
+  <div class="table-responsive">
+    <table class="table table-striped bg-white rounded shadow-sm overflow-hidden">
+      <thead class="table-danger text-dark">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Nome Store</th>
+          <th scope="col">Tipo</th>
+          <th scope="col">Dominio</th>
+          <th scope="col">Proprietario</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for store in stores %}
+        <tr>
+          <th scope="row">{{ loop.index }}</th>
+          <td>
+            <span class="fw-bold">{{ store.shop_name }}</span>
+          </td>
+          <td>
+            <span class="badge bg-info">{{ store.shop_type }}</span>
+          </td>
+          <td>
+            {% if store.domain %}
+              <a href="//{{ store.domain }}" target="_blank" class="text-decoration-none">
+                {{ store.domain }}
+              </a>
+            {% else %}
+              <span class="text-muted">N/D</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{{ url_for('landing.dashboard_user_profile', user_id=store.owner_id) }}" 
+               class="text-decoration-none">
+              {{ store.nome }} {{ store.cognome }}
+            </a>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" class="text-center py-4">
+            <div class="alert alert-info mb-0">
+              Nessuno store registrato al momento
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginazione (uguale a prima) -->
+  <nav class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if page > 1 %}
+        <li class="page-item">
+          <a class="page-link" href="{{ url_for('landing.store_list', page=page-1) }}">« Precedente</a>
+        </li>
+      {% endif %}
+      
+      {% for p in range(1, total_pages + 1) %}
+        <li class="page-item {% if p == page %}active{% endif %}">
+          <a class="page-link" href="{{ url_for('landing.store_list', page=p) }}">{{ p }}</a>
+        </li>
+      {% endfor %}
+      
+      {% if page < total_pages %}
+        <li class="page-item">
+          <a class="page-link" href="{{ url_for('landing.store_list', page=page+1) }}">Successivo »</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
 
 {% endblock %}
