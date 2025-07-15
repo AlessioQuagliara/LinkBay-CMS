@@ -126,7 +126,7 @@ def ai_analysis():
 @ui_bp.route('/admin/cms/pages/theme-selection')
 def theme_selection():
     shop_name = request.host.split('.')[0]
-    themes_folder = os.path.join(os.getcwd(), 'Themes')
+    themes_folder = os.path.join(os.getcwd(), 'themes')
     theme_files = [f for f in os.listdir(themes_folder) if f.endswith('.json')]
 
     theme_data = []

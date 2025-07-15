@@ -1,87 +1,127 @@
-[2025-06-13 18:43:44,345] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-13 18:43:48,772] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-13 18:43:49,371] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-13 18:43:51,918] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-13 18:43:52,487] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-13 18:47:11,257] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-13 18:47:11,261] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-13 18:49:51,289] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-13 18:49:51,329] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-13 18:50:23,599] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-13 18:50:23,631] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-13 19:27:53,533] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-13 19:27:54,107] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-13 19:27:56,922] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-13 19:27:57,541] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-13 21:01:34,515] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-13 21:01:35,405] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-13 21:01:58,462] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-13 21:01:59,038] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 22:35:25,371] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 22:35:25,945] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 22:35:29,965] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 22:35:30,616] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:11:23,602] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:11:24,589] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:11:25,503] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:11:48,054] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:11:48,681] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:11:50,552] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:11:51,129] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:26:32,926] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:26:32,933] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:29:06,886] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:29:06,897] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:29:29,773] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:29:29,800] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:29:41,144] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:29:41,179] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:29:55,756] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:29:55,783] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:34:04,713] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:34:04,754] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:39:36,203] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:39:36,210] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:42:35,096] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-14 23:42:35,141] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:20:41,855] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:20:42,712] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:20:43,735] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:21:18,085] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:21:18,704] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:21:23,641] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:21:24,260] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:26:59,855] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:27:00,302] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:30:08,219] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:30:08,476] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:30:45,749] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:30:45,975] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:36:00,895] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:36:00,899] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:38:22,928] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:38:22,962] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:42:16,760] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:42:17,379] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:42:21,403] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:42:21,971] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:44:37,992] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 00:44:38,222] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 01:00:34,756] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 01:01:08,707] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 01:06:02,796] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 01:06:03,389] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 01:06:05,092] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 01:06:05,719] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 21:09:23,878] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 21:09:24,452] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 21:09:46,154] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 21:09:46,749] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 21:17:10,507] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 21:19:25,260] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 21:19:26,194] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 21:19:27,082] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 21:19:38,641] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 21:19:39,236] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 21:19:41,064] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
-[2025-06-15 21:19:41,691] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-07-16 00:16:39,965] [ERROR] in routes: Errore dashboard admin: Can't determine which FROM clause to join from, there are multiple FROMS which can join to this entity. Please use the .select_from() method to establish an explicit left side, as well as providing an explicit ON clause if not present already to help resolve the ambiguity.
+Traceback (most recent call last):
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/routes.py", line 533, in dashboard_admin_leaderboard
+    ).all()
+      ~~~^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/orm/query.py", line 2699, in all
+    return self._iter().all()  # type: ignore
+           ~~~~~~~~~~^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/orm/query.py", line 2853, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+        params,
+        ^^^^^^^
+        execution_options={"_sa_orm_load_options": self.load_options},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2365, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 305, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 516, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1630, in _execute_clauseelement
+    compiled_sql, extracted_params, cache_hit = elem._compile_w_cache(
+                                                ~~~~~~~~~~~~~~~~~~~~~^
+        dialect=dialect,
+        ^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        linting=self.dialect.compiler_linting | compiler.WARN_LINTING,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 704, in _compile_w_cache
+    compiled_sql = self._compiler(
+        dialect,
+    ...<4 lines>...
+        **kw,
+    )
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 317, in _compiler
+    return dialect.statement_compiler(dialect, self, **kw)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/sql/compiler.py", line 1429, in __init__
+    Compiled.__init__(self, dialect, statement, **kwargs)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/sql/compiler.py", line 870, in __init__
+    self.string = self.process(self.statement, **compile_kwargs)
+                  ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/sql/compiler.py", line 915, in process
+    return obj._compiler_dispatch(self, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/sql/visitors.py", line 141, in _compiler_dispatch
+    return meth(self, **kw)  # type: ignore  # noqa: E501
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/sql/compiler.py", line 4680, in visit_select
+    compile_state = select_stmt._compile_state_factory(
+        select_stmt, self, **kwargs
+    )
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/sql/base.py", line 683, in create_for_statement
+    return klass.create_for_statement(statement, compiler, **kw)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 1181, in create_for_statement
+    self._setup_for_generate()
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 1216, in _setup_for_generate
+    self._join(query._setup_joins, self._entities)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 1859, in _join
+    self._join_left_to_right(
+    ~~~~~~~~~~~~~~~~~~~~~~~~^
+        entities_collection,
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        full,
+        ^^^^^
+    )
+    ^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 1894, in _join_left_to_right
+    ) = self._join_determine_implicit_left_side(
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        entities_collection, left, right, onclause
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 2049, in _join_determine_implicit_left_side
+    raise sa_exc.InvalidRequestError(
+    ...<6 lines>...
+    )
+sqlalchemy.exc.InvalidRequestError: Can't determine which FROM clause to join from, there are multiple FROMS which can join to this entity. Please use the .select_from() method to establish an explicit left side, as well as providing an explicit ON clause if not present already to help resolve the ambiguity.
+[2025-07-16 00:33:39,924] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-07-16 00:33:39,949] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-07-16 00:34:13,304] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-07-16 00:34:13,333] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-07-16 00:40:53,912] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-07-16 00:40:53,915] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.

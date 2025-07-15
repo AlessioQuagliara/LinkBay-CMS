@@ -31,6 +31,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+@landing_bp.before_request
+def set_shop_name():
+    # Ottieni shop_name solo quando esiste un contesto di richiesta
+    if request.host:
+        g.shop_name = request.host.split(':')[0].lower()
+    else:
+        g.shop_name = "default_shop"  # Valore di fallback
+
 def load_release_notes(language="it"):
     try:
         with open("release_note.json", "r", encoding="utf-8") as f:
@@ -215,15 +223,22 @@ def dashboard_user_profile(user_id):
         flash("Utente non trovato.", "warning")
         return redirect(url_for('landing.dashboard_team'))
 
-    # Recupera i negozi di proprietà dell'utente
-    shops = ShopList.query.filter_by(user_id=user_id).all()
+    # Ottieni shop_name dal contesto g
+    shop_name = g.get('shop_name', 'default_shop')
+    
+    # Recupera i negozi dell'utente filtrati per nome
+    shops = ShopList.query.filter_by(
+        user_id=user_id,
+        shop_name=shop_name
+    ).all()
 
-    # Statistiche globali
+    # Statistiche filtrate per shop_id dei negozi trovati
     total_revenue = 0
     total_orders = 0
+    shop_ids = [shop.id for shop in shops]  # Lista di ID negozi
 
-    for shop in shops:
-        orders = Order.query.filter_by(shop_name=shop.shop_name).all()
+    if shop_ids:  # Solo se ci sono negozi
+        orders = Order.query.filter(Order.shop_id.in_(shop_ids)).all()
         for order in orders:
             total_revenue += order.total_amount or 0
             total_orders += 1
@@ -236,6 +251,8 @@ def dashboard_user_profile(user_id):
         total_orders=total_orders,
         shops=shops
     )
+
+
 @landing_bp.route('/dashboard/sales')
 def dashboard_sales():
     if 'user_id' not in session:
@@ -476,68 +493,38 @@ def dashboard_manage_shop(shop_name):
     )
 
 @landing_bp.route('/dashboard/team')
-def dashboard_admin_leaderboard():
+def store_list():
+    """Visualizza la lista completa degli store con i loro proprietari"""
+    # Verifica autenticazione
     if 'user_id' not in session:
         return redirect(url_for('landing.login'))
-
+    
+    # Paginazione
     page = request.args.get('page', 1, type=int)
     per_page = 10
-
-    admin_entries = UserStoreAccess.query.filter_by(access_level='admin').all()
-    user_ids = list(set([entry.user_id for entry in admin_entries]))
-
-    leaderboard_data = []
-
-    for uid in user_ids:
-        user = User.query.get(uid)
-        user_shops = ShopList.query.filter_by(user_id=uid).all()
-
-        total_revenue = 0
-        total_orders = 0
-        best_store = None
-        max_revenue = 0
-
-        shop_names = [shop.shop_name for shop in user_shops]
-
-        if shop_names:
-            order_stats = db.session.query(
-                func.sum(Order.total_amount),
-                func.count(Order.id),
-                Order.shop_name
-            ).filter(Order.shop_name.in_(shop_names)).group_by(Order.shop_name).all()
-
-            for revenue, order_count, name in order_stats:
-                revenue = revenue or 0
-                total_revenue += revenue
-                total_orders += order_count or 0
-                if revenue > max_revenue:
-                    max_revenue = revenue
-                    best_store = name
-
-        leaderboard_data.append({
-            "user_id": uid,
-            "nome": user.nome,
-            "cognome": user.cognome,
-            "profilo_foto": user.profilo_foto or "/static/images/superadmin/admin_avatar.png",
-            "total_revenue": round(total_revenue, 2),
-            "total_orders": total_orders,
-            "best_store": best_store or "Nessun negozio"
-        })
-
-    leaderboard_data.sort(key=lambda x: x["total_revenue"], reverse=True)
-
-    # 🔢 Applica la paginazione
-    total_entries = len(leaderboard_data)
-    start = (page - 1) * per_page
-    end = start + per_page
-    paginated_data = leaderboard_data[start:end]
-
+    
+    # Query per ottenere tutti gli store con i proprietari
+    stores_query = db.session.query(
+        ShopList.id,
+        ShopList.shop_name,
+        ShopList.shop_type,
+        ShopList.domain,
+        User.id.label('owner_id'),
+        User.nome,
+        User.cognome,
+        User.email
+    ).join(User, ShopList.user_id == User.id
+    ).order_by(ShopList.shop_name.asc())
+    
+    # Applica paginazione
+    stores = stores_query.paginate(page=page, per_page=per_page, error_out=False)
+    
     return render_template(
-        'landing/dashboard_team.html',
+        'landing/dashboard_team.html',  # Usiamo lo stesso template
         user=get_user_from_session(),
-        leaderboard=paginated_data,
+        stores=stores.items,
         page=page,
-        total_pages=(total_entries + per_page - 1) // per_page
+        total_pages=stores.pages
     )
 
 @landing_bp.route("/blog")
