@@ -125,3 +125,7 @@ sqlalchemy.exc.InvalidRequestError: Can't determine which FROM clause to join fr
 [2025-07-16 00:34:13,333] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
 [2025-07-16 00:40:53,912] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
 [2025-07-16 00:40:53,915] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-07-17 13:18:11,065] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-07-17 13:18:11,778] [INFO] in app: ✅ LinkBayCMS avviato correttamente.
+[2025-07-17 13:18:28,149] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
+[2025-07-17 13:18:28,720] [INFO] in landing_app: ✅ LinkBayCMS avviato correttamente.
