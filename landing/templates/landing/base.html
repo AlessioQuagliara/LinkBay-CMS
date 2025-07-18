@@ -15,6 +15,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Shepherd -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/css/shepherd.css">
+    <script src="https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/js/shepherd.min.js"></script>
     <!-- Custom CSS -->
     <style>
       #wrapper {
@@ -330,6 +333,35 @@
 
     document.addEventListener("DOMContentLoaded", loadUnreadCount);
   </script>
+
+
+
+<!-- 4. CSS personalizzato -->
+<style>
+  /* Tema rosso (adattalo al tuo brand) */
+  .shepherd-element {
+    border-radius: 12px 12px 12px 12px !important;
+  }
+  .shepherd-header {
+    background-color: #ff5757 !important;
+  }
+  .shepherd-title {
+    color: #ffffff  !important;
+    font-weight: 600 !important;
+  }
+  .shepherd-text {
+    color: #ffffff !important;
+    font-size: 15px !important;
+  }
+  .shepherd-button {
+    border-radius: 12px 12px 12px 12px !important;
+    background-color: #343a40 !important;
+  }
+  .shepherd-button-primary {
+    background-color: #ff5757 !important;
+  }
+</style>
+
   {% block scripts %}{% endblock %}
 </body>
 </html>
