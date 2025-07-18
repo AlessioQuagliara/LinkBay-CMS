@@ -193,5 +193,7 @@ def generate_token(shop_name):
     
     if environment == 'development':
         return redirect(f"http://{shop_name}.localhost:8080/admin/login?token={token}")
+    elif environment == 'staging':
+        return redirect(f"https://{shop_name}.staging-yoursite-linkbay-cms.eu/admin/login?token={token}")
     else:
         return redirect(f"https://{shop_name}.yoursite-linkbay-cms.com/admin/login?token={token}")

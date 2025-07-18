@@ -16,7 +16,7 @@
         <div class="col-12">
           <div class="card shadow-sm border-0">
             <div class="card-body">
-              <h5 class="card-title mb-2">📜 Abbonamento attivo</h5>
+              <h5 class="card-title mb-2"><i class="fa-solid fa-file-contract"></i>&nbsp; Abbonamento attivo</h5>
               {% if subscription %}
                 <p><strong>Piano:</strong> {{ subscription.plan_name }}</p>
                 <p><strong>Prezzo:</strong> €{{ subscription.price }} / mese</p>
@@ -33,7 +33,7 @@
         <div class="col-md-6">
           <div class="card shadow-sm border-0">
             <div class="card-body">
-              <h5 class="card-title mb-2">👥 Gestione Utenti</h5>
+              <h5 class="card-title mb-2"><i class="fa-solid fa-users"></i>&nbsp; Gestione Utenti</h5>
               <p>Condividi l’accesso con altri collaboratori e gestisci i permessi.</p>
               <a href="/dashboard/users/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Gestisci utenti</a>
             </div>
@@ -46,7 +46,7 @@
         <div class="col-md-6">
           <div class="card shadow-sm border-0">
             <div class="card-body">
-              <h5 class="card-title mb-2">🌍 Gestione Domini</h5>
+              <h5 class="card-title mb-2"><i class="fa-solid fa-earth-americas"></i>&nbsp; Gestione Domini</h5>
               <p>Configura il tuo dominio personalizzato e monitora lo stato DNS.</p>
               <a href="/dashboard/domains/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Gestisci domini</a>
             </div>
@@ -56,12 +56,12 @@
 
         <!-- Monitoraggio & Analytics -->
         <hr>
-        <h5 class="text-muted mt-4 mb-3">📈 Monitoraggio & Analytics</h5>
+        <h5 class="text-muted mt-4 mb-3"><i class="fa-solid fa-chart-simple"></i>&nbsp; Monitoraggio & Analytics</h5>
         <div class="row g-4">
           <div class="col-md-4">
             <div class="card shadow-sm border-0 h-100">
               <div class="card-body">
-                <h6 class="card-title">🔍 Google Analytics</h6>
+                <h6 class="card-title"><i class="fa-brands fa-google"></i>&nbsp; Google Analytics</h6>
                 <p class="small text-muted">Collega il tuo account per monitorare il traffico.</p>
                 <a href="/dashboard/analytics/google_analytics/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Configura</a>
               </div>
@@ -70,7 +70,7 @@
           <div class="col-md-4">
             <div class="card shadow-sm border-0 h-100">
               <div class="card-body">
-                <h6 class="card-title">📘 Facebook Pixel</h6>
+                <h6 class="card-title"><i class="fa-brands fa-facebook"></i>&nbsp; Facebook Pixel</h6>
                 <p class="small text-muted">Tieni traccia degli utenti da Facebook.</p>
                 <a href="/dashboard/analytics/facebook_pixel/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Configura</a>
               </div>
@@ -79,7 +79,7 @@
           <div class="col-md-4">
             <div class="card shadow-sm border-0 h-100">
               <div class="card-body">
-                <h6 class="card-title">🎵 TikTok Pixel</h6>
+                <h6 class="card-title"><i class="fa-brands fa-tiktok"></i>&nbsp; TikTok Pixel</h6>
                 <p class="small text-muted">Monitora conversioni dalle campagne TikTok.</p>
                 <a href="/dashboard/analytics/tiktok_pixel/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Configura</a>
               </div>
@@ -89,7 +89,7 @@
 
         <!-- Integrazioni -->
         <hr>
-        <h5 class="text-muted mt-4 mb-3">🔌 Integrazioni</h5>
+        <h5 class="text-muted mt-4 mb-3"><i class="fa-solid fa-plug-circle-plus"></i>&nbsp; Integrazioni</h5>
         <div class="row g-4">
           {% for plugin in ['Aruba Fatturazione', 'Zapier', 'Mailchimp', 'Klaviyo', 'Zendesk', 'Twilio'] %}
           <div class="col-md-4">
@@ -106,7 +106,7 @@
 
         <!-- Metodi di Pagamento -->
         <hr>
-        <h5 class="text-muted mt-4 mb-3">💳 Metodi di Pagamento</h5>
+        <h5 class="text-muted mt-4 mb-3"><i class="fa-solid fa-credit-card"></i>&nbsp; Metodi di Pagamento</h5>
         <div class="row g-4">
           {% for metodo in ['Stripe', 'PayPal'] %}
           <div class="col-md-6">
@@ -124,12 +124,12 @@
         {% if subscription and subscription.plan_name == 'ProfessionalDesk' %}
         <!-- Analisi Intelligente -->
         <hr>
-        <h5 class="text-muted mt-4 mb-3">🧠 Analisi con Intelligenza Artificiale</h5>
+        <h5 class="text-muted mt-4 mb-3"><i class="fa-solid fa-hexagon-nodes"></i>&nbsp; Analisi con Intelligenza Artificiale</h5>
         <div class="row g-4">
           <div class="col-md-6">
             <div class="card shadow-sm border-0 h-100">
               <div class="card-body">
-                <h6 class="card-title">📊 Flusso Analitico Avanzato</h6>
+                <h6 class="card-title"><i class="fa-solid fa-chart-pie"></i>&nbsp; Flusso Analitico Avanzato</h6>
                 <p class="small text-muted">Scopri pattern di comportamento e previsioni vendita.</p>
                 <a href="/dashboard/ai/analytics/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Visualizza Analisi</a>
               </div>
@@ -138,7 +138,7 @@
           <div class="col-md-6">
             <div class="card shadow-sm border-0 h-100">
               <div class="card-body">
-                <h6 class="card-title">📢 Campagne Pubblicitarie</h6>
+                <h6 class="card-title"><i class="fa-solid fa-bullhorn"></i>&nbsp; Campagne Pubblicitarie</h6>
                 <p class="small text-muted">Crea e ottimizza campagne marketing con suggerimenti AI.</p>
                 <a href="/dashboard/ai/campaigns/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Gestisci Campagne</a>
               </div>
@@ -150,7 +150,7 @@
       </div>
     {% else %}
         <div class="container py-5 text-center">
-          <h2 class="mb-3">🚫 Accesso Negato</h2>
+          <h2 class="mb-3"><i class="fa-solid fa-ban"></i>&nbsp; Accesso Negato</h2>
           <p class="lead">Questo store non è tuo. Per collaborare, puoi inviare una richiesta al proprietario.</p>
           <a href="/dashboard/stores" class="btn btn-outline-dark mt-3">
             <i class="fa-solid fa-arrow-left"></i> Torna alla tua dashboard

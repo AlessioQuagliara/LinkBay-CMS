@@ -51,7 +51,7 @@
                 {% endif %}
               </div>
               <div class="d-flex flex-wrap gap-2 mt-3">
-                {% if variabile == 'production' %}
+                {% if variabile == 'production' or variabile == 'staging' %}
                   <a href="{{ url_for('auth.generate_token', shop_name=shop.shop_name) }}" target="_blank" class="btn btn-outline-primary btn-sm">
                     <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> Accedi al Negozio
                   </a>

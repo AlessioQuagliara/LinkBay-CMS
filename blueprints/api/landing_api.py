@@ -558,7 +558,7 @@ def checkout_subscribe():
 
     environment = os.getenv('ENVIRONMENT', 'development')
 
-    if environment == 'production':
+    if environment == 'production' or environment == 'staging':
         plans = {
             "allisready": {
                 "label": "AllIsReady",
