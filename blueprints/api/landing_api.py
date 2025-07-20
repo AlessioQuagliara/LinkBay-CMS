@@ -918,9 +918,9 @@ def send_success_email():
         <h2 style="color:#333;">Dominio acquistato con successo!</h2>
         <p>Ciao {user.nome},</p>
         <p>Il tuo dominio personalizzato <strong>{domain}</strong> è stato acquistato con successo e sarà configurato entro pochi minuti.</p>
-        <p>Grazie per aver scelto <strong>LinkBayCMS</strong>!</p>
+        <p>Grazie per aver scelto <strong>LinkBay-CMS</strong>!</p>
         <hr/>
-        <p>🔗 <a href="https://linkbay-cms.com">Visita LinkBayCMS</a></p>
+        <p>🔗 <a href="https://linkbay-cms.com">Visita LinkBay-CMS</a></p>
         """
         mail.send(msg)
         return jsonify(success=True, message="Email inviata con successo")

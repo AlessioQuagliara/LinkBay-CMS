@@ -190,7 +190,7 @@ async function sendMessage() {
     const botMessage = document.createElement("div");
     botMessage.classList.add("alert", "alert-secondary", "p-2");
     const typingSpan = document.createElement("span");
-    botMessage.innerHTML = `<strong>LinkBayCMS AI:</strong> `;
+    botMessage.innerHTML = `<strong>LinkBay-CMS AI:</strong> `;
     botMessage.appendChild(typingSpan);
     chatBox.appendChild(botMessage);
     chatBox.scrollTop = chatBox.scrollHeight;
@@ -223,17 +223,17 @@ async function sendMessage() {
         if (response.ok) {
             // Anima la scrittura della risposta lettera per lettera
             typeText(typingSpan, data.response, () => {
-                botMessage.innerHTML = `<strong>LinkBayCMS AI:</strong> ${data.response}`;
+                botMessage.innerHTML = `<strong>LinkBay-CMS AI:</strong> ${data.response}`;
                 chatBox.scrollTop = chatBox.scrollHeight;  // Scroll automatico dopo risposta
                 saveChatHistory();
             });
         } else {
-            botMessage.innerHTML = `<strong>LinkBayCMS AI:</strong> <span class="text-danger">Error processing your request.</span>`;
+            botMessage.innerHTML = `<strong>LinkBay-CMS AI:</strong> <span class="text-danger">Error processing your request.</span>`;
             saveChatHistory();
         }
     } catch (error) {
         console.error("Error:", error);
-        botMessage.innerHTML = `<strong>LinkBayCMS AI:</strong> <span class="text-danger">An unexpected error occurred.</span>`;
+        botMessage.innerHTML = `<strong>LinkBay-CMS AI:</strong> <span class="text-danger">An unexpected error occurred.</span>`;
         saveChatHistory();
     }
     

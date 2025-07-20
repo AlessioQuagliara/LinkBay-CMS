@@ -1,4 +1,4 @@
-# LinkBay CMS  
+# LinkBay-CMS CMS  
 © 2024 Alessio Quagliara. Tutti i diritti riservati.  
 
 ## Licenza  

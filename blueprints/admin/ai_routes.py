@@ -19,7 +19,7 @@ client = openai.OpenAI(api_key=Config.OPENAI_API_KEY)
 @ai_bp.route('/assistant', methods=['POST'])
 def assistant():
     """
-    API che utilizza OpenAI per rispondere alle domande dell'utente sul CMS LinkBay.
+    API che utilizza OpenAI per rispondere alle domande dell'utente sul CMS LinkBay-CMS.
     """
     try:
         # 📌 Ottieni il nome del negozio dal sottodominio
@@ -43,11 +43,11 @@ def assistant():
 
         # 📌 Costruzione del prompt AI per GPT-4
         prompt = (
-            f"Agisci come un assistente AI altamente specializzato per il CMS LinkBay, progettato per utenti professionisti dell’e-commerce.\n"
+            f"Agisci come un assistente AI altamente specializzato per il CMS LinkBay-CMS, progettato per utenti professionisti dell’e-commerce.\n"
             f"Il negozio con sottodominio '{shop_name}' opera nel settore: '{industry}'.\n"
             f"Descrizione fornita: '{description}'.\n"
             f"Eventuale sito concorrente indicato: {website_url}.\n\n"
-            f"Il CMS LinkBay è una piattaforma multi-tenant completa per la gestione di e-commerce con funzionalità modulari, tra cui:\n"
+            f"Il CMS LinkBay-CMS è una piattaforma multi-tenant completa per la gestione di e-commerce con funzionalità modulari, tra cui:\n"
             f"  • Gestione avanzata del catalogo prodotti (creazione, varianti, immagini, SEO, tag, categorie).\n"
             f"  • Sistema ordini con stato avanzato, notifiche, spedizioni, pagamenti e gestione rimborsi.\n"
             f"  • Anagrafica clienti con analisi comportamentale, storico ordini, segmentazione e preferenze.\n"

@@ -116,7 +116,7 @@ from blueprints.admin import register_admin_blueprints
 from blueprints.shop import register_user_blueprints
 from blueprints.api import register_api_blueprints
 from blueprints.main import main_bp
-from errors import register_error_handlers # Blueprint del sito ufficiale LinkBay
+from errors import register_error_handlers # Blueprint del sito ufficiale LinkBay-CMS
 
 
 app.register_blueprint(main_bp)  # Blueprint per la parte pubblica
@@ -167,7 +167,7 @@ file_handler.setLevel(logging.INFO)
 
 app.logger.addHandler(file_handler)
 app.logger.setLevel(logging.INFO)
-app.logger.info('✅ LinkBayCMS avviato correttamente.')
+app.logger.info('✅ LinkBay-CMS avviato correttamente.')
 
 # SISTEMA DI TRADUZIONE AUTOMATICA ----------------------------------------------------------------------
 TRANSLATIONS_DIR = os.path.join(os.path.dirname(__file__), 'translations')
