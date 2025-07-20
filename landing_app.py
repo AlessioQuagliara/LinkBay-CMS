@@ -161,7 +161,7 @@ file_handler.setLevel(logging.INFO)
 
 app.logger.addHandler(file_handler)
 app.logger.setLevel(logging.INFO)
-app.logger.info('✅ LinkBayCMS avviato correttamente.')
+app.logger.info('✅ LinkBay-CMS avviato correttamente.')
 
 # SISTEMA DI TRADUZIONE AUTOMATICA ----------------------------------------------------------------------
 TRANSLATIONS_DIR = os.path.join(os.path.dirname(__file__), 'translations')

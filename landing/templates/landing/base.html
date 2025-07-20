@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}LinkBay{% endblock %}</title>
-    <meta name="description" content="{% block description %}LinkBayCMS - Dashboard{% endblock %}">
+    <title>{% block title %}LinkBay-CMS{% endblock %}</title>
+    <meta name="description" content="{% block description %}LinkBay-CMS - Dashboard{% endblock %}">
     <meta name="author" content="Quagliara Alessio">
     <link rel="shortcut icon" href="/static/images/superadmin/favicon.ico" type="image/x-icon">
     <!-- Bootstrap CSS -->
@@ -20,6 +20,19 @@
     <script src="https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/js/shepherd.min.js"></script>
     <!-- Custom CSS -->
     <style>
+      /* Import da Google Fonts */
+      @import url('https://fonts.googleapis.com/css2?family=Electrolize&display=swap');
+      
+      /* Applica a tutto il progetto */
+      body, html {
+        font-family: 'Electrolize', sans-serif !important;
+      }
+      
+      /* Fallback per elementi specifici */
+      button, input, textarea, select {
+        font-family: inherit;
+      }
+
       #wrapper {
         display: flex;
         flex-direction: row;
@@ -238,7 +251,7 @@
     {% else %}
       <button class="btn d-md-none m-2" id="sidebarToggle">
       <i class="fas fa-bars"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <img src="/static/images/superadmin/linkbay_logo.png" alt="LinkBayCMS Logo" width="140">
+      <img src="/static/images/superadmin/linkbay_logo.svg" alt="LinkBay-CMS Logo" width="140">
       </button>
     {% endif %}
 
@@ -247,7 +260,7 @@
         <div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 bg-light border-end min-vh-100">
           <div>
             <a href="#" class="brand d-flex align-items-center mb-4">
-              <img src="/static/images/superadmin/linkbay_logo.png" alt="LinkBayCMS Logo" width="140">
+              <img src="/static/images/superadmin/linkbay_logo.svg" alt="LinkBay-CMS Logo" width="140">
             </a>
             <nav class="nav flex-column">
               <a href="/dashboard" class="nav-link {% if request.path == '/dashboard' %}active{% endif %}"><i class="fa-solid fa-house me-2"></i> Home</a>

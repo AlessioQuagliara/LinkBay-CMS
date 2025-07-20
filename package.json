@@ -1,7 +1,7 @@
 {
   "name": "cms_def",
   "version": "1.0.0",
-  "description": "LinkBayCMS Definitive Shopify Destroyer",
+  "description": "LinkBay-CMS Definitive Shopify Destroyer",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

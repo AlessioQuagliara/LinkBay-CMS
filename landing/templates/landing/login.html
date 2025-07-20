@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>LinkBayCMS - {{ translate('login-title') }}</title>
+        <title>LinkBay-CMS - {{ translate('login-title') }}</title>
         <meta name="description" content="{{ translate('login-description') }}">
         <meta name="keywords" content="{{ translate('login-keywords') }}">
         <meta name="author" content="Quagliara Alessio">
@@ -12,7 +12,7 @@
     
         <meta property="og:title" content="{{ translate('login-title') }}">
         <meta property="og:description" content="{{ translate('login-description') }}">
-        <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png') }}">
+        <meta property="og:image" content="{{ url_for('static', filename='images/og-image.svg') }}">
         <meta property="og:url" content="https://www.linkbay-cms.com">
         <meta property="og:type" content="website">
 
@@ -44,6 +44,19 @@
         <link rel="icon" href="/static/images/superadmin/favicon.ico" type="image/x-icon">
 
         <style>
+            /* Import da Google Fonts */
+            @import url('https://fonts.googleapis.com/css2?family=Electrolize&display=swap');
+            
+            /* Applica a tutto il progetto */
+            body, html {
+              font-family: 'Electrolize', sans-serif !important;
+            }
+            
+            /* Fallback per elementi specifici */
+            button, input, textarea, select {
+              font-family: inherit;
+            }
+            
             body {
                 background: url('static/images/superadmin/background.webp') no-repeat center center fixed;
                 background-size: cover;
@@ -89,12 +102,12 @@
         <div class="login-card" id="client-form" data-aos="fade-up">
             <div class="mb-4">
                 <a href="{{ url_for('landing.home') }}">
-                    <img src="../static/images/superadmin/linkbay_logo.png" width="150px" alt="Logo">
+                    <img src="../static/images/superadmin/linkbay_logo.svg" width="150px" alt="Logo">
                 </a>
             </div>
             <div class="mb-4">
                 <h3>Login Clienti</h3>
-                <p>Continua su LinkBay</p>
+                <p>Continua su LinkBay-CMS</p>
             </div>
             <form id="loginForm" method="POST" onsubmit="return false;">
                 <!-- Campo Email -->
