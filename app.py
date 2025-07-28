@@ -214,4 +214,4 @@ if __name__ == "__main__":
     L'app viene eseguita in modalità debug sulla porta 5001.
     L'host è impostato su "0.0.0.0" per consentire l'accesso da remoto se necessario.
     """
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=False)

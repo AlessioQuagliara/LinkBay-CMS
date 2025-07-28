@@ -1,0 +1,155 @@
+{% extends 'landing/landing_home.html' %}
+{% block content %}
+
+<style>
+    .login-card {
+        max-width: 500px;
+        margin: 0 auto;
+        border: 1px solid #e9ecef;
+    }
+    .input-group-text {
+        background-color: #f8f9fa;
+    }
+    .hover-scale {
+        transition: transform 0.2s;
+    }
+    .hover-scale:hover {
+        transform: scale(1.02);
+    }
+</style>
+
+<section class="py-8" style="background-color: var(--linkbay-red); min-height: 100vh;">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="login-card shadow-lg rounded-4 overflow-hidden bg-white">
+                    <div class="p-4 p-md-5">
+                        <!-- Logo Centrato -->
+                        <div class="text-center mb-4">
+                            <a href="{{ url_for('landing.home') }}">
+                                <img src="{{ url_for('static', filename='images/superadmin/linkbay_logo.svg') }}" width="180px" alt="Logo LinkBay-CMS" class="img-fluid">
+                            </a>
+                        </div>
+                        
+                        <!-- Titolo e Sottotitolo -->
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold mb-2">Login Clienti</h2>
+                            <p class="text-muted">Accedi alla tua dashboard LinkBay-CMS</p>
+                        </div>
+                        
+                        <!-- Form Login -->
+                        <form id="loginForm" method="POST">
+                            <!-- Campo Email -->
+                            <div class="mb-3">
+                                <label for="clientEmail" class="form-label small text-muted">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-envelope text-muted"></i>
+                                    </span>
+                                    <input type="email" class="form-control" id="clientEmail" name="email" placeholder="la.tua@email.com" required>
+                                </div>
+                            </div>
+                            
+                            <!-- Campo Password -->
+                            <div class="mb-3">
+                                <label for="clientPassword" class="form-label small text-muted">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-lock text-muted"></i>
+                                    </span>
+                                    <input type="password" class="form-control" id="clientPassword" name="password" placeholder="La tua password" required>
+                                </div>
+                            </div>
+                            
+                            <!-- Link Password Dimenticata -->
+                            <div class="d-flex justify-content-end mb-4">
+                                <a href="#" class="small text-danger">Password dimenticata?</a>
+                            </div>
+                            
+                            <!-- Pulsante di Login -->
+                            <div class="d-grid gap-2 mb-4">
+                                <button type="submit" class="btn btn-danger btn-lg py-2 fw-bold hover-scale">
+                                    Accedi ora <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Divisore -->
+                            <div class="position-relative mb-4">
+                                <hr>
+                                <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 small text-muted">OPPURE</span>
+                            </div>
+                            
+                            <!-- Login Social -->
+                            <div class="text-center">
+                                <p class="small text-muted mb-3">Accedi con il tuo account social</p>
+                                <div class="d-flex justify-content-center gap-3">
+                                    <a href="{{ url_for('auth.login_facebook') }}" class="btn btn-outline-dark rounded-circle p-2 hover-scale" title="Login con Facebook">
+                                        <i class="fa-brands fa-facebook-f"></i>
+                                    </a>
+                                    <a href="{{ url_for('auth.login_google') }}" class="btn btn-outline-dark rounded-circle p-2 hover-scale" title="Login con Google">
+                                        <i class="fa-brands fa-google"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Footer Form -->
+                    <div class="bg-light py-3 px-4 text-center">
+                        <p class="small mb-0">Non hai un account? <a href="#" class="text-danger fw-bold">Registrati ora</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Gestione del form di login
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(this);
+
+        fetch('/login', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Successo!',
+                    text: data.message,
+                    showConfirmButton: true,
+                }).then(() => {
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    } else {
+                        window.location.href = '/dashboard';
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Errore!',
+                    text: data.message
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Errore:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Errore!',
+                text: 'Si è verificato un errore durante il login.'
+            });
+        });
+    });
+</script>
+
+{% endblock %}

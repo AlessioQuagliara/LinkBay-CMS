@@ -1,27 +1,5 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinkBay-CMS - {{ translate('integration-title') }}</title>
-    <meta name="description" content="{{ translate('integration-description') }}">
-    <meta name="keywords" content="{{ translate('integration-keywords') }}">
-    <meta name="author" content="Quagliara Alessio">
-
-    <!-- Open Graph Meta Tags -->
-
-    <meta property="og:title" content="{{ translate('integration-title') }}">
-    <meta property="og:description" content="{{ translate('integration-description') }}">
-    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.svg') }}">
-    <meta property="og:url" content="https://www.linkbay-cms.com">
-    <meta property="og:type" content="website">
-
-    {% include '/landing/head.html' %}
-</head>
-<body class="bg-danger">
-
-    <!-- Navbar -->
-    {% include '/landing/navbar.html' %}
+{% extends 'landing/landing_home.html' %}
+{% block content %}
 
     <br><br>
     <!-- Sezione 1: Testo a Sinistra e Video a Destra -->
@@ -187,8 +165,6 @@
     
         </div>
     </div>
-    {% include '/landing/visit_tracker.html' %}
-    {% include '/landing/modal.html' %}
-    {% include '/landing/footer.html' %}
-</body>
-</html>
+
+    
+{% endblock %}

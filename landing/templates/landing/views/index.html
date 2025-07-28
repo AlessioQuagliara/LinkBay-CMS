@@ -1,0 +1,374 @@
+{% extends 'landing/landing_home.html' %}
+{% block content %}
+
+<!-- Hero Section - Design Avanzato con Animazioni -->
+<section class="hero-section position-relative overflow-hidden">
+    <!-- Background animato con onde -->
+    
+    <div class="container h-100 d-flex align-items-center py-6 position-relative z-1">
+        <div class="row align-items-center g-5">
+            <!-- Colonna Testo con Animazione -->
+            <div class="col-lg-6">
+                <div class="p-5 bg-dark bg-opacity-90 rounded-4 shadow-lg animate__animated animate__fadeInLeft">
+                    <div class="badge bg-danger mb-3 animate__animated animate__pulse animate__infinite">
+                        <i class="fas fa-rocket me-2"></i> {{ translate('NUOVO') }}: {{ translate('Tempo record di setup!') }}
+                    </div>
+                    <h1 class="display-4 fw-bold text-white mb-4">
+                        <span class="text-gradient">{{ translate('Trasforma il Tuo') }}</span><br>
+                        {{ translate('E-Commerce in una Potenza Navale') }}
+                    </h1>
+                    <p class="lead text-white mb-4 position-relative">
+                        <i class="fas fa-quote-left text-danger opacity-25 position-absolute start-0 top-0 fs-3"></i>
+                        {{ translate('LinkBayCMS è la tua ciurma esperta: gestiamo la tecnologia mentre tu conquisti nuovi mercati. Lancia il tuo negozio in 72 ore con la nostra piattaforma premiata.') }}
+                    </p>
+                    
+                    <!-- Contatore Social Proof -->
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="text-white-50">
+                            <strong class="text-white">10+</strong> {{ translate('business hanno già salpato con noi') }}
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex flex-wrap gap-3">
+                        <button class="btn btn-danger btn-lg px-4 py-3 fw-bold rounded-pill hover-scale" data-bs-toggle="modal" data-bs-target="#multiStepModal">
+                            <i class="fas fa-ship me-2"></i>{{ translate('Inizia il Viaggio') }}
+                        </button>
+                        <a href="#features" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill hover-scale">
+                            <i class="fas fa-compass me-2"></i>{{ translate('Esplora le Funzioni') }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Colonna Video con Effetto Parallax -->
+            <div class="col-lg-6">
+                <div class="video-container rounded-4 overflow-hidden shadow-lg border border-3 border-danger position-relative animate__animated animate__fadeIn">
+                    <div class="video-badge bg-white text-danger fw-bold">
+                        <i class="fas fa-play me-2"></i> {{ translate('Guarda la Demo') }}
+                    </div>
+                    <div class="ratio ratio-16x9">
+                        <video autoplay muted loop playsinline class="w-100">
+                            <source src="{{ url_for('static', filename='images/superadmin/video1.mp4') }}" type="video/mp4">
+                        </video>
+                    </div>
+                    <div class="video-overlay d-flex align-items-center justify-content-center">
+                        <button class="btn-play btn btn-danger rounded-circle p-3">
+                            <i class="fas fa-play fs-4"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Mini Cards Features -->
+                <div class="row mt-4 g-3">
+                    <div class="col-4">
+                        <div class="feature-mini-card bg-white bg-opacity-10 text-center p-3 rounded-3 backdrop-blur">
+                            <i class="fas fa-bolt text-warning mb-2"></i>
+                            <div class="text-white fw-bold fs-sm">5x più veloce</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="feature-mini-card bg-white bg-opacity-10 text-center p-3 rounded-3 backdrop-blur">
+                            <i class="fas fa-shield-alt text-success mb-2"></i>
+                            <div class="text-white fw-bold fs-sm">Sicurezza premium</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="feature-mini-card bg-white bg-opacity-10 text-center p-3 rounded-3 backdrop-blur">
+                            <i class="fas fa-infinity text-primary mb-2"></i>
+                            <div class="text-white fw-bold fs-sm">Scalabilità illimitata</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Elementi decorativi -->
+    <div class="hero-decoration">
+        <div class="decoration-circle circle-1 bg-danger opacity-10"></div>
+        <div class="decoration-circle circle-2 bg-danger opacity-15"></div>
+        <div class="decoration-wave"></div>
+    </div>
+</section>
+
+<!-- Sezione Funzionalità Principali -->
+<section id="features" class="py-8 bg-white position-relative">
+    <div class="wave-divider-top">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="#343a40"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="#343a40"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="#343a40"></path>
+        </svg>
+    </div>
+
+    <div class="container" style="padding: 5%;">
+        <div class="text-center mb-7">
+            <h2 class="display-5 fw-bold mb-3">
+                <i class="fas fa-tools text-danger me-2"></i> {{ translate('Il Tuo Arsenale Digitale') }}
+            </h2>
+            <p class="lead text-muted mx-auto" style="max-width: 700px;">
+                {{ translate('Tutti gli strumenti necessari per navigare nel mondo digitale con la sicurezza di un vero capitano') }}
+            </p>
+        </div>
+
+        <div class="row g-5">
+            <!-- Funzionalità 1 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card h-100 p-4 rounded-4 shadow-sm border-start border-4 border-danger hover-lift">
+                    <div class="feature-icon mb-4">
+                        <div class="icon-wrapper bg-danger bg-opacity-10 text-danger">
+                            <i class="fas fa-boxes fs-2"></i>
+                        </div>
+                    </div>
+                    <h3 class="h4 mb-3">{{ translate('Gestione Magazzino Avanzata') }}</h3>
+                    <p class="text-muted mb-0">
+                        {{ translate('Tieni traccia di ogni prodotto come un vero comandante, con alert automatici per scorte basse e integrazioni con i principali corrieri.') }}
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Funzionalità 2 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card h-100 p-4 rounded-4 shadow-sm border-start border-4 border-primary hover-lift">
+                    <div class="feature-icon mb-4">
+                        <div class="icon-wrapper bg-primary bg-opacity-10 text-primary">
+                            <i class="fas fa-chart-line fs-2"></i>
+                        </div>
+                    </div>
+                    <h3 class="h4 mb-3">{{ translate('Analisi in Tempo Reale') }}</h3>
+                    <p class="text-muted mb-0">
+                        {{ translate('Naviga tra i dati con la precisione di una bussola, individuando rotte commerciali redditizie e tempeste da evitare.') }}
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Funzionalità 3 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card h-100 p-4 rounded-4 shadow-sm border-start border-4 border-success hover-lift">
+                    <div class="feature-icon mb-4">
+                        <div class="icon-wrapper bg-success bg-opacity-10 text-success">
+                            <i class="fas fa-robot fs-2"></i>
+                        </div>
+                    </div>
+                    <h3 class="h4 mb-3">{{ translate('Automazione Intelligente') }}</h3>
+                    <p class="text-muted mb-0">
+                        {{ translate('Lascia che il pilota automatico gestisca ordini, fatture e comunicazioni mentre tu ti concentri sulla rotta.') }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<!-- Sezione Dashboard Demo -->
+<section class="py-8 bg-light">
+    <div class="wave-divider-top">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="#ffffff"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="#ffffff"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="#ffffff"></path>
+        </svg>
+    </div>
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <div class="pe-lg-5">
+                    <h2 class="display-5 fw-bold mb-4">
+                        <i class="fas fa-tachometer-alt text-danger me-3"></i> {{ translate('Plancia di Comando Personale') }}
+                    </h2>
+                    <p class="lead text-muted mb-4">
+                        {{ translate('La nostra dashboard è stata progettata come il ponte di comando di una nave moderna: tutto sotto controllo con un solo sguardo.') }}
+                    </p>
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-3 d-flex">
+                            <i class="fas fa-check-circle text-success me-3 mt-1"></i>
+                            <span>{{ translate('Metriche chiave sempre in primo piano') }}</span>
+                        </li>
+                        <li class="mb-3 d-flex">
+                            <i class="fas fa-check-circle text-success me-3 mt-1"></i>
+                            <span>{{ translate('Personalizzazione totale dei widget') }}</span>
+                        </li>
+                        <li class="mb-3 d-flex">
+                            <i class="fas fa-check-circle text-success me-3 mt-1"></i>
+                            <span>{{ translate('Alert intelligenti per tempeste in arrivo') }}</span>
+                        </li>
+                    </ul>
+                    <a href="#pricing" class="btn btn-danger px-4 py-3 rounded-pill fw-bold">
+                        {{ translate('Prova la Demo') }} <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="dashboard-preview rounded-4 overflow-hidden shadow-lg border border-3 border-white">
+                    <img src="{{ url_for('static', filename='images/superadmin/dashboard-demo.jpg') }}" alt="Dashboard Demo" class="img-fluid">
+                    <div class="dashboard-badge bg-danger text-white">
+                        {{ translate('INTERATTIVO') }} <i class="fas fa-mouse-pointer ms-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sezione Integrazioni -->
+<section class="py-8" style="background-color: #ff5758;">
+    <div class="wave-divider-top">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="#f8f9fa"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="#f8f9fa"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="#f8f9fa"></path>
+        </svg>
+    </div>
+    <div class="container" style="padding: 5%;">
+        <div class="text-center mb-7 text-white">
+            <h2 class="display-5 fw-bold mb-3">
+                <i class="fas fa-plug text-light me-2"></i> {{ translate('Porto delle Integrazioni') }}
+            </h2>
+            <p class="lead text-muted mx-auto" style="max-width: 700px;">
+                {{ translate('Collega tutti i tuoi strumenti preferiti in un unico luogo, come navi che attraccano nel tuo porto digitale') }}
+            </p>
+        </div>
+
+            <div class="integration-slider">
+                <!-- Integrazioni reali -->
+                <div class="integration-item bg-white">
+                    <img src="{{ url_for('static', filename='images/integrations/klaviyo.png') }}" alt="Klaviyo" class="img-fluid" style="max-height: 25px;">
+                </div>
+                <div class="integration-item bg-white">
+                    <img src="{{ url_for('static', filename='images/integrations/stripe.png') }}" alt="Stripe" class="img-fluid" style="max-height: 40px;">
+                </div>
+                <div class="integration-item bg-white">
+                    <img src="{{ url_for('static', filename='images/integrations/mailchimp.png') }}" alt="Mailchimp" class="img-fluid" style="max-height: 40px;">
+                </div>
+                <div class="integration-item bg-white">
+                    <img src="{{ url_for('static', filename='images/integrations/paypal.png') }}" alt="PayPal" class="img-fluid" style="max-height: 30px;">
+                </div>
+                <div class="integration-item bg-white">
+                    <img src="{{ url_for('static', filename='images/integrations/zapier.png') }}" alt="Zapier" class="img-fluid" style="max-height: 30px;">
+                </div>
+            </div>
+
+        <div class="text-center mt-5">
+            <a href="#" class="btn btn-outline-light px-4 py-2 rounded-pill">
+                {{ translate('Esplora Tutte le Integrazioni') }} <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Sezione Testimonianze -->
+<section class="py-8 bg-dark text-white">
+    <div class="wave-divider-top">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="#ff5758"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="#ff5758"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="#ff5758"></path>
+        </svg>
+    </div>
+
+    <div class="container position-relative">
+        <div class="text-center mb-7">
+            <div class="mb-4">
+                <i class="fas fa-star text-warning fs-4 mx-1"></i>
+                <i class="fas fa-star text-warning fs-4 mx-1"></i>
+                <i class="fas fa-star text-warning fs-4 mx-1"></i>
+                <i class="fas fa-star text-warning fs-4 mx-1"></i>
+                <i class="fas fa-star text-warning fs-4 mx-1"></i>
+            </div>
+            <h2 class="display-5 fw-bold mb-3">
+                <i class="fas fa-quote-left text-danger me-3"></i> {{ translate('Storie di Successo') }}
+            </h2>
+            <p class="lead opacity-75">{{ translate('Ascolta cosa dicono i nostri capitani') }}</p>
+        </div>
+
+        <div class="testimonial-slider">
+            <!-- Testimonial 1 -->
+            <div class="testimonial-card">
+                <div class="testimonial-content bg-white bg-opacity-10 p-4 rounded-4 backdrop-blur">
+                    <div class="mb-4">
+                        <img src="{{ url_for('static', filename='images/testimonials/1.jpg') }}" alt="Testimonial" class="rounded-circle border border-3 border-danger" width="70">
+                    </div>
+                    <p class="mb-4 fst-italic">
+                        "{{ translate('LinkBayCMS ci ha aiutato a triplicare il nostro fatturato in 6 mesi. La gestione multi-negozio è rivoluzionaria!') }}"
+                    </p>
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <h4 class="h6 mb-0">Marco R.</h4>
+                            <small class="text-light opacity-75">{{ translate('Agenzia Digitale') }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Testimonial 2 -->
+            <div class="testimonial-card">
+                <div class="testimonial-content bg-white bg-opacity-10 p-4 rounded-4 backdrop-blur">
+                    <div class="mb-4">
+                        <img src="{{ url_for('static', filename='images/testimonials/2.jpg') }}" alt="Testimonial" class="rounded-circle border border-3 border-danger" width="70">
+                    </div>
+                    <p class="mb-4 fst-italic">
+                        "{{ translate('Dopo 3 piattaforme diverse, finalmente ho trovato la soluzione perfetta. L\'integrazione con i corrieri mi fa risparmiare 10 ore a settimana!') }}"
+                    </p>
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <h4 class="h6 mb-0">Sarah K.</h4>
+                            <small class="text-light opacity-75">{{ translate('Boutique di Moda') }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Testimonial 3 -->
+            <div class="testimonial-card">
+                <div class="testimonial-content bg-white bg-opacity-10 p-4 rounded-4 backdrop-blur">
+                    <div class="mb-4">
+                        <img src="{{ url_for('static', filename='images/testimonials/3.jpg') }}" alt="Testimonial" class="rounded-circle border border-3 border-danger" width="70">
+                    </div>
+                    <p class="mb-4 fst-italic">
+                        "{{ translate('Il modulo di automazione ha trasformato il nostro business. Ora gestiamo 200 ordini al giorno con lo stesso staff.') }}"
+                    </p>
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <h4 class="h6 mb-0">Luca B.</h4>
+                            <small class="text-light opacity-75">{{ translate('Produttore Artigianale') }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sezione CTA Finale -->
+<section class="py-8 text-white position-relative" style="background-color: #ff5758;">
+    <div class="wave-divider-top">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="#212529"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="#212529"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="#212529"></path>
+        </svg>
+    </div>
+    <div class="container" style="padding: 5%;">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="display-4 fw-bold mb-4">
+                    <i class="fas fa-anchor me-3"></i> {{ translate('Pronto a Salpare?') }}
+                </h2>
+                <p class="lead mb-5">
+                    {{ translate('Unisciti a migliaia di business che crescono con LinkBayCMS. Inizia la tua prova gratuita di 14 giorni oggi stesso.') }}
+                </p>
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <button class="btn btn-light btn-lg px-5 py-3 fw-bold rounded-pill shadow hover-scale" data-bs-toggle="modal" data-bs-target="#multiStepModal">
+                        {{ translate('Inizia Ora') }} <i class="fas fa-arrow-right ms-3"></i>
+                    </button>
+                    <a href="#" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill hover-scale">
+                        <i class="fas fa-book me-2"></i> {{ translate('Leggi le FAQ') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

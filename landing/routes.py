@@ -50,23 +50,23 @@ def load_release_notes(language="it"):
 
 @landing_bp.route('/')
 def home():
-    return render_template('landing/landing_home.html')
+    return render_template('landing/views/index.html')
 
 @landing_bp.route('/partner')
 def partner():
-    return render_template('landing/partner.html')
+    return render_template('landing/views/partner.html')
 
 @landing_bp.route('/price')
 def prices():
-    return render_template('landing/price.html')
+    return render_template('landing/views/price.html')
 
 @landing_bp.route('/integration')
 def integration():
-    return render_template('landing/integration.html')
+    return render_template('landing/views/integration.html')
 
 @landing_bp.route('/login')
 def login():
-    return render_template('landing/login.html')
+    return render_template('landing/views/login.html', page='login')
 
 @landing_bp.route('/login', methods=['POST'])
 def login_post():
@@ -99,7 +99,7 @@ def dashboard():
     lang = session.get('lang', 'it')  # oppure rilevato da intestazione browser
     release_notes = load_release_notes(lang)
 
-    return render_template('landing/dashboard.html', user=user, notes=release_notes)
+    return render_template('landing/admin/dashboard.html', user=user, notes=release_notes)
 
 @landing_bp.route('/dashboard/stores')
 def dashboard_stores():
@@ -159,7 +159,7 @@ def dashboard_stores():
     variable = os.getenv('ENVIRONMENT')
 
     return render_template(
-        'landing/dashboard_shop.html',
+        'landing/admin/dashboard_shop.html',
         user=get_user_from_session(),
         shops=list(all_shops.values()),
         variable=variable,  # Variabile di ambiente per sviluppo
@@ -191,7 +191,7 @@ def dashboard_chats_list():
         u.unread_count = unread_dict.get(u.id, 0)
 
     return render_template(
-        'landing/dashboard_chats.html',
+        'landing/admin/dashboard_chats.html',
         user=get_user_from_session(),
         chat_users=chat_users
     )
@@ -207,7 +207,7 @@ def dashboard_private_chat(target_user_id):
         return redirect(url_for('landing.dashboard_team'))
 
     return render_template(
-        'landing/dashboard_private_chat.html',
+        'landing/admin/dashboard_private_chat.html',
         user=get_user_from_session(),
         target_user=target_user
     )
@@ -244,7 +244,7 @@ def dashboard_user_profile(user_id):
             total_orders += 1
 
     return render_template(
-        'landing/dashboard_user_profile.html',
+        'landing/admin/dashboard_user_profile.html',
         user=get_user_from_session(),
         target_user=user,
         total_revenue=round(total_revenue, 2),
@@ -258,7 +258,7 @@ def dashboard_sales():
     if 'user_id' not in session:
         return redirect(url_for('landing.login'))
 
-    return render_template('landing/dashboard_sell.html', user=get_user_from_session())
+    return render_template('landing/admin/dashboard_sell.html', user=get_user_from_session())
 
 @landing_bp.route('/dashboard/themes')
 def dashboard_themes():
@@ -283,7 +283,7 @@ def dashboard_themes():
         logging.error(f"Errore nel caricamento dei temi da cartella: {e}")
 
     return render_template(
-        'landing/dashboard_themes.html',
+        'landing/admin/dashboard_themes.html',
         user=get_user_from_session(),
         json_themes=json_themes  # 👈 qui la lista dei temi da visualizzare
     )
@@ -292,27 +292,27 @@ def dashboard_themes():
 def dashboard_support():
     if 'user_id' not in session:
         return redirect(url_for('landing.login'))
-    return render_template('landing/dashboard_support.html', user=get_user_from_session())
+    return render_template('landing/admin/dashboard_support.html', user=get_user_from_session())
 
 @landing_bp.route('/dashboard/payouts')
 def dashboard_payments():
     if 'user_id' not in session:
         return redirect(url_for('landing.login'))
-    return render_template('landing/dashboard_payments.html', user=get_user_from_session())
+    return render_template('landing/admin/dashboard_payments.html', user=get_user_from_session())
 
 # 💳 Stripe - Configurazione pagamento
 @landing_bp.route('/dashboard/payments/stripe/<shop_name>')
 def dashboard_payment_stripe(shop_name):
     if 'user_id' not in session:
         return redirect(url_for('landing.login'))
-    return render_template('landing/dashboard_payment_stripe.html', user=get_user_from_session(), shop_name=shop_name)
+    return render_template('landing/admin/dashboard_payment_stripe.html', user=get_user_from_session(), shop_name=shop_name)
 
 # 💳 PayPal - Configurazione pagamento
 @landing_bp.route('/dashboard/payments/paypal/<shop_name>')
 def dashboard_payment_paypal(shop_name):
     if 'user_id' not in session:
         return redirect(url_for('landing.login'))
-    return render_template('landing/dashboard_payment_paypal.html', user=get_user_from_session(), shop_name=shop_name)
+    return render_template('landing/admin/dashboard_payment_paypal.html', user=get_user_from_session(), shop_name=shop_name)
 
 @landing_bp.route('/dashboard/settings')
 def dashboard_settings():
@@ -325,7 +325,7 @@ def dashboard_settings():
         flash("Utente non trovato.", "danger")
         return redirect(url_for('landing.login'))
 
-    return render_template('landing/dashboard_settings.html', user=user.to_dict())
+    return render_template('landing/admin/dashboard_settings.html', user=user.to_dict())
 
 @landing_bp.route('/subscription/select/<shop_name>')
 def subscription_select(shop_name):
@@ -343,7 +343,7 @@ def subscription_select(shop_name):
     if not is_owner and not has_access:
         return redirect(url_for('landing.dashboard_stores'))
 
-    return render_template('landing/dashboard_shop_plan.html', user=get_user_from_session(), shop_name=shop_name)
+    return render_template('landing/admin/dashboard_shop_plan.html', user=get_user_from_session(), shop_name=shop_name)
 
 def get_user_from_session():
     return {
@@ -368,7 +368,7 @@ def dashboard_support_chat(ticket_id):
     if not ticket:
         return redirect(url_for('landing.dashboard_support'))
 
-    return render_template('landing/dashboard_support_chat.html', user=get_user_from_session(), ticket=ticket)
+    return render_template('landing/admin/dashboard_support_chat.html', user=get_user_from_session(), ticket=ticket)
 
 @landing_bp.route('/preview-theme/<theme_name>')
 def preview_theme(theme_name):
@@ -483,7 +483,7 @@ def dashboard_manage_shop(shop_name):
     suggestions = ImprovementSuggestion.query.filter_by(shop_name=shop_name).all()
 
     return render_template(
-        'landing/dashboard_shop_manage.html',
+        'landing/admin/dashboard_shop_manage.html',
         shop_name=shop_name,
         subscription=subscription,
         addons=addons,
@@ -520,7 +520,7 @@ def store_list():
     stores = stores_query.paginate(page=page, per_page=per_page, error_out=False)
     
     return render_template(
-        'landing/dashboard_team.html',  # Usiamo lo stesso template
+        'landing/admin/dashboard_team.html',  # Usiamo lo stesso template
         user=get_user_from_session(),
         stores=stores.items,
         page=page,
@@ -533,7 +533,7 @@ def blog():
 
 @landing_bp.route("/docs")
 def docs():
-    return render_template("landing/docs.html")
+    return render_template("landing/views/docs.html")
 
 @landing_bp.route("/news")
 def news():
@@ -548,42 +548,42 @@ def dashboard_google_analytics(shop_name):
     
     websettings = WebSettings.query.filter_by(shop_name=shop_name).all()
 
-    return render_template('landing/dashboard_google_analytics.html', user=get_user_from_session(), shop_name=shop_name, websettings=websettings)
+    return render_template('landing/admin/dashboard_google_analytics.html', user=get_user_from_session(), shop_name=shop_name, websettings=websettings)
 
 # 📘 Facebook Pixel
 @landing_bp.route('/dashboard/analytics/facebook_pixel/<shop_name>')
 def dashboard_facebook_pixel(shop_name):
     if 'user_id' not in session:
         return redirect(url_for('landing.login'))
-    return render_template('landing/dashboard_facebook_pixel.html', user=get_user_from_session(), shop_name=shop_name)
+    return render_template('landing/admin/dashboard_facebook_pixel.html', user=get_user_from_session(), shop_name=shop_name)
 
 # 🎵 TikTok Pixel
 @landing_bp.route('/dashboard/analytics/tiktok_pixel/<shop_name>')
 def dashboard_tiktok_pixel(shop_name):
     if 'user_id' not in session:
         return redirect(url_for('landing.login'))
-    return render_template('landing/dashboard_tiktok_pixel.html', user=get_user_from_session(), shop_name=shop_name)
+    return render_template('landing/admin/dashboard_tiktok_pixel.html', user=get_user_from_session(), shop_name=shop_name)
 
 # 🔌 Plugin generici (fatturazione, zapier, ecc.)
 @landing_bp.route('/dashboard/integrations/<plugin>/<shop_name>')
 def dashboard_plugin_integration(plugin, shop_name):
     if 'user_id' not in session:
         return redirect(url_for('landing.login'))
-    return render_template('landing/dashboard_integration_plugin.html', user=get_user_from_session(), plugin=plugin, shop_name=shop_name)
+    return render_template('landing/admin/dashboard_integration_plugin.html', user=get_user_from_session(), plugin=plugin, shop_name=shop_name)
 
 # 🧠 Analisi con AI
 @landing_bp.route('/dashboard/ai/analytics/<shop_name>')
 def dashboard_ai_analytics(shop_name):
     if 'user_id' not in session:
         return redirect(url_for('landing.login'))
-    return render_template('landing/dashboard_ai_analytics.html', user=get_user_from_session(), shop_name=shop_name)
+    return render_template('landing/admin/dashboard_ai_analytics.html', user=get_user_from_session(), shop_name=shop_name)
 
 # 📢 Campagne con AI
 @landing_bp.route('/dashboard/ai/campaigns/<shop_name>')
 def dashboard_ai_campaigns(shop_name):
     if 'user_id' not in session:
         return redirect(url_for('landing.login'))
-    return render_template('landing/dashboard_ai_campaigns.html', user=get_user_from_session(), shop_name=shop_name)
+    return render_template('landing/admin/dashboard_ai_campaigns.html', user=get_user_from_session(), shop_name=shop_name)
 
 # 🌐 Gestione domini
 @landing_bp.route('/dashboard/domains/<shop_name>')
@@ -602,7 +602,7 @@ def dashboard_manage_domains(shop_name):
     
     from config import Config
     return render_template(
-        'landing/dashboard_domains.html',
+        'landing/admin/dashboard_domains.html',
         user=get_user_from_session(),
         shop_name=shop_name,
         domains=domain_data,
@@ -680,7 +680,7 @@ def dashboard_manage_users(shop_name):
         )
 
     return render_template(
-        'landing/dashboard_users.html',
+        'landing/admin/dashboard_users.html',
         user=get_user_from_session(),
         shop_name=shop_name,
         subscription=subscription,

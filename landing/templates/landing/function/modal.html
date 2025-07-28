@@ -1,0 +1,349 @@
+<!-- Modern Multi-Step Modal -->
+<div class="modal fade" id="multiStepModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content overflow-hidden">
+      <!-- Progress Bar -->
+      <div class="progress-container">
+        <div class="progress-steps">
+          <div class="step-progress" id="modalProgress"></div>
+          <div class="step-indicator active" data-step="1">
+            <div class="step-number">1</div>
+            <div class="step-label">{{ translate('Shop') }}</div>
+          </div>
+          <div class="step-indicator" data-step="2">
+            <div class="step-number">2</div>
+            <div class="step-label">{{ translate('Account') }}</div>
+          </div>
+          <div class="step-indicator" data-step="3">
+            <div class="step-number">3</div>
+            <div class="step-label">{{ translate('Start') }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Close Button -->
+      <button type="button" class="btn-close-modal" data-bs-dismiss="modal" aria-label="Close">
+        <i class="fas fa-times"></i>
+      </button>
+      
+      <!-- Modal Body with Steps -->
+      <div class="modal-body p-0">
+        <!-- Step 1: Shop Details -->
+        <div class="modal-step active" id="step1">
+          <div class="step-content">
+            <div class="step-header">
+              <h3>{{ translate('Create your online store') }}</h3>
+              <p class="text-muted">{{ translate('Start your e-commerce journey in minutes') }}</p>
+            </div>
+            
+            <div class="form-floating mb-4">
+              <input type="text" class="form-control" id="shop_name" placeholder=" " required>
+              <label for="shop_name">{{ translate('Shop Name') }}</label>
+              <div class="invalid-feedback">{{ translate('Please enter a shop name') }}</div>
+              <div class="form-text">{{ translate('You can change this later') }}</div>
+            </div>
+            
+            <div class="mb-4">
+              <h6 class="mb-3">{{ translate('Business Type') }}</h6>
+              <div class="business-types">
+                <div class="business-type-card active" data-type="ecommerce">
+                  <div class="type-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                  </div>
+                  <h6>{{ translate('E-Commerce') }}</h6>
+                  <p>{{ translate('Sell products online') }}</p>
+                </div>
+                
+                <div class="business-type-card" data-type="platform">
+                  <div class="type-icon">
+                    <i class="fas fa-network-wired"></i>
+                  </div>
+                  <h6>{{ translate('Platform') }}</h6>
+                  <p>{{ translate('Multi-vendor marketplace') }}</p>
+                </div>
+                
+                <div class="business-type-card" data-type="website">
+                  <div class="type-icon">
+                    <i class="fas fa-globe"></i>
+                  </div>
+                  <h6>{{ translate('Website') }}</h6>
+                  <p>{{ translate('Content or service site') }}</p>
+                </div>
+              </div>
+              <input type="hidden" id="business_type" value="ecommerce">
+            </div>
+          </div>
+        </div>
+        
+        <!-- Step 2: Account Creation -->
+        <div class="modal-step" id="step2">
+          <div class="step-content">
+            <div class="step-header">
+              <h3>{{ translate('Create your account') }}</h3>
+              <p class="text-muted">{{ translate('Secure access to your store') }}</p>
+            </div>
+            
+            <div class="form-floating mb-3">
+              <input type="email" class="form-control" id="email" placeholder=" " required>
+              <label for="email">{{ translate('Email Address') }}</label>
+              <div class="invalid-feedback">{{ translate('Please enter a valid email') }}</div>
+            </div>
+            
+            <div class="form-floating mb-3">
+              <input type="password" class="form-control" id="password" placeholder=" " required>
+              <label for="password">{{ translate('Password') }}</label>
+              <div class="password-strength mt-2">
+                <div class="strength-meter">
+                  <div class="strength-meter-fill" id="strength-meter-fill"></div>
+                </div>
+                <small id="passwordStrengthText">{{ translate('Password strength:') }} <span>Weak</span></small>
+              </div>
+            </div>
+            
+            <div class="form-floating mb-4">
+              <input type="password" class="form-control" id="confirmPassword" placeholder=" " required>
+              <label for="confirmPassword">{{ translate('Confirm Password') }}</label>
+              <div class="invalid-feedback">{{ translate('Passwords do not match') }}</div>
+            </div>
+            
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="termsCheck" required>
+              <label class="form-check-label" for="termsCheck">
+                {{ translate('I agree to the') }} <a href="#" target="_blank">{{ translate('Terms of Service') }}</a> {{ translate('and') }} <a href="#" target="_blank">{{ translate('Privacy Policy') }}</a>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Step 3: Confirmation -->
+        <div class="modal-step" id="step3">
+          <div class="step-content text-center">
+            <div class="success-animation">
+              <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+              </svg>
+            </div>
+            
+            <div class="step-header">
+              <h3>{{ translate('Ready to Launch!') }}</h3>
+              <p class="text-muted">{{ translate('Your store is ready to be created') }}</p>
+            </div>
+            
+            <div class="store-summary mb-5">
+              <div class="summary-item">
+                <span>{{ translate('Store Name:') }}</span>
+                <strong id="summary-shopname"></strong>
+              </div>
+              <div class="summary-item">
+                <span>{{ translate('Business Type:') }}</span>
+                <strong id="summary-businesstype"></strong>
+              </div>
+              <div class="summary-item">
+                <span>{{ translate('Account Email:') }}</span>
+                <strong id="summary-email"></strong>
+              </div>
+            </div>
+            
+            <button type="button" class="btn btn-primary btn-lg w-100 py-3" onclick="inviaDati()">
+              {{ translate('Launch My Store') }} <i class="fas fa-rocket ms-2"></i>
+            </button>
+            
+            <p class="text-muted mt-3">
+              <small>{{ translate('14-day free trial. No credit card required.') }}</small>
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Modal Footer with Navigation -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" id="prevBtn">
+          <i class="fas fa-arrow-left me-2"></i>{{ translate('Back') }}
+        </button>
+        <button type="button" class="btn btn-outline-secondary" id="nextBtn">
+          {{ translate('Continue') }} <i class="fas fa-arrow-right ms-2"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Password Strength Checker
+document.getElementById('password').addEventListener('input', function() {
+  const password = this.value;
+  const meter = document.getElementById('strength-meter-fill');
+  const text = document.querySelector('#passwordStrengthText span');
+  
+  // Reset
+  meter.style.width = '0';
+  meter.style.backgroundColor = '#dc3545';
+  text.textContent = 'Weak';
+  text.style.color = '#dc3545';
+  
+  if (password.length === 0) return;
+  
+  // Calculate strength
+  let strength = 0;
+  
+  // Length check
+  if (password.length > 7) strength += 1;
+  if (password.length > 10) strength += 1;
+  
+  // Character variety
+  if (/[A-Z]/.test(password)) strength += 1;
+  if (/[0-9]/.test(password)) strength += 1;
+  if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+  
+  // Update meter
+  const width = (strength / 5) * 100;
+  meter.style.width = width + '%';
+  
+  // Update colors and text
+  if (strength <= 2) {
+    meter.style.backgroundColor = '#dc3545';
+    text.textContent = 'Weak';
+    text.style.color = '#dc3545';
+  } else if (strength <= 3) {
+    meter.style.backgroundColor = '#fd7e14';
+    text.textContent = 'Medium';
+    text.style.color = '#fd7e14';
+  } else {
+    meter.style.backgroundColor = '#28a745';
+    text.textContent = 'Strong';
+    text.style.color = '#28a745';
+  }
+});
+
+// Business Type Selection
+document.querySelectorAll('.business-type-card').forEach(card => {
+  card.addEventListener('click', function() {
+    document.querySelectorAll('.business-type-card').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById('business_type').value = this.dataset.type;
+  });
+});
+
+// Multi-step Form Logic
+let currentStep = 1;
+const totalSteps = 3;
+
+function updateProgress() {
+  const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+  document.querySelector('.step-progress').style.width = progress + '%';
+  
+  document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
+    if (index < currentStep) {
+      indicator.classList.add('active');
+    } else {
+      indicator.classList.remove('active');
+    }
+  });
+  
+  // Update buttons
+  document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'block';
+  document.getElementById('nextBtn').textContent = currentStep === totalSteps ? 'Complete' : 'Continue';
+  
+  if (currentStep === totalSteps) {
+    // Update summary
+    document.getElementById('summary-shopname').textContent = document.getElementById('shop_name').value;
+    document.getElementById('summary-businesstype').textContent = 
+      document.querySelector('.business-type-card.active h6').textContent;
+    document.getElementById('summary-email').textContent = document.getElementById('email').value;
+  }
+}
+
+function validateStep(step) {
+  let isValid = true;
+  
+  if (step === 1) {
+    const shopName = document.getElementById('shop_name').value.trim();
+    if (shopName === '') {
+      isValid = false;
+      document.getElementById('shop_name').classList.add('is-invalid');
+    } else {
+      document.getElementById('shop_name').classList.remove('is-invalid');
+    }
+  }
+  
+  if (step === 2) {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const termsChecked = document.getElementById('termsCheck').checked;
+    
+    // Email validation
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      isValid = false;
+      document.getElementById('email').classList.add('is-invalid');
+    } else {
+      document.getElementById('email').classList.remove('is-invalid');
+    }
+    
+    // Password validation
+    if (password.length < 8) {
+      isValid = false;
+      document.getElementById('password').classList.add('is-invalid');
+    } else {
+      document.getElementById('password').classList.remove('is-invalid');
+    }
+    
+    // Password match
+    if (password !== confirmPassword || confirmPassword === '') {
+      isValid = false;
+      document.getElementById('confirmPassword').classList.add('is-invalid');
+    } else {
+      document.getElementById('confirmPassword').classList.remove('is-invalid');
+    }
+    
+    // Terms check
+    if (!termsChecked) {
+      isValid = false;
+      document.getElementById('termsCheck').classList.add('is-invalid');
+    } else {
+      document.getElementById('termsCheck').classList.remove('is-invalid');
+    }
+  }
+  
+  return isValid;
+}
+
+function nextStep() {
+  if (!validateStep(currentStep)) return;
+  
+  if (currentStep < totalSteps) {
+    document.getElementById(`step${currentStep}`).classList.remove('active');
+    currentStep++;
+    document.getElementById(`step${currentStep}`).classList.add('active');
+    updateProgress();
+  } else {
+    // Submit form
+    inviaDati();
+  }
+}
+
+function prevStep() {
+  if (currentStep > 1) {
+    document.getElementById(`step${currentStep}`).classList.remove('active');
+    currentStep--;
+    document.getElementById(`step${currentStep}`).classList.add('active');
+    updateProgress();
+  }
+}
+
+// Initialize
+document.getElementById('prevBtn').addEventListener('click', prevStep);
+document.getElementById('nextBtn').addEventListener('click', nextStep);
+updateProgress();
+
+// Form submission
+function inviaDati() {
+  // Add your form submission logic here
+  console.log('Form submitted!');
+  
+  // Show success message or redirect
+  alert('Store creation process started!');
+  bootstrap.Modal.getInstance(document.getElementById('multiStepModal')).hide();
+}
+</script>
