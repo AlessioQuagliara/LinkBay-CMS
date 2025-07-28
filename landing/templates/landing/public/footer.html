@@ -1,0 +1,72 @@
+<!-- Modern Footer -->
+<footer class="bg-dark text-white">
+    <div class="wave-divider-top">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="#ff5758"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="#ff5758"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="#ff5758"></path>
+        </svg>
+    </div>
+    <div class="container">
+        <div class="row">
+            <!-- Brand Column -->
+            <div class="col-lg-4 mb-4 mb-lg-0">
+                <div class="d-flex align-items-center mb-3">
+                    <img src="{{ url_for('static', filename='images/superadmin/lb-logo-w.svg') }}" alt="LinkBayCMS Logo" height="40" class="me-2">
+                </div>
+                <p class="small" style="color: #adb5bd;">{{ translate('Your journey from idea to success starts here.') }}</p>
+                <div class="social-icons mt-3">
+                    <a href="#" class="text-white me-3"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-white"><i class="fab fa-x-twitter"></i></a>
+                </div>
+            </div>
+
+            <!-- Links Column -->
+            <div class="col-lg-4 mb-4 mb-lg-0">
+                <h5 class="text-uppercase mb-4" style="color: #ff5758;">{{ translate('Quick Links') }}</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="/features" class="text-white text-decoration-none">{{ translate('Features') }}</a></li>
+                    <li class="mb-2"><a href="/pricing" class="text-white text-decoration-none">{{ translate('Pricing') }}</a></li>
+                    <li class="mb-2"><a href="/blog" class="text-white text-decoration-none">{{ translate('Blog') }}</a></li>
+                    <li class="mb-2"><a href="/contact" class="text-white text-decoration-none">{{ translate('Contact Us') }}</a></li>
+                </ul>
+            </div>
+
+            <!-- Legal Column -->
+            <div class="col-lg-4">
+                <h5 class="text-uppercase mb-4" style="color: #ff5758;">{{ translate('Legal') }}</h5>
+                <ul class="list-unstyled small">
+                    <li class="mb-2"><a href="https://www.iubenda.com/privacy-policy/73694070/cookie-policy" class="text-white text-decoration-none">{{ translate('Terms and Conditions') }}</a></li>
+                    <li class="mb-2"><a href="https://www.iubenda.com/privacy-policy/73694070" class="text-white text-decoration-none">{{ translate('Privacy and Cookie Policy') }}</a></li>
+                    <li class="mb-2">{{ translate('This site is not affiliated with Facebook™ or Meta Platforms, Inc.') }}</li>
+                </ul>
+            </div>
+        </div>
+
+        <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start">
+                <p class="small mb-3 mb-md-0" style="color: #adb5bd;">&copy; 2024 LinkBay-CMS, {{ translate('Intellectual Work of Quagliara Alessio.') }}</p>
+            </div>
+            <div class="col-md-6 text-center text-md-end">
+                <p class="small mb-0" style="color: #adb5bd;">
+                    <i class="fas fa-anchor me-1" style="color: #ff5758;"></i> {{ translate('Made with passion in Italy') }}
+                </p>
+            </div>
+        </div>
+    </div>
+    <br><br>
+</footer>
+
+<!-- Scripts (unchanged from your original) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.27/dist/sweetalert2.all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="{{ url_for('static', filename='js/superadmin/landing.js') }}"></script>
+

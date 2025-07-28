@@ -1,375 +1,67 @@
 <!DOCTYPE html>
-<html lang="it">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>LinkBay-CMS - {{ translate('home-title') }}</title>
-        <meta name="description" content="{{ translate('home-description') }}">
-        <meta name="keywords" content="{{ translate('home-keywords') }}">
-        <meta name="author" content="Quagliara Alessio">
+<html lang="it" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkBayCMS - {{ translate('home-title') }}</title>
+    <meta name="description" content="{{ translate('home-description') }}">
+    <meta name="keywords" content="{{ translate('home-keywords') }}">
+    <meta name="author" content="Quagliara Alessio">
+    <meta name="theme-color" content="#ff5758">
+
+    <!-- Open Graph / Social Meta -->
+    <meta property="og:title" content="LinkBayCMS - {{ translate('home-title') }}">
+    <meta property="og:description" content="{{ translate('home-description') }}">
+    <meta property="og:image" content="{{ url_for('static', filename='images/social/og-home.jpg') }}">
+    <meta property="og:url" content="https://www.linkbay-cms.com">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="LinkBayCMS">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:creator" content="@linkbaycms">
+
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="{{ url_for('static', filename='css/main.css') }}" as="style">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" as="script">
     
-        <!-- Open Graph Meta Tags -->
-    
-        <meta property="og:title" content="{{ translate('home-title') }}">
-        <meta property="og:description" content="{{ translate('home-description') }}">
-        <meta property="og:image" content="{{ url_for('static', filename='images/og-image.svg') }}">
-        <meta property="og:url" content="https://www.linkbay-cms.com">
-        <meta property="og:type" content="website">
-    
-        {% include '/landing/head.html' %}
-        <style>
-            .full-cover-section {
-                height: 120vh;
-                background-size: cover;
-                background-repeat: no-repeat;
-                background-position: center center;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                text-align: center;
-                color: white;
-                position: relative;
-            }
-            .overlay {
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background: rgba(0, 0, 0, 0.5);
-            }
-            .content {
-                position: relative;
-                z-index: 1;
-            }
-            /* Contenitore video fisso */
-            .sticky-video-container {
-                position: sticky;
-                top: 20px; /* Puoi regolare il valore di 'top' per il distanziamento */
-                max-height: 80vh; /* Limita l'altezza del video */
-                overflow: hidden; /* Assicura che il contenuto rimanga all'interno */
-            }
-            
-            /* Contenitore dei benefici scorrevoli */
-            .benefits-scroll-container {
-                max-height: 100vh; /* Massima altezza della sezione visibile */
-                overflow-y: auto; /* Scorrimento verticale */
-                padding-right: 15px; /* Margine per lo scorrimento */
-            }
-        </style>
-    </head>
-<body class="bg-danger">
+    {% include '/landing/public/head.html' %}
+
+    <!-- Critical CSS -->
+    <style>
+        :root {
+            --linkbay-red: #ff5758;
+            --linkbay-dark: #343a40;
+            --linkbay-light: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Electrolize', sans-serif;
+            background-color: var(--linkbay-light);
+            color: var(--linkbay-dark);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body style="background-color: #212529;">
     <!-- Navbar -->
-    {% include '/landing/navbar.html' %}
-    <br><br>
-    <!-- Sezione 1 migliorata con layout a due colonne -->
-    <div class="full-cover-section position-relative bg-dark text-white" style="background-image: url('../../static/images/superadmin/web1.jpg'); background-size: cover; background-position: center; min-height: 100vh;">
-        <div class="container h-100 d-flex align-items-center">
-            <div class="row w-100 justify-content-center align-items-center">
-                
-                <!-- Colonna Testo a Sinistra --> 
-                <div class="col-lg-6 col-md-12 text-start p-4 bg-dark bg-opacity-75 rounded-5 shadow-lg" >
-                    <!-- Titolo principale -->
-                    <h1 class="display-6 fw-bold mb-3">{{ translate('Build your online store with the utmost simplicity') }}</h1>
-                    
-                    <!-- Testo descrittivo -->
-                    <p class="lead mb-4">{{ translate('A powerful and flexible CMS for every type of business. Easy to use, highly customizable.') }}</p>
-                    
-                    <!-- Pulsante CTA -->
-                    <button type="button" class="btn btn-lg btn-danger mb-3" data-bs-toggle="modal" data-bs-target="#multiStepModal">{{ translate('Start Now for Free') }}</button>
-                    
-                </div>
-                
-                <!-- Colonna Video a Destra -->
-                <div class="col-lg-6 col-md-12 text-center p-4" >
-                    <div class="video-container">
-                        <video class="w-100 rounded-5 shadow" src="{{ url_for('static', filename='images/superadmin/video1.mp4') }}" autoplay muted loop playsinline></video>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-    </div>
-    
-    <!-- Sezione 3 migliorata -->
-    <div class="rating-section position-relative d-flex flex-column align-items-center justify-content-center text-center text-black" style="background: url('../static/images/superadmin/web3.jpg') no-repeat center center; background-size: cover; height: 400px;">
-        <!-- Icone delle Stelle -->
-        <div class="mb-3">
-            <i class="fa-solid fa-star text-warning fs-2 mx-1"></i>
-            <i class="fa-solid fa-star text-warning fs-2 mx-1"></i>
-            <i class="fa-solid fa-star text-warning fs-2 mx-1"></i>
-            <i class="fa-solid fa-star text-warning fs-2 mx-1"></i>
-            <i class="fa-solid fa-star text-warning fs-2 mx-1"></i>
-        </div>
-        <!-- Titolo della sezione -->
-        <h3 class="fw-bold">{{ translate('Rated 5 Stars on Google by Our Customers') }}</h3>
-        <br><br><br>
-    </div>
+    {% include '/landing/public/navbar.html' %}
 
-    
-    <!-- Sezione 4: Video Fisso e Benefici Scorrevoli in Sezioni Separate -->
-    <div class="container-fluid" style="background-color: white;">
-        <div class="row">
-            
-            <!-- Colonna Video Fisso sulla Sinistra -->
-            <div class="col-lg-5 position-relative">
-                <div class="sticky-video-container"  data-aos-duration="1000">
-                    <video src="../../static/images/superadmin/video2.mp4" autoplay muted loop playsinline class="w-100 rounded-5 shadow-sm"></video>
-                </div>
-            </div>
-            
-            <!-- Colonna Benefici Scorrevoli sulla Destra -->
-            <div class="col-lg-7">
-                <div class="benefits-scroll-container">
-                    <h2 class="text-center mb-5 fw-bold"  data-aos-duration="1000">{{ translate('Start Your Online Store with Ease') }}</h2>
-    
-                    <!-- Sezione Beneficio 1 -->
-                    <div class="benefit-section mb-5" >
-                        <div class="card border-0 shadow-sm h-100 p-4">
-                            <div class="row g-0 align-items-center">
-                                <div class="col-3 text-center">
-                                    <div class="benefit-icon bg-success text-white rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 70px; height: 70px;">
-                                        <i class="bi bi-gear-fill fs-3"></i>
-                                    </div>
-                                </div>
-                                <div class="col-9">
-                                    <h5 class="card-title">{{ translate('Ease of Use') }}</h5>
-                                    <p class="card-text">{{ translate('You don’t need technical skills. With our intuitive platform, you can configure and customize your online store in just a few clicks.') }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-    
-                    <!-- Sezione Beneficio 2 -->
-                    <div class="benefit-section mb-5">
-                        <div class="card border-0 shadow-sm h-100 p-4">
-                            <div class="row g-0 align-items-center">
-                                <div class="col-3 text-center">
-                                    <div class="benefit-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 70px; height: 70px;">
-                                        <i class="bi bi-wallet2 fs-3"></i>
-                                    </div>
-                                </div>
-                                <div class="col-9">
-                                    <h5 class="card-title">{{ translate('Affordable cost') }}</h5>
-                                    <p class="card-text">{{ translate('Flexible and affordable pricing plans to fit any budget. Start with a minimum investment and scale your business with ease.') }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-    
-                    <!-- Sezione Beneficio 3 -->
-                    <div class="benefit-section mb-5">
-                        <div class="card border-0 shadow-sm h-100 p-4">
-                            <div class="row g-0 align-items-center">
-                                <div class="col-3 text-center">
-                                    <div class="benefit-icon bg-warning text-white rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 70px; height: 70px;">
-                                        <i class="bi bi-headset fs-3"></i>
-                                    </div>
-                                </div>
-                                <div class="col-9">
-                                    <h5 class="card-title">{{ translate('Continuous Support') }}</h5>
-                                    <p class="card-text">{{ translate('Our dedicated support team is always ready to help you at every stage of your journey, with quick assistance and tailor-made solutions.') }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-    
-                    <!-- Sezione Beneficio 4 -->
-                    <div class="benefit-section mb-5">
-                        <div class="card border-0 shadow-sm h-100 p-4">
-                            <div class="row g-0 align-items-center">
-                                <div class="col-3 text-center">
-                                    <div class="benefit-icon bg-info text-white rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 70px; height: 70px;">
-                                        <i class="bi bi-cart-check-fill fs-3"></i>
-                                    </div>
-                                </div>
-                                <div class="col-9">
-                                    <h5 class="card-title">{{ translate('Simple Order Management') }}</h5>
-                                    <p class="card-text">{{ translate('Monitor and manage orders with a simple and intuitive interface. With just a few clicks, you can process orders, manage inventory and update customers.') }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-    
-                    <!-- Sezione Beneficio 5 -->
-                    <div class="benefit-section mb-5">
-                        <div class="card border-0 shadow-sm h-100 p-4">
-                            <div class="row g-0 align-items-center">
-                                <div class="col-3 text-center">
-                                    <div class="benefit-icon bg-danger text-white rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 70px; height: 70px;">
-                                        <i class="bi bi-speedometer2 fs-3"></i>
-                                    </div>
-                                </div>
-                                <div class="col-9">
-                                    <h5 class="card-title">{{ translate('Quick Start') }}</h5>
-                                    <p class="card-text">{{ translate('Start your online store in less than an hour. Our configuration wizard allows you to be up and running in no time.') }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-    
-                    <!-- Sezione Beneficio 6 -->
-                    <div class="benefit-section mb-5">
-                        <div class="card border-0 shadow-sm h-100 p-4">
-                            <div class="row g-0 align-items-center">
-                                <div class="col-3 text-center">
-                                    <div class="benefit-icon bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 70px; height: 70px;">
-                                        <i class="bi bi-graph-up-arrow fs-3"></i>
-                                    </div>
-                                </div>
-                                <div class="col-9">
-                                    <h5 class="card-title">{{ translate('Scalable Growth') }}</h5>
-                                    <p class="card-text">{{ translate('Start with the basics and scale your store as you grow. Our platform supports stores of all sizes, with no technical limitations.') }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-    
-                </div>
-            </div>
-    
-        </div>
-    </div>
-    
-    <!-- Sezione 5: Scopri Perché LinkBay-CMS è la Soluzione Ideale in Griglia -->
-    <div class="full-cover-section text-white bg-light" style="background-image: url('../../static/images/superadmin/web2.jpg'); background-size: cover; background-position: center;">
-        <div class="container py-5">
-            <div class="row align-items-center">
-                
-                <!-- Colonna di Sinistra -->
-                <div class="col-lg-6 mb-4 mb-lg-0" >
-                    <div class="p-4 bg-dark bg-opacity-75 rounded-5 shadow-lg">
-                        <h2 class="mb-4">{{ translate('The Perfect Solution for Every Business') }}</h2>
-                        <p class="lead">{{ translate('Whether you are a small business owner or a large company, our platform offers you everything you need to sell online without the need for technical skills.') }}</p>
-                        <p>{{ translate('Use free tools like SEO, photos, themes and more to create a professional website. For those who want total control, we offer all the flexibility to customize every detail.') }}</p>
-                    </div>
-                </div>
-                
-                <!-- Colonna di Destra -->
-                <div class="col-lg-6" >
-                    <div class="p-4 bg-dark bg-opacity-75 rounded-5 shadow-lg">
-                        <h4 class="mb-4">{{ translate('Buy your own custom domain') }}</h4>
-                        <p class="lead">{{ translate('Easily choose and manage your domain directly from our platform.') }}</p>
-                        <p>{{ translate('Use free tools to find the perfect brand name for your brand and make it easy to manage your online store.') }}</p>
-                        <button type="button" class="btn btn-lg btn-danger mb-3" data-bs-toggle="modal" data-bs-target="#multiStepModal">{{ translate('Start Now for Free') }}</button>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-    </div>
+    {% block content %}{% endblock %}
 
+    <!-- Tracking & Modals -->
+    {% include '/landing/function/visit_tracker.html' %}
+    {% include '/landing/function/modal.html' %}
 
+    <!-- Footer -->
+    {% include '/landing/public/footer.html' %}
 
-    <!-- Sezione 6: Assistenza 24/7 con Design Rinnovato -->
-    <div class="container-fluid py-5" style="background-color: #FF5758;">
-        <div class="text-center text-white mb-5">
-            <h2 class="fw-bold mb-3" data-aos="fade-down">{{ translate('Dedicated 24/7 Support') }}</h2>
-            <p class="lead" data-aos="fade-down" data-aos-delay="100">{{ translate('The LinkBay-CMS team is always here to ensure your success. We are available 24/7 to answer any questions and offer you the assistance you need.') }}</p>
-        </div>
+    <!-- Core Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+    
 
-        <div class="container">
-            <div class="row gy-5">
-                
-                <!-- Assistenza Diretta -->
-                <div class="col-md-6 d-flex align-items-stretch" >
-                    <div class="card bg-white text-dark shadow-sm border-0 w-100 p-4 rounded-5">
-                        <div class="card-body d-flex flex-column text-center">
-                            <i class="fa-solid fa-headset fa-3x text-danger mb-3"></i>
-                            <h4 class="card-title fw-bold mb-3">{{ translate('Direct Assistance') }}</h4>
-                            <p class="card-text mb-4">{{ translate('Need help? Our team of experts is available 24/7 to support you in creating your website and solve any technical problem.') }}</p>
-                            <button type="button" class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#contactModal">{{ translate('Contact an expert') }} </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Risorse Formative -->
-                <div class="col-md-6 d-flex align-items-stretch" >
-                    <div class="card bg-white text-dark shadow-sm border-0 w-100 p-4 rounded-5">
-                        <div class="card-body d-flex flex-column text-center">
-                            <i class="fa-solid fa-book-open fa-3x text-danger mb-3"></i>
-                            <h4 class="card-title fw-bold mb-3">{{ translate('Training Resources') }}</h4>
-                            <p class="card-text mb-4">{{ translate('Access online courses, webinars and articles to learn everything you need to promote your products and grow your online presence.') }}</p>
-                            <a href="#" class="btn btn-danger btn-lg mt-auto">{{ translate('Explore the Resources') }}</a>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Sezione 7 -->
-    <div class="container-fluid faq-section d-flex align-items-center justify-content-center" style="background: url('../static/images/superadmin/web4.jpg') no-repeat center center; background-size: cover; height: 100vh;">
-        <div class="container faq-content" >
-            <h2 class="text-center mb-4">{{ translate('Frequently Asked Questions (FAQ)') }}</h2>
-            <div class="accordion" id="faqAccordion">
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingOne">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                            {{ translate('What is LinkBay-CMS and how can it help my company?') }}
-                        </button>
-                    </h2>
-                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            {{ translate('LinkBay-CMS is a content management system (CMS) designed to simplify the creation and management of your website. In addition to the typical CMS features, LinkBay-CMS offers integrated tools for finding and managing new customers, thus enhancing your marketing strategy and online presence.') }}
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingThree">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                            {{ translate('How can I use LinkBay-CMS to find new customers?') }}
-                        </button>
-                    </h2>
-                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            {{ translate('LinkBay-CMS offers advanced tools to find customers. You can use the Niche Researcher to find results immediately adjacent to your target or put a powerful contact form on your site and organize a Lead Generation campaign.') }}
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingFouth">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
-                            {{ translate('What are the main features of LinkBay-CMS?') }}
-                        </button>
-                    </h2>
-                    <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="headingFouth" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            {{ translate('The main features of LinkBay-CMS include web content creation and management, customizable templates, integrated SEO tools, web traffic analysis, marketing campaign and contact management, multi-user support and advanced security.') }}
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingfivth">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
-                            {{ translate('Can I import my existing website into LinkBay-CMS?') }}
-                        </button>
-                    </h2>
-                    <div id="collapse5" class="accordion-collapse collapse" aria-labelledby="headingfivth" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            {{ translate('Yes, you can import your existing website into LinkBay-CMS. We offer migration tools that make it easy to transfer your existing site’s content and structures, allowing you to take advantage of the LinkBay-CMS potential without having to start from scratch.') }}
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingSixth">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse6" aria-expanded="false" aria-controls="collapse6">
-                            {{ translate('What support options are available for LinkBay-CMS users?') }}
-                        </button>
-                    </h2>
-                    <div id="collapse6" class="accordion-collapse collapse" aria-labelledby="headingSixth" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            {{ translate('We offer several support options for our users, including a full documentation, video tutorials, an online help center and email support. During the free trial period, you’ll have full access to all these resources to help you get the most out of LinkBay-CMS.') }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% include '/landing/visit_tracker.html' %}
-    {% include '/landing/modal.html' %}
-    {% include '/landing/footer.html' %}
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>
