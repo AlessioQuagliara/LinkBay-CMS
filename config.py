@@ -26,8 +26,8 @@ class Config:
     APPLE_CLIENT_ID = os.getenv("APPLE_CLIENT_ID", "365461856822-j2egbbab7fihijb8vsg4h3298dge1shp.apps.googleusercontent.com")
     APPLE_CLIENT_SECRET = os.getenv("APPLE_CLIENT_SECRET", "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")
 
-    # OpenAI API Key
-    OPENAI_API_KEY = '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'
+    # DeepSeek API Key
+    DEEPSEEK_API_KEY = 'sk-82c79d72f35b402fb2f85a81bfe2d245'
 
     # Configurazione per l'invio di email
     MAIL_SERVER = 'smtps.aruba.it'

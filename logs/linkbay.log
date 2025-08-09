@@ -58,3 +58,6 @@ TypeError: argument of type 'NoneType' is not iterable
 [2025-07-30 13:31:02,686] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
 [2025-07-30 13:31:28,453] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
 [2025-07-30 13:31:29,000] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-09 11:36:44,344] [INFO] in app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-09 11:36:51,943] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-09 11:36:52,520] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.

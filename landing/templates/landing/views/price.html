@@ -1,264 +1,549 @@
 {% extends 'landing/landing_home.html' %}
 {% block content %}
 
-    <br><br>
-    <!-- Sezione Prezzi: Piani di Abbonamento -->
-    <div class="container-fluid py-5" style="background-color: #f7f8fa;">
-        <div class="container">
-            <!-- Titolo della Sezione -->
-            <div class="text-center mb-5" data-aos="fade-down">
-                <h2 class="fw-bold">{{ translate('Our Subscription Plans') }}</h2>
-                <p class="lead">{{ translate('Choose the plan that best suits the needs of your online store.') }}</p>
+<!-- Sezione Hero Pricing -->
+<section class="hero-pricing py-8 position-relative overflow-hidden" style="background: linear-gradient(135deg, #0b1a2e 0%, #212529 100%);">
+    <div class="wave-divider-top">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="#ff5758"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="#ff5758"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="#ff5758"></path>
+        </svg>
+    </div>
+    
+    <div class="container position-relative z-1 py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="badge bg-danger bg-opacity-25 text-danger px-4 py-2 rounded-pill mb-4 animate__animated animate__pulse animate__infinite">
+                    <i class="fas fa-tags me-2"></i> {{ translate('OFFERTA DI LANCIO') }}
+                </div>
+                <h1 class="display-4 fw-bold text-white mb-3">
+                    <i class="fas fa-coins text-warning me-3"></i> 
+                    {{ translate('La Tua Rota verso il Successo') }}
+                </h1>
+                <p class="lead text-light opacity-75 mb-5">
+                    {{ translate('Scegli il piano perfetto per la tua impresa. Naviga senza limiti con strumenti pensati per far crescere il tuo business.') }}
+                </p>
+                
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a href="#piani" class="btn btn-danger btn-lg px-5 py-3 rounded-pill hover-scale fw-bold">
+                        <i class="fas fa-binoculars me-2"></i> {{ translate('Esplora i Piani') }}
+                    </a>
+                    <a href="#confronto" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill hover-scale">
+                        <i class="fas fa-table me-2"></i> {{ translate('Confronto Completo') }}
+                    </a>
+                </div>
             </div>
-
-            <!-- Griglia dei Piani di Prezzo -->
-            <div class="row gy-5">
-
-                <!-- Piano Freemium -->
-                <div class="col-md-6 col-lg-4" data-aos="fade-up">
-                    <div class="card border-0 shadow-sm text-center h-100">
-                        <div class="card-header bg-white border-0">
-                            <h5 class="fw-bold mb-0">Freemium</h5>
-                            <p class="text-muted mb-0">{{ translate('Free Plan') }}</p>
-                        </div>
-                        <div class="card-body">
-                            <h2 class="fw-bold text-success">0€</h2>
-                            <p class="text-muted">{{ translate('Up to 50 products, no custom domain.') }}</p>
-                            <ul class="list-unstyled mb-4">
-                                <li><i class="fa-solid fa-check text-success me-2"></i> {{ translate('50 Products Limit') }}</li>
-                                <li><i class="fa-solid fa-check text-success me-2"></i> {{ translate('Basic Support') }}</li>
-                                <li><i class="fa-solid fa-check text-success me-2"></i> {{ translate('No Custom Domain') }}</li>
-                            </ul>
-                            <button type="button" class="btn btn-lg btn-success mb-3">{{ translate('Sign Up Free') }}</button>
-                        </div>
-                    </div>
-                </div>
-            
-                <!-- Piano AllIsReady -->
-                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
-                    <div class="card border-0 shadow-sm text-center h-100">
-                        <div class="card-header bg-white border-0">
-                            <h5 class="fw-bold mb-0">AllIsReady</h5>
-                            <p class="text-muted mb-0">{{ translate('18€ / Month per User') }}</p>
-                        </div>
-                        <div class="card-body">
-                            <h2 class="fw-bold text-danger">18€</h2>
-                            <p class="text-muted">{{ translate('Up to 5 users, 600 products, customizable domain.') }}</p>
-                            <ul class="list-unstyled mb-4">
-                                <li><i class="fa-solid fa-check text-success me-2"></i> {{ translate('Up to 5 Users') }}</li>
-                                <li><i class="fa-solid fa-check text-success me-2"></i> {{ translate('600 Products') }}</li>
-                                <li><i class="fa-solid fa-check text-success me-2"></i> {{ translate('Customizable Domain') }}</li>
-                                <li><i class="fa-solid fa-check text-success me-2"></i> {{ translate('Priority Support') }}</li>
-                                <li><i class="fa-solid fa-check text-success me-2"></i> {{ translate('Basic Inventory Management') }}</li>
-                                <li><i class="fa-solid fa-check text-success me-2"></i> {{ translate('Basic AI Optimization') }}</li>
-                            </ul>
-                            <button type="button" class="btn btn-lg btn-danger mb-3">{{ translate('Choose AllIsReady') }}</button>
-                        </div>
-                    </div>
-                </div>
-            
-                <!-- Piano ProfessionalDesk -->
-                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
-                    <div class="card border-0 shadow-sm text-center h-100">
-                        <div class="card-header bg-white border-0">
-                            <h5 class="fw-bold mb-0">ProfessionalDesk</h5>
-                            <p class="text-muted mb-0">{{ translate('36€ / Month per User') }}</p>
-                        </div>
-                        <div class="card-body">
-                            <h2 class="fw-bold text-danger">36€</h2>
-                            <p class="text-muted">{{ translate('Up to 10 users, unlimited products, multi-domain and inventory management.') }}</p>
-                            <ul class="list-unstyled mb-4">
-                                <li><i class="fa-solid fa-check text-success me-2"></i> {{ translate('Up to 10 Users') }}</li>
-                                <li><i class="fa-solid fa-check text-success me-2"></i> {{ translate('Unlimited Products') }}</li>
-                                <li><i class="fa-solid fa-check text-success me-2"></i> {{ translate('Multi-Domain') }}</li>
-                                <li><i class="fa-solid fa-check text-success me-2"></i> {{ translate('Inventory Management') }}</li>
-                                <li><i class="fa-solid fa-check text-success me-2"></i> {{ translate('Premium Support') }}</li>
-                            </ul>
-                            <button type="button" class="btn btn-lg btn-danger mb-3">{{ translate('Choose ProfessionalDesk') }}</button>
-                        </div>
-                    </div>
-                </div>
-            
-            </div>
-
-<!-- Sezione Funzionalità: Confronto tra Piani -->
-<div class="container-fluid py-5" style="background-color: #ffffff;">
-    <div class="container">
-        <div class="text-center mb-5" data-aos="fade-down">
-            <h2 class="fw-bold">{{ translate('Plan Comparison') }}</h2>
-            <p class="lead">{{ translate('Discover the differences between the available plans.') }}</p>
         </div>
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle">
-                <thead class="table-light text-center">
-                    <tr>
-                        <th class="text-start">{{ translate('Feature') }}</th>
-                        <th>Freemium</th>
-                        <th>AllIsReady</th>
-                        <th>ProfessionalDesk</th>
+    </div>
+    
+    <!-- Elementi decorativi nautici -->
+    <div class="hero-pricing-decoration">
+        <div class="decoration-anchor">
+            <i class="fas fa-anchor text-white opacity-10"></i>
+        </div>
+        <div class="decoration-wheel">
+            <i class="fas fa-ship text-white opacity-05"></i>
+        </div>
+    </div>
+</section>
+
+<!-- Sezione Piani - "Scegli la Tua Nave" -->
+<section id="piani" class="py-8 bg-light">
+    <div class="container">
+        <div class="text-center mb-7">
+            <h2 class="display-5 fw-bold mb-3">
+                <i class="fas fa-ship text-danger me-2"></i> {{ translate('Scegli la Tua Nave') }}
+            </h2>
+            <p class="lead text-muted mx-auto" style="max-width: 700px;">
+                {{ translate('Dalla piccola imbarcazione alla flotta da battaglia, abbiamo la soluzione perfetta per la tua avventura digitale') }}
+            </p>
+        </div>
+
+        <div class="row g-5 justify-content-center">
+            <!-- Piano Explorer -->
+            <div class="col-md-6 col-lg-4">
+                <div class="pricing-card h-100 p-0 rounded-4 overflow-hidden shadow-lg border border-2 border-info hover-lift">
+                    <div class="pricing-header bg-info text-white text-center p-5">
+                        <span class="badge bg-white text-info py-2 px-3 mb-3">{{ translate('PER PICCOLI EQUIPAGGI') }}</span>
+                        <h3 class="h2 fw-bold mb-1">Explorer</h3>
+                        <p class="opacity-75 mb-0">{{ translate('La tua prima imbarcazione') }}</p>
+                    </div>
+                    <div class="pricing-body bg-white p-5 text-center">
+                        <div class="price-display mb-4">
+                            <span class="display-2 fw-bold text-dark">0€</span>
+                            <span class="text-muted">/{{ translate('sempre') }}</span>
+                        </div>
+                        
+                        <ul class="list-unstyled mb-5">
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-check-circle text-info me-3 mt-1"></i>
+                                <span>{{ translate('Fino a 50 prodotti') }}</span>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-check-circle text-info me-3 mt-1"></i>
+                                <span>{{ translate('Supporto base') }}</span>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-check-circle text-info me-3 mt-1"></i>
+                                <span>{{ translate('Dominio linkbay.store') }}</span>
+                            </li>
+                            <li class="mb-3 d-flex text-muted">
+                                <i class="fas fa-times-circle me-3 mt-1"></i>
+                                <span>{{ translate('Dominio personalizzato') }}</span>
+                            </li>
+                        </ul>
+                        
+                        <button class="btn btn-outline-info w-100 py-3 rounded-pill fw-bold hover-scale">
+                            {{ translate('Salpa Gratis') }} <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                    <div class="pricing-footer bg-light py-3 text-center">
+                        <small class="text-muted">{{ translate('Perfetto per testare le acque') }}</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Piano Captain - POPOLARE -->
+            <div class="col-md-6 col-lg-4">
+                <div class="pricing-card h-100 p-0 rounded-4 overflow-hidden shadow-lg border border-3 border-danger position-relative hover-lift">
+                    <div class="position-absolute top-0 start-50 translate-middle mt-n4">
+                        <span class="badge bg-danger py-2 px-4 fw-bold">{{ translate('PIÙ SCELTO') }}</span>
+                    </div>
+                    
+                    <div class="pricing-header bg-danger text-white text-center p-5">
+                        <span class="badge bg-white text-danger py-2 px-3 mb-3">{{ translate('PER COMMERCIANTI ESPERTI') }}</span>
+                        <h3 class="h2 fw-bold mb-1">Captain</h3>
+                        <p class="opacity-75 mb-0">{{ translate('La nave perfetta per crescere') }}</p>
+                    </div>
+                    <div class="pricing-body bg-white p-5 text-center">
+                        <div class="price-display mb-4">
+                            <span class="display-2 fw-bold text-dark">18€</span>
+                            <span class="text-muted">/{{ translate('utente/mese') }}</span>
+                        </div>
+                        
+                        <ul class="list-unstyled mb-5">
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-check-circle text-danger me-3 mt-1"></i>
+                                <span>{{ translate('Fino a 5 membri equipaggio') }}</span>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-check-circle text-danger me-3 mt-1"></i>
+                                <span>{{ translate('Fino a 600 prodotti') }}</span>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-check-circle text-danger me-3 mt-1"></i>
+                                <span>{{ translate('Dominio personalizzato') }}</span>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-check-circle text-danger me-3 mt-1"></i>
+                                <span>{{ translate('Supporto prioritario 24/7') }}</span>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-check-circle text-danger me-3 mt-1"></i>
+                                <span>{{ translate('Gestione inventario base') }}</span>
+                            </li>
+                        </ul>
+                        
+                        <button class="btn btn-danger w-100 py-3 rounded-pill fw-bold hover-scale">
+                            {{ translate('Diventa Capitano') }} <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                    <div class="pricing-footer bg-light py-3 text-center">
+                        <small class="text-danger fw-bold">{{ translate('Risparmia 20% con pagamento annuale') }}</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Piano Admiral -->
+            <div class="col-md-6 col-lg-4">
+                <div class="pricing-card h-100 p-0 rounded-4 overflow-hidden shadow-lg border border-2 border-primary hover-lift">
+                    <div class="pricing-header bg-primary text-white text-center p-5">
+                        <span class="badge bg-white text-primary py-2 px-3 mb-3">{{ translate('PER FLOTTE CORPORATE') }}</span>
+                        <h3 class="h2 fw-bold mb-1">Admiral</h3>
+                        <p class="opacity-75 mb-0">{{ translate('Comando totale della tua flotta') }}</p>
+                    </div>
+                    <div class="pricing-body bg-white p-5 text-center">
+                        <div class="price-display mb-4">
+                            <span class="display-2 fw-bold text-dark">36€</span>
+                            <span class="text-muted">/{{ translate('utente/mese') }}</span>
+                        </div>
+                        
+                        <ul class="list-unstyled mb-5">
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-check-circle text-primary me-3 mt-1"></i>
+                                <span>{{ translate('Fino a 10 membri equipaggio') }}</span>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-check-circle text-primary me-3 mt-1"></i>
+                                <span>{{ translate('Prodotti illimitati') }}</span>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-check-circle text-primary me-3 mt-1"></i>
+                                <span>{{ translate('Multi-dominio e marketplace') }}</span>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-check-circle text-primary me-3 mt-1"></i>
+                                <span>{{ translate('Gestione inventario avanzata') }}</span>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-check-circle text-primary me-3 mt-1"></i>
+                                <span>{{ translate('Supporto premium dedicato') }}</span>
+                            </li>
+                        </ul>
+                        
+                        <button class="btn btn-primary w-100 py-3 rounded-pill fw-bold hover-scale">
+                            {{ translate('Comanda la Flotta') }} <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                    <div class="pricing-footer bg-light py-3 text-center">
+                        <small class="text-muted">{{ translate('Soluzione enterprise personalizzabile') }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sezione Confronto Piani - "Confronto delle Imbarcazioni" -->
+<section id="confronto" class="py-8 bg-dark text-white">
+    <div class="wave-divider-top">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="#ff5758"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="#ff5758"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="#ff5758"></path>
+        </svg>
+    </div>
+    
+    <div class="container py-5">
+        <div class="text-center mb-7">
+            <h2 class="display-5 fw-bold mb-3">
+                <i class="fas fa-compass text-warning me-2"></i> {{ translate('Confronto delle Imbarcazioni') }}
+            </h2>
+            <p class="lead opacity-75 mx-auto" style="max-width: 800px;">
+                {{ translate('Tutte le specifiche tecniche per scegliere la nave perfetta per la tua avventura digitale') }}
+            </p>
+        </div>
+        
+        <div class="table-responsive rounded-4 overflow-hidden border border-2 border-danger">
+            <table class="table table-dark table-hover align-middle mb-0">
+                <thead>
+                    <tr class="bg-danger">
+                        <th class="text-start ps-5">{{ translate('CARATTERISTICHE') }}</th>
+                        <th class="text-center">Explorer</th>
+                        <th class="text-center">Captain</th>
+                        <th class="text-center">Admiral</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="text-start">{{ translate('Number of Users') }}</td>
-                        <td class="text-center">1</td>
-                        <td class="text-center">{{ translate('Up to 5') }}</td>
-                        <td class="text-center">{{ translate('Up to 10') }}</td>
+                    <!-- Categoria: Equipaggio -->
+                    <tr class="bg-dark bg-opacity-50">
+                        <td colspan="4" class="fw-bold ps-4">
+                            <i class="fas fa-users me-2"></i> {{ translate('Equipaggio e Gestione') }}
+                        </td>
                     </tr>
                     <tr>
-                        <td class="text-start">{{ translate('Number of Products') }}</td>
+                        <td class="text-start ps-5">{{ translate('Membri equipaggio') }}</td>
+                        <td class="text-center">1</td>
+                        <td class="text-center">{{ translate('Fino a 5') }}</td>
+                        <td class="text-center">{{ translate('Fino a 10') }}</td>
+                    </tr>
+                    
+                    <!-- Categoria: Carico -->
+                    <tr class="bg-dark bg-opacity-50">
+                        <td colspan="4" class="fw-bold ps-4">
+                            <i class="fas fa-boxes me-2"></i> {{ translate('Carico e Magazzino') }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-start ps-5">{{ translate('Prodotti') }}</td>
                         <td class="text-center">50</td>
                         <td class="text-center">600</td>
-                        <td class="text-center">{{ translate('Unlimited') }}</td>
+                        <td class="text-center">{{ translate('Illimitati') }}</td>
                     </tr>
                     <tr>
-                        <td class="text-start">{{ translate('Custom Domain') }}</td>
-                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i></td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i></td>
+                        <td class="text-start ps-5">{{ translate('Gestione inventario') }}</td>
+                        <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                        <td class="text-center"><i class="fas fa-check text-success"></i> {{ translate('Base') }}</td>
+                        <td class="text-center"><i class="fas fa-check text-success"></i> {{ translate('Avanzata') }}</td>
+                    </tr>
+                    
+                    <!-- Categoria: Navigazione -->
+                    <tr class="bg-dark bg-opacity-50">
+                        <td colspan="4" class="fw-bold ps-4">
+                            <i class="fas fa-map-marked-alt me-2"></i> {{ translate('Navigazione e Dominio') }}
+                        </td>
                     </tr>
                     <tr>
-                        <td class="text-start">{{ translate('Inventory Management') }}</td>
-                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> {{ translate('Basic') }}</td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i></td>
+                        <td class="text-start ps-5">{{ translate('Dominio personalizzato') }}</td>
+                        <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                        <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                        <td class="text-center"><i class="fas fa-check text-success"></i></td>
                     </tr>
                     <tr>
-                        <td class="text-start">{{ translate('Priority Support') }}</td>
-                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i></td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> {{ translate('Premium') }}</td>
+                        <td class="text-start ps-5">{{ translate('Multi-dominio') }}</td>
+                        <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                        <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                        <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                    </tr>
+                    
+                    <!-- Categoria: Supporto -->
+                    <tr class="bg-dark bg-opacity-50">
+                        <td colspan="4" class="fw-bold ps-4">
+                            <i class="fas fa-life-ring me-2"></i> {{ translate('Assistenza e Sicurezza') }}
+                        </td>
                     </tr>
                     <tr>
-                        <td class="text-start">{{ translate('Detailed Reports') }}</td>
-                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> {{ translate('Basic') }}</td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> {{ translate('Advanced') }}</td>
+                        <td class="text-start ps-5">{{ translate('Supporto prioritario') }}</td>
+                        <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                        <td class="text-center"><i class="fas fa-check text-success"></i> 24/7</td>
+                        <td class="text-center"><i class="fas fa-check text-success"></i> {{ translate('Dedicato') }}</td>
                     </tr>
                     <tr>
-                        <td class="text-start">{{ translate('API Integrations') }}</td>
-                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i></td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i></td>
+                        <td class="text-start ps-5">{{ translate('Backup automatici') }}</td>
+                        <td class="text-center">{{ translate('Manuali') }}</td>
+                        <td class="text-center">{{ translate('Giornalieri') }}</td>
+                        <td class="text-center">{{ translate('In tempo reale') }}</td>
+                    </tr>
+                    
+                    <!-- Categoria: Strumenti -->
+                    <tr class="bg-dark bg-opacity-50">
+                        <td colspan="4" class="fw-bold ps-4">
+                            <i class="fas fa-tools me-2"></i> {{ translate('Strumenti Avanzati') }}
+                        </td>
                     </tr>
                     <tr>
-                        <td class="text-start">{{ translate('Automatic Backups') }}</td>
-                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> {{ translate('Weekly') }}</td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> {{ translate('Daily') }}</td>
+                        <td class="text-start ps-5">{{ translate('LinkBay-CMS AI') }}</td>
+                        <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                        <td class="text-center"><i class="fas fa-check text-success"></i> {{ translate('Base') }}</td>
+                        <td class="text-center"><i class="fas fa-check text-success"></i> {{ translate('Avanzata') }}</td>
                     </tr>
                     <tr>
-                        <td class="text-start">{{ translate('SEO Optimization') }}</td>
-                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i></td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> {{ translate('Advanced') }}</td>
-                    </tr>
-                    <tr>
-                        <td class="text-start">{{ translate('Integrated Analytics') }}</td>
-                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i></td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> {{ translate('Advanced + AI') }}</td>
-                    </tr>
-                    <tr>
-                        <td class="text-start">{{ translate('Order & Shipping Management') }}</td>
-                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> {{ translate('Basic') }}</td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> {{ translate('Complete') }}</td>
-                    </tr>
-                    <tr>
-                        <td class="text-start">{{ translate('LinkBay-CMS AI Optimization') }}</td>
-                        <td class="text-center"><i class="fa-solid fa-xmark text-danger"></i></td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> {{ translate('Basic') }}</td>
-                        <td class="text-center"><i class="fa-solid fa-check text-success"></i> {{ translate('Included') }}</td>
+                        <td class="text-start ps-5">{{ translate('Report analitici') }}</td>
+                        <td class="text-center">{{ translate('Base') }}</td>
+                        <td class="text-center">{{ translate('Completi') }}</td>
+                        <td class="text-center">{{ translate('Predittivi') }}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
+        
+        <div class="text-center mt-6">
+            <a href="#piani" class="btn btn-outline-light px-5 py-3 rounded-pill fw-bold hover-scale">
+                <i class="fas fa-ship me-2"></i> {{ translate('Scegli la Tua Nave') }}
+            </a>
+        </div>
     </div>
-</div>
+</section>
 
-<!-- Sezione Vantaggi dei Nostri Piani -->
-<div class="container-fluid py-5" style="background-color: #f7f8fa;">
+<!-- Sezione Vantaggi - "Perché Navigare con Noi" -->
+<section class="py-8" style="background-color: #f7f8fa;">
     <div class="container">
-        <!-- Titolo della Sezione -->
-        <div class="text-center mb-5" data-aos="fade-down">
-            <h2 class="fw-bold">{{ translate('Benefits of Our Plans') }}</h2>
-            <p class="lead">{{ translate('Explore the main advantages you’ll get by choosing one of our subscription plans.') }}</p>
+        <div class="text-center mb-7">
+            <h2 class="display-5 fw-bold mb-3">
+                <i class="fas fa-anchor text-danger me-2"></i> {{ translate('Perché Navigare con Noi') }}
+            </h2>
+            <p class="lead text-muted mx-auto" style="max-width: 700px;">
+                {{ translate('Tutti i vantaggi di una ciurma esperta al tuo servizio, 24 ore su 24') }}
+            </p>
         </div>
-
-        <!-- Griglia dei Vantaggi -->
-        <div class="row gy-5">
-            
+        
+        <div class="row g-5">
             <!-- Vantaggio 1 -->
-            <div class="col-md-4" data-aos="fade-up">
-                <div class="card border-0 shadow-sm text-center h-100">
-                    <div class="card-body">
-                        <i class="fa-solid fa-thumbs-up fa-3x text-danger mb-3"></i>
-                        <h5 class="card-title fw-bold">{{ translate('User Friendly') }}</h5>
-                        <p class="card-text">{{ translate('Designed for simplicity and ease of use, even for non-experts.') }}</p>
+            <div class="col-md-4">
+                <div class="benefit-card h-100 p-4 rounded-4 shadow-sm border-start border-4 border-danger hover-lift">
+                    <div class="icon-wrapper bg-danger bg-opacity-10 text-danger mb-4">
+                        <i class="fas fa-rocket fa-2x"></i>
                     </div>
+                    <h3 class="h4 mb-3">{{ translate('Velocità di Lancio') }}</h3>
+                    <p class="text-muted mb-0">
+                        {{ translate('Il tuo e-commerce online in 72 ore. Nessun ingorgo burocratico, solo mare aperto davanti a te.') }}
+                    </p>
                 </div>
             </div>
-
+            
             <!-- Vantaggio 2 -->
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="card border-0 shadow-sm text-center h-100">
-                    <div class="card-body">
-                        <i class="fa-solid fa-headset fa-3x text-danger mb-3"></i>
-                        <h5 class="card-title fw-bold">{{ translate('Reliable Support') }}</h5>
-                        <p class="card-text">{{ translate('Our team is always ready to assist you with professional support.') }}</p>
+            <div class="col-md-4">
+                <div class="benefit-card h-100 p-4 rounded-4 shadow-sm border-start border-4 border-primary hover-lift">
+                    <div class="icon-wrapper bg-primary bg-opacity-10 text-primary mb-4">
+                        <i class="fas fa-shield-alt fa-2x"></i>
                     </div>
+                    <h3 class="h4 mb-3">{{ translate('Sicurezza Totale') }}</h3>
+                    <p class="text-muted mb-0">
+                        {{ translate('Difendiamo il tuo business come un vascello da guerra. Protezione DDoS, SSL e backup automatici.') }}
+                    </p>
                 </div>
             </div>
-
+            
             <!-- Vantaggio 3 -->
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="card border-0 shadow-sm text-center h-100">
-                    <div class="card-body">
-                        <i class="fa-solid fa-chart-line fa-3x text-danger mb-3"></i>
-                        <h5 class="card-title fw-bold">{{ translate('Growth Tools') }}</h5>
-                        <p class="card-text">{{ translate('Advanced features that help you scale your online business.') }}</p>
+            <div class="col-md-4">
+                <div class="benefit-card h-100 p-4 rounded-4 shadow-sm border-start border-4 border-success hover-lift">
+                    <div class="icon-wrapper bg-success bg-opacity-10 text-success mb-4">
+                        <i class="fas fa-chart-line fa-2x"></i>
                     </div>
+                    <h3 class="h4 mb-3">{{ translate('Crescita Garantita') }}</h3>
+                    <p class="text-muted mb-0">
+                        {{ translate('Strumenti avanzati per espandere il tuo business. Dalle analisi predittive all\'AI per l\'upselling.') }}
+                    </p>
                 </div>
             </div>
-
+            
             <!-- Vantaggio 4 -->
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="card border-0 shadow-sm text-center h-100">
-                    <div class="card-body">
-                        <i class="fa-solid fa-cogs fa-3x text-danger mb-3"></i>
-                        <h5 class="card-title fw-bold">{{ translate('Customizable Platform') }}</h5>
-                        <p class="card-text">{{ translate('Adjust settings, layout, and features to suit your unique brand.') }}</p>
+            <div class="col-md-4">
+                <div class="benefit-card h-100 p-4 rounded-4 shadow-sm border-start border-4 border-info hover-lift">
+                    <div class="icon-wrapper bg-info bg-opacity-10 text-info mb-4">
+                        <i class="fas fa-plug fa-2x"></i>
                     </div>
+                    <h3 class="h4 mb-3">{{ translate('Integrazioni Illimitate') }}</h3>
+                    <p class="text-muted mb-0">
+                        {{ translate('Collega tutti i tuoi strumenti preferiti. Dal pagamento alla logistica, tutto in un unico posto.') }}
+                    </p>
                 </div>
             </div>
-
+            
             <!-- Vantaggio 5 -->
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
-                <div class="card border-0 shadow-sm text-center h-100">
-                    <div class="card-body">
-                        <i class="fa-solid fa-rocket fa-3x text-danger mb-3"></i>
-                        <h5 class="card-title fw-bold">{{ translate('Fast Performance') }}</h5>
-                        <p class="card-text">{{ translate('Enjoy lightning-fast loading times and smooth navigation.') }}</p>
+            <div class="col-md-4">
+                <div class="benefit-card h-100 p-4 rounded-4 shadow-sm border-start border-4 border-warning hover-lift">
+                    <div class="icon-wrapper bg-warning bg-opacity-10 text-warning mb-4">
+                        <i class="fas fa-sync-alt fa-2x"></i>
                     </div>
+                    <h3 class="h4 mb-3">{{ translate('Aggiornamenti Costanti') }}</h3>
+                    <p class="text-muted mb-0">
+                        {{ translate('Nuove funzionalità ogni mese. Navigherai sempre con le tecnologie più avanzate senza costi aggiuntivi.') }}
+                    </p>
                 </div>
             </div>
-
+            
             <!-- Vantaggio 6 -->
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="500">
-                <div class="card border-0 shadow-sm text-center h-100">
-                    <div class="card-body">
-                        <i class="fa-solid fa-shield-alt fa-3x text-danger mb-3"></i>
-                        <h5 class="card-title fw-bold">{{ translate('Top-notch Security') }}</h5>
-                        <p class="card-text">{{ translate('Your data is protected with our secure and GDPR-compliant systems.') }}</p>
+            <div class="col-md-4">
+                <div class="benefit-card h-100 p-4 rounded-4 shadow-sm border-start border-4 border-danger hover-lift">
+                    <div class="icon-wrapper bg-danger bg-opacity-10 text-danger mb-4">
+                        <i class="fas fa-life-ring fa-2x"></i>
                     </div>
+                    <h3 class="h4 mb-3">{{ translate('Supporto Reale') }}</h3>
+                    <p class="text-muted mb-0">
+                        {{ translate('Non chatbot, ma esperti veri. La nostra ciurma ti assiste in tempo reale per ogni evenienza.') }}
+                    </p>
                 </div>
             </div>
-
         </div>
     </div>
-</div>
-</div>
-</div>
+</section>
+
+<!-- Sezione FAQ - "Domande dei Marinai" -->
+<section class="py-8 bg-white">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <div class="pe-lg-4">
+                    <h2 class="display-5 fw-bold mb-4">
+                        <i class="fas fa-question-circle text-danger me-2"></i> {{ translate('Domande dei Marinai') }}
+                    </h2>
+                    <p class="lead text-muted mb-5">
+                        {{ translate('Le risposte alle domande più frequenti sulla nostra flotta digitale') }}
+                    </p>
+                    <img src="{{ url_for('static', filename='images/superadmin/faq-ship.png') }}" alt="FAQ" class="img-fluid rounded-4">
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="accordion" id="faqAccordion">
+                    <!-- Domanda 1 -->
+                    <div class="accordion-item border-0 mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button shadow-none rounded-3 bg-light fw-bold py-4" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                <i class="fas fa-ship text-danger me-3"></i> {{ translate('Posso cambiare nave durante il viaggio?') }}
+                            </button>
+                        </h3>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                {{ translate('Certo! Puoi aggiornare il tuo piano in qualsiasi momento senza costi aggiuntivi o interruzioni del servizio.') }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Domanda 2 -->
+                    <div class="accordion-item border-0 mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button shadow-none rounded-3 bg-light fw-bold py-4" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                <i class="fas fa-coins text-warning me-3"></i> {{ translate('Ci sono costi nascosti?') }}
+                            </button>
+                        </h3>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                {{ translate('Assolutamente no. Il prezzo che vedi è tutto ciò che pagherai. Niente costi di transazione aggiuntivi o commissioni nascoste.') }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Domanda 3 -->
+                    <div class="accordion-item border-0 mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button shadow-none rounded-3 bg-light fw-bold py-4" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                <i class="fas fa-lock text-success me-3"></i> {{ translate('I miei dati sono al sicuro?') }}
+                            </button>
+                        </h3>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                {{ translate('Utilizziamo crittografia militare e backup giornalieri. I tuoi dati sono più sicuri che in una cassaforte sottomarina.') }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Domanda 4 -->
+                    <div class="accordion-item border-0 mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button shadow-none rounded-3 bg-light fw-bold py-4" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                <i class="fas fa-calendar-check text-primary me-3"></i> {{ translate('Cosa succede alla fine del trial?') }}
+                            </button>
+                        </h3>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                {{ translate('Il tuo store rimarrà attivo senza interruzioni. Potrai scegliere se passare a un piano a pagamento o continuare con Explorer gratis.') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-5">
+                    <a href="#" class="btn btn-outline-danger px-4 py-3 rounded-pill">
+                        <i class="fas fa-book me-2"></i> {{ translate('Vedi tutte le FAQ') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sezione CTA Finale -->
+<section class="py-8 text-white position-relative" style="background: linear-gradient(135deg, #ff5758 0%, #d14243 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="display-4 fw-bold mb-4">
+                    <i class="fas fa-ship me-3"></i> {{ translate('Pronto a Salpare?') }}
+                </h2>
+                <p class="lead mb-5">
+                    {{ translate('Unisciti a migliaia di business che crescono con LinkBayCMS. Inizia la tua prova gratuita di 14 giorni oggi stesso.') }}
+                </p>
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <button class="btn btn-light btn-lg px-5 py-3 fw-bold rounded-pill shadow hover-scale">
+                        {{ translate('Inizia il Viaggio') }} <i class="fas fa-arrow-right ms-3"></i>
+                    </button>
+                    <a href="#piani" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill hover-scale">
+                        <i class="fas fa-compass me-2"></i> {{ translate('Confronta i Piani') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Decorazione onda -->
+    <div class="wave-cta">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#ffffff"></path>
+        </svg>
+    </div>
+</section>
 
 {% endblock %}
