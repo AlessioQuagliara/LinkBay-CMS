@@ -20,8 +20,8 @@ app.config.from_object(Config)
 # 📌 Configura la chiave segreta per la sicurezza delle sessioni Flask
 app.secret_key = os.getenv('SECRET_KEY', 'default_secret_key')
 
-# 🔹 Configura l'API Key di OpenAI se disponibile nelle variabili d'ambiente
-openai.api_key = app.config.get('OPENAI_API_KEY')
+# 🔹 Configura l'API Key di DeepSeek se disponibile nelle variabili d'ambiente
+openai.api_key = app.config.get('DEEPSEEK_API_KEY')
 
 # 📌 Configura il database PostgreSQL
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(

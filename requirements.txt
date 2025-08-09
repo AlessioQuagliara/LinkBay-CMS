@@ -6,11 +6,11 @@ webdriver-manager
 Pillow
 Stripe
 gunicorn
-openai
 PyJWT
 python-dotenv
 Flask-Session
 Jinja2
+openai
 requests
 Werkzeug
 psycopg2-binary
