@@ -61,3 +61,34 @@ TypeError: argument of type 'NoneType' is not iterable
 [2025-08-09 11:36:44,344] [INFO] in app: ✅ LinkBay-CMS avviato correttamente.
 [2025-08-09 11:36:51,943] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
 [2025-08-09 11:36:52,520] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-11 22:36:06,317] [INFO] in app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-11 22:36:27,491] [ERROR] in app: Exception on / [GET]
+Traceback (most recent call last):
+  File "/Users/alessio/PYTHON_SOFTWARE/LinkBay-CMS/venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/alessio/PYTHON_SOFTWARE/LinkBay-CMS/venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/alessio/PYTHON_SOFTWARE/LinkBay-CMS/venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/alessio/PYTHON_SOFTWARE/LinkBay-CMS/venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/LinkBay-CMS/blueprints/main.py", line 30, in render_dynamic_page
+    page = load_page_content(slug, shop_subdomain)
+  File "/Users/alessio/PYTHON_SOFTWARE/LinkBay-CMS/helpers.py", line 37, in load_page_content
+    shop_name = extract_shop_name(shop_subdomain)
+  File "/Users/alessio/PYTHON_SOFTWARE/LinkBay-CMS/helpers.py", line 18, in extract_shop_name
+    return shop_subdomain.split('.')[0] if '.' in shop_subdomain else shop_subdomain
+                                           ^^^^^^^^^^^^^^^^^^^^^
+TypeError: argument of type 'NoneType' is not iterable
+[2025-08-11 22:36:41,342] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-11 22:36:41,911] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-13 17:55:14,235] [INFO] in app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-13 17:55:19,667] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-13 17:55:20,928] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-13 17:55:48,985] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-13 17:55:50,220] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-13 18:08:13,343] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-13 18:08:14,530] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-15 14:27:25,224] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-15 14:27:26,478] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.

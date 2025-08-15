@@ -1,144 +1,235 @@
 {% extends 'landing/base.html' %}
 {% block content %}
 
-<!-- CONTENUTI DINAMICI -->
-<div id="content9" class="content-pane" data-aos="fade-up">
-  <h4 class="mb-4">📈 Statistiche di Vendita</h4>
-  <p>Visualizza le performance dei tuoi negozi online con dati aggiornati sulle vendite e il fatturato.</p>
-  <div id="shopsContainer"></div>
+<!-- HEADER -->
+<div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-white rounded shadow-sm">
+  <div class="d-flex align-items-center">
+    <i class="fas fa-chart-line fa-2x text-danger me-3"></i>
+    <div>
+      <h3 class="mb-0">Statistiche di Vendita</h3>
+      <p class="text-muted mb-0">Monitora le performance dei tuoi negozi</p>
+    </div>
+  </div>
+  <a href="/dashboard" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-1"></i> Torna alla Dashboard
+  </a>
 </div>
+
+<!-- DIVISORE -->
+<div class="border-top border-danger border-2 my-4 opacity-75"></div>
+
+<!-- OVERVIEW CARDS -->
+<div class="row g-4 mb-4" id="overview-section">
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body text-center">
+        <div class="bg-success bg-opacity-10 rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+          <i class="fas fa-shopping-cart fa-2x text-success"></i>
+        </div>
+        <h5 class="card-title">Ordini Totali</h5>
+        <h3 class="text-success mb-0" id="total-orders">-</h3>
+        <small class="text-muted">Ordini completati</small>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body text-center">
+        <div class="bg-primary bg-opacity-10 rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+          <i class="fas fa-euro-sign fa-2x text-primary"></i>
+        </div>
+        <h5 class="card-title">Fatturato Totale</h5>
+        <h3 class="text-primary mb-0" id="total-revenue">-</h3>
+        <small class="text-muted">Ricavi complessivi</small>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body text-center">
+        <div class="bg-info bg-opacity-10 rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+          <i class="fas fa-store fa-2x text-info"></i>
+        </div>
+        <h5 class="card-title">Negozi Attivi</h5>
+        <h3 class="text-info mb-0" id="total-shops">-</h3>
+        <small class="text-muted">Negozi con vendite</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DETTAGLIO NEGOZI -->
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white border-0">
+    <h4 class="mb-0" id="shops-section-title">
+      <i class="fas fa-chart-bar me-2 text-danger"></i>Dettaglio per Negozio
+    </h4>
+  </div>
+  <div class="card-body">
+    <div id="shopsContainer">
+      <div class="text-center py-4">
+        <div class="spinner-border text-danger" role="status">
+          <span class="visually-hidden">Caricamento...</span>
+        </div>
+        <p class="mt-2 text-muted">⏳ Caricamento dati in corso...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PULSANTE AIUTO -->
+<button id="start-sales-tutorial" class="btn btn-danger position-fixed bottom-0 end-0 m-4 rounded-circle shadow" 
+        style="width: 50px; height: 50px;">
+  <i class="fas fa-question"></i>
+</button>
 
 <!-- Script Chart.js + Fetch -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', async function () {
     const container = document.getElementById('shopsContainer');
-    container.innerHTML = '<p>⏳ Caricamento dati...</p>';
 
     try {
       const response = await fetch('/api/user_shops_sales');
       const result = await response.json();
 
       if (!response.ok) {
-        container.innerHTML = `<div class="alert alert-danger">Errore HTTP: ${response.status}</div>`;
+        container.innerHTML = `
+          <div class="alert alert-danger d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <div>Errore HTTP: ${response.status}</div>
+          </div>
+        `;
         return;
       }
+      
       if (!result.success) {
-        container.innerHTML = `<div class="alert alert-warning">Errore: ${result.message}</div>`;
+        container.innerHTML = `
+          <div class="alert alert-warning d-flex align-items-center">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <div>Errore: ${result.message}</div>
+          </div>
+        `;
         return;
       }
+      
       if (!Array.isArray(result.data)) {
-        container.innerHTML = `<div class="alert alert-warning">Formato dati non valido</div>`;
+        container.innerHTML = `
+          <div class="alert alert-warning d-flex align-items-center">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <div>Formato dati non valido</div>
+          </div>
+        `;
         return;
       }
+
+      // Aggiorna le statistiche overview
+      let totalOrders = 0;
+      let totalRevenue = 0;
+      let activeShops = result.data.length;
+
+      result.data.forEach(shop => {
+        totalOrders += shop.total_orders;
+        totalRevenue += shop.total_revenue;
+      });
+
+      document.getElementById('total-orders').textContent = totalOrders.toLocaleString();
+      document.getElementById('total-revenue').textContent = `€ ${totalRevenue.toFixed(2)}`;
+      document.getElementById('total-shops').textContent = activeShops;
 
       if (result.data.length === 0) {
         container.innerHTML = `
-          <div class="alert alert-info">
-            Nessun dato disponibile al momento. I tuoi negozi sono pronti, inizia a vendere per vedere le statistiche 📊
-          </div>
-        `;
-
-        const placeholder = document.createElement('div');
-        placeholder.className = "card mb-4 shadow-sm border-0 rounded";
-        placeholder.innerHTML = `
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <h5 class="card-title text-dark">Nessun negozio attivo</h5>
-                <p class="mb-1"><strong>Totale ordini completati:</strong> 0</p>
-                <p class="mb-1"><strong>Fatturato:</strong> € 0.00</p>
-              </div>
-              <div>
-                <canvas id="chart_empty" width="300" height="200"></canvas>
-              </div>
+          <div class="text-center py-5">
+            <div class="bg-light rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+              <i class="fas fa-chart-line fa-3x text-muted"></i>
             </div>
+            <h5 class="text-muted">Nessun dato disponibile</h5>
+            <p class="text-muted">I tuoi negozi sono pronti, inizia a vendere per vedere le statistiche 📊</p>
+            <a href="/dashboard/stores" class="btn btn-danger">
+              <i class="fas fa-store me-1"></i> Gestisci Negozi
+            </a>
           </div>
         `;
-        container.appendChild(placeholder);
 
-        const ctx = document.getElementById(`chart_empty`).getContext('2d');
-        new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: ['Ordini Completati', 'Fatturato (€)'],
-            datasets: [{
-              label: 'Valori',
-              data: [0, 0],
-              backgroundColor: ['rgba(220, 53, 69, 0.8)', 'rgba(0,0,0,0.8)']
-            }]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: { display: false }
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                ticks: { color: '#333' }
-              },
-              x: {
-                ticks: { color: '#333' }
-              }
-            }
-          }
-        });
-
+        // Reset overview per caso senza dati
+        document.getElementById('total-orders').textContent = '0';
+        document.getElementById('total-revenue').textContent = '€ 0.00';
+        document.getElementById('total-shops').textContent = '0';
         return;
       }
 
       container.innerHTML = '';
 
-      result.data.forEach(shop => {
+      result.data.forEach((shop, index) => {
         const safeId = shop.shop_name.replace(/[^a-zA-Z0-9_]/g, "_");
 
         const card = document.createElement('div');
-        card.className = "card mb-4 shadow-sm border-0 rounded";
+        card.className = "card mb-4 border-0 shadow-sm";
         card.innerHTML = `
           <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <h5 class="card-title text-dark">${shop.shop_name} <span class="badge bg-danger">${shop.shop_type}</span></h5>
-                <p class="mb-1"><strong>Totale ordini completati:</strong> ${shop.total_orders}</p>
-                <p class="mb-1"><strong>Fatturato:</strong> € ${shop.total_revenue.toFixed(2)}</p>
+            <div class="row align-items-center">
+              <div class="col-lg-6">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="bg-danger bg-opacity-10 rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                    <i class="fas fa-store text-danger"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-1">${shop.shop_name}</h5>
+                    <span class="badge bg-danger">${shop.shop_type}</span>
+                  </div>
+                </div>
+                
+                <div class="row text-center">
+                  <div class="col-6">
+                    <div class="border-end">
+                      <h4 class="text-success mb-0">${shop.total_orders}</h4>
+                      <small class="text-muted">Ordini</small>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <h4 class="text-primary mb-0">€ ${shop.total_revenue.toFixed(2)}</h4>
+                    <small class="text-muted">Fatturato</small>
+                  </div>
+                </div>
               </div>
-              <div>
-                <canvas id="chart_${safeId}" width="300" height="200"></canvas>
+              
+              <div class="col-lg-6">
+                <div class="chart-container" style="position: relative; height: 200px;">
+                  <canvas id="chart_${safeId}"></canvas>
+                </div>
               </div>
             </div>
           </div>
         `;
+        
         container.appendChild(card);
 
+        // Crea il grafico
         const ctx = document.getElementById(`chart_${safeId}`).getContext('2d');
         new Chart(ctx, {
-          type: 'bar',
-          data: {
+          type: 'doughnut',
+           {
             labels: ['Ordini Completati', 'Fatturato (€)'],
             datasets: [{
-              label: 'Valori',
-              data: [shop.total_orders, shop.total_revenue],
-              backgroundColor: ['rgba(220, 53, 69, 0.8)', 'rgba(0,0,0,0.8)']
+               [shop.total_orders, shop.total_revenue],
+              backgroundColor: [
+                'rgba(220, 53, 69, 0.8)',
+                'rgba(13, 110, 253, 0.8)'
+              ],
+              borderWidth: 0
             }]
           },
           options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
               legend: {
-                display: false
-              }
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                ticks: {
-                  color: '#333'
-                }
-              },
-              x: {
-                ticks: {
-                  color: '#333'
+                position: 'bottom',
+                labels: {
+                  padding: 20,
+                  usePointStyle: true
                 }
               }
             }
@@ -148,8 +239,59 @@
 
     } catch (error) {
       console.error('Errore durante il recupero dei dati:', error);
-      container.innerHTML = '<div class="alert alert-danger">Errore imprevisto durante il caricamento.</div>';
+      container.innerHTML = `
+        <div class="alert alert-danger d-flex align-items-center">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <div>Errore imprevisto durante il caricamento dei dati.</div>
+        </div>
+      `;
     }
   });
+
+  // Tour guidato per le vendite
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof Shepherd === 'undefined') return;
+
+    const salesTour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: { enabled: true },
+        scrollTo: { behavior: 'smooth', block: 'center' },
+        classes: 'shadow-lg bg-danger text-white',
+        arrow: true
+      },
+      useModalOverlay: true
+    });
+
+    salesTour.addStep({
+      title: '<i class="fas fa-chart-line"></i>&nbsp; Statistiche Overview',
+      text: 'Qui vedi un riepilogo rapido delle tue performance di vendita.',
+      attachTo: {
+        element: '#overview-section',
+        on: 'bottom'
+      },
+      buttons: [
+        { text: 'Salta', action: salesTour.cancel },
+        { text: 'Avanti', action: salesTour.next }
+      ]
+    });
+
+    salesTour.addStep({
+      title: '<i class="fas fa-store"></i>&nbsp; Dettaglio Negozi',
+      text: 'Ogni negozio ha le sue statistiche dettagliate con grafici.',
+      attachTo: {
+        element: '#shops-section-title',
+        on: 'bottom'
+      },
+      buttons: [
+        { text: 'Indietro', action: salesTour.back },
+        { text: 'Fatto!', action: salesTour.complete }
+      ]
+    });
+
+    document.getElementById('start-sales-tutorial').addEventListener('click', () => {
+      salesTour.start();
+    });
+  });
 </script>
+
 {% endblock %}

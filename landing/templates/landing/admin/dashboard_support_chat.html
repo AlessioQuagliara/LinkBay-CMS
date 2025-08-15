@@ -1,35 +1,130 @@
 {% extends 'landing/base.html' %}
 {% block content %}
 
-    <div class="card shadow-sm mb-4" data-aos="fade-up">
-      <div class="card-body d-flex justify-content-between align-items-center">
-        <div>
-          <h5 class="mb-1">{{ ticket.title }}</h5>
-          <p class="mb-0 text-muted">
-            {{ ticket.category }} • 
-            <span class="text-uppercase fw-bold text-{{ 'success' if ticket.priority == 'low' else 'warning' if ticket.priority == 'normal' else 'danger' }}">
-              {{ ticket.priority }}
-            </span>
-          </p>
-        </div>
-        <span class="badge text-bg-{{ 'secondary' if ticket.status == 'open' else 'info' if ticket.status == 'in_progress' else 'success' }}">
-          {{ ticket.status.replace('_', ' ').title() }}
+<!-- HEADER UNIFORME -->
+<div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-white rounded shadow-sm">
+  <div class="d-flex align-items-center">
+    <i class="fas fa-ticket-alt fa-2x text-danger me-3"></i>
+    <div>
+      <h3 class="mb-0">Ticket di Supporto</h3>
+      <p class="text-muted mb-0">Gestisci la tua richiesta di assistenza</p>
+    </div>
+  </div>
+  <a href="/dashboard/support" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-1"></i> Torna al Supporto
+  </a>
+</div>
+
+<!-- DIVISORE -->
+<div class="border-top border-danger border-2 my-4 opacity-75"></div>
+
+<!-- CARD DETTAGLI TICKET -->
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body d-flex justify-content-between align-items-center">
+    <div>
+      <h5 class="mb-1">{{ ticket.title }}</h5>
+      <p class="mb-0 text-muted">
+        <i class="fas fa-tag me-1"></i>{{ ticket.category }} • 
+        <span class="text-uppercase fw-bold text-{{ 'success' if ticket.priority == 'low' else 'warning' if ticket.priority == 'normal' else 'danger' }}">
+          <i class="fas fa-{{ 'check-circle' if ticket.priority == 'low' else 'exclamation-circle' if ticket.priority == 'normal' else 'exclamation-triangle' }} me-1"></i>
+          {{ ticket.priority }}
         </span>
+      </p>
+    </div>
+    <span class="badge bg-{{ 'secondary' if ticket.status == 'open' else 'info' if ticket.status == 'in_progress' else 'success' }} rounded-pill">
+      <i class="fas fa-{{ 'clock' if ticket.status == 'open' else 'sync-alt' if ticket.status == 'in_progress' else 'check' }} me-1"></i>
+      {{ ticket.status.replace('_', ' ').title() }}
+    </span>
+  </div>
+</div>
+
+<!-- CARD CHAT -->
+<div class="card border-0 shadow-sm mb-4" style="height: 60vh;">
+  <div class="card-header bg-white border-0">
+    <h5 class="mb-0"><i class="fas fa-comments me-2 text-danger"></i>Conversazione</h5>
+  </div>
+  <div class="card-body overflow-auto p-0" id="chatMessages" style="max-height: 100%; scroll-behavior: smooth;">
+    <!-- Messaggi caricati dinamicamente -->
+    <div class="d-flex justify-content-center align-items-center h-100">
+      <div class="text-center text-muted">
+        <i class="fas fa-comment-dots fa-3x mb-3"></i>
+        <p>Caricamento della conversazione in corso...</p>
       </div>
     </div>
+  </div>
+</div>
 
-    <div class="card shadow-sm mb-4" style="height: 60vh;" data-aos="fade-up">
-      <div class="card-body overflow-auto" id="chatMessages" style="max-height: 100%; scroll-behavior: smooth;">
-        <!-- Messaggi caricati dinamicamente -->
-      </div>
-    </div>
+<!-- INPUT MESSAGGIO -->
+<div class="input-group mb-3 shadow-sm">
+  <input type="text" id="chatInput" class="form-control border-0 py-3" placeholder="Scrivi un messaggio..." aria-label="Messaggio">
+  <button class="btn btn-danger px-4" type="button" id="sendMessageBtn">
+    <i class="fas fa-paper-plane me-1"></i> Invia
+  </button>
+</div>
 
-    <div class="input-group">
-      <input type="text" id="chatInput" class="form-control" placeholder="Scrivi un messaggio..." aria-label="Messaggio">
-      <button class="btn btn-danger" type="button" id="sendMessageBtn">
-        <i class="fa-solid fa-paper-plane"></i>
-      </button>
-    </div>
+<!-- PULSANTE AIUTO -->
+<button id="start-tutorial" class="btn btn-danger position-fixed bottom-0 end-0 m-4 rounded-circle shadow" 
+        style="width: 50px; height: 50px;">
+  <i class="fas fa-question"></i>
+</button>
 
-    <script src="/static/js/superadmin/ticket_chat.js"></script>
+<script src="/static/js/superadmin/ticket_chat.js"></script>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Tour guidato
+document.getElementById('start-tutorial').addEventListener('click', () => {
+  const tour = new Shepherd.Tour({
+    defaultStepOptions: {
+      cancelIcon: { enabled: true },
+      scrollTo: { behavior: 'smooth', block: 'center' },
+      classes: 'shadow-lg bg-danger text-white',
+      arrow: true
+    },
+    useModalOverlay: true
+  });
+
+  tour.addStep({
+    title: '<i class="fas fa-ticket-alt"></i> Dettagli Ticket',
+    text: 'Qui puoi vedere lo stato e la priorità della tua richiesta di supporto.',
+    attachTo: {
+      element: '.card-body',
+      on: 'bottom'
+    },
+    buttons: [
+      { text: 'Salta', action: tour.cancel },
+      { text: 'Avanti', action: tour.next }
+    ]
+  });
+
+  tour.addStep({
+    title: '<i class="fas fa-comments"></i> Conversazione',
+    text: 'In questa area trovi tutta la conversazione con il nostro team di supporto.',
+    attachTo: {
+      element: '#chatMessages',
+      on: 'top'
+    },
+    buttons: [
+      { text: 'Indietro', action: tour.back },
+      { text: 'Avanti', action: tour.next }
+    ]
+  });
+
+  tour.addStep({
+    title: '<i class="fas fa-paper-plane"></i> Invia Messaggio',
+    text: 'Scrivi qui per rispondere o aggiungere informazioni al tuo ticket.',
+    attachTo: {
+      element: '#chatInput',
+      on: 'top'
+    },
+    buttons: [
+      { text: 'Fine', action: tour.complete }
+    ]
+  });
+
+  tour.start();
+});
+</script>
 {% endblock %}

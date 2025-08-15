@@ -1,79 +1,92 @@
 {% extends 'landing/base.html' %}
 {% block content %}
-<div class="container py-4">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-danger text-white">
-      <h5 class="mb-0"><i class="fa-solid fa-users me-2"></i>Gestione Utenti</h5>
-    </div>
-    <div class="card-body">
-      <p class="text-muted">Visualizza e gestisci gli utenti che hanno accesso al tuo shop.</p>
 
-      <div class="table-responsive">
-        <table class="table align-middle">
-          <thead>
-            <tr>
-              <th>👤 Nome</th>
-              <th>📧 Email</th>
-              <th>📱 Telefono</th>
-              <th>🔐 Ruolo</th>
-              <th class="text-end">Azioni</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for u in authorized_users %}
-            <tr>
-              <td>{{ u.nome }} {{ u.cognome }}</td>
-              <td>{{ u.email }}</td>
-              <td>{{ u.telefono or '—' }}</td>
-              <td>{{ u.access_level|capitalize }}</td>
-              <td class="text-end">
-                <button class="btn btn-sm btn-outline-primary edit-user-btn"
-                        data-bs-toggle="modal" data-bs-target="#editUserModal"
-                        data-user-id="{{ u.id }}"
-                        data-user-email="{{ u.email }}"
-                        data-user-name="{{ u.nome }} {{ u.cognome }}"
-                        data-access-level="{{ u.access_level }}">
-                  <i class="fa-solid fa-pen"></i>
-                </button>
-                <form method="POST" action="/dashboard/users/delete/{{ u.id }}?shop_name={{ shop_name }}" style="display:inline-block;">
-                  <button type="button" class="btn btn-sm btn-outline-danger delete-user-btn">
-                    <i class="fa-solid fa-trash"></i>
-                  </button>
-                </form>
-              </td>
-            </tr>
-            {% else %}
-            <tr>
-              <td colspan="5" class="text-center text-muted">Nessun utente trovato</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        {% if subscription.plan_name == 'AllIsReady' %}
-        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addUserModal">
-          <i class="fa-solid fa-plus"></i> Aggiungi
-        </button>
-        {% elif subscription.plan_name == 'ProfessionalDesk' %}
-        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addUserModal">
-          <i class="fa-solid fa-plus"></i> Aggiungi
-        </button>
-        {% else %}
-        <p>Non puoi aggiungere utenti</p>
-        {% endif %}
-      </div>
+<!-- HEADER UNIFORME ----------------------------------------------------->
+<div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-white rounded shadow-sm">
+  <div class="d-flex align-items-center">
+    <i class="fas fa-users fa-2x text-danger me-3"></i>
+    <div>
+      <h3 class="mb-0">Gestione Utenti</h3>
+      <p class="text-muted mb-0">Controlla gli utenti con accesso al tuo shop</p>
     </div>
+  </div>
+  <a href="/dashboard" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-1"></i> Torna alla Dashboard
+  </a>
+</div>
+
+<!-- DIVISORE ------------------------------------------------------------>
+<div class="border-top border-danger border-2 my-4 opacity-75"></div>
+
+<!-- CARD PRINCIPALE ----------------------------------------------------->
+<div class="card shadow-sm border-0 rounded-4" data-aos="fade-up">
+  <div class="card-body">
+    <p class="text-muted">Visualizza e gestisci gli utenti che hanno accesso al tuo shop.</p>
+
+    <!-- TABELLA ---------------------------------------------------------->
+    <div class="table-responsive mb-3">
+      <table class="table table-hover align-middle bg-white rounded shadow-sm overflow-hidden" id="usersTable">
+        <thead class="table-danger text-dark">
+          <tr>
+            <th><i class="fas fa-user me-1"></i>Nome</th>
+            <th><i class="fas fa-envelope me-1"></i>Email</th>
+            <th><i class="fas fa-phone me-1"></i>Telefono</th>
+            <th><i class="fas fa-key me-1"></i>Ruolo</th>
+            <th class="text-end">Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in authorized_users %}
+          <tr>
+            <td>{{ u.nome }} {{ u.cognome }}</td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.telefono or '—' }}</td>
+            <td><span class="badge bg-info">{{ u.access_level|capitalize }}</span></td>
+            <td class="text-end">
+              <button class="btn btn-sm btn-outline-primary edit-user-btn"
+                      data-bs-toggle="modal" data-bs-target="#editUserModal"
+                      data-user-id="{{ u.id }}"
+                      data-user-email="{{ u.email }}"
+                      data-user-name="{{ u.nome }} {{ u.cognome }}"
+                      data-access-level="{{ u.access_level }}">
+                <i class="fas fa-pen"></i>
+              </button>
+              <form method="POST" action="/dashboard/users/delete/{{ u.id }}?shop_name={{ shop_name }}" style="display:inline-block;">
+                <button type="button" class="btn btn-sm btn-outline-danger delete-user-btn">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="text-center text-muted py-4">Nessun utente trovato</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- BOTTONE AGGIUNGI ------------------------------------------------->
+    {% if subscription.plan_name in ['AllIsReady', 'ProfessionalDesk'] %}
+      <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addUserModal">
+        <i class="fas fa-user-plus me-1"></i>Aggiungi Utente
+      </button>
+    {% else %}
+      <div class="alert alert-warning d-inline-block mb-0">
+        Il tuo piano non consente l’aggiunta di altri utenti
+      </div>
+    {% endif %}
   </div>
 </div>
 
-
-
-<!-- Modal: Modifica Utente -->
+<!-- MODAL EDIT ---------------------------------------------------------->
 <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <form class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editUserLabel">Modifica Utente</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header bg-danger text-white rounded-top-4">
+        <h5 class="modal-title" id="editUserLabel"><i class="fas fa-user-edit me-2"></i>Modifica Utente</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <p id="editUserName" class="fw-bold mb-3"></p>
@@ -90,32 +103,42 @@
           <textarea id="editMessage" class="form-control" rows="3"></textarea>
         </div>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer bg-light rounded-bottom-4">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-        <button type="submit" class="btn btn-primary">Salva</button>
+        <button type="submit" class="btn btn-danger">Salva</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- Modal: Conferma Eliminazione -->
+<!-- MODAL DELETE -------------------------------------------------------->
 <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="deleteLabel">Conferma eliminazione</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header bg-danger text-white rounded-top-4">
+        <h5 class="modal-title" id="deleteLabel"><i class="fas fa-trash-alt me-2"></i>Conferma Eliminazione</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         Sei sicuro di voler rimuovere questo utente dallo shop?
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer bg-light rounded-bottom-4">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
         <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Elimina</button>
       </div>
     </div>
   </div>
 </div>
+
+{% endblock %}
+
+<style>
+/* Hover soft-lift sulla tabella */
+#usersTable tbody tr:hover {
+  background: rgba(220,53,69,.05);
+  cursor: pointer;
+}
+</style>
 
 {% block scripts %}
   {{ super() }}

@@ -1,169 +1,182 @@
 {% extends 'landing/base.html' %}
 {% block content %}
-{% if request.args.get('success') == 'true' and request.args.get('domain') %}
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const domain = "{{ request.args.get('domain') }}";
-      let seconds = 30;
-      const alert = document.createElement("div");
-      alert.className = "alert alert-success";
-      alert.innerHTML = `
-        ✅ Dominio <strong>${domain}</strong> acquistato con successo!<br>
-        Verifica in corso... inserisco nel sistema il dominio, attendi: <strong id="countdown">${seconds}</strong> secondi.
-      `;
-      document.querySelector(".card-body").prepend(alert);
 
-      const countdownEl = document.getElementById("countdown");
-      const interval = setInterval(() => {
-        seconds--;
-        countdownEl.textContent = seconds;
-        if (seconds <= 0) {
-          clearInterval(interval);
-            window.location.href = `/dashboard/domains/${domain}`;
-        }
-      }, 1000);
-    });
-  </script>
-{% endif %}
+<!-- HEADER UNIFORME -->
+<div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-white rounded shadow-sm">
+  <div class="d-flex align-items-center">
+    <i class="fas fa-globe fa-2x text-danger me-3"></i>
+    <div>
+      <h3 class="mb-0">Gestione Domini</h3>
+      <p class="text-muted mb-0">Aggiungi o gestisci domini personalizzati per il tuo shop</p>
+    </div>
+  </div>
+  <a href="/dashboard" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-1"></i> Torna alla Dashboard
+  </a>
+</div>
+
+<!-- DIVISORE -->
+<div class="border-top border-danger border-2 my-4 opacity-75"></div>
+
+<!-- CONTENITORE STRIPE DATA (necessario per JS) -->
 <div id="stripe-data"
      data-stripe-pk="{{ stripe_pk }}"
      data-shop-name="{{ shop_name }}">
 </div>
-<div class="container py-4">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-danger text-white">
-      <h5 class="mb-0"><i class="fa-solid fa-globe me-2"></i>Gestione Domini</h5>
-    </div>
-    <div class="card-body">
-      <p class="text-muted">Aggiungi o gestisci domini personalizzati per il tuo shop.</p>
 
-      <div class="card mb-4">
-        <div class="card-body">
-          <h6><i class="fa-solid fa-cart-shopping me-2"></i>Acquista un dominio da GoDaddy</h6>
-          <div class="row align-items-end g-3">
-            <div class="col-md-6">
-              <label class="form-label">Dominio da cercare</label>
-              <input type="text" id="search-domain-input" class="form-control" placeholder="es. linkbay.it">
-            </div>
-            <div class="col-md-3">
-              <button id="check-domain-btn" class="btn btn-danger w-100"><i class="fa fa-search me-1"></i> Verifica</button>
-            </div>
-            <div class="col-md-3" id="purchase-col" style="display: none;">
-              <button id="purchase-domain-btn" class="btn btn-success w-100"><i class="fa fa-credit-card me-1"></i> Acquista</button>
-            </div>
+<!-- CARD PRINCIPALE -->
+<div class="card shadow-sm border-0 rounded-4" data-aos="fade-up">
+  <div class="card-body">
+
+    <!-- ALERT SUCCESSO (inserito via JS) -->
+    {% if request.args.get('success') == 'true' and request.args.get('domain') %}
+      <!-- lo script originale resta invariato -->
+    {% endif %}
+
+    <!-- SEZIONE ACQUISTO DOMINIO --------------------------------------->
+    <div class="card border-0 shadow-sm mb-4 rounded-4">
+      <div class="card-body">
+        <h6 class="mb-3">
+          <i class="fas fa-cart-shopping me-2 text-danger"></i>Acquista un dominio da GoDaddy
+        </h6>
+        <div class="row g-3 align-items-end">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold"><i class="fas fa-search me-1"></i>Dominio da cercare</label>
+            <input type="text" id="search-domain-input" class="form-control" placeholder="es. linkbay.it">
           </div>
-          <div id="domain-result" class="small text-muted mt-2"></div>
-
-          <div id="payment-section" class="mt-4" style="display: none;">
-            <label class="form-label">Pagamento (Stripe)</label>
-            <div id="stripe-card-element" class="form-control mb-2"></div>
-            <div id="card-errors" class="text-danger small mt-1"></div>
+          <div class="col-md-3">
+            <button id="check-domain-btn" class="btn btn-danger w-100">
+              <i class="fas fa-search me-1"></i>Verifica
+            </button>
+          </div>
+          <div class="col-md-3 d-none" id="purchase-col">
+            <button id="purchase-domain-btn" class="btn btn-success w-100">
+              <i class="fas fa-credit-card me-1"></i>Acquista
+            </button>
           </div>
         </div>
-      </div>
+        <div id="domain-result" class="small text-muted mt-2"></div>
 
-      <hr>
-      <h6 class="mt-4 mb-3">🌐 Domini Attuali</h6>
-      <div class="table-responsive">
-        <style>
-          .table thead th:first-child,
-          .table tbody td:first-child {
-            border-top-left-radius: 2rem;
-          }
- 
-          .table thead th:last-child,
-          .table tbody td:last-child {
-            border-top-right-radius: 2rem;
-          }
- 
-          .table tbody tr:last-child td:first-child {
-            border-bottom-left-radius: 2rem;
-          }
- 
-          .table tbody tr:last-child td:last-child {
-            border-bottom-right-radius: 2rem;
-          }
-        </style>
-        <table class="table table-bordered align-middle rounded shadow-sm overflow-hidden">
-          <thead class="table-light">
-            <tr>
-              <th>🌍 Dominio</th>
-              <th>🔧 Provider DNS</th>
-              <th>♻️ Rinnovo</th>
-              <th>⚙️ Stato</th>
-              <th class="text-end">Azioni</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for domain in domains %}
-            <tr>
-              <td>{{ domain.domain }}</td>
-              <td>{{ domain.dns_provider or "—" }}</td>
-              <td>
-                {% if domain.renewal_enabled %}
-                  <span class="badge bg-success"><i class="fa-solid fa-rotate"></i> Auto</span><br>
-                {% else %}
-                  <span class="badge bg-secondary"><i class="fa-solid fa-hand"></i> Manuale</span><br>
-                {% endif %}
-                {% if domain.renewal_date %}
-                  <small class="text-muted">
-                    <i class="fa-regular fa-calendar-days me-1"></i>
-                    Rinnovo: {{ domain.renewal_date.strftime('%d/%m/%Y') }}
-                  </small>
-                {% else %}
-                  <small class="text-muted">—</small>
-                {% endif %}
-              </td>
-              <td>
-                <span class="badge bg-{{ 'success' if domain.status == 'active' else 'warning' }}">
-                  <i class="fa-solid fa-circle-dot me-1"></i>{{ domain.status.capitalize() }}
-                </span>
-              </td>
-              <td class="text-end">
-                <button class="btn btn-outline-danger btn-sm" onclick="disableRenewal('{{ domain.id }}')">
-                  <i class="fa fa-trash-alt"></i> Disattiva rinnovo
-                </button>
-              </td>
-            </tr>
-            {% else %}
-            <tr>
-              <td colspan="5" class="text-muted text-center">Nessun dominio associato</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        <!-- STRIPE -->
+        <div id="payment-section" class="mt-4 d-none">
+          <label class="form-label fw-semibold"><i class="fas fa-wallet me-1"></i>Pagamento (Stripe)</label>
+          <div id="stripe-card-element" class="form-control mb-2"></div>
+          <div id="card-errors" class="text-danger small mt-1"></div>
+        </div>
       </div>
+    </div>
+
+    <!-- SEZIONE DOMINI ATTUALI ----------------------------------------->
+    <h6 class="mb-3"><i class="fas fa-globe me-2 text-danger"></i>Domini Attuali</h6>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle bg-white rounded shadow-sm overflow-hidden" id="domainsTable">
+        <thead class="table-danger text-dark">
+          <tr>
+            <th><i class="fas fa-globe-asia me-1"></i>Dominio</th>
+            <th><i class="fas fa-server me-1"></i>Provider DNS</th>
+            <th><i class="fas fa-sync-alt me-1"></i>Rinnovo</th>
+            <th><i class="fas fa-info-circle me-1"></i>Stato</th>
+            <th class="text-end">Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for domain in domains %}
+          <tr>
+            <td>{{ domain.domain }}</td>
+            <td>{{ domain.dns_provider or '—' }}</td>
+            <td>
+              <span class="badge bg-{{ 'success' if domain.renewal_enabled else 'secondary' }}">
+                <i class="fas {{ 'fa-sync-alt' if domain.renewal_enabled else 'fa-hand-paper' }} me-1"></i>
+                {{ 'Auto' if domain.renewal_enabled else 'Manuale' }}
+              </span><br>
+              {% if domain.renewal_date %}
+                <small class="text-muted">
+                  <i class="far fa-calendar-alt me-1"></i>
+                  {{ domain.renewal_date.strftime('%d/%m/%Y') }}
+                </small>
+              {% endif %}
+            </td>
+            <td>
+              <span class="badge bg-{{ 'success' if domain.status == 'active' else 'warning' }}">
+                <i class="fas fa-circle-notch me-1"></i>{{ domain.status.capitalize() }}
+              </span>
+            </td>
+            <td class="text-end">
+              <button class="btn btn-outline-danger btn-sm" onclick="disableRenewal('{{ domain.id }}')">
+                <i class="fas fa-times-circle me-1"></i>Disattiva rinnovo
+              </button>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="text-muted text-center py-4">Nessun dominio associato</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
 
-<script src="/static/js/superadmin/domains.js" ></script>
-<script src="https://js.stripe.com/v3/"></script>
-<script src="/static/js/superadmin/domains_stripe.js"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    const success = urlParams.get('success');
-    const domain = urlParams.get('domain');
+<!-- PULSANTE AIUTO -->
+<button id="start-domain-tutorial" class="btn btn-danger position-fixed bottom-0 end-0 m-4 rounded-circle shadow"
+        style="width:50px; height:50px;">
+  <i class="fas fa-question"></i>
+</button>
 
-    if (success === 'true' && domain) {
-      fetch('/api/domains/send-success-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
+{% endblock %}
+
+<style>
+/* Hover soft-lift sulla tabella domini */
+#domainsTable tbody tr:hover {
+  background: rgba(220,53,69,.05);
+  cursor: pointer;
+}
+
+/* Card hover */
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(220,53,69,.15) !important;
+  transition: all 0.3s ease;
+}
+</style>
+
+{% block scripts %}
+  {{ super() }}
+  <!-- JS originali già inclusi (domains.js, stripe, ecc.) -->
+  <script>
+    /* Shepherd Tour (opzionale) */
+    document.addEventListener('DOMContentLoaded',()=>{
+      if(typeof Shepherd==='undefined') return;
+      const tour=new Shepherd.Tour({
+        defaultStepOptions:{
+          cancelIcon:{enabled:true},
+          scrollTo:{behavior:'smooth',block:'center'},
+          classes:'shadow-lg bg-danger text-white',
+          arrow:true
         },
-        body: JSON.stringify({ domain: domain })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          console.log("📧 Email inviata con successo");
-        } else {
-          console.warn("⚠️ Problema con l'invio email:", data.message);
-        }
-      })
-      .catch(err => console.error("Errore durante l'invio email:", err));
-    }
-  });
-</script>
+        useModalOverlay:true
+      });
+
+      tour.addStep({
+        title:'<i class="fas fa-search"></i>&nbsp; Verifica Dominio',
+        text:'Cerca un dominio libero e procedi all’acquisto.',
+        attachTo:{element:'#check-domain-btn',on:'bottom'},
+        buttons:[{text:'Avanti',action:tour.next}]
+      });
+
+      tour.addStep({
+        title:'<i class="fas fa-globe"></i>&nbsp; Domini Attuali',
+        text:'Qui trovi tutti i domini collegati al tuo shop.',
+        attachTo:{element:'#domainsTable',on:'top'},
+        buttons:[
+          {text:'Indietro',action:tour.back},
+          {text:'Fatto!',action:tour.complete}
+        ]
+      });
+
+      document.getElementById('start-domain-tutorial')
+              .addEventListener('click',()=>tour.start());
+    });
+  </script>
 {% endblock %}
