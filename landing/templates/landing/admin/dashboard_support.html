@@ -1,36 +1,219 @@
 {% extends 'landing/base.html' %}
 {% block content %}
 
-    <!-- INIZIO SEZIONE SUPPORTO -->
-    <div id="support-section" class="pt-3" data-aos="fade-up">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0"><i class="fa-solid fa-headset text-danger me-2"></i> Supporto Clienti</h4>
-        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#newTicketModal">
-          <i class="fa-solid fa-plus me-1"></i> Nuovo Ticket
-        </button>
-      </div>
+<!-- HEADER -->
+<div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-white rounded shadow-sm">
+  <div class="d-flex align-items-center">
+    <i class="fas fa-headset fa-2x text-danger me-3"></i>
+    <div>
+      <h3 class="mb-0">Supporto Clienti</h3>
+      <p class="text-muted mb-0">Gestisci i ticket e fornisci assistenza ai tuoi utenti</p>
+    </div>
+  </div>
+  <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#newTicketModal">
+    <i class="fas fa-plus me-1"></i> Nuovo Ticket
+  </button>
+</div>
 
-      <div id="ticketList" class="row gy-3 px-2">
-        <!-- I ticket verranno caricati dinamicamente via JavaScript -->
+<!-- DIVISORE -->
+<div class="border-top border-danger border-2 my-4 opacity-75"></div>
+
+<!-- LISTA TICKET -->
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white border-0">
+    <h4 class="mb-0" id="ticket-section-title">
+      <i class="fas fa-inbox me-2 text-danger"></i>Elenco Ticket
+    </h4>
+  </div>
+  <div class="card-body">
+    <div id="ticketList" class="row gy-3">
+      <div class="text-center w-100 py-4" id="tickets-loading">
+        <div class="spinner-border text-danger" role="status"></div>
+        <p class="mt-2 text-muted">⏳ Caricamento ticket...</p>
       </div>
     </div>
+  </div>
+</div>
 
+<!-- PULSANTE AIUTO -->
+<button id="start-support-tutorial" class="btn btn-danger position-fixed bottom-0 end-0 m-4 rounded-circle shadow"
+        style="width: 50px; height: 50px;">
+  <i class="fas fa-question"></i>
+</button>
 
+<!-- MODAL DETTAGLIO TICKET -->
+<div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content rounded-4">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ticketModalTitle"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+      </div>
+      <div class="modal-body" id="ticketModalBody"></div>
+    </div>
+  </div>
+</div>
 
-    <div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalTitle" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="ticketModalTitle"></h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
-          </div>
-          <div class="modal-body" id="ticketModalBody">
-            <!-- Contenuto dinamico -->
-          </div>
-        </div>
+<!-- MODAL NUOVO TICKET -->
+<div class="modal fade" id="newTicketModal" tabindex="-1" aria-labelledby="newTicketModalTitle" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded-4">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newTicketModalTitle">Nuovo Ticket</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Il form del nuovo ticket verrà iniettato via JS o inserito qui -->
       </div>
     </div>
+  </div>
+</div>
 
-    <script src="/static/js/superadmin/support.js"></script>
+<style>
+  .ticket-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 1rem !important;
+  }
+  .ticket-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 30px rgba(220, 53, 69, 0.25);
+  }
+</style>
+
+<script src="/static/js/superadmin/support.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  // Caricamento ticket
+  document.addEventListener('DOMContentLoaded', loadTickets);
+
+  async function loadTickets() {
+    const list = document.getElementById('ticketList');
+    try {
+      const res = await fetch('/api/support/tickets');
+      const data = await res.json();
+
+      list.innerHTML = '';
+
+      if (!res.ok || !data.success) {
+        list.innerHTML = `
+          <div class="alert alert-danger d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <div>${data.message || 'Errore nel caricamento dei ticket'}</div>
+          </div>`;
+        return;
+      }
+
+      if (data.tickets.length === 0) {
+        list.innerHTML = `
+          <div class="text-center w-100 py-5">
+            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">Nessun ticket presente</h5>
+            <p class="text-muted">Crea un nuovo ticket per iniziare</p>
+          </div>`;
+        return;
+      }
+
+      data.tickets.forEach(ticket => {
+        const col = document.createElement('div');
+        col.className = 'col-12 col-md-6 col-lg-4';
+
+        col.innerHTML = `
+          <div class="card shadow-sm border-0 ticket-card h-100" onclick="openTicket(${ticket.id})">
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title text-dark">${ticket.subject}</h5>
+                <p class="text-muted mb-1"><i class="fas fa-hashtag me-1"></i>${ticket.code}</p>
+                <span class="badge ${ticket.status === 'open' ? 'bg-success' : 'bg-secondary'}">
+                  ${ticket.status === 'open' ? 'Aperto' : 'Chiuso'}
+                </span>
+              </div>
+              <small class="text-muted mt-3">
+                <i class="fas fa-clock me-1"></i>${new Date(ticket.updated_at).toLocaleString()}
+              </small>
+            </div>
+          </div>`;
+        list.appendChild(col);
+      });
+
+    } catch (err) {
+      console.error(err);
+      list.innerHTML = `
+        <div class="alert alert-danger d-flex align-items-center">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <div>Errore imprevisto</div>
+        </div>`;
+    }
+  }
+
+  // Apertura ticket in modal
+  async function openTicket(id) {
+    const titleEl = document.getElementById('ticketModalTitle');
+    const bodyEl  = document.getElementById('ticketModalBody');
+    titleEl.textContent = 'Caricamento...';
+    bodyEl.innerHTML    = '<p class="text-center my-4"><span class="spinner-border text-danger"></span></p>';
+    const modal = new bootstrap.Modal(document.getElementById('ticketModal'));
+    modal.show();
+
+    try {
+      const res = await fetch(`/api/support/ticket/${id}`);
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        titleEl.textContent = 'Errore';
+        bodyEl.innerHTML = `<div class="alert alert-danger">${data.message || 'Impossibile caricare il ticket'}</div>`;
+        return;
+      }
+
+      titleEl.textContent = data.ticket.subject;
+      bodyEl.innerHTML = `
+        <p><strong>Codice:</strong> ${data.ticket.code}</p>
+        <p><strong>Stato:</strong> ${data.ticket.status}</p>
+        <hr>
+        <p>${data.ticket.message}</p>`;
+    } catch (err) {
+      titleEl.textContent = 'Errore';
+      bodyEl.innerHTML = `<div class="alert alert-danger">Errore imprevisto</div>`;
+    }
+  }
+
+  /* Tour guidato */
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof Shepherd === 'undefined') return;
+
+    const supportTour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: { enabled: true },
+        scrollTo: { behavior: 'smooth', block: 'center' },
+        classes: 'shadow-lg bg-danger text-white',
+        arrow: true
+      },
+      useModalOverlay: true
+    });
+
+    supportTour.addStep({
+      title: '<i class="fas fa-plus"></i>&nbsp; Crea Ticket',
+      text: 'Clicca qui per inviare una nuova richiesta di assistenza.',
+      attachTo: { element: '[data-bs-target="#newTicketModal"]', on: 'left' },
+      buttons: [
+        { text: 'Salta', action: supportTour.cancel },
+        { text: 'Avanti', action: supportTour.next }
+      ]
+    });
+
+    supportTour.addStep({
+      title: '<i class="fas fa-inbox"></i>&nbsp; Elenco Ticket',
+      text: 'I tuoi ticket vengono mostrati qui e possono essere aperti per i dettagli.',
+      attachTo: { element: '#ticket-section-title', on: 'bottom' },
+      buttons: [
+        { text: 'Indietro', action: supportTour.back },
+        { text: 'Fatto!', action: supportTour.complete }
+      ]
+    });
+
+    document.getElementById('start-support-tutorial')
+            .addEventListener('click', () => supportTour.start());
+  });
+</script>
 
 {% endblock %}

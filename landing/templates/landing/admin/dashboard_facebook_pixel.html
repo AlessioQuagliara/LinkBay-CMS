@@ -1,20 +1,178 @@
 {% extends 'landing/base.html' %}
 {% block content %}
-<div class="container py-4">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white">
-      <h5 class="mb-0"><i class="fa-brands fa-facebook me-2"></i>Facebook Pixel</h5>
-    </div>
-    <div class="card-body">
-      <p class="text-muted">Inserisci l'ID del tuo Facebook Pixel per tracciare le interazioni del tuo shop.</p>
-      <form method="POST" action="/api/integrations/facebook_pixel/{{ shop_name }}">
-        <div class="mb-3">
-          <label for="fb_pixel_id" class="form-label">ID Facebook Pixel</label>
-          <input type="text" class="form-control" id="fb_pixel_id" name="fb_pixel_id" placeholder="Es: 123456789012345" required>
-        </div>
-        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-link"></i> Salva Collegamento</button>
-      </form>
+
+<!-- HEADER UNIFORME -->
+<div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-white rounded shadow-sm">
+  <div class="d-flex align-items-center">
+    <i class="fab fa-facebook fa-2x text-danger me-3"></i>
+    <div>
+      <h3 class="mb-0">Facebook Pixel</h3>
+      <p class="text-muted mb-0">Configura il tracciamento delle interazioni del tuo shop</p>
     </div>
   </div>
+  <a href="/dashboard" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-1"></i> Torna alla Dashboard
+  </a>
 </div>
+
+<!-- DIVISORE -->
+<div class="border-top border-danger border-2 my-4 opacity-75"></div>
+
+<!-- CARD PRINCIPALE -->
+<div class="card shadow-sm border-0 rounded-4" data-aos="fade-up">
+  <div class="card-body">
+    <p class="text-muted mb-4">Inserisci l'ID del tuo Facebook Pixel per tracciare le conversioni e ottimizzare le tue campagne pubblicitarie.</p>
+    
+    <!-- FORM CONFIGURAZIONE -->
+    <form method="POST" action="/api/integrations/facebook_pixel/{{ shop_name }}">
+      <div class="row g-3">
+        <div class="col-md-8">
+          <label for="fb_pixel_id" class="form-label fw-semibold">
+            <i class="fab fa-facebook me-1"></i>ID Facebook Pixel
+          </label>
+          <div class="input-group">
+            <span class="input-group-text bg-primary text-white">
+              <i class="fas fa-hashtag"></i>
+            </span>
+            <input type="text" 
+                   class="form-control" 
+                   id="fb_pixel_id" 
+                   name="fb_pixel_id" 
+                   placeholder="Es: 123456789012345" 
+                   required>
+          </div>
+          <div class="form-text">
+            <i class="fas fa-info-circle me-1"></i>
+            Puoi trovare il tuo ID Pixel nel Business Manager di Facebook
+          </div>
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+          <button type="submit" class="btn btn-danger w-100">
+            <i class="fas fa-link me-1"></i>Salva Collegamento
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- SEZIONE INFO -->
+    <div class="card bg-light border-0 mt-4 rounded-4">
+      <div class="card-body">
+        <h6 class="mb-3">
+          <i class="fas fa-lightbulb me-2 text-warning"></i>Come funziona?
+        </h6>
+        <ul class="mb-0 small">
+          <li class="mb-2">
+            <i class="fas fa-chart-line me-1 text-primary"></i>
+            Traccia le conversioni e le azioni degli utenti sul tuo shop
+          </li>
+          <li class="mb-2">
+            <i class="fas fa-target me-1 text-success"></i>
+            Ottimizza le campagne pubblicitarie Facebook e Instagram
+          </li>
+          <li class="mb-2">
+            <i class="fas fa-users me-1 text-info"></i>
+            Crea audience personalizzate per il retargeting
+          </li>
+          <li>
+            <i class="fas fa-analytics me-1 text-warning"></i>
+            Misura il ROI delle tue inserzioni
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- STATO CONNESSIONE (se pixel già configurato) -->
+    {% if current_pixel_id %}
+    <div class="alert alert-success d-flex align-items-center mt-4" role="alert">
+      <i class="fas fa-check-circle me-2"></i>
+      <div>
+        <strong>Pixel attivo!</strong> ID: {{ current_pixel_id }}
+        <br><small>Il tracciamento è configurato correttamente</small>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- PULSANTE AIUTO -->
+<button id="start-pixel-tutorial" class="btn btn-danger position-fixed bottom-0 end-0 m-4 rounded-circle shadow"
+        style="width:50px; height:50px;">
+  <i class="fas fa-question"></i>
+</button>
+
 {% endblock %}
+
+<style>
+/* Hover effect per la card principale */
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(220,53,69,0.15) !important;
+  transition: all 0.3s ease;
+}
+
+/* Input group personalizzato */
+.input-group-text {
+  border-color: var(--primary);
+}
+
+/* Form focus */
+#fb_pixel_id:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.2rem rgba(255, 87, 87, 0.25);
+}
+</style>
+
+<script>
+// Validazione ID Pixel (solo numeri, 15-16 cifre)
+document.getElementById('fb_pixel_id').addEventListener('input', function(e) {
+  let value = e.target.value.replace(/\D/g, ''); // Solo numeri
+  if (value.length > 16) value = value.substring(0, 16);
+  e.target.value = value;
+});
+
+// Form submission con feedback
+document.querySelector('form').addEventListener('submit', function(e) {
+  const btn = e.target.querySelector('button[type="submit"]');
+  const originalText = btn.innerHTML;
+  
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Salvando...';
+  btn.disabled = true;
+  
+  // Il form continua il submit normale, questo è solo UX
+});
+
+// Tour guidato Facebook Pixel
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof Shepherd !== 'undefined') {
+    const pixelTour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: { enabled: true },
+        scrollTo: { behavior: 'smooth', block: 'center' },
+        classes: 'shadow-lg bg-danger text-white',
+        arrow: true
+      },
+      useModalOverlay: true
+    });
+
+    pixelTour.addStep({
+      title: '<i class="fab fa-facebook"></i>&nbsp; ID Pixel',
+      text: 'Inserisci qui l\'ID del tuo Facebook Pixel per abilitare il tracciamento.',
+      attachTo: { element: '#fb_pixel_id', on: 'bottom' },
+      buttons: [{ text: 'Avanti', action: pixelTour.next }]
+    });
+
+    pixelTour.addStep({
+      title: '<i class="fas fa-lightbulb"></i>&nbsp; Vantaggi',
+      text: 'Il Pixel ti permette di tracciare conversioni e creare audience per il retargeting.',
+      attachTo: { element: '.bg-light.card', on: 'top' },
+      buttons: [
+        { text: 'Indietro', action: pixelTour.back },
+        { text: 'Fatto!', action: pixelTour.complete }
+      ]
+    });
+
+    document.getElementById('start-pixel-tutorial')
+            .addEventListener('click', () => pixelTour.start());
+  }
+});
+</script>

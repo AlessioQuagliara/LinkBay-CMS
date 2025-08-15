@@ -1,163 +1,266 @@
 {% extends 'landing/base.html' %}
 {% block content %}
 
-    <!-- CONTENUTI DINAMICI -->
-    <div class="d-flex align-items-center mb-4">
-  {% if is_owner == has_access %}
-      <div>
-        <h4 class="mb-0">🛠️ Gestione Risorse</h4>
-        <a href="/dashboard/stores" class="text-muted">Torna alla panoramica dei tuoi negozi.</a>
-      </div>
+<!-- HEADER UNIFORME -->
+<div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-white rounded shadow-sm">
+  <div class="d-flex align-items-center">
+    <i class="fas fa-tools fa-2x text-danger me-3"></i>
+    <div>
+      <h3 class="mb-0">Gestione Risorse</h3>
+      <p class="text-muted mb-0">Configura le impostazioni avanzate del tuo negozio</p>
     </div>
-    <div id="content9" class="content-pane">
+  </div>
+  <a href="/dashboard/stores" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-1"></i> Torna ai Negozi
+  </a>
+</div>
+
+<!-- DIVISORE -->
+<div class="border-top border-danger border-2 my-4 opacity-75"></div>
+
+<!-- CONTENUTO PRINCIPALE -->
+{% if is_owner == has_access %}
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body">
+    <!-- SEZIONE ABBONAMENTO -->
+    <div class="mb-5">
+      <h4 class="mb-3"><i class="fas fa-file-contract text-danger me-2"></i>Abbonamento</h4>
+      {% if subscription %}
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card border-0 bg-light rounded-3 h-100">
+            <div class="card-body">
+              <h5 class="card-title">{{ subscription.plan_name }}</h5>
+              <p class="card-text">
+                <span class="d-block"><strong>Prezzo:</strong> €{{ subscription.price }}/mese</span>
+                <span class="d-block"><strong>Scadenza:</strong> {{ subscription.renewal_date.strftime('%d/%m/%Y') }}</span>
+              </p>
+              <a href="/subscription/select/{{ shop_name }}" class="btn btn-sm btn-outline-danger">Cambia piano</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="alert alert-warning">
+        Nessun abbonamento attivo. <a href="/subscription/select/{{ shop_name }}" class="alert-link">Scegli un piano</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- SEZIONI CONFIGURAZIONE -->
+    <div class="row g-4">
+      <!-- GESTIONE UTENTI -->
+      {% if subscription and subscription.plan_name in ['AllIsReady', 'ProfessionalDesk'] %}
+      <div class="col-md-6">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="row g-0 h-100">
+            <div class="col-md-4 bg-danger bg-opacity-10 d-flex align-items-center justify-content-center">
+              <i class="fas fa-users fa-3x text-danger"></i>
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title">Gestione Utenti</h5>
+                <p class="card-text text-muted">Condividi l'accesso con collaboratori e gestisci permessi.</p>
+                <a href="/dashboard/users/{{ shop_name }}" class="btn btn-outline-danger">Gestisci</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- GESTIONE DOMINI -->
+      {% if subscription and subscription.plan_name in ['AllIsReady', 'ProfessionalDesk'] %}
+      <div class="col-md-6">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="row g-0 h-100">
+            <div class="col-md-4 bg-primary bg-opacity-10 d-flex align-items-center justify-content-center">
+              <i class="fas fa-globe fa-3x text-primary"></i>
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title">Gestione Domini</h5>
+                <p class="card-text text-muted">Configura il tuo dominio personalizzato.</p>
+                <a href="/dashboard/domains/{{ shop_name }}" class="btn btn-outline-primary">Gestisci</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="mt-5">
+      <h4 class="mb-3"><i class="fas fa-chart-line text-danger me-2"></i>Analytics</h4>
       <div class="row g-4">
-
-        <!-- Abbonamento -->
-        <div class="col-12">
-          <div class="card shadow-sm border-0">
-            <div class="card-body">
-              <h5 class="card-title mb-2"><i class="fa-solid fa-file-contract"></i>&nbsp; Abbonamento attivo</h5>
-              {% if subscription %}
-                <p><strong>Piano:</strong> {{ subscription.plan_name }}</p>
-                <p><strong>Prezzo:</strong> €{{ subscription.price }} / mese</p>
-                <p><strong>Scadenza:</strong> {{ subscription.renewal_date.strftime('%d/%m/%Y') }}</p>
-              {% else %}
-                <div class="alert alert-warning">Nessun abbonamento attivo</div>
-              {% endif %}
+        {% for service in [
+          {'icon': 'google', 'name': 'Google Analytics', 'color': 'success'},
+          {'icon': 'facebook', 'name': 'Facebook Pixel', 'color': 'primary'},
+          {'icon': 'tiktok', 'name': 'TikTok Pixel', 'color': 'dark'}
+        ] %}
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+              <i class="fab fa-{{ service.icon }} fa-3x text-{{ service.color }} mb-3"></i>
+              <h5 class="card-title">{{ service.name }}</h5>
+              <p class="card-text text-muted small">Configura l'integrazione con {{ service.name }}</p>
+              <a href="/dashboard/analytics/{{ service.name|lower|replace(' ', '_') }}/{{ shop_name }}" 
+                 class="btn btn-sm btn-outline-{{ service.color }}">Configura</a>
             </div>
           </div>
         </div>
-
-        <!-- Collaboratori -->
-        {% if subscription and subscription.plan_name in ['AllIsReady', 'ProfessionalDesk'] %}
-        <div class="col-md-6">
-          <div class="card shadow-sm border-0">
-            <div class="card-body">
-              <h5 class="card-title mb-2"><i class="fa-solid fa-users"></i>&nbsp; Gestione Utenti</h5>
-              <p>Condividi l’accesso con altri collaboratori e gestisci i permessi.</p>
-              <a href="/dashboard/users/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Gestisci utenti</a>
-            </div>
-          </div>
-        </div>
-        {% endif %}
-
-        <!-- Domini -->
-        {% if subscription and subscription.plan_name in ['AllIsReady', 'ProfessionalDesk'] %}
-        <div class="col-md-6">
-          <div class="card shadow-sm border-0">
-            <div class="card-body">
-              <h5 class="card-title mb-2"><i class="fa-solid fa-earth-americas"></i>&nbsp; Gestione Domini</h5>
-              <p>Configura il tuo dominio personalizzato e monitora lo stato DNS.</p>
-              <a href="/dashboard/domains/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Gestisci domini</a>
-            </div>
-          </div>
-        </div>
-        {% endif %}
-
-        <!-- Monitoraggio & Analytics -->
-        <hr>
-        <h5 class="text-muted mt-4 mb-3"><i class="fa-solid fa-chart-simple"></i>&nbsp; Monitoraggio & Analytics</h5>
-        <div class="row g-4">
-          <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-              <div class="card-body">
-                <h6 class="card-title"><i class="fa-brands fa-google"></i>&nbsp; Google Analytics</h6>
-                <p class="small text-muted">Collega il tuo account per monitorare il traffico.</p>
-                <a href="/dashboard/analytics/google_analytics/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Configura</a>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-              <div class="card-body">
-                <h6 class="card-title"><i class="fa-brands fa-facebook"></i>&nbsp; Facebook Pixel</h6>
-                <p class="small text-muted">Tieni traccia degli utenti da Facebook.</p>
-                <a href="/dashboard/analytics/facebook_pixel/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Configura</a>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-              <div class="card-body">
-                <h6 class="card-title"><i class="fa-brands fa-tiktok"></i>&nbsp; TikTok Pixel</h6>
-                <p class="small text-muted">Monitora conversioni dalle campagne TikTok.</p>
-                <a href="/dashboard/analytics/tiktok_pixel/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Configura</a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Integrazioni -->
-        <hr>
-        <h5 class="text-muted mt-4 mb-3"><i class="fa-solid fa-plug-circle-plus"></i>&nbsp; Integrazioni</h5>
-        <div class="row g-4">
-          {% for plugin in ['Aruba Fatturazione', 'Zapier', 'Mailchimp', 'Klaviyo', 'Zendesk', 'Twilio'] %}
-          <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-              <div class="card-body">
-                <h6 class="card-title">{{ plugin }}</h6>
-                <p class="small text-muted">Integra con {{ plugin }} per espandere le funzionalità.</p>
-                <a href="/dashboard/integrations/{{ plugin|lower|replace(' ', '_') }}/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Gestisci</a>
-              </div>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-
-        <!-- Metodi di Pagamento -->
-        <hr>
-        <h5 class="text-muted mt-4 mb-3"><i class="fa-solid fa-credit-card"></i>&nbsp; Metodi di Pagamento</h5>
-        <div class="row g-4">
-          {% for metodo in ['Stripe', 'PayPal'] %}
-          <div class="col-md-6">
-            <div class="card shadow-sm border-0 h-100">
-              <div class="card-body">
-                <h6 class="card-title">{{ metodo }}</h6>
-                <p class="small text-muted">Configura {{ metodo }} per ricevere pagamenti online.</p>
-                <a href="/dashboard/payments/{{ metodo|lower }}/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Imposta</a>
-              </div>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-
-        {% if subscription and subscription.plan_name == 'ProfessionalDesk' %}
-        <!-- Analisi Intelligente -->
-        <hr>
-        <h5 class="text-muted mt-4 mb-3"><i class="fa-solid fa-hexagon-nodes"></i>&nbsp; Analisi con Intelligenza Artificiale</h5>
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="card shadow-sm border-0 h-100">
-              <div class="card-body">
-                <h6 class="card-title"><i class="fa-solid fa-chart-pie"></i>&nbsp; Flusso Analitico Avanzato</h6>
-                <p class="small text-muted">Scopri pattern di comportamento e previsioni vendita.</p>
-                <a href="/dashboard/ai/analytics/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Visualizza Analisi</a>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="card shadow-sm border-0 h-100">
-              <div class="card-body">
-                <h6 class="card-title"><i class="fa-solid fa-bullhorn"></i>&nbsp; Campagne Pubblicitarie</h6>
-                <p class="small text-muted">Crea e ottimizza campagne marketing con suggerimenti AI.</p>
-                <a href="/dashboard/ai/campaigns/{{ shop_name }}" class="btn btn-outline-primary btn-sm">Gestisci Campagne</a>
-              </div>
-            </div>
-          </div>
-        </div>
-        {% endif %}
-
+        {% endfor %}
       </div>
-    {% else %}
-        <div class="container py-5 text-center">
-          <h2 class="mb-3"><i class="fa-solid fa-ban"></i>&nbsp; Accesso Negato</h2>
-          <p class="lead">Questo store non è tuo. Per collaborare, puoi inviare una richiesta al proprietario.</p>
-          <a href="/dashboard/stores" class="btn btn-outline-dark mt-3">
-            <i class="fa-solid fa-arrow-left"></i> Torna alla tua dashboard
-          </a>
-        </div>
-    {% endif %}
     </div>
 
+    <!-- INTEGRAZIONI -->
+    <div class="mt-5">
+      <h4 class="mb-3"><i class="fas fa-plug text-danger me-2"></i>Integrazioni</h4>
+      <div class="row g-4">
+        {% for plugin in ['Aruba Fatturazione', 'Zapier', 'Mailchimp', 'Klaviyo', 'Zendesk', 'Twilio'] %}
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <h5 class="card-title">{{ plugin }}</h5>
+              <p class="card-text text-muted small">Integra con {{ plugin }} per espandere le funzionalità</p>
+              <a href="/dashboard/integrations/{{ plugin|lower|replace(' ', '_') }}/{{ shop_name }}" 
+                 class="btn btn-sm btn-outline-secondary">Gestisci</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- PAGAMENTI -->
+    <div class="mt-5">
+      <h4 class="mb-3"><i class="fas fa-credit-card text-danger me-2"></i>Pagamenti</h4>
+      <div class="row g-4">
+        {% for metodo in ['Stripe', 'PayPal'] %}
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <h5 class="card-title">{{ metodo }}</h5>
+              <p class="card-text text-muted small">Configura {{ metodo }} per ricevere pagamenti</p>
+              <a href="/dashboard/payments/{{ metodo|lower }}/{{ shop_name }}" 
+                 class="btn btn-sm btn-outline-danger">Configura</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- AI (solo per ProfessionalDesk) -->
+    {% if subscription and subscription.plan_name == 'ProfessionalDesk' %}
+    <div class="mt-5">
+      <h4 class="mb-3"><i class="fas fa-robot text-danger me-2"></i>Intelligenza Artificiale</h4>
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <h5 class="card-title">Analisi Avanzata</h5>
+              <p class="card-text text-muted small">Scopri pattern di comportamento e previsioni vendita</p>
+              <a href="/dashboard/ai/analytics/{{ shop_name }}" class="btn btn-sm btn-outline-danger">Visualizza</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <h5 class="card-title">Campagne Pubblicitarie</h5>
+              <p class="card-text text-muted small">Crea e ottimizza campagne con suggerimenti AI</p>
+              <a href="/dashboard/ai/campaigns/{{ shop_name }}" class="btn btn-sm btn-outline-danger">Gestisci</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% else %}
+<!-- ACCESSO NEGATO -->
+<div class="card border-0 shadow-sm">
+  <div class="card-body text-center py-5">
+    <i class="fas fa-ban fa-4x text-danger mb-4"></i>
+    <h3 class="mb-3">Accesso Negato</h3>
+    <p class="text-muted">Non hai i permessi per accedere a questa sezione.</p>
+    <a href="/dashboard/stores" class="btn btn-danger">
+      <i class="fas fa-arrow-left me-1"></i> Torna alla Dashboard
+    </a>
+  </div>
+</div>
+{% endif %}
+
+<!-- PULSANTE AIUTO -->
+<button id="start-tutorial" class="btn btn-danger position-fixed bottom-0 end-0 m-4 rounded-circle shadow" 
+        style="width: 50px; height: 50px;">
+  <i class="fas fa-question"></i>
+</button>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Tour guidato
+document.getElementById('start-tutorial').addEventListener('click', () => {
+  const tour = new Shepherd.Tour({
+    defaultStepOptions: {
+      cancelIcon: { enabled: true },
+      scrollTo: { behavior: 'smooth', block: 'center' },
+      classes: 'shadow-lg bg-danger text-white',
+      arrow: true
+    },
+    useModalOverlay: true
+  });
+
+  // Step 1: Abbonamento
+  tour.addStep({
+    title: '<i class="fas fa-file-contract"></i> Il tuo Abbonamento',
+    text: 'Qui puoi vedere i dettagli del tuo piano attivo e cambiarlo se necessario.',
+    attachTo: {
+      element: '.card-body h4:first-child',
+      on: 'bottom'
+    },
+    buttons: [
+      { text: 'Salta', action: tour.cancel },
+      { text: 'Avanti', action: tour.next }
+    ]
+  });
+
+  // Step 2: Gestione Utenti
+  tour.addStep({
+    title: '<i class="fas fa-users"></i> Collaboratori',
+    text: 'Aggiungi altri utenti e gestisci i loro permessi di accesso.',
+    attachTo: {
+      element: '.fa-users',
+      on: 'right'
+    },
+    buttons: [
+      { text: 'Indietro', action: tour.back },
+      { text: 'Avanti', action: tour.next }
+    ]
+  });
+
+  // Step 3: Analytics
+  tour.addStep({
+    title: '<i class="fas fa-chart-line"></i> Strumenti di Analisi',
+    text: 'Collega i servizi di analytics per monitorare il tuo traffico.',
+    attachTo: {
+      element: '.fa-chart-line',
+      on: 'bottom'
+    },
+    buttons: [
+      { text: 'Fine', action: tour.complete }
+    ]
+  });
+
+  tour.start();
+});
+</script>
 <script src="/static/js/superadmin/access.js"></script>
 {% endblock %}

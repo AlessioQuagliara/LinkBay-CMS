@@ -2,19 +2,19 @@
 {% block content %}
 
 <!-- Sezione Hero Pricing -->
-<section class="hero-pricing py-8 position-relative overflow-hidden" style="background: linear-gradient(135deg, #0b1a2e 0%, #212529 100%);">
+<section class="hero-pricing py-8 position-relative overflow-hidden" style="background: #ff5757;">
     <div class="wave-divider-top">
         <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="#ff5758"></path>
-            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="#ff5758"></path>
-            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="#ff5758"></path>
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="#1b212b"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="#1b212b"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="#1b212b"></path>
         </svg>
     </div>
     
     <div class="container position-relative z-1 py-5">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
-                <div class="badge bg-danger bg-opacity-25 text-danger px-4 py-2 rounded-pill mb-4 animate__animated animate__pulse animate__infinite">
+                <div class="badge bg-dark bg-opacity-25 text-light px-4 py-2 rounded-pill mb-4 animate__animated animate__pulse animate__infinite">
                     <i class="fas fa-tags me-2"></i> {{ translate('OFFERTA DI LANCIO') }}
                 </div>
                 <h1 class="display-4 fw-bold text-white mb-3">
@@ -36,20 +36,17 @@
             </div>
         </div>
     </div>
-    
-    <!-- Elementi decorativi nautici -->
-    <div class="hero-pricing-decoration">
-        <div class="decoration-anchor">
-            <i class="fas fa-anchor text-white opacity-10"></i>
-        </div>
-        <div class="decoration-wheel">
-            <i class="fas fa-ship text-white opacity-05"></i>
-        </div>
-    </div>
 </section>
 
 <!-- Sezione Piani - "Scegli la Tua Nave" -->
 <section id="piani" class="py-8 bg-light">
+    <div class="wave-divider-top">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="#ff5757"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="#ff5757"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="#ff5757"></path>
+        </svg>
+    </div>
     <div class="container">
         <div class="text-center mb-7">
             <h2 class="display-5 fw-bold mb-3">
@@ -72,7 +69,7 @@
                     <div class="pricing-body bg-white p-5 text-center">
                         <div class="price-display mb-4">
                             <span class="display-2 fw-bold text-dark">0€</span>
-                            <span class="text-muted">/{{ translate('sempre') }}</span>
+                            <span class="text-muted">/{{ translate('Limitato') }}</span>
                         </div>
                         
                         <ul class="list-unstyled mb-5">
@@ -86,7 +83,7 @@
                             </li>
                             <li class="mb-3 d-flex">
                                 <i class="fas fa-check-circle text-info me-3 mt-1"></i>
-                                <span>{{ translate('Dominio linkbay.store') }}</span>
+                                <span>{{ translate('Dominio store.linkbay-cms.com') }}</span>
                             </li>
                             <li class="mb-3 d-flex text-muted">
                                 <i class="fas fa-times-circle me-3 mt-1"></i>
@@ -95,11 +92,13 @@
                         </ul>
                         
                         <button class="btn btn-outline-info w-100 py-3 rounded-pill fw-bold hover-scale">
-                            {{ translate('Salpa Gratis') }} <i class="fas fa-arrow-right ms-2"></i>
+                            {{ translate('Prova a Salpare') }} <i class="fas fa-arrow-right ms-2"></i>
                         </button>
                     </div>
                     <div class="pricing-footer bg-light py-3 text-center">
-                        <small class="text-muted">{{ translate('Perfetto per testare le acque') }}</small>
+                        <small class="text-muted">{{ translate('Perfetto per testare le acque*') }}</small>
+                        <br>
+                        <small class="text-muted">{{ translate('Il piano ha delle limitazioni, ossia massimo di 50 prodotti caricabili, 1000 visite al mese, superata una di queste soglie si passerà al piano superiore.') }}</small>
                     </div>
                 </div>
             </div>
@@ -108,7 +107,8 @@
             <div class="col-md-6 col-lg-4">
                 <div class="pricing-card h-100 p-0 rounded-4 overflow-hidden shadow-lg border border-3 border-danger position-relative hover-lift">
                     <div class="position-absolute top-0 start-50 translate-middle mt-n4">
-                        <span class="badge bg-danger py-2 px-4 fw-bold">{{ translate('PIÙ SCELTO') }}</span>
+                        <br>
+                        <span class="badge bg-dark py-2 px-4 fw-bold">{{ translate('PIÙ SCELTO') }}</span>
                     </div>
                     
                     <div class="pricing-header bg-danger text-white text-center p-5">
@@ -119,7 +119,7 @@
                     <div class="pricing-body bg-white p-5 text-center">
                         <div class="price-display mb-4">
                             <span class="display-2 fw-bold text-dark">18€</span>
-                            <span class="text-muted">/{{ translate('utente/mese') }}</span>
+                            <span class="text-muted">/{{ translate('mese') }}</span>
                         </div>
                         
                         <ul class="list-unstyled mb-5">
@@ -166,7 +166,7 @@
                     <div class="pricing-body bg-white p-5 text-center">
                         <div class="price-display mb-4">
                             <span class="display-2 fw-bold text-dark">36€</span>
-                            <span class="text-muted">/{{ translate('utente/mese') }}</span>
+                            <span class="text-muted">/{{ translate('mese') }}</span>
                         </div>
                         
                         <ul class="list-unstyled mb-5">
@@ -202,6 +202,7 @@
                 </div>
             </div>
         </div>
+        <br><br><br>
     </div>
 </section>
 
@@ -209,9 +210,9 @@
 <section id="confronto" class="py-8 bg-dark text-white">
     <div class="wave-divider-top">
         <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="#ff5758"></path>
-            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="#ff5758"></path>
-            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="#ff5758"></path>
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="#f8f9fa"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="#f8f9fa"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="#f8f9fa"></path>
         </svg>
     </div>
     
@@ -329,6 +330,7 @@
         </div>
         
         <div class="text-center mt-6">
+            <br>
             <a href="#piani" class="btn btn-outline-light px-5 py-3 rounded-pill fw-bold hover-scale">
                 <i class="fas fa-ship me-2"></i> {{ translate('Scegli la Tua Nave') }}
             </a>
@@ -338,6 +340,13 @@
 
 <!-- Sezione Vantaggi - "Perché Navigare con Noi" -->
 <section class="py-8" style="background-color: #f7f8fa;">
+    <div class="wave-divider-top">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="#212529"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="#212529"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="#212529"></path>
+        </svg>
+    </div>
     <div class="container">
         <div class="text-center mb-7">
             <h2 class="display-5 fw-bold mb-3">
@@ -432,6 +441,13 @@
 
 <!-- Sezione FAQ - "Domande dei Marinai" -->
 <section class="py-8 bg-white">
+    <div class="wave-divider-top">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="#f8f9fa"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="#f8f9fa"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="#f8f9fa"></path>
+        </svg>
+    </div>
     <div class="container">
         <div class="row g-5">
             <div class="col-lg-6">
@@ -499,7 +515,7 @@
                         </h3>
                         <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                             <div class="accordion-body">
-                                {{ translate('Il tuo store rimarrà attivo senza interruzioni. Potrai scegliere se passare a un piano a pagamento o continuare con Explorer gratis.') }}
+                                {{ translate('Il tuo store rimarrà attivo senza interruzioni. Potrai scegliere se passare a un piano a pagamento o continuare con Explorer.') }}
                             </div>
                         </div>
                     </div>
@@ -516,7 +532,14 @@
 </section>
 
 <!-- Sezione CTA Finale -->
-<section class="py-8 text-white position-relative" style="background: linear-gradient(135deg, #ff5758 0%, #d14243 100%);">
+<section class="py-8 text-white position-relative" style="background: #ff5758;">
+    <div class="wave-divider-top">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="#ffffff"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="#ffffff"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="#ffffff"></path>
+        </svg>
+    </div>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
@@ -524,7 +547,7 @@
                     <i class="fas fa-ship me-3"></i> {{ translate('Pronto a Salpare?') }}
                 </h2>
                 <p class="lead mb-5">
-                    {{ translate('Unisciti a migliaia di business che crescono con LinkBayCMS. Inizia la tua prova gratuita di 14 giorni oggi stesso.') }}
+                    {{ translate('Unisciti a migliaia di business che crescono con LinkBayCMS. Inizia la tua prova gratuita oggi stesso.') }}
                 </p>
                 <div class="d-flex flex-wrap justify-content-center gap-3">
                     <button class="btn btn-light btn-lg px-5 py-3 fw-bold rounded-pill shadow hover-scale">
@@ -536,14 +559,9 @@
                 </div>
             </div>
         </div>
+        <br><br><br>
     </div>
     
-    <!-- Decorazione onda -->
-    <div class="wave-cta">
-        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#ffffff"></path>
-        </svg>
-    </div>
 </section>
 
 {% endblock %}

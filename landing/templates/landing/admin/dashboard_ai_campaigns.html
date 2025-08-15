@@ -1,62 +1,270 @@
 {% extends 'landing/base.html' %}
 {% block content %}
-<div class="container py-4">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-dark text-white">
-      <h5 class="mb-0"><i class="fa-solid fa-bullhorn me-2"></i>Campagne Pubblicitarie con AI</h5>
+
+<!-- HEADER UNIFORME -->
+<div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-white rounded shadow-sm">
+  <div class="d-flex align-items-center">
+    <i class="fas fa-bullhorn fa-2x text-danger me-3"></i>
+    <div>
+      <h3 class="mb-0">Campagne Pubblicitarie AI</h3>
+      <p class="text-muted mb-0">Analizza performance e crea campagne ottimizz```</p>
     </div>
-    <div class="card-body">
-      <p class="text-muted">Analizza le performance e crea campagne ottimizzate con il supporto dell'intelligenza artificiale.</p>
-      <div class="row">
-        <div class="col-md-6 mb-4">
-          <div class="border rounded p-3 shadow-sm">
-            <h6>📊 Performance Recenti</h6>
-            <canvas id="adPerformanceChart" height="200"></canvas>
+  </div>
+  <a href="/dashboard" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-1"></i> Torna alla Dashboard
+  </a>
+</div>
+
+<!-- DIVISORE -->
+<div class="border-top border-danger border-2 my-4 opacity-75"></div>
+
+<!-- CARDS CAMP```E -->
+<div class="row g-4" data-aos="fade-up">
+  <!-- PERFORMANCE RECENTI -->
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm h-100 rounded-4">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-3">
+          <div class="bg-info bg-opacity-10 rounded-circle me-3 d-flex align-items-center justify-content-center" style="width:50px; height:50px;">
+            <i class="fas fa-chart-bar fa-lg text-info"></i>
+          </div>
+          <div>
+            <h6 class="mb-0">Performance Recenti</h6>
+            <small class="text-muted">Click e conversioni campagne attive</small>
           </div>
         </div>
-        <div class="col-md-6 mb-4">
-          <div class="border rounded p-3 shadow-sm">
-            <h6>✨ Crea Nuova Campagna</h6>
-            <form>
-              <div class="mb-2">
-                <label class="form-label">Obiettivo</label>
-                <select class="form-select">
-                  <option>Traffico</option>
-                  <option>Vendite</option>
-                  <option>Lead</option>
-                </select>
-              </div>
-              <div class="mb-2">
-                <label class="form-label">Budget</label>
-                <input type="number" class="form-control" placeholder="€">
-              </div>
-              <button class="btn btn-danger mt-2" type="submit"><i class="fa-solid fa-robot me-1"></i> Suggerisci Strategia</button>
-            </form>
+        <div class="chart-container">
+          <canvas id="adPerformanceChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- CREA CAMPAGNA -->
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm h-100 rounded-4">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-3">
+          <div class="bg-primary bg-opacity-10 rounded-circle me-3 d-flex align-items-center justify-content-center" style="width:50px; height:50px;">
+            <i class="fas fa-magic fa-lg text-primary"></i>
+          </div>
+          <div>
+            <h6 class="mb-0">Crea Nuova Campagna</h6>
+            <small class="text-muted">Configurazione guidata con AI</small>
           </div>
         </div>
+        
+        <!-- FORM CAMPAGNA -->
+        <form id="campaignForm">
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="fas fa-target me-1"></i>Obiettivo
+            </label>
+            <select class="form-select">
+              <option value="traffic">Traffico</option>```            <option value="sales">Vendite</option>
+              <option value="leads">Lead Generation</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="fas fa-euro-sign me-1"></i>Budget Giornaliero
+            </label>
+            <div class="input-group">
+              <span class="input-group-text">€</span>
+              <input type="number" class="form-control" placeholder="50" min="10">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="fas fa-calendar me-1"></i>Durata
+            </label>
+            <select class="form-select">
+              <option value="7">1 Settimana</option>
+              <option value="14">2 Settimane</option>
+              <option value="30">1 Mese</option>
+            </select>
+          </div>
+          <button class="btn btn-danger w-100" type="submit">
+            <i class="fas fa-robot me-1"></i>Suggerisci Strategia AI
+          </button>
+        </form>
       </div>
     </div>
   </div>
 </div>
 
+<!-- OVERVIEW METRICHE -->
+<div class="row g-4 mt-2" data-aos="fade-up" data-aos-delay="200">
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm text-center">
+      <div class="card-body">
+        <div class="bg-success bg-opacity-10 rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center" style="width:50px; height:50px;">
+          <i class="fas fa-mouse-pointer fa-lg text-success"></i>
+        </div>
+        <h5 class="text-success mb-0">2,847</h5>
+        <small class="text-muted">Click Totali</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm text-center">
+      <div class="card-body">
+        <div class="bg-warning bg-opacity-10 rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center" style="width:50px; height:50px;">
+          <i class="fas fa-percentage fa-lg text-warning"></i>
+        </div>
+        <h5 class="text-warning mb-0">3.2%</h5>
+        <small class="text-muted">CTR Medio</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm text-center">
+      <div class="card-body">
+        <div class="bg-primary bg-opacity-10 rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center" style="width:50px; height:50px;">
+          <i class="fas fa-shopping-cart fa-lg text-primary"></i>
+        </div>
+        <h5 class="text-primary mb-0">€1,248</h5>
+        <small class="text-muted">Conversioni</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PULSANTE AIUTO -->
+<button id="start-ads-tutorial" class="btn btn-danger position-fixed bottom-0 end-0 m-4 rounded-circle shadow"
+        style="width:50px; height:50px;">
+  <i class="fas fa-question"></i>
+</button>
+
+{% endblock %}
+
+<style>
+/* Hover effect per le card */
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(220,53,69,0.15) !important;
+  transition: all 0.3s ease;
+}
+
+/* Form styling */
+#campaignForm .form-label {
+  font-weight: 600;
+  color: #495057;
+}
+
+#campaignForm .input-group-text {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  const ctx = document.getElementById('adPerformanceChart').getContext('2d');
-  const adPerformanceChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Campagna A', 'Campagna B', 'Campagna C'],
-      datasets: [{
-        label: 'Click',
-        data: [230, 190, 340],
-        backgroundColor: ['#ff5757', '#ffc107', '#28a745']
-      }]
+// Grafico performance campagne
+const ctx = document.getElementById('adPerformanceChart').getContext('2d');
+const adPerformanceChart = new Chart(ctx, {
+  type: 'bar',
+   {
+    labels: ['Campagna A', 'Campagna B', 'Campagna C'],
+    datasets: [{
+      label: 'Click',
+       [230, 190, 340],
+      backgroundColor: [
+        'rgba(255, 87, 87, 0.8)',
+        'rgba(255, 193, 7, 0.8)', 
+        'rgba(40, 167, 69, 0.8)'
+      ],
+      borderRadius: 8,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false }
     },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false }
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: '#f1f3f4' },
+        ticks: { color: '#6c757d' }
+      },
+      x: {
+        grid: { display: false },
+        ticks: { color: '#6c757d' }
       }
     }
-  });
+  }
+});
+
+// Form submission
+document.getElementById('campaignForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  // Simula caricamento AI
+  const btn = e.target.querySelector('button[type="submit"]');
+  const originalText = btn.innerHTML;
+  
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Analizzando...';
+  btn.disabled = true;
+  
+  setTimeout(() => {
+    Swal.fire({
+      title: 'Strategia AI Generata!```      html: `
+        <div class="text-start">
+          <h6 class="mb-2">Raccomandazioni:</h6>
+          <ul class="list-unstyled">
+            <li>📈 Budget ottimale: €75/giorno</li>
+            <li>🎯 Target: 25-45 anni</li>
+            <li>⏰ Orario migliore: 18:00-21:00</li>
+            <li>📱 Piattaforme: Facebook```Instagram</li>
+          </ul>
+        </div>
+      `,
+      icon: 'success',
+      confirmButtonText: 'Avvia Campagna',
+      confirmButtonColor: '#ff5757'
+    });
+    
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }, 2000);
+});
+
+// Tour guidato campagne
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof Shepherd !== 'undefined') {
+    const adsTour = new Shepherd.Tour({
+      defaultStepOptions: {
+        cancelIcon: { enabled: true },
+        scrollTo: { behavior: 'smooth', block: 'center' },
+        classes: 'shadow-lg bg-danger text-white',
+        arrow: true
+      },
+      useModalOverlay: true
+    });
+
+    adsTour.addStep({
+      title: '<i class="fas fa-chart-bar"></i>&nbsp; Performance',
+      text: 'Monitora le performance delle tue campagne pubblicitarie att```.',
+      attachTo: { element: '#adPerformanceChart', on: 'right' },
+      buttons: [{ text: 'Avanti', action: adsTour.next }]
+    });
+
+    adsTour.addStep({
+      title: '<i class="fas fa-magic"></i>&nbsp; Crea Campagna',
+      text: 'L\'AI ti aiuta a configurare campagne ottimizzate per i tuoi obiettivi.',
+      attachTo: { element: '#campaignForm', on: 'left```,
+      buttons: [
+        { text: 'Indietro', action: adsTour.back },
+        { text: 'Fatto!', action: adsTour.complete }
+      ]
+    });
+
+    document.getElementById('start-ads-tutorial')
+            .addEventListener('click', () => adsTour.start());
+  }
+});
 </script>
-{% endblock %}

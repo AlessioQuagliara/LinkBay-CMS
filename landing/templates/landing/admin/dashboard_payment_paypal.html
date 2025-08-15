@@ -1,25 +1,195 @@
 {% extends 'landing/base.html' %}
 {% block content %}
-<div class="container py-4">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white">
-      <h5 class="mb-0"><i class="fa-brands fa-paypal me-2"></i>Configurazione PayPal</h5>
-    </div>
-    <div class="card-body">
-      <p class="text-muted">Inserisci le credenziali per ricevere pagamenti con PayPal dal tuo shop <strong>{{ shop_name }}</strong>.</p>
 
-      <form method="POST" action="/api/payments/paypal/{{ shop_name }}">
-        <div class="mb-3">
-          <label for="paypal_client_id" class="form-label">🧾 Client ID</label>
-          <input type="text" class="form-control" id="paypal_client_id" name="paypal_client_id" placeholder="AXXXXXX..." required>
-        </div>
-        <div class="mb-3">
-          <label for="paypal_secret" class="form-label">🔐 Secret Key</label>
-          <input type="text" class="form-control" id="paypal_secret" name="paypal_secret" placeholder="EXXXXXX..." required>
-        </div>
-        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-link"></i> Salva Configurazione</button>
-      </form>
+<!-- HEADER UNIFORME -->
+<div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-white rounded shadow-sm">
+  <div class="d-flex align-items-center">
+    <i class="fab fa-paypal fa-2x text-danger me-3"></i>
+    <div>
+      <h3 class="mb-0">Configurazione PayPal</h3>
+      <p class="text-muted mb-0">Collega PayPal per ricevere pagamenti su <strong>{{ shop_name }}</strong></p>
     </div>
   </div>
+  <a href="/dashboard" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-1"></i> Torna alla Dashboard
+  </a>
 </div>
+
+<!-- DIVISORE -->
+<div class="border-top border-danger border-2 my-4 opacity-75"></div>
+
+<!-- CARD PRINCIPALE -->
+<div class="card shadow-sm border-0 rounded-4" data-aos="fade-up">
+  <div class="card-body">
+    <p class="text-muted mb-4">Inserisci le credenziali PayPal per abilitare i pagamenti sicuri nel tuo shop.</p>
+    
+    <!-- FORM CONFIGURAZIONE -->
+    <form id="paypalForm" method="POST" action="/api/payments/paypal/{{ shop_name }}">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="paypal_client_id" class="form-label fw-semibold">
+            <i class="fas fa-receipt me-1"></i>Client&nbsp;ID
+          </label>
+          <div class="input-group">
+            <span class="input-group-text bg-danger text-white">
+              <i class="fas fa-id-card-alt"></i>
+            </span>
+            <input type="text" 
+                   class="form-control" 
+                   id="paypal_client_id" 
+                   name="paypal_client_id" 
+                   placeholder="AXXXXXX..." 
+                   required>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label for="paypal_secret" class="form-label fw-semibold">
+            <i class="fas fa-key me-1"></i>Secret&nbsp;Key
+          </label>
+          <div class="input-group">
+            <span class="input-group-text bg-danger text-white">
+              <i class="fas fa-lock"></i>
+            </span>
+            <input type="password" 
+                   class="form-control" 
+                   id="paypal_secret" 
+                   name="paypal_secret" 
+                   placeholder="EXXXXXX..." 
+                   required>
+            <button type="button" class="btn btn-outline-secondary" onclick="toggleSecret()">
+              <i id="secretIcon" class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="col-12 d-flex justify-content-end pt-2">
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-link me-1"></i>Salva Configurazione
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- INFO PAYPAL -->
+    <div class="card bg-light border-0 mt-4 rounded-4">
+      <div class="card-body">
+        <h6 class="mb-3">
+          <i class="fas fa-info-circle me-2 text-warning"></i>Perché collegare PayPal?
+        </h6>
+        <ul class="mb-0 small">
+          <li class="mb-2">
+            <i class="fas fa-shield-alt me-1 text-success"></i>
+            Pagamenti sicuri con protezione acquirente
+          </li>
+          <li class="mb-2">
+            <i class="fas fa-wallet me-1 text-primary"></i>
+            Accesso a +350&nbsp;milioni di utenti PayPal
+          </li>
+          <li class="mb-2">
+            <i class="fas fa-sync-alt me-1 text-info"></i>
+            Accredito immediato dei fondi sul tuo conto
+          </li>
+          <li>
+            <i class="fas fa-chart-line me-1 text-warning"></i>
+            Migliori conversioni grazie alla fiducia nel brand
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- STATO CONFIGURAZIONE -->
+    {% if paypal_active %}
+    <div class="alert alert-success d-flex align-items-center mt-4" role="alert">
+      <i class="fas fa-check-circle me-2"></i>
+      <div>
+        <strong>PayPal configurato correttamente!</strong>
+        <br><small>I pagamenti sono attivi.</small>
+      </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning d-flex align-items-center mt-4" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      <div>
+        <strong>PayPal non configurato</strong>
+        <br><small>Completa il form per abilitare i pagamenti.</small>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- PULSANTE AIUTO -->
+<button id="start-paypal-tutorial" class="btn btn-danger position-fixed bottom-0 end-0 m-4 rounded-circle shadow"
+        style="width:50px; height:50px;">
+  <i class="fas fa-question"></i>
+</button>
+
 {% endblock %}
+
+<style>
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(220,53,69,.15) !important;
+  transition: all 0.3s ease;
+}
+#paypal_client_id:focus,
+#paypal_secret:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.2rem rgba(255,87,87,.25);
+}
+</style>
+
+<script>
+// Mostra/nasconde secret key
+function toggleSecret(){
+  const secret = document.getElementById('paypal_secret');
+  const icon   = document.getElementById('secretIcon');
+  if(secret.type === 'password'){
+    secret.type = 'text';
+    icon.className = 'fas fa-eye-slash';
+  } else {
+    secret.type = 'password';
+    icon.className = 'fas fa-eye';
+  }
+}
+
+// UX feedback submit
+document.getElementById('paypalForm').addEventListener('submit', function(e){
+  const btn = this.querySelector('button[type="submit"]');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Salvando...';
+  btn.disabled = true;
+});
+
+// Tour PayPal
+document.addEventListener('DOMContentLoaded',()=>{
+  if(typeof Shepherd==='undefined') return;
+  const tour = new Shepherd.Tour({
+    defaultStepOptions:{
+      cancelIcon:{enabled:true},
+      scrollTo:{behavior:'smooth',block:'center'},
+      classes:'shadow-lg bg-danger text-white',
+      arrow:true
+    },
+    useModalOverlay:true
+  });
+
+  tour.addStep({
+    title:'<i class="fab fa-paypal"></i>&nbsp; Client ID',
+    text:'Inserisci il Client ID del tuo account PayPal.',
+    attachTo:{element:'#paypal_client_id',on:'bottom'},
+    buttons:[{text:'Avanti',action:tour.next}]
+  });
+
+  tour.addStep({
+    title:'<i class="fas fa-key"></i>&nbsp; Secret Key',
+    text:'Aggiungi la Secret Key per completare la configurazione.',
+    attachTo:{element:'#paypal_secret',on:'bottom'},
+    buttons:[
+      {text:'Indietro',action:tour.back},
+      {text:'Fatto!',action:tour.complete}
+    ]
+  });
+
+  document.getElementById('start-paypal-tutorial')
+          .addEventListener('click',()=>tour.start());
+});
+</script>

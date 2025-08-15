@@ -1,0 +1,125 @@
+<!-- 🔴 MODALE: NUOVO TICKET -->
+<div class="modal fade" id="newTicketModal" tabindex="-1" aria-labelledby="newTicketModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header bg-danger text-white rounded-top-4">
+        <h5 class="modal-title" id="newTicketModalLabel">
+          <i class="fas fa-paper-plane me-2"></i>Apri un nuovo ticket
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <form id="ticketForm">
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Seleziona Negozio</label>
+              <select id="shopNameSelect" class="form-select" name="shop_name" required>
+                <option selected disabled>-- Caricamento negozi… --</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Categoria</label>
+              <select id="ticketCategory" class="form-select" name="category" required>
+                <option value="tecnico">Problema Tecnico</option>
+                <option value="fatturazione">Fatturazione</option>
+                <option value="ecommerce">Funzionalità E-commerce</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Oggetto del Ticket</label>
+              <input id="ticketTitle" type="text" class="form-control" name="title" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Messaggio</label>
+              <textarea id="ticketMessage" class="form-control" name="message" rows="4" required></textarea>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Priorità</label>
+              <select id="ticketPriority" class="form-select" name="priority">
+                <option value="low">Bassa</option>
+                <option value="normal" selected>Normale</option>
+                <option value="high">Alta</option>
+                <option value="critical">Critica</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer bg-light rounded-bottom-4">
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-paper-plane me-1"></i>Invia Richiesta
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- 🔴 MODALE: CREA NEGOZIO -->
+<div class="modal fade" id="createShopModal" tabindex="-1" aria-labelledby="createShopModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form id="createShopForm" class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header bg-danger text-white rounded-top-4">
+        <h5 class="modal-title" id="createShopModalLabel">
+          <i class="fas fa-store me-2"></i>Crea Nuovo Negozio
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Nome Negozio</label>
+          <input id="shop_name" type="text" class="form-control" name="shop_name"
+                 placeholder="es. erboristeria-digitale" required>
+          <div id="shopNameHelp" class="invalid-feedback d-none">
+            Nome già in uso o non valido. Usa solo lettere, numeri e trattini (-).
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Tipologia</label>
+          <select id="shop_type" class="form-select" name="shop_type" required>
+            <option disabled selected>Seleziona una tipologia</option>
+            <option value="ecommerce">Negozio Online</option>
+            <option value="platform">Piattaforma Online</option>
+            <option value="website">Sito Web</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer bg-light rounded-bottom-4">
+        <button id="finalCreateBtn" type="button" class="btn btn-success" onclick="creaNegozioPerUtente()">
+          <i class="fas fa-plus me-1"></i>Crea Negozio
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  /* 🎨 CSS comune per tutti i modali */
+.modal-content {
+  border-radius: 1rem !important;
+}
+
+.modal-header.rounded-top-4 {
+  border-top-left-radius: 1rem !important;
+  border-top-right-radius: 1rem !important;
+}
+
+.modal-footer.rounded-bottom-4 {
+  border-bottom-left-radius: 1rem !important;
+  border-bottom-right-radius: 1rem !important;
+}
+
+.modal-header.bg-danger {
+  background: var(--primary) !important;      /* = #ff5757 dal tuo :root */
+}
+
+.btn-close-white {
+  filter: invert(1);  /* chiusura bianca visibile sul rosso */
+}
+
+</style>

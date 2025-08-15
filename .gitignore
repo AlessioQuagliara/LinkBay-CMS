@@ -1,5 +1,5 @@
 # 👉 Ambiente virtuale
-/CMS_DEF/
+/venv/
 
 # 👉 Configurazioni locali
 .env

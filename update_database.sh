@@ -4,7 +4,7 @@
 # SCRIPT DI AGGIORNAMENTO DATABASE "BOTTE DI FERRO"
 # =============================================
 # Sicuro, non distruttivo, con rollback automatico
-# By YourName - Linkbay CMS
+# By Alessio Quagliara - Linkbay CMS
 
 set -euo pipefail  # Modalità strict: interrompe su errori
 

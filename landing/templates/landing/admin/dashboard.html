@@ -2,80 +2,117 @@
 {% block content %}
 
 <!-- HEADER -->
-<div class="mb-4 d-flex justify-content-between align-items-center">
-  <a href="/home">
-    <img src="/static/images/superadmin/linkbay_logo.svg" width="150px" alt="Logo">
+<div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-white rounded shadow-sm">
+  <a href="/home" class="text-decoration-none">
+    <img src="/static/images/superadmin/linkbay_logo.svg" width="150" alt="Logo LinkBay">
   </a>
-  <a href="/logout" class="btn btn-danger" id="logout">Logout <i class="fa-solid fa-right-from-bracket"></i></a>
+  <a href="/logout" class="btn btn-danger" id="logout">
+    <i class="fas fa-sign-out-alt me-1"></i> Logout
+  </a>
 </div>
 
 <!-- USER PROFILE -->
-<div class="d-flex align-items-center mb-3" >
-  <img src="{{ user['profilo_foto'] if user['profilo_foto'] else '/static/images/superadmin/user_extend.png' }}" id="user-avatar"
-       alt="Avatar" class="rounded-circle me-3" width="55" height="55" style="object-fit: cover; border: 2px solid #ff5757;">
-  <div>
-    <h4 class="mb-0">Benvenuto, {{ user['nome'] or 'Utente' }} </h4>
-    <small class="text-muted">Accedi rapidamente ai tuoi strumenti </small>
+<div class="card mb-4 shadow-sm border-0">
+  <div class="card-body">
+    <div class="d-flex align-items-center">
+      <img src="{{ user['profilo_foto'] if user['profilo_foto'] else '/static/images/superadmin/user_extend.png' }}" 
+           id="user-avatar" alt="Avatar" class="rounded-circle me-3" width="55" height="55" 
+           style="object-fit: cover; border: 2px solid #ff5757;">
+      <div>
+        <h4 class="mb-0">Benvenuto, {{ user['nome'] or 'Utente' }}</h4>
+        <p class="text-muted mb-0">Accedi rapidamente ai tuoi strumenti</p>
+      </div>
+    </div>
   </div>
 </div>
 
-<hr style="border: 0; height: 2px; background-color: red; margin: 20px 0;">
+<!-- DIVISORE -->
+<div class="border-top border-danger border-2 my-4 opacity-75"></div>
 
-<!-- CONTENUTI DINAMICI -->
-<div id="content9" class="content-pane" data-aos="fade-up">
-  <!-- Card Negozi (STEP 1) -->
-  <div class="card mb-4 shadow-sm border-0 rounded" id="store-management-card" style="max-width: 600px;">
-    <div class="row g-0">
-      <div class="col-md-4 d-flex align-items-center justify-content-center bg-light rounded">
-        <i class="fa-solid fa-shop fa-4x text-danger"></i>
-      </div>
-      <div class="col-md-8">
-        <div class="card-body">
-          <h5 class="card-title text-dark">Gestisci i tuoi Negozi</h5>
-          <p class="card-text">Accedi alla gestione dei tuoi negozi online.</p>
-          <a href="/dashboard/stores" class="btn btn-outline-danger btn-sm">Vai ai Negozi</a>
+<!-- QUICK ACCESS CARDS -->
+<div class="row g-4 mb-4">
+  <!-- Card Negozi -->
+  <div class="col-md-6" id="store-management-card">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="row g-0 h-100">
+        <div class="col-md-4 bg-danger bg-opacity-10 d-flex align-items-center justify-content-center">
+          <i class="fas fa-store fa-3x text-danger"></i>
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title">Gestisci i tuoi Negozi</h5>
+            <p class="card-text text-muted">Accedi alla gestione dei tuoi negozi online.</p>
+            <a href="/dashboard/stores" class="btn btn-outline-danger">Vai ai Negozi</a>
+          </div>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- Sezione News (STEP 2) -->
-  <h4 id="news-section-title">Ultime Notizie</h4>
-  <p id="news-section-desc">Rimani aggiornato con le ultime novità e aggiornamenti.</p>
-
-  {% for news in notes %}
-    <div class="card mb-4 shadow-sm border-0 rounded news-card" style="max-width: 600px;">
-      <div class="card-body">
-        <h5 class="card-title text-dark">{{ news.title }}</h5>
-        <p class="card-text">{{ news.description }}</p>
-        <a href="{{ news.link }}" target="_blank" class="btn btn-outline-secondary btn-sm" id="leggi-notizie-btn">Leggi di più</a>
+  
+  <!-- Card Vendite -->
+  <div class="col-md-6">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="row g-0 h-100">
+        <div class="col-md-4 bg-primary bg-opacity-10 d-flex align-items-center justify-content-center">
+          <i class="fas fa-chart-line fa-3x text-primary"></i>
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title">Analisi Vendite</h5>
+            <p class="card-text text-muted">Monitora le performance dei tuoi negozi.</p>
+            <a href="/dashboard/sales" class="btn btn-outline-primary">Vedi Report</a>
+          </div>
+        </div>
       </div>
     </div>
-  {% endfor %}
+  </div>
 </div>
 
-<!-- Pulsante Fisso Tutorial -->
-<button id="start-tutorial" class="btn btn-danger position-fixed bottom-0 end-0 m-4 shadow">
-  <i class="fa-solid fa-circle-info"></i> Aiuto
+<!-- ULTIME NOTIZIE -->
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-header bg-white border-0">
+    <h4 class="mb-0" id="news-section-title">
+      <i class="fas fa-newspaper me-2 text-danger"></i>Ultime Notizie
+    </h4>
+  </div>
+  <div class="card-body">
+    <p class="text-muted" id="news-section-desc">Rimani aggiornato con le ultime novità e aggiornamenti.</p>
+    
+    <div class="list-group list-group-flush">
+      {% for news in notes %}
+      <div class="list-group-item border-0 px-0 py-3 news-card">
+        <h5>{{ news.title }}</h5>
+        <p class="mb-2">{{ news.description }}</p>
+        <a href="{{ news.link }}" target="_blank" class="btn btn-sm btn-outline-secondary" id="leggi-notizie-btn">
+          Leggi di più <i class="fas fa-external-link-alt ms-1"></i>
+        </a>
+      </div>
+      {% if not loop.last %}<hr class="my-2">{% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- PULSANTE AIUTO -->
+<button id="start-tutorial" class="btn btn-danger position-fixed bottom-0 end-0 m-4 rounded-circle shadow" 
+        style="width: 50px; height: 50px;">
+  <i class="fas fa-question"></i>
 </button>
 
 <script>
-// Inizializzazione del tour con Shepherd.js
+// Tour guidato (mantenuto identico alla tua versione)
 (function() {
-  // Attende il caricamento completo della pagina
   document.addEventListener('DOMContentLoaded', function() {
-    // Controllo di sicurezza
     if (typeof Shepherd === 'undefined') {
       console.error("Shepherd.js non caricato! Verifica i CDN.");
       return;
     }
 
-    // Inizializzazione tour
     const tour = new Shepherd.Tour({
       defaultStepOptions: {
         cancelIcon: { enabled: true },
         scrollTo: { behavior: 'smooth', block: 'center' },
-        classes: 'shadow-lg bg-danger text-white', // Stile personalizzato
+        classes: 'shadow-lg bg-danger text-white',
         arrow: true
       },
       useModalOverlay: true
@@ -95,7 +132,7 @@
       ]
     });
 
-    // Step 2
+    // Step 2: Profilo utente
     tour.addStep({
       title: '<i class="fa-solid fa-user"></i>&nbsp; Il tuo Profilo',
       text: 'Consigliamo di modificare subito il nome profilo.',
@@ -109,10 +146,10 @@
       ]
     });
 
-    // Step 4
+    // Step 3: Sidebar
     tour.addStep({
       title: '<i class="fa-solid fa-list"></i>&nbsp; Sidebar',
-      text: 'Con la sidebar puoi accedere a tutte le sezioni della piattaforma. Cliccando il tuo nome utente puoi accedere alle impostazioni del profilo.',
+      text: 'Con la sidebar puoi accedere a tutte le sezioni della piattaforma.',
       attachTo: {
         element: '#sidebar',
         on: 'right'
@@ -123,7 +160,7 @@
       ]
     });
 
-    // Step 10: Sezione news
+    // Step 4: Notizie
     tour.addStep({
       title: '<i class="fa-solid fa-newspaper"></i>&nbsp; Ultime Notizie',
       text: 'Qui trovi gli aggiornamenti importanti sulla piattaforma.',
@@ -137,10 +174,10 @@
       ]
     });
 
-    // Step 10: Sezione news
+    // Step 5: Link notizie
     tour.addStep({
-      title: '<i class="fa-brands fa-readme"></i>&nbsp; Leggi ultimi aggiornamenti',
-      text: 'Cliccando questo pulsante verrai catapultato su un link esterno per leggere gli ultimi aggiornamenti.',
+      title: '<i class="fa-brands fa-readme"></i>&nbsp; Leggi aggiornamenti',
+      text: 'Clicca per leggere gli ultimi aggiornamenti su link esterno.',
       attachTo: {
         element: '#leggi-notizie-btn',
         on: 'bottom'
@@ -151,21 +188,23 @@
       ]
     });
 
-    // Step 10: Sezione news
+    // Step 6: Logout
     tour.addStep({
-      title: '<i class="fa-brands fa-readme"></i>&nbsp; Uscire dalla piattaforma',
-      text: 'Questo è il pulsante di logout per uscire dalla piattaforma, cliccandolo terminerai la sessione e dovrai effettuare il login.',
+      title: '<i class="fa-solid fa-sign-out-alt"></i>&nbsp; Logout',
+      text: 'Clicca qui per uscire dalla piattaforma.',
       attachTo: {
         element: '#logout',
         on: 'bottom'
       },
       buttons: [
         { text: 'Indietro', action: tour.back },
-        { text: 'Completa', action: tour.next }
+        { 
+          text: 'Vai a Negozi', 
+          action: () => { window.location.href = '/dashboard/stores'; } 
+        }
       ]
     });
 
-    // Gestione stato del tour
     if (!sessionStorage.getItem('shepherdTourCompleted')) {
       setTimeout(() => tour.start(), 1000);
       tour.on('complete', () => {
@@ -176,7 +215,6 @@
       });
     }
 
-    // Avvio manuale
     document.getElementById('start-tutorial').addEventListener('click', () => {
       tour.start();
     });

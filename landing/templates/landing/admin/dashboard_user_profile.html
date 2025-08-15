@@ -1,75 +1,161 @@
 {% extends 'landing/base.html' %}
 {% block content %}
 
-<!-- CONTENUTI DINAMICI -->
-<div id="content9" class="content-pane" data-aos="fade-up">
-  <div class="mb-4 d-flex justify-content-between align-items-center">
+<!-- HEADER UNIFORME -->
+<div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-white rounded shadow-sm">
+  <div class="d-flex align-items-center">
+    <i class="fas fa-user-tie fa-2x text-danger me-3"></i>
     <div>
-      <h3 class="fw-bold text-danger"><i class="fa-solid fa-user-tie me-2"></i>Profilo Utente Admin</h3>
-      <p class="text-muted mb-0">Dettagli relativi all'amministratore selezionato e ai suoi negozi.</p>
+      <h3 class="mb-0">Profilo Amministratore</h3>
+      <p class="text-muted mb-0">Dettagli e statistiche dell'utente selezionato</p>
     </div>
-    <a href="/dashboard/team" class="btn btn-outline-dark">
-      <i class="fa-solid fa-arrow-left"></i>
-    </a>
   </div>
+  <a href="/dashboard/team" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-1"></i> Torna al Team
+  </a>
+</div>
 
-  <div class="card mb-4 shadow-sm">
-    <div class="card-body d-flex align-items-center">
-      <img src="{{ target_user.profilo_foto or '/static/images/superadmin/admin_avatar.png' }}" alt="Avatar" class="rounded-circle me-3" width="70" height="70">
+<!-- DIVISORE -->
+<div class="border-top border-danger border-2 my-4 opacity-75"></div>
+
+<!-- CARD PROFILO -->
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body">
+    <div class="d-flex align-items-center">
+      <img src="{{ target_user.profilo_foto or '/static/images/superadmin/admin_avatar.png' }}" 
+           alt="Avatar" class="rounded-circle me-4 border border-2 border-danger" 
+           width="80" height="80" style="object-fit: cover;">
       <div>
-        <h5 class="fw-bold mb-0">{{ target_user.nome }} {{ target_user.cognome }}</h5>
-        <p class="mb-0 text-muted">{{ target_user.email }}</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="card mb-4">
-    <div class="card-body d-flex align-items-center">
-        <p>Messaggia e Comincia gli Affari&nbsp;&nbsp;&nbsp;</p>
-        <a href="/dashboard/chat/{{ target_user.id }}" class="btn btn-danger">
-          <i class="fa-solid fa-comments me-1"></i>
+        <h4 class="fw-bold mb-1">{{ target_user.nome }} {{ target_user.cognome }}</h4>
+        <p class="text-muted mb-2">
+          <i class="fas fa-envelope me-1"></i>{{ target_user.email }}
+        </p>
+        <a href="/dashboard/chat/{{ target_user.id }}" class="btn btn-sm btn-danger">
+          <i class="fas fa-comments me-1"></i> Contatta
         </a>
-    </div>
-  </div>
-
-  <div class="row g-4 mb-4">
-    <div class="col-md-6">
-      <div class="card border-0 bg-white shadow-sm">
-        <div class="card-body">
-          <h6 class="text-muted">Totale Fatturato</h6>
-          <h3 class="fw-bold text-danger">€ {{ "%.2f"|format(total_revenue) }}</h3>
-        </div>
       </div>
-    </div>
-    <div class="col-md-6">
-      <div class="card border-0 bg-white shadow-sm">
-        <div class="card-body">
-          <h6 class="text-muted">Totale Ordini</h6>
-          <h3 class="fw-bold text-dark">{{ total_orders }}</h3>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card shadow-sm">
-    <div class="card-header bg-danger text-white">
-      <h5 class="mb-0"><i class="fa-solid fa-store me-2"></i>Negozi Gestiti</h5>
-    </div>
-    <div class="card-body">
-      {% if shops %}
-      <ul class="list-group list-group-flush">
-        {% for shop in shops %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <span class="fw-semibold text-dark">{{ shop.shop_name }}</span>
-          <span class="badge bg-secondary">{{ shop.shop_type }}</span>
-        </li>
-        {% endfor %}
-      </ul>
-      {% else %}
-      <p class="text-muted">Nessun negozio associato a questo utente.</p>
-      {% endif %}
     </div>
   </div>
 </div>
 
+<!-- STATISTICHE -->
+<div class="row g-4 mb-4">
+  <!-- Fatturato -->
+  <div class="col-md-6">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body text-center">
+        <i class="fas fa-euro-sign fa-2x text-danger mb-3"></i>
+        <h6 class="text-muted text-uppercase small">Totale Fatturato</h6>
+        <h3 class="fw-bold text-danger">€ {{ "%.2f"|format(total_revenue) }}</h3>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Ordini -->
+  <div class="col-md-6">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body text-center">
+        <i class="fas fa-shopping-bag fa-2x text-dark mb-3"></i>
+        <h6 class="text-muted text-uppercase small">Totale Ordini</h6>
+        <h3 class="fw-bold text-dark">{{ total_orders }}</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEGOZI GESTITI -->
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white border-0">
+    <h4 class="mb-0">
+      <i class="fas fa-store me-2 text-danger"></i>Negozi Gestiti
+    </h4>
+  </div>
+  <div class="card-body">
+    {% if shops %}
+    <div class="list-group list-group-flush">
+      {% for shop in shops %}
+      <div class="list-group-item border-0 px-0 py-3 d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="mb-1">{{ shop.shop_name }}</h5>
+          <span class="badge bg-secondary">{{ shop.shop_type }}</span>
+        </div>
+        <a href="/dashboard/stores/{{ shop.shop_name }}" class="btn btn-sm btn-outline-secondary">
+          <i class="fas fa-external-link-alt"></i>
+        </a>
+      </div>
+      {% if not loop.last %}<hr class="my-2">{% endif %}
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-4">
+      <i class="fas fa-store-slash fa-3x text-muted mb-3"></i>
+      <p class="text-muted">Nessun negozio associato a questo utente</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- PULSANTE AIUTO -->
+<button id="start-tutorial" class="btn btn-danger position-fixed bottom-0 end-0 m-4 rounded-circle shadow" 
+        style="width: 50px; height: 50px;">
+  <i class="fas fa-question"></i>
+</button>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Tour guidato
+document.getElementById('start-tutorial').addEventListener('click', () => {
+  const tour = new Shepherd.Tour({
+    defaultStepOptions: {
+      cancelIcon: { enabled: true },
+      scrollTo: { behavior: 'smooth', block: 'center' },
+      classes: 'shadow-lg bg-danger text-white',
+      arrow: true
+    },
+    useModalOverlay: true
+  });
+
+  tour.addStep({
+    title: '<i class="fas fa-user-tie"></i> Profilo Admin',
+    text: 'Qui trovi tutte le informazioni principali sull\'amministratore selezionato.',
+    attachTo: {
+      element: '.card-body .d-flex.align-items-center',
+      on: 'bottom'
+    },
+    buttons: [
+      { text: 'Salta', action: tour.cancel },
+      { text: 'Avanti', action: tour.next }
+    ]
+  });
+
+  tour.addStep({
+    title: '<i class="fas fa-chart-bar"></i> Statistiche',
+    text: 'Visualizza il fatturato totale e il numero di ordini gestiti.',
+    attachTo: {
+      element: '.row.g-4.mb-4',
+      on: 'top'
+    },
+    buttons: [
+      { text: 'Indietro', action: tour.back },
+      { text: 'Avanti', action: tour.next }
+    ]
+  });
+
+  tour.addStep({
+    title: '<i class="fas fa-store"></i> Negozi',
+    text: 'Lista completa dei negozi gestiti da questo amministratore.',
+    attachTo: {
+      element: '.card-header',
+      on: 'bottom'
+    },
+    buttons: [
+      { text: 'Fine', action: tour.complete }
+    ]
+  });
+
+  tour.start();
+});
+</script>
 {% endblock %}

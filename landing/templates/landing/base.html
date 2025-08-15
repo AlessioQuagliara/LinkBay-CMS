@@ -26,6 +26,8 @@
       /* Applica a tutto il progetto */
       body, html {
         font-family: 'Electrolize', sans-serif !important;
+        background-color: #f8f9fa;
+        height: 100%;
       }
       
       /* Fallback per elementi specifici */
@@ -33,11 +35,66 @@
         font-family: inherit;
       }
 
-      #wrapper {
-        display: flex;
-        flex-direction: row;
+      /* Colori principali */
+      :root {
+        --primary: #ff5757;
+        --primary-light: #ff8a8a;
+        --primary-dark: #d93e3e;
+        --secondary: #343a40;
+        --light: #f8f9fa;
+        --dark: #212529;
       }
-
+      
+      /* Header migliorato */
+      .dashboard-header {
+        background: white;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        padding: 0.5rem 1rem;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+      
+      .brand img {
+        height: 32px;
+      }
+      
+      .header-user {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      
+      .notification-icon {
+        position: relative;
+        color: var(--secondary);
+        font-size: 1.2rem;
+      }
+      
+      .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: var(--primary);
+        color: white;
+        font-size: 0.65rem;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .user-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--primary);
+      }
+      
+      /* Sidebar migliorata */
       #sidebar {
         width: 240px;
         min-width: 240px;
@@ -46,335 +103,260 @@
         top: 0;
         height: 100vh;
         overflow-y: auto;
+        background: white;
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        z-index: 900;
       }
-
-      #wrapper.toggled #sidebar {
-        margin-left: -240px;
+      
+      .sidebar-header {
+        padding: 1.5rem 1rem 1rem;
+        border-bottom: 1px solid #eee;
       }
-
+      
+      .sidebar-content {
+        padding: 1rem;
+      }
+      
+      .nav-link {
+        padding: 0.7rem 1rem;
+        color: var(--secondary);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 0.25rem;
+      }
+      
+      .nav-link i {
+        width: 24px;
+        text-align: center;
+      }
+      
+      .nav-link:hover,
+      .nav-link.active {
+        background-color: var(--primary);
+        color: #fff !important;
+        box-shadow: 0 4px 8px rgba(255, 87, 87, 0.3);
+      }
+      
+      .nav-link.active {
+        font-weight: 600;
+      }
+      
+      .nav-link-badge {
+        margin-left: auto;
+        background: white;
+        color: var(--primary);
+        font-size: 0.8rem;
+        padding: 2px 8px;
+        border-radius: 10px;
+      }
+      
+      /* Contenuto principale */
       #page-content-wrapper {
         flex-grow: 1;
-        padding: 20px;
+        padding: 1.5rem;
         transition: all 0.3s ease;
+        background: #f8f9fa;
       }
-
+      
+      .content-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+      
+      /* Footer */
+      .dashboard-footer {
+        background: white;
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #eee;
+        font-size: 0.85rem;
+        color: #6c757d;
+      }
+      
+      /* Responsive */
       @media (max-width: 768px) {
         #sidebar {
-          position: absolute;
+          position: fixed;
           top: 0;
           bottom: 0;
           left: 0;
           z-index: 1030;
-          background-color: #f8f9fa;
+          background-color: white;
           margin-left: -240px;
         }
-
+        
         #wrapper.toggled #sidebar {
           margin-left: 0;
         }
-
+        
         #page-content-wrapper {
-          width: 100%;
-          padding: 20px;
+          padding: 1rem;
+        }
+        
+        .sidebar-header {
+          padding-top: 3rem;
         }
       }
-
-      .nav-link {
-        padding: 10px 15px;
-        color: #333;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        font-weight: 500;
+      
+      /* Animazioni */
+      .fade-in {
+        animation: fadeIn 0.5s ease-in-out;
       }
-
-      .nav-link:hover,
-      .nav-link.active {
-        background-color: #ff5757;
-        color: #fff !important;
+      
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
       }
-
-      .brand img {
-        max-width: 100%;
+      
+      /* Stili per Shepherd */
+      .shepherd-element {
+        border-radius: 12px !important;
       }
-
-      #sidebar-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.4);
-        z-index: 1020;
-        display: none;
+      .shepherd-header {
+        background-color: var(--primary) !important;
       }
-      #wrapper.toggled + #sidebar-overlay {
-        display: block !important;
+      .shepherd-title {
+        color: #ffffff  !important;
+        font-weight: 600 !important;
+      }
+      .shepherd-text {
+        color: #ffffff !important;
+        font-size: 15px !important;
+      }
+      .shepherd-button {
+        border-radius: 12px !important;
+        background-color: var(--secondary) !important;
+      }
+      .shepherd-button-primary {
+        background-color: var(--primary) !important;
       }
     </style>
     {% block head %}{% endblock %}
 </head>
 <body>
-
-      <!-- MODALE: NUOVO TICKET -->
-    <div class="modal fade" id="newTicketModal" tabindex="-1" aria-labelledby="newTicketModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow">
-          <div class="modal-header bg-danger text-white">
-            <h5 class="modal-title" id="newTicketModalLabel">Apri un nuovo ticket</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Chiudi"></button>
-          </div>
-          <div class="modal-body">
-            <form id="ticketForm">
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <label for="shopNameSelect" class="form-label">Seleziona Negozio</label>
-                  <select class="form-select" id="shopNameSelect" name="shop_name" required>
-                    <option selected disabled>-- Caricamento negozi... --</option>
-                  </select>
-                </div>
-                <div class="col-md-6">
-                  <label for="ticketCategory" class="form-label">Categoria</label>
-                  <select class="form-select" id="ticketCategory" name="category" required>
-                    <option value="tecnico">Problema Tecnico</option>
-                    <option value="fatturazione">Fatturazione</option>
-                    <option value="ecommerce">Funzionalità Ecommerce</option>
-                  </select>
-                </div>
-                <div class="col-md-12">
-                  <label for="ticketTitle" class="form-label">Oggetto del Ticket</label>
-                  <input type="text" class="form-control" id="ticketTitle" name="title" required>
-                </div>
-                <div class="col-md-12">
-                  <label for="ticketMessage" class="form-label">Messaggio</label>
-                  <textarea class="form-control" id="ticketMessage" name="message" rows="5" required></textarea>
-                </div>
-                <div class="col-md-6">
-                  <label for="ticketPriority" class="form-label">Priorità</label>
-                  <select class="form-select" id="ticketPriority" name="priority">
-                    <option value="low">Bassa</option>
-                    <option value="normal" selected>Normale</option>
-                    <option value="high">Alta</option>
-                    <option value="critical">Critica</option>
-                  </select>
-                </div>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer d-flex justify-content-end">
-            <button type="submit" form="ticketForm" class="btn btn-danger">
-              <i class="fa-solid fa-paper-plane me-1"></i> Invia Richiesta
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  <!-- Modal: Aggiungi Utente -->
-<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <form class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addUserLabel">Aggiungi Utente</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <label class="form-label">Email</label>
-          <input type="email" id="addEmail" class="form-control" required>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Ruolo</label>
-          <select id="addLevel" class="form-select">
-            <option value="viewer">Viewer</option>
-            <option value="editor">Editor</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Messaggio (opzionale)</label>
-          <textarea id="addMessage" class="form-control" rows="3"></textarea>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-        <button type="submit" class="btn btn-danger">Invia invito</button>
-      </div>
-    </form>
-  </div>
-</div>
-<!-- MODALE PER LA CREAZIONE DEL NEGOZIO CON STEP -->
-    <div class="modal fade" id="createShopModal" tabindex="-1" aria-labelledby="createShopModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <form id="createShopForm">
-            <div class="modal-header">
-              <h5 class="modal-title" id="createShopModalLabel">Crea Nuovo Negozio</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
-            </div>
-            <div class="modal-body">
-              <!-- Step 1: Nome negozio + Tipologia -->
-              <div id="step1">
-                <div class="mb-3">
-                  <label for="shop_name" class="form-label">Nome Negozio</label>
-                  <input type="text" class="form-control" id="shop_name" name="shop_name" placeholder="es. erboristeria-digitale" required>
-                  <div id="shopNameHelp" class="invalid-feedback d-none">Nome già in uso o non valido. Usa solo lettere, numeri e trattini (-).</div>
-                </div>
-                <div class="mb-3">
-                  <label for="shop_type" class="form-label">Tipologia</label>
-                  <select class="form-select" id="shop_type" name="shop_type" required>
-                    <option value="" disabled selected>Seleziona una tipologia</option>
-                    <option value="ecommerce">Negozio Online</option>
-                    <option value="platform">Piattaforma Online</option>
-                    <option value="website">Sito Web</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer d-flex justify-content-end">
-              <button type="button" class="btn btn-success" id="finalCreateBtn" onclick="creaNegozioPerUtente()">
-                <i class="fa-solid fa-plus me-1"></i> Crea Negozio
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-    <!-- Mobile Toggle Button -->
-    {% if '/dashboard/themes/upload' in request.path %}
-      <a href="/dashboard/themes/explore" class="btn ms-auto d-md-none m-2">
-      <i class="fa-solid fa-arrow-left"></i> Torna Indietro
-      </a>
-    {% elif '/dashboard/themes/explore' in request.path or '/dashboard/manage/' in request.path %}
-      <a href="/dashboard/themes" class="btn ms-auto d-md-none p-2">
-      <i class="fa-solid fa-arrow-left"></i> Torna Indietro
-      </a>
-    {% else %}
-      <button class="btn d-md-none m-2" id="sidebarToggle">
-      <i class="fas fa-bars"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <img src="/static/images/superadmin/linkbay_logo.svg" alt="LinkBay-CMS Logo" width="140">
-      </button>
-    {% endif %}
+    <!-- Modal per Ticket -->
+    {% include 'landing/function/modals.html' %}
 
     <div class="d-flex" id="wrapper">
         <!-- Sidebar -->
-        <div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 bg-light border-end min-vh-100">
-          <div>
-            <a href="#" class="brand d-flex align-items-center mb-4">
+        <div id="sidebar" class="d-flex flex-column flex-shrink-0">
+          <div class="sidebar-header">
+            <a href="#" class="brand d-flex align-items-center mb-0">
               <img src="/static/images/superadmin/linkbay_logo.svg" alt="LinkBay-CMS Logo" width="140">
             </a>
+          </div>
+          
+          <div class="sidebar-content">
             <nav class="nav flex-column">
-              <a href="/dashboard" class="nav-link {% if request.path == '/dashboard' %}active{% endif %}"><i class="fa-solid fa-house me-2"></i> Home</a>
-              <a href="/dashboard/stores" class="nav-link {% if '/dashboard/stores' in request.path %}active{% endif %}"><i class="fa-solid fa-store me-2"></i> Negozi</a>
-              <a href="/dashboard/sales" class="nav-link {% if '/dashboard/sales' in request.path %}active{% endif %}"><i class="fa-solid fa-chart-line me-2"></i> Vendite</a>
-              <a href="/dashboard/themes" class="nav-link {% if '/dashboard/themes' in request.path %}active{% endif %}"><i class="fa-solid fa-palette me-2"></i> Temi</a>
-              <a href="/dashboard/support" class="nav-link {% if '/dashboard/support' in request.path %}active{% endif %}"><i class="fa-solid fa-headset me-2"></i> Supporto</a>
-              <a href="/dashboard/team" class="nav-link {% if '/dashboard/team' in request.path %}active{% endif %}"><i class="fa-solid fa-users me-2"></i> Collabora</a>
-              <a href="/dashboard/payouts" class="nav-link {% if '/dashboard/payouts' in request.path %}active{% endif %}"><i class="fa-solid fa-credit-card me-2"></i> Pagamenti</a>
-              <a href="/dashboard/chats" class="nav-link d-flex justify-content-between align-items-center {% if '/dashboard/chats' in request.path %}active{% endif %}">
-                <span><i class="fa-solid fa-comments me-2"></i> Chat</span>
+              <a href="/dashboard" class="nav-link {% if request.path == '/dashboard' %}active{% endif %}">
+                <i class="fa-solid fa-house"></i> Home
+              </a>
+              
+              <a href="/dashboard/stores" class="nav-link {% if '/dashboard/stores' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-store"></i> Negozi
+                <span class="nav-link-badge">5</span>
+              </a>
+              
+              <a href="/dashboard/sales" class="nav-link {% if '/dashboard/sales' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-chart-line"></i> Vendite
+              </a>
+              
+              <a href="/dashboard/themes" class="nav-link {% if '/dashboard/themes' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-palette"></i> Temi
+                <span class="nav-link-badge">12</span>
+              </a>
+              
+              <a href="/dashboard/support" class="nav-link {% if '/dashboard/support' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-headset"></i> Supporto
+              </a>
+              
+              <a href="/dashboard/team" class="nav-link {% if '/dashboard/team' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-users"></i> Collabora
+              </a>
+              
+              <a href="/dashboard/payouts" class="nav-link {% if '/dashboard/payouts' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-credit-card"></i> Pagamenti
+              </a>
+              
+              <a href="/dashboard/chats" class="nav-link {% if '/dashboard/chats' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-comments"></i> Chat
+                <span class="nav-link-badge">8</span>
               </a>
             </nav>
-          </div>
-          <div>
-            <hr>
-            <div class="dropdown mt-3">
-              <a class="d-flex align-items-center text-decoration-none dropdown-toggle nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            
+            <div class="mt-4 pt-3 border-top">
+              <div class="d-flex align-items-center">
                 <img src="{{ session['profile_photo'] or session.get('user_avatar', '/static/images/superadmin/user_extend.png') }}"
-                     alt="user" width="32" height="32" class="rounded-circle me-2" style="object-fit: cover; border: 2px solid #ff5757;">
-                <strong class="text-dark">{{ user['nome'] if user and user['nome'] else 'Utente' }}</strong>
-              </a>
-              <ul class="dropdown-menu shadow-sm">
-                <li><a class="dropdown-item" href="/dashboard/settings"><i class="fas fa-user-cog me-2"></i> Profilo</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
-              </ul>
+                     alt="user" width="36" height="36" class="rounded-circle me-2" style="object-fit: cover; border: 2px solid #ff5757;">
+                <div>
+                  <div class="fw-medium">{{ user['nome'] if user and user['nome'] else 'Utente' }}</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+        
         <!-- Page Content -->
         <div id="page-content-wrapper" class="flex-grow-1">
-          <div class="container-fluid mt-4" data-aos="fade-up">
+          <div class="container-fluid" data-aos="fade-up">
             {% block content %}{% endblock %}
           </div>
+          
         </div>
-      </div>
-      
-      <div id="sidebar-overlay" class="d-md-none"></div>
+    </div>
+    
+    <div id="sidebar-overlay" class="d-md-none"></div>
 
-  <!-- Scripts -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    AOS.init({ duration: 1000, once: true });
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      AOS.init({ duration: 1000, once: true });
 
-    // Nasconde sidebar all'avvio su mobile
-    $(document).ready(function () {
-      if (window.innerWidth < 768 && !$('#wrapper').hasClass('toggled')) {
-        $('#wrapper').addClass('toggled');
-      }
-    });
-
-    $('#sidebarToggle').on('click', function () {
-      $('#wrapper').toggleClass('toggled');
-    });
-
-    // Chiudi sidebar cliccando sull'overlay
-    $('#sidebar-overlay').on('click', function () {
-      $('#wrapper').removeClass('toggled');
-    });
-
-    async function loadUnreadCount() {
-      try {
-        const res = await fetch("/api/chat/unread-count");
-        const data = await res.json();
-        if (data.success && data.unread_count > 0) {
-          const chatLink = document.querySelector('a[href="/dashboard/chats"]');
-          if (chatLink) {
-            const badge = document.createElement("span");
-            badge.className = "badge bg-danger";
-            badge.textContent = data.unread_count;
-            badge.style.marginLeft = "auto";
-            chatLink.appendChild(badge);
-          }
+      // Toggle sidebar
+      $(document).ready(function () {
+        $('#sidebarToggle').on('click', function () {
+          $('#wrapper').toggleClass('toggled');
+        });
+        
+        // Chiudi sidebar cliccando sull'overlay
+        $('#sidebar-overlay').on('click', function () {
+          $('#wrapper').removeClass('toggled');
+        });
+        
+        // Nasconde sidebar all'avvio su mobile
+        if (window.innerWidth < 768 && !$('#wrapper').hasClass('toggled')) {
+          $('#wrapper').addClass('toggled');
         }
-      } catch (err) {
-        console.error("Errore caricamento conteggio messaggi:", err);
+      });
+
+      // Carica conteggio messaggi non letti
+      async function loadUnreadCount() {
+        try {
+          const res = await fetch("/api/chat/unread-count");
+          const data = await res.json();
+          if (data.success && data.unread_count > 0) {
+            const chatLink = document.querySelector('a[href="/dashboard/chats"] .nav-link-badge');
+            if (chatLink) {
+              chatLink.textContent = data.unread_count;
+            }
+          }
+        } catch (err) {
+          console.error("Errore caricamento conteggio messaggi:", err);
+        }
       }
-    }
 
-    document.addEventListener("DOMContentLoaded", loadUnreadCount);
-  </script>
-
-
-
-<!-- 4. CSS personalizzato -->
-<style>
-  /* Tema rosso (adattalo al tuo brand) */
-  .shepherd-element {
-    border-radius: 12px 12px 12px 12px !important;
-  }
-  .shepherd-header {
-    background-color: #ff5757 !important;
-  }
-  .shepherd-title {
-    color: #ffffff  !important;
-    font-weight: 600 !important;
-  }
-  .shepherd-text {
-    color: #ffffff !important;
-    font-size: 15px !important;
-  }
-  .shepherd-button {
-    border-radius: 12px 12px 12px 12px !important;
-    background-color: #343a40 !important;
-  }
-  .shepherd-button-primary {
-    background-color: #ff5757 !important;
-  }
-</style>
-
-  {% block scripts %}{% endblock %}
+      document.addEventListener("DOMContentLoaded", loadUnreadCount);
+    </script>
+    
+    {% block scripts %}{% endblock %}
 </body>
 </html>
