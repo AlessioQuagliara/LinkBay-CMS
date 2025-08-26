@@ -47,9 +47,9 @@ class Config:
         GODADDY_API_KEY = '3mM44WkB29Cg9H_GRJds69oVsyQQrUYFoeTyh'
         GODADDY_API_SECRET = '42FBcBbn8SZFWuGGsetaDF'
         # Configurazioni Stripe interne
-        STRIPE_WEBHOOK_SECRET = 'whsec_9e89f572077eefee590c317bafbb534224b3d64c9c5cbdc4cfebb625a5c80589'
-        STRIPE_SECRET_KEY='sk_test_51R8r8BPteJOX9ukri0MrftLIDZoumDLgnKQz4upe7kHyhuxD3EpG44LAtz6jBdDhUr6iQAbvx9a0oIKfpfNClNCU00zCFovMAA'
-        STRIPE_PUBLISHABLE_KEY='pk_test_51R8r8BPteJOX9ukruE1O5G1S8VqbgKzlHmhTPAqQQdWSibh9fkctSH6zobztupPgnrQiGfDZ7C9En96mSMxyO1Yz00R0EdgIUd'
+        STRIPE_WEBHOOK_SECRET = 'whsec_1ed569a345b3c8495889ef29f755ed3cc625b21d5dace1785aba1ded3361a5ef'
+        STRIPE_SECRET_KEY='sk_test_51MijPqDLzaeBHrX0sANwN2OTk43EzIueJxORaOy2aVaB77TlLHhHabKQpB9TiWtBcD0KJySxCLSTiXZNzmz1FJJp00TQrNp2Ll'
+        STRIPE_PUBLISHABLE_KEY='pk_test_51MijPqDLzaeBHrX0Z6D5pdjNKS8OiXPIotFn4UlT7e46JKq46uE0NWEPbjCdUiWWFYfSoNSH1KCJofT6YpOFn3xF002YUuT3E2'
     else:
         SESSION_COOKIE_SECURE = True  # PER CHI MODIFICA = Sicuro solo su HTTPS, disabilitato in locale
         SESSION_PERMANENT = True  # PER CHI MODIFICA = Non mantenere la sessione dopo la chiusura del browser
@@ -58,6 +58,6 @@ class Config:
         GODADDY_API_KEY = 'h1p3oVvDvVzt_4bcJJnnHMd3naQ74EaWzzS'  
         GODADDY_API_SECRET = 'NeLezhbgDrRdE56raE5KmY'  
         # Configurazioni Stripe interne
-        STRIPE_WEBHOOK_SECRET = 'whsec_xEE4UjbnBuwf9HehsVfL7p4OeuSFaequ'
-        STRIPE_SECRET_KEY='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'
-        STRIPE_PUBLISHABLE_KEY='pk_live_51R8r84LbvfE9v2XljJqWpMiNMskDZi4rmfy00FsWVYgxReVXyctlCWUexNxhzq64jlLy7TYwEQ3xiBi8BwVtDMUw00DslS3PLB'
+        STRIPE_WEBHOOK_SECRET = 'whsec_1ed569a345b3c8495889ef29f755ed3cc625b21d5dace1785aba1ded3361a5ef'
+        STRIPE_SECRET_KEY='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'
+        STRIPE_PUBLISHABLE_KEY='pk_live_51MijPqDLzaeBHrX0GLrx51ZkpbIkn8b7XbtOleImyQQsS4RoSSFQYd5TwWwu2mayeY9Uppkb8rQQ7fq9d1GkjYLX00qfcvjFFs'

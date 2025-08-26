@@ -93,10 +93,10 @@ def create_shop():
 
         db.session.commit()
 
-        freemium = Subscription(
+        Explorer = Subscription(
             shop_name=new_shop.shop_name,
             user_id=new_user.id,
-            plan_name='Freemium',
+            plan_name='Explorer',
             price=0.00,
             currency='EUR',
             features='{"max_products":50}',
@@ -106,7 +106,7 @@ def create_shop():
             payment_reference=None,
             renewal_date=datetime.utcnow() + timedelta(days=30)
         )
-        db.session.add(freemium)
+        db.session.add(Explorer)
         db.session.commit()
 
         logger.info(f"✅ Shop '{shop_name}' creato con ID utente: {new_user.id}")
@@ -155,10 +155,10 @@ def create_shop_access():
         db.session.refresh(access)
         logger.warning(f"🧪 Access level da DB dopo commit: {access.access_level}")
 
-        freemium = Subscription(
+        Explorer = Subscription(
             shop_name=new_shop.shop_name,
             user_id=user_id,
-            plan_name='Freemium',
+            plan_name='Explorer',
             price=0.00,
             currency='EUR',
             features='{"max_products":50}',
@@ -168,7 +168,7 @@ def create_shop_access():
             payment_reference=None,
             renewal_date=datetime.utcnow() + timedelta(days=30)
         )
-        db.session.add(freemium)
+        db.session.add(Explorer)
         db.session.commit()
 
         logger.info(f"✅ Nuovo shop '{shop_name}' creato da utente ID {user_id}")
@@ -560,28 +560,38 @@ def checkout_subscribe():
 
     if environment == 'production' or environment == 'staging':
         plans = {
-            "allisready": {
-                "label": "AllIsReady",
-                "price": 18,
-                "price_id": "price_1RC23wLbvfE9v2XlYWS1fTtS"
+            "explorer": {
+                "label": "Explorer",
+                "price": 0,
+                "price_id": "price_1RwkYNDLzaeBHrX0H0y9n243"
             },
-            "professionaldesk": {
-                "label": "ProfessionalDesk",
+            "captain": {
+                "label": "Captain",
+                "price": 18,
+                "price_id": "price_1RwkbRDLzaeBHrX0Ue9DBSOG"
+            },
+            "admiral": {
+                "label": "Admiral",
                 "price": 36,
-                "price_id": "price_1RC24VLbvfE9v2XlDtrNqxHg"
+                "price_id": "price_1RwkePDLzaeBHrX04Snx7tdH"
             }
         }
     else:
         plans = {
-            "allisready": {
-                "label": "AllIsReady",
-                "price": 18,
-                "price_id": "price_1RC3XtPteJOX9ukrGj97iGom"
+            "explorer": {
+                "label": "Explorer",
+                "price": 0,
+                "price_id": "price_1RwkizDLzaeBHrX0abK4NdEz"
             },
-            "professionaldesk": {
-                "label": "ProfessionalDesk",
+            "captain": {
+                "label": "Captain",
+                "price": 18,
+                "price_id": "price_1Rwkk3DLzaeBHrX02iNmqEeY"
+            },
+            "admiral": {
+                "label": "Admiral",
                 "price": 36,
-                "price_id": "price_1RC3Y6PteJOX9ukrratINEP1"
+                "price_id": "price_1RwkklDLzaeBHrX0CwoJoX1q"
             }
         }
 

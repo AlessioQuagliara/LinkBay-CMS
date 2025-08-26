@@ -53,20 +53,20 @@
 
         <!-- Stato abbonamento -->
         {% if shop.subscription %}
-          {% if shop.subscription.plan_name == 'Freemium' %}
+          {% if shop.subscription.plan_name == 'Explorer' %}
             <div class="alert alert-warning py-2 px-3 mb-3">
               <small>
-                <i class="fas fa-exclamation-triangle me-1"></i> Piano <strong>Freemium</strong>.
+                <i class="fas fa-exclamation-triangle me-1"></i> Piano <strong>Explorer</strong>.
                 <a href="/subscription/select/{{ shop.shop_name }}" class="text-dark fw-bold">Aggiorna</a>
               </small>
             </div>
-          {% elif shop.subscription.plan_name == 'AllIsReady' %}
+          {% elif shop.subscription.plan_name == 'Captain' %}
             <div class="alert alert-primary py-2 px-3 mb-3">
-              <small><i class="fas fa-check-circle me-1"></i> Piano <strong>AllIsReady</strong> attivo</small>
+              <small><i class="fas fa-check-circle me-1"></i> Piano <strong>Captain</strong> attivo</small>
             </div>
-          {% elif shop.subscription.plan_name == 'ProfessionalDesk' %}
+          {% elif shop.subscription.plan_name == 'Admiral' %}
             <div class="alert alert-success py-2 px-3 mb-3">
-              <small><i class="fas fa-star me-1"></i> Piano <strong>ProfessionalDesk</strong></small>
+              <small><i class="fas fa-star me-1"></i> Piano <strong>Admiral</strong></small>
             </div>
           {% endif %}
         {% else %}

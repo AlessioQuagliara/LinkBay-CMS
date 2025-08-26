@@ -54,15 +54,15 @@ def handle_stripe_webhook():
                 current_app.logger.warning(f"❌ Nessuna subscription trovata con shop_name={shop_name} e user_id={user_id}")
             else:
                 plan_map = {
-                    "allisready": {
-                        "label": "AllIsReady",
+                    "Captain": {
+                        "label": "Captain",
                         "price": 18,
                         "features": '{"max_products":600}',
                         "limits": '{"max_visits":999999}'
                     },
-                    "professionaldesk": {
-                        "label": "ProfessionalDesk",
-                        "price": 36,
+                    "Admiral": {
+                        "label": "Admiral",
+                        "price": 36, 
                         "features": '{"max_products":"unlimited"}',
                         "limits": '{"max_visits":"unlimited"}'
                     }
@@ -147,6 +147,7 @@ def handle_stripe_webhook():
                         db.session.commit()
 
                         from godaddypy import Client, Account
+                        # Configurazione GoDaddy API
                         account_godaddy = Account(api_key=current_app.config['GODADDY_API_KEY'], api_secret=current_app.config['GODADDY_API_SECRET'])
                         client = Client(account_godaddy)
  

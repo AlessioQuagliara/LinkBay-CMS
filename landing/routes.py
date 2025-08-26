@@ -39,9 +39,27 @@ def set_shop_name():
     else:
         g.shop_name = "default_shop"  # Valore di fallback
 
-def load_release_notes(language="it"):
+def load_docs_notes(language="it"):
     try:
-        with open("release_note.json", "r", encoding="utf-8") as f:
+        with open("release_docs.json", "r", encoding="utf-8") as f:
+            all_notes = json.load(f)
+            return [note for note in all_notes if note["lang"] == language]
+    except Exception as e:
+        logging.error(f"❌ Errore nel caricamento delle note di rilascio: {e}")
+        return []
+
+def load_blog_notes(language="it"):
+    try:
+        with open("release_blog.json", "r", encoding="utf-8") as f:
+            all_notes = json.load(f)
+            return [note for note in all_notes if note["lang"] == language]
+    except Exception as e:
+        logging.error(f"❌ Errore nel caricamento delle note di rilascio: {e}")
+        return []
+
+def load_news_notes(language="it"):
+    try:
+        with open("release_news.json", "r", encoding="utf-8") as f:
             all_notes = json.load(f)
             return [note for note in all_notes if note["lang"] == language]
     except Exception as e:
@@ -97,7 +115,7 @@ def dashboard():
         return redirect(url_for('landing.login'))
     
     lang = session.get('lang', 'it')  # oppure rilevato da intestazione browser
-    release_notes = load_release_notes(lang)
+    release_notes = load_blog_notes(lang)
 
     return render_template('landing/admin/dashboard.html', user=user, notes=release_notes)
 
@@ -140,8 +158,8 @@ def dashboard_stores():
         subscription = Subscription.query.filter_by(shop_name=shop['shop_name'], user_id=user_id).first()
         shop['subscription'] = subscription.to_dict() if subscription else None
 
-        # VISITE RESTANTI per piano Freemium
-        if not subscription or (subscription and subscription.plan_name == "Freemium"):
+        # VISITE RESTANTI per piano Explorer
+        if not subscription or (subscription and subscription.plan_name == "Explorer"):
 
             now = datetime.utcnow()
             start_month = datetime(now.year, now.month, 1)
@@ -450,12 +468,12 @@ def upload_themes():
 @landing_bp.route('/subscription/cancel')
 def subscription_cancel():
     shop_name = request.args.get("shop", "")
-    return render_template("landing/subscription_cancel.html", shop_name=shop_name)
+    return render_template("landing/function/subscription_cancel.html", shop_name=shop_name)
 
 @landing_bp.route('/subscription/success')
 def subscription_success():
     shop_name = request.args.get("shop", "")
-    return render_template("landing/subscription_success.html", shop_name=shop_name)
+    return render_template("landing/function/subscription_success.html", shop_name=shop_name)
 
 @landing_bp.route('/dashboard/manage/<shop_name>')
 def dashboard_manage_shop(shop_name):
@@ -529,15 +547,27 @@ def store_list():
 
 @landing_bp.route("/blog")
 def blog():
-    return render_template("landing/blog.html")
+
+    lang = session.get('lang', 'it')  # oppure rilevato da intestazione browser
+    release_notes = load_blog_notes(lang)
+
+    return render_template("landing/views/blog.html", notes=release_notes)
 
 @landing_bp.route("/docs")
 def docs():
-    return render_template("landing/views/docs.html")
+
+    lang = session.get('lang', 'it')  # oppure rilevato da intestazione browser
+    release_notes = load_docs_notes(lang)
+
+    return render_template("landing/views/docs.html", notes=release_notes)
 
 @landing_bp.route("/news")
 def news():
-    return render_template("landing/news.html")
+
+    lang = session.get('lang', 'it')  # oppure rilevato da intestazione browser
+    release_notes = load_news_notes(lang)
+
+    return render_template("landing/news.html", notes=release_notes)
 
 
  # 📊 Google Analytics
