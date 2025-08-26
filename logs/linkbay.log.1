@@ -1,84 +1,4 @@
-[2025-07-28 23:52:01,966] [ERROR] in app: Exception on / [GET]
-Traceback (most recent call last):
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/routes.py", line 53, in home
-    return render_template('landing/views/index.html')
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 149, in render_template
-    template = app.jinja_env.get_or_select_template(template_name_or_list)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
-    return self.get_template(template_name_or_list, parent, globals)
-           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 1016, in get_template
-    return self._load_template(name, globals)
-           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 975, in _load_template
-    template = self.loader.load(self, name, self.make_globals(globals))
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/loaders.py", line 138, in load
-    code = environment.compile(source, name, filename)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 771, in compile
-    self.handle_exception(source=source_hint)
-    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/views/index.html", line 488, in template
-    "{{ translate('Dopo 3 piattaforme diverse, finalmente ho trovato la soluzione perfetta. L'integrazione con i corrieri mi fa risparmiare 10 ore a settimana!') }}"
-    ^
-jinja2.exceptions.TemplateSyntaxError: expected token ',', got 'integrazione'
-[2025-07-28 23:52:02,953] [ERROR] in app: Exception on / [GET]
-Traceback (most recent call last):
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/routes.py", line 53, in home
-    return render_template('landing/views/index.html')
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/templating.py", line 149, in render_template
-    template = app.jinja_env.get_or_select_template(template_name_or_list)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
-    return self.get_template(template_name_or_list, parent, globals)
-           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 1016, in get_template
-    return self._load_template(name, globals)
-           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 975, in _load_template
-    template = self.loader.load(self, name, self.make_globals(globals))
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/loaders.py", line 138, in load
-    code = environment.compile(source, name, filename)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 771, in compile
-    self.handle_exception(source=source_hint)
-    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/landing/templates/landing/views/index.html", line 488, in template
-    "{{ translate('Dopo 3 piattaforme diverse, finalmente ho trovato la soluzione perfetta. L'integrazione con i corrieri mi fa risparmiare 10 ore a settimana!') }}"
-    ^
-jinja2.exceptions.TemplateSyntaxError: expected token ',', got 'integrazione'
-[2025-07-28 23:52:32,945] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
-[2025-07-28 23:53:37,705] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
-[2025-07-28 23:55:33,729] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
-[2025-07-28 23:55:34,340] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
-[2025-07-29 00:02:18,008] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
-[2025-07-29 00:02:18,641] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
-[2025-07-29 01:13:42,453] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
-[2025-07-29 01:13:43,039] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
-[2025-07-29 01:18:24,672] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
-[2025-07-29 01:18:25,259] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
-[2025-07-29 01:26:15,918] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
-[2025-07-30 13:29:48,796] [INFO] in app: ✅ LinkBay-CMS avviato correttamente.
-[2025-07-30 13:29:59,428] [ERROR] in app: Exception on / [GET]
+[2025-07-30 13:30:18,919] [ERROR] in app: Exception on / [GET]
 Traceback (most recent call last):
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -97,7 +17,7 @@ Traceback (most recent call last):
     return shop_subdomain.split('.')[0] if '.' in shop_subdomain else shop_subdomain
                                            ^^^^^^^^^^^^^^^^^^^^^
 TypeError: argument of type 'NoneType' is not iterable
-[2025-07-30 13:30:07,978] [ERROR] in app: Exception on / [GET]
+[2025-07-30 13:30:39,114] [ERROR] in app: Exception on / [GET]
 Traceback (most recent call last):
   File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -116,3 +36,89 @@ Traceback (most recent call last):
     return shop_subdomain.split('.')[0] if '.' in shop_subdomain else shop_subdomain
                                            ^^^^^^^^^^^^^^^^^^^^^
 TypeError: argument of type 'NoneType' is not iterable
+[2025-07-30 13:30:46,233] [ERROR] in app: Exception on /about-us [GET]
+Traceback (most recent call last):
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/CMS_DEF/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/blueprints/main.py", line 30, in render_dynamic_page
+    page = load_page_content(slug, shop_subdomain)
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/helpers.py", line 37, in load_page_content
+    shop_name = extract_shop_name(shop_subdomain)
+  File "/Users/alessio/PYTHON_SOFTWARE/CMS_DEF/helpers.py", line 18, in extract_shop_name
+    return shop_subdomain.split('.')[0] if '.' in shop_subdomain else shop_subdomain
+                                           ^^^^^^^^^^^^^^^^^^^^^
+TypeError: argument of type 'NoneType' is not iterable
+[2025-07-30 13:31:02,686] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-07-30 13:31:28,453] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-07-30 13:31:29,000] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-09 11:36:44,344] [INFO] in app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-09 11:36:51,943] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-09 11:36:52,520] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-11 22:36:06,317] [INFO] in app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-11 22:36:27,491] [ERROR] in app: Exception on / [GET]
+Traceback (most recent call last):
+  File "/Users/alessio/PYTHON_SOFTWARE/LinkBay-CMS/venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/alessio/PYTHON_SOFTWARE/LinkBay-CMS/venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/alessio/PYTHON_SOFTWARE/LinkBay-CMS/venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/alessio/PYTHON_SOFTWARE/LinkBay-CMS/venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/alessio/PYTHON_SOFTWARE/LinkBay-CMS/blueprints/main.py", line 30, in render_dynamic_page
+    page = load_page_content(slug, shop_subdomain)
+  File "/Users/alessio/PYTHON_SOFTWARE/LinkBay-CMS/helpers.py", line 37, in load_page_content
+    shop_name = extract_shop_name(shop_subdomain)
+  File "/Users/alessio/PYTHON_SOFTWARE/LinkBay-CMS/helpers.py", line 18, in extract_shop_name
+    return shop_subdomain.split('.')[0] if '.' in shop_subdomain else shop_subdomain
+                                           ^^^^^^^^^^^^^^^^^^^^^
+TypeError: argument of type 'NoneType' is not iterable
+[2025-08-11 22:36:41,342] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-11 22:36:41,911] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-13 17:55:14,235] [INFO] in app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-13 17:55:19,667] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-13 17:55:20,928] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-13 17:55:48,985] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-13 17:55:50,220] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-13 18:08:13,343] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-13 18:08:14,530] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-15 14:27:25,224] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-15 14:27:26,478] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 15:27:44,474] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 15:27:45,713] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 15:33:51,329] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 15:34:51,019] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 15:35:13,734] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 15:43:18,811] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 15:44:35,164] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 15:45:15,850] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 15:45:22,683] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:02:20,164] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:03:01,817] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:03:30,834] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:07:07,037] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:07:18,537] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:07:29,866] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:12:11,237] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:12:26,816] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:13:57,008] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:14:31,337] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:14:57,119] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:17:18,521] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:17:40,087] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:18:58,417] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:24:00,525] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:30:58,640] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:31:38,064] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:34:26,834] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:35:17,832] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:35:25,752] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.
+[2025-08-16 16:35:36,896] [INFO] in landing_app: ✅ LinkBay-CMS avviato correttamente.

@@ -50,7 +50,7 @@
     <!-- SEZIONI CONFIGURAZIONE -->
     <div class="row g-4">
       <!-- GESTIONE UTENTI -->
-      {% if subscription and subscription.plan_name in ['AllIsReady', 'ProfessionalDesk'] %}
+      {% if subscription and subscription.plan_name in ['Captain', 'Admiral'] %}
       <div class="col-md-6">
         <div class="card h-100 border-0 shadow-sm">
           <div class="row g-0 h-100">
@@ -70,7 +70,7 @@
       {% endif %}
 
       <!-- GESTIONE DOMINI -->
-      {% if subscription and subscription.plan_name in ['AllIsReady', 'ProfessionalDesk'] %}
+      {% if subscription and subscription.plan_name in ['Captain', 'Admiral'] %}
       <div class="col-md-6">
         <div class="card h-100 border-0 shadow-sm">
           <div class="row g-0 h-100">
@@ -152,8 +152,8 @@
       </div>
     </div>
 
-    <!-- AI (solo per ProfessionalDesk) -->
-    {% if subscription and subscription.plan_name == 'ProfessionalDesk' %}
+    <!-- AI (solo per Admiral) -->
+    {% if subscription and subscription.plan_name == 'Admiral' %}
     <div class="mt-5">
       <h4 class="mb-3"><i class="fas fa-robot text-danger me-2"></i>Intelligenza Artificiale</h4>
       <div class="row g-4">
