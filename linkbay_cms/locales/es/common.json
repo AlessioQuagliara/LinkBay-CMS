@@ -1,0 +1,16 @@
+{
+  "dashboard": {
+    "title": "Panel de Administración",
+    "tenants": "Inquilinos",
+    "users": "Usuarios"
+  },
+  "editor": {
+    "save": "Guardar",
+    "preview": "Vista previa",
+    "blocks": "Bloques",
+    "loading_blocks": "Cargando bloques...",
+    "preview_error": "Error de vista previa",
+    "saving": "Guardando...",
+    "saved": "Guardado"
+  }
+}

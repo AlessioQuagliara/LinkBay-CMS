@@ -1,0 +1,32 @@
+<% /*
+  Usage:
+    <%- include('partials/components/delete-button', { url: '/api/products/123', label: 'Elimina', confirmMessage: 'Confermi l\'eliminazione?', target: '#products-table' }) %>
+  Props:
+    - url (required): the DELETE endpoint
+    - label: button label
+    - confirmLabel: confirm button text
+    - confirmMessage: message shown in modal
+    - target: HTMX target to swap with server response (defaults to #notification-area)
+*/ %>
+<% const btnLabel = typeof label !== 'undefined' ? label : 'Elimina'; %>
+<% const confirmLabel = typeof confirmLabel !== 'undefined' ? confirmLabel : 'Elimina'; %>
+<% const confirmMsg = typeof confirmMessage !== 'undefined' ? confirmMessage : 'Sei sicuro di voler eliminare questo elemento?'; %>
+<% const hxTarget = typeof target !== 'undefined' ? target : '#notification-area'; %>
+
+<div x-data="{ open:false }" class="inline-block">
+  <button @click="open = true" type="button" class="px-2 py-1 rounded text-sm text-red-700 bg-red-50 hover:bg-red-100">
+    <%= btnLabel %>
+  </button>
+
+  <!-- Modal -->
+  <div x-show="open" style="display:none;" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="relative bg-white rounded-lg shadow-lg w-full max-w-md p-4">
+      <div class="mb-4 text-sm text-gray-800"><%= confirmMsg %></div>
+      <div class="flex justify-end space-x-2">
+        <button @click="open = false" type="button" class="px-3 py-2 rounded border">Annulla</button>
+        <button hx-delete="<%= url %>" hx-target="<%= hxTarget %>" hx-swap="innerHTML" @click="open = false" type="button" class="px-3 py-2 rounded bg-red-600 text-white"> <%= confirmLabel %> </button>
+      </div>
+    </div>
+  </div>
+</div>

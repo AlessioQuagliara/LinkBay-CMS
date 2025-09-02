@@ -1,0 +1,156 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Menus Builder</title>
+    <style>
+      body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial}
+      .panel{display:flex;gap:1rem}
+      .col{flex:1;padding:1rem;border:1px solid #ddd;border-radius:6px}
+      .menu-list li{padding:6px;border:1px solid #eee;margin:6px;background:#fafafa}
+      .controls{margin-top:8px}
+      .nested{margin-left:20px}
+    </style>
+  </head>
+  <body>
+    <h1>Menus</h1>
+    <div class="panel">
+      <div class="col">
+        <h3>Create / Edit</h3>
+        <form id="menuForm">
+          <input type="hidden" id="menuId" />
+          <div>
+            <label>Name</label><br/>
+            <input id="menuName" required />
+          </div>
+          <div>
+            <label>Location (header/footer)</label><br/>
+            <input id="menuLocation" value="header" />
+          </div>
+          <div class="controls">
+            <button type="submit">Save Menu</button>
+            <button type="button" id="newMenu">New</button>
+          </div>
+        </form>
+        <hr/>
+        <h3>Add Item</h3>
+        <form id="itemForm">
+          <input id="itemLabel" placeholder="Label" required />
+          <input id="itemUrl" placeholder="/path or https://" />
+          <input id="itemSlug" placeholder="page slug (optional)" />
+          <div class="controls"><button id="addItem">Add Item</button></div>
+        </form>
+      </div>
+      <div class="col">
+        <h3>Existing Menus</h3>
+        <div id="menusContainer"></div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    <script>
+      const api = {
+        list: ()=>fetch('/api/menus').then(r=>r.json()),
+        create: (m)=>fetch('/api/menus', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(m)}).then(r=>r.json()),
+        update: (id,m)=>fetch('/api/menus/'+id, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(m)}).then(r=>r.json()),
+        del: (id)=>fetch('/api/menus/'+id, {method:'DELETE'}).then(r=>r.json())
+      };
+      let currentMenu = null;
+
+      function el(q){ return document.querySelector(q); }
+
+      function renderMenuEditor(menu){
+        el('#menuId').value = menu.id || '';
+        el('#menuName').value = menu.name || '';
+        el('#menuLocation').value = menu.location || 'header';
+        currentMenu = JSON.parse(JSON.stringify(menu));
+        renderItems();
+      }
+
+      function renderItems(){
+        const cont = document.getElementById('menusContainer');
+        cont.innerHTML = '';
+        if(!currentMenu) return;
+        const box = document.createElement('div');
+        box.innerHTML = `<h4>${currentMenu.name||'Untitled'}</h4><div><button id="saveItems">Save Items</button> <button id="deleteMenu">Delete Menu</button></div><ul id="menuItems" class="menu-list"></ul>`;
+        cont.appendChild(box);
+        const ul = box.querySelector('#menuItems');
+        function addNode(item){
+          const li = document.createElement('li');
+          li.dataset.id = item.id || '';
+          li.innerHTML = `<strong>${item.label}</strong> <small>${item.url||item.page_slug||''}</small> <button class="edit">Edit</button> <button class="remove">Remove</button>`;
+          if(item.children && item.children.length){
+            const sub = document.createElement('ul'); sub.className='nested';
+            item.children.forEach(addNode.bind(null));
+            li.appendChild(sub);
+          }
+          ul.appendChild(li);
+        }
+        (currentMenu.items||[]).forEach(addNode);
+
+        // make sortable
+        new Sortable(ul, { group: 'menus', animation: 150 });
+
+        box.querySelector('#saveItems').addEventListener('click', async ()=>{
+          // gather items from DOM (simple, non-nested capture for MVP)
+          const items = [];
+          ul.querySelectorAll('> li').forEach(li=>{
+            items.push({ label: li.querySelector('strong').textContent, url: (li.querySelector('small')||{}).textContent || '' });
+          });
+          currentMenu.items = items;
+          if(currentMenu.id) await api.update(currentMenu.id, currentMenu);
+          else { const r = await api.create(currentMenu); currentMenu = r.menu; }
+          alert('saved'); loadMenus();
+        });
+
+        box.querySelector('#deleteMenu').addEventListener('click', async ()=>{
+          if(!currentMenu.id) { alert('not saved'); return; }
+          if(confirm('Delete menu?')){ await api.del(currentMenu.id); currentMenu = null; loadMenus(); }
+        });
+
+        // edit/remove handlers
+        ul.querySelectorAll('.edit').forEach(btn=>btn.addEventListener('click', (ev)=>{
+          const li = ev.target.closest('li');
+          const label = li.querySelector('strong').textContent;
+          const url = (li.querySelector('small')||{}).textContent || '';
+          el('#itemLabel').value = label; el('#itemUrl').value = url; el('#itemSlug').value = '';
+        }));
+        ul.querySelectorAll('.remove').forEach(btn=>btn.addEventListener('click', (ev)=>{
+          const li = ev.target.closest('li'); li.remove();
+        }));
+      }
+
+      document.getElementById('menuForm').addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        const id = el('#menuId').value;
+        const m = { name: el('#menuName').value, location: el('#menuLocation').value, items: currentMenu ? currentMenu.items || [] : [] };
+        if(id) { await api.update(id, m); alert('updated'); }
+        else { const r = await api.create(m); currentMenu = r.menu; renderMenuEditor(currentMenu); }
+        loadMenus();
+      });
+
+      document.getElementById('itemForm').addEventListener('submit', (e)=>{
+        e.preventDefault();
+        const label = el('#itemLabel').value; const url = el('#itemUrl').value; const slug = el('#itemSlug').value;
+        const item = { label, url: url||undefined, page_slug: slug||undefined };
+        currentMenu.items = currentMenu.items || []; currentMenu.items.push(item); renderItems();
+        el('#itemLabel').value=''; el('#itemUrl').value=''; el('#itemSlug').value='';
+      });
+
+      document.getElementById('newMenu').addEventListener('click', ()=>{ renderMenuEditor({ name:'New menu', items:[] }); });
+
+      async function loadMenus(){
+        const j = await api.list();
+        const wrap = document.createElement('div');
+        j.menus.forEach(m=>{
+          const b = document.createElement('button'); b.textContent = m.name + ' ('+m.location+')';
+          b.addEventListener('click', ()=>renderMenuEditor(m)); wrap.appendChild(b);
+        });
+        document.getElementById('menusContainer').innerHTML = '';
+        document.getElementById('menusContainer').appendChild(wrap);
+      }
+
+      loadMenus();
+    </script>
+  </body>
+</html>

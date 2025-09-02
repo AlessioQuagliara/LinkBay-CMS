@@ -1,0 +1,4 @@
+<% /* Usage: <%- include('partials/components/dark-toggle') %> */ %>
+<div x-data="{ dark: localStorage.getItem('dark') === '1' }" x-init="$watch('dark', value => { document.documentElement.classList.toggle('dark', value); localStorage.setItem('dark', value ? '1' : '0') })">
+  <button @click="dark = !dark" class="px-2 py-1 rounded border">Toggle Dark</button>
+</div>

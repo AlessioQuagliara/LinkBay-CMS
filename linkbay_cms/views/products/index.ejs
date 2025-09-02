@@ -1,0 +1,33 @@
+<%- include('../layouts/boilerplate', { title: title }) %>
+<% var body = `
+  <div class="max-w-7xl mx-auto mt-8">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-2xl font-semibold">Prodotti</h1>
+      <div>
+        <button @click="$dispatch('open-create-product')" class="px-4 py-2 rounded bg-primary text-white">Nuovo Prodotto</button>
+      </div>
+    </div>
+
+    <div id="notification-area"></div>
+
+    <div id="products-table" hx-get="/api/products?partial=table" hx-trigger="load" hx-swap="innerHTML">
+      <!-- table will be loaded here by HTMX -->
+      <div class="text-sm text-gray-400">Caricamento...</div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal-root" x-data="{ open:false }" x-on:open-create-product.window="open=true" x-on:close-modal.window="open=false" x-show="open" style="display:none;">
+      <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-lg p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold">Crea / Modifica Prodotto</h2>
+            <button @click="open=false" class="text-gray-500">×</button>
+          </div>
+          <div hx-get="/api/products/new?partial=form" hx-trigger="revealed" hx-swap="innerHTML">
+            <!-- form will load here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+` %>

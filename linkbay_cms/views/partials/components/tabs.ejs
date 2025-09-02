@@ -1,0 +1,17 @@
+<% /* Usage:
+  <%- include('partials/components/tabs', { tabs: [{ id:'info', label:'Info'}, {id:'meta', label:'Meta'}], default: 'info', content: { info: '<p>..</p>', meta: '<p>..</p>' } }) %>
+*/ %>
+<div x-data="{ activeTab: '<%= default || tabs[0].id %>' }">
+  <div class="flex space-x-2 border-b mb-4">
+    <% tabs.forEach(function(t){ %>
+      <button @click="activeTab = '<%= t.id %>'" :class="activeTab === '<%= t.id %>' ? 'border-b-2 border-primary' : ''" class="px-3 py-2 text-sm"><%= t.label %></button>
+    <% }) %>
+  </div>
+  <div>
+    <% tabs.forEach(function(t){ %>
+      <div x-show="activeTab === '<%= t.id %>'">
+        <%- content[t.id] %>
+      </div>
+    <% }) %>
+  </div>
+</div>

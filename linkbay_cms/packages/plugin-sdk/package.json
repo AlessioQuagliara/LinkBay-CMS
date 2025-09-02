@@ -1,0 +1,9 @@
+{
+  "name": "@linkbaycms/plugin-sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK and types for LinkBay CMS plugins. Defines strict and safe plugin contracts.",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": ["lib"],
+  "license": "MIT"
+}

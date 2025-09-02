@@ -1,0 +1,24 @@
+<%- include('../layouts/boilerplate', { title: title }) %>
+<% var body = `
+  <div class="max-w-4xl mx-auto mt-8">
+    <h1 class="text-2xl font-semibold mb-4">SSO / SAML</h1>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="bg-white p-4 rounded shadow">
+        <h3 class="font-medium mb-2">OAuth Providers</h3>
+        <div class="space-y-2">
+          <button @click="$dispatch('open-modal', { id: 'oauthModal' })" class="px-3 py-2 rounded border">Aggiungi Provider OAuth</button>
+        </div>
+      </div>
+      <div class="bg-white p-4 rounded shadow">
+        <h3 class="font-medium mb-2">SAML Providers</h3>
+        <div class="space-y-2">
+          <button @click="$dispatch('open-modal', { id: 'samlModal' })" class="px-3 py-2 rounded border">Configura SAML</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modals included -->
+    <%- include('../partials/components/modal', { id: 'oauthModal', title: 'Aggiungi OAuth', content: '<form hx-post="/api/settings/sso/oauth" hx-target="#notification-area" hx-swap="innerHTML" class="space-y-3"><input name="client_id" placeholder="Client ID" class="w-full" /><input name="client_secret" placeholder="Client Secret" class="w-full" /><div class="flex justify-end"><button type="submit" class="px-3 py-2 rounded bg-primary text-white">Salva</button></div></form>' }) %>
+    <%- include('../partials/components/modal', { id: 'samlModal', title: 'Configura SAML', content: '<form hx-post="/api/settings/sso/saml" hx-target="#notification-area" hx-swap="innerHTML" class="space-y-3"><input name="entity_id" placeholder="Entity ID" class="w-full" /><input name="sso_url" placeholder="SSO URL" class="w-full" /><div class="flex justify-end"><button type="submit" class="px-3 py-2 rounded bg-primary text-white">Salva</button></div></form>' }) %>
+  </div>
+` %>

@@ -1,0 +1,11 @@
+<% /* Usage:
+  <%- include('partials/components/dropdown', { label: 'Menu', items: [{label:'One', href:'#'},{label:'Two', href:'#'}] }) %>
+*/ %>
+<div x-data="{ open:false }" class="relative inline-block">
+  <button @click="open = !open" class="px-3 py-2 border rounded"><%= label %></button>
+  <div x-show="open" @click.away="open=false" class="absolute right-0 mt-2 bg-white border rounded shadow z-20" x-transition>
+    <% items.forEach(function(it){ %>
+      <a href="<%= it.href %>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"><%= it.label %></a>
+    <% }) %>
+  </div>
+</div>
