@@ -1,0 +1,18 @@
+<form class="max-w-md mx-auto bg-white p-6 rounded shadow" method="POST" action="/signup">
+  <h2 class="text-2xl font-semibold">Create your workspace</h2>
+  <label class="block mt-4">
+    <span class="text-sm text-gray-600">Workspace name (subdomain)</span>
+    <input name="subdomain" required class="mt-1 block w-full border rounded px-3 py-2" placeholder="e.g. yourshop" />
+  </label>
+  <label class="block mt-4">
+    <span class="text-sm text-gray-600">Email</span>
+    <input name="email" type="email" required class="mt-1 block w-full border rounded px-3 py-2" />
+  </label>
+  <label class="block mt-4">
+    <span class="text-sm text-gray-600">Password</span>
+    <input name="password" type="password" required class="mt-1 block w-full border rounded px-3 py-2" />
+  </label>
+  <div class="mt-6 flex justify-end">
+    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded">Create workspace</button>
+  </div>
+</form>
