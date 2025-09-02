@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="6000" height="1220" viewBox="0 0 6000 1220">
+  <defs>
+    <clipPath id="clip-iPhone_14_Pro_11">
+      <rect width="6000" height="1220"/>
+    </clipPath>
+  </defs>
+  <g id="iPhone_14_Pro_11" data-name="iPhone 14 Pro – 11" clip-path="url(#clip-iPhone_14_Pro_11)">
+    <text id="LinkBay" transform="translate(562.774 792)" fill="#fff" stroke="#fff" stroke-width="20" font-size="869" font-family="Electrolize-Regular, Electrolize"><tspan x="0" y="0">LinkBay</tspan></text>
+    <path id="Tracciato_166" data-name="Tracciato 166" d="M16852.893,14222.383c-59.922,25.877-52.242,437.906,0,488.24s811.381,56.951,1033.955,0,751.217-455.789,704.473-488.24S16912.809,14196.51,16852.893,14222.383Z" transform="translate(-13157.005 -13960.168)" fill="#ff5758"/>
+    <text id="CMS" transform="translate(3734.955 669.277)" fill="#fff" stroke="#fff" stroke-width="20" font-size="471" font-family="Electrolize-Regular, Electrolize"><tspan x="0" y="0">CMS</tspan></text>
+    <text id="TM" transform="translate(5543 291)" fill="#fff" stroke="#fff" stroke-width="20" font-size="319" font-family="Electrolize-Regular, Electrolize"><tspan x="0" y="0">TM</tspan></text>
+  </g>
+</svg>

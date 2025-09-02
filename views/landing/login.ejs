@@ -1,0 +1,11 @@
+<form class="max-w-md mx-auto bg-white p-6 rounded shadow" method="GET" action="/login-redirect">
+  <h2 class="text-2xl font-semibold">Login to your workspace</h2>
+  <label class="block mt-4">
+    <span class="text-sm text-gray-600">Your workspace name</span>
+    <input name="tenant" required class="mt-1 block w-full border rounded px-3 py-2" placeholder="e.g. pippo" />
+  </label>
+  <div class="mt-6 flex justify-between items-center">
+    <a href="/signup" class="text-sm text-indigo-600">Create a workspace</a>
+    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded">Go to workspace</button>
+  </div>
+</form>
