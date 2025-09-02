@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="<%= typeof lang !== 'undefined' ? lang : 'en' %>">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title><%= title ? title + ' - LinkBay' : 'LinkBay' %></title>
+    <link rel="stylesheet" href="/css/main.css" />
+
+    <!-- Tenant theme variables (can be overridden per-tenant) -->
+    <style>
+      :root {
+        --color-primary: <%- tenant?.primary_color || '#6366f1' %>;
+      }
+    </style>
+
+    <% if (typeof head !== 'undefined') { %>
+      <%- head %>
+    <% } %>
+  </head>
+  <body class="min-h-screen bg-gray-50 text-gray-900 <%= typeof bodyClass !== 'undefined' ? bodyClass : '' %>">
+    <%- include('partials/header') %>
+
+    <main class="container mx-auto p-4">
+      <%- include('partials/flash-messages') %>
+      <div id="app-content">
+        <%- body %>
+      </div>
+    </main>
+
+    <%- include('partials/footer') %>
+
+    <!-- Alpine.js (lightweight reactive attributes) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- htmx for AJAX/UX enhancements -->
+    <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+
+    <% if (typeof scripts !== 'undefined') { %>
+      <%- scripts %>
+    <% } %>
+  </body>
+</html>

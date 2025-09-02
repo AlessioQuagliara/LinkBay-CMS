@@ -1,0 +1,9 @@
+<%# Usage:
+   <%- include('partials/components/card', { title: 'Card title', body: '<p>HTML body</p>' }) %>
+%>
+<div class="bg-white rounded-lg shadow-sm border p-4">
+  <% if (typeof title !== 'undefined') { %>
+    <h3 class="text-lg font-semibold mb-2"><%= title %></h3>
+  <% } %>
+  <div class="prose max-w-none text-sm text-gray-700"><%- body %></div>
+</div>

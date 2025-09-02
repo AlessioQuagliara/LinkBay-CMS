@@ -1,0 +1,10 @@
+<html>
+  <body>
+    <h2>Report for tenant <%= tenantId %></h2>
+    <p>Period: <%= start.toISOString().slice(0,10) %> - <%= end.toISOString().slice(0,10) %></p>
+    <ul>
+      <li>Visits: <%= visits %></li>
+      <li>Revenue: $<%= (revenue_cents/100).toFixed(2) %></li>
+    </ul>
+  </body>
+</html>

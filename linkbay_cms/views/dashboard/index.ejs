@@ -1,0 +1,49 @@
+<%- include('../layouts/boilerplate', { title: title }) %>
+<% var body = `
+  <div class="max-w-7xl mx-auto mt-8">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-semibold">Overview</h1>
+      <div x-data="{ open:false, range: '7' }" class="flex items-center space-x-3">
+        <div class="relative">
+          <button @click="open = !open" class="px-3 py-2 border rounded">Filtro: <span x-text="range == '7' ? 'Ultimi 7 giorni' : (range=='30' ? 'Ultimi 30 giorni' : 'Oggi')"></span></button>
+          <div x-show="open" @click.away="open=false" class="absolute right-0 mt-2 bg-white border rounded shadow p-2">
+            <button @click="range='1'; open=false" class="block px-3 py-1 text-sm">Oggi</button>
+            <button @click="range='7'; open=false" class="block px-3 py-1 text-sm">Ultimi 7 giorni</button>
+            <button @click="range='30'; open=false" class="block px-3 py-1 text-sm">Ultimi 30 giorni</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div hx-get="/api/analytics/overview?range=7" hx-trigger="load every 30s" hx-swap="outerHTML">
+        <%- include('../partials/dashboard-card', { title: 'Visit', value: '—', meta: '' }) %>
+      </div>
+      <div hx-get="/api/analytics/overview?range=7" hx-trigger="load every 30s" hx-swap="outerHTML">
+        <%- include('../partials/dashboard-card', { title: 'Utenti unici', value: '—' }) %>
+      </div>
+      <div hx-get="/api/analytics/overview?range=7" hx-trigger="load every 30s" hx-swap="outerHTML">
+        <%- include('../partials/dashboard-card', { title: 'Ordini', value: '—' }) %>
+      </div>
+      <div hx-get="/api/analytics/overview?range=7" hx-trigger="load every 30s" hx-swap="outerHTML">
+        <%- include('../partials/dashboard-card', { title: 'Revenue', value: '—' }) %>
+      </div>
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div class="lg:col-span-2 bg-white rounded-lg shadow p-4">
+        <h3 class="text-lg font-medium mb-2">Vendite (ultimi giorni)</h3>
+        <div id="sales-chart" hx-get="/api/analytics/sales?range=7" hx-trigger="load" hx-swap="innerHTML">
+          <!-- server returns simple sparkline or JSON -> client render can be added later -->
+          <div class="text-sm text-gray-400">Caricamento...</div>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg shadow p-4">
+        <h3 class="text-lg font-medium mb-2">Pagine popolari</h3>
+        <div id="popular-pages" hx-get="/api/analytics/popular-pages?range=7" hx-trigger="load" hx-swap="innerHTML">
+          <div class="text-sm text-gray-400">Caricamento...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+` %>

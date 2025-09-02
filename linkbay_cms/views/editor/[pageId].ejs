@@ -1,0 +1,69 @@
+<%- include('../layouts/boilerplate', { title: title }) %>
+
+<% var body = `
+  <div class="max-w-full mx-auto mt-6">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center space-x-3">
+        <a href="/dashboard" class="text-sm text-gray-600 hover:underline">Esci</a>
+        <h1 class="text-xl font-semibold">Editor Pagina</h1>
+      </div>
+      <div class="flex items-center space-x-2">
+        <form id="editor-save-form" hx-post="/api/pages/${pageId}/save" hx-target="#notification-area" hx-swap="innerHTML" style="display:inline;">
+          <input type="hidden" id="editor-content" name="content" />
+          <button id="save-btn" type="button" class="px-4 py-2 rounded bg-primary text-white">Salva</button>
+        </form>
+        <button id="preview-btn" @click="showPreview = true" class="px-4 py-2 rounded border">Anteprima</button>
+        <a href="/pages" class="px-4 py-2 rounded border">Esci</a>
+      </div>
+    </div>
+
+    <div id="notification-area" class="mb-4"></div>
+
+    <div id="gjs" style="height: 70vh; border: 1px solid #e5e7eb;"></div>
+
+    <!-- Preview Modal -->
+    <div x-data="{ showPreview:false }" x-show="showPreview" style="display:none;" class="fixed inset-0 z-50 flex items-center justify-center">
+      <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+      <div class="relative bg-white w-full max-w-5xl h-4/5 rounded shadow-lg">
+        <div class="p-3 flex items-center justify-between border-b">
+          <div class="font-medium">Anteprima</div>
+          <div>
+            <button @click="showPreview=false" class="px-3 py-1 border rounded">Chiudi</button>
+          </div>
+        </div>
+        <iframe id="preview-iframe" src="/preview/page/${pageId}" class="w-full h-full"></iframe>
+      </div>
+    </div>
+  </div>
+` %>
+
+<% var scripts = `
+  <link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet" />
+  <script src="https://unpkg.com/grapesjs"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      // init grapesjs
+      const editor = grapesjs.init({
+        container: '#gjs',
+        fromElement: false,
+        height: '100%',
+        storageManager: { autoload: false },
+        panels: { defaults: [] }
+      });
+
+      // Save handler: serialize content and submit form via HTMX
+      const saveBtn = document.getElementById('save-btn');
+      const saveForm = document.getElementById('editor-save-form');
+      const contentInput = document.getElementById('editor-content');
+      saveBtn && saveBtn.addEventListener('click', function(e){
+        const data = JSON.stringify({ html: editor.getHtml(), css: editor.getCss(), components: editor.getComponents(), styles: editor.getStyles() });
+        contentInput.value = data;
+        // use requestSubmit so HTMX intercepts the form submit
+        if (typeof saveForm.requestSubmit === 'function') saveForm.requestSubmit(); else saveForm.submit();
+      });
+
+      // Optional: listen for response and show simple toast
+      // HTMX will replace #notification-area with server response (can be HTML snippet)
+    });
+  </script>
+` %>

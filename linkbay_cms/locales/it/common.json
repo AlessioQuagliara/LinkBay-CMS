@@ -1,0 +1,16 @@
+{
+  "dashboard": {
+    "title": "Dashboard Admin",
+    "tenants": "Tenant",
+    "users": "Utenti"
+  },
+  "editor": {
+    "save": "Salva",
+    "preview": "Anteprima",
+    "blocks": "Blocchi",
+    "loading_blocks": "Caricamento blocchi...",
+    "preview_error": "Errore anteprima",
+    "saving": "Salvataggio...",
+    "saved": "Salvato"
+  }
+}

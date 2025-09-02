@@ -1,0 +1,15 @@
+<%#
+  Usage:
+  <%- include('partials/components/button', { text: 'Save', href: '/save', variant: 'primary', type: 'button' }) %>
+%>
+<% const variant = typeof variant !== 'undefined' ? variant : 'primary'; %>
+<% const btnType = typeof type !== 'undefined' ? type : 'button'; %>
+<% if (href) { %>
+  <a href="<%= href %>" class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-white bg-primary hover:opacity-90 transition">
+    <%= text %>
+  </a>
+<% } else { %>
+  <button type="<%= btnType %>" class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-white bg-primary hover:opacity-90 transition">
+    <%= text %>
+  </button>
+<% } %>

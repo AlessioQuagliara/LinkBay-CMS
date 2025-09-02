@@ -1,0 +1,27 @@
+<% 
+// menu partial expects `menu` object with .items (array)
+function renderItems(items){ %>
+  <ul>
+  <% items.forEach(function(it){ %>
+    <li>
+      <% if (it.url) { %>
+        <a href="<%= it.url %>"><%= it.label %></a>
+      <% } else if (it.page_slug) { %>
+        <a href="/<%= it.language || 'en' %>/<%= it.page_slug %>"><%= it.label %></a>
+      <% } else { %>
+        <span><%= it.label %></span>
+      <% } %>
+      <% if (it.children && it.children.length) { %>
+        <%- renderItems(it.children) %>
+      <% } %>
+    </li>
+  <% }); %>
+  </ul>
+<% } %>
+<% if (!menu || !menu.items) { %>
+  <!-- empty menu -->
+<% } else { %>
+  <nav class="tenant-menu">
+    <%- renderItems(menu.items) %>
+  </nav>
+<% } %>
