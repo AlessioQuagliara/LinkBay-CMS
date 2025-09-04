@@ -29,22 +29,31 @@
 <script>
   // Handler per login via provider dalla landing: chiama API tenant-aware e reindirizza
   document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('google-login-btn');
-    if (!btn) return;
-    btn.addEventListener('click', async (ev) => {
-      ev.preventDefault();
+    const emailInput = document.querySelector('input[name="email"]');
+    const getEmail = () => (emailInput ? emailInput.value.trim() : '');
+
+    const loader = document.createElement('div');
+    loader.id = 'auth-loader';
+    loader.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;align-items:center;justify-content:center;z-index:9999;';
+    loader.innerHTML = '<div class="bg-white p-6 rounded shadow">Accesso in corso...<div class="loader" style="margin-top:8px"></div></div>';
+    document.body.appendChild(loader);
+
+    function showLoader(){ loader.style.display = 'flex'; }
+    function hideLoader(){ loader.style.display = 'none'; }
+
+    async function startProvider(provider){
       try {
-        const emailInput = document.querySelector('input[name="email"]');
-        const email = emailInput ? emailInput.value.trim() : '';
+        showLoader();
         const res = await fetch('/api/auth/provider-redirect', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ provider: 'google', email })
+          body: JSON.stringify({ provider, email: getEmail() })
         });
         const json = await res.json();
-        if (!res.ok || !json.redirect) {
+        if (!res.ok || !json.redirect){
           const msg = (json && json.error) ? json.error : 'Impossibile risolvere il tenant per il login';
           alert(msg);
+          hideLoader();
           return;
         }
         // naviga al redirect tenant-scoped
@@ -52,8 +61,29 @@
       } catch (err) {
         console.error(err);
         alert('Errore durante il reindirizzamento al provider');
+        hideLoader();
       }
-    });
+    }
+
+    document.getElementById('google-login-btn')?.addEventListener('click', ev => { ev.preventDefault(); startProvider('google'); });
+    document.getElementById('github-login-btn')?.addEventListener('click', ev => { ev.preventDefault(); startProvider('github'); });
+    document.getElementById('microsoft-login-btn')?.addEventListener('click', ev => { ev.preventDefault(); startProvider('microsoft'); });
+
+    // handle token in query string after provider redirect (fallback when server includes token in URL)
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token') || params.get('t') || params.get('access_token');
+    if (token){
+      try {
+        // store token in localStorage as fallback (cannot set httpOnly cookie from JS)
+        localStorage.setItem('access_token', token);
+        // remove token from URL
+        params.delete('token'); params.delete('t'); params.delete('access_token');
+        const newUrl = window.location.pathname + (params.toString() ? ('?' + params.toString()) : '');
+        window.history.replaceState({}, document.title, newUrl);
+        // redirect to dashboard on same host
+        window.location.href = `${window.location.protocol}//${window.location.host}/dashboard`;
+      } catch(e){ console.error('callback token handling error', e); }
+    }
   });
 </script>
       
@@ -120,20 +150,20 @@
         </button>
               
         <!-- GitHub -->
-        <a href="/auth/github" 
+        <button type="button" id="github-login-btn"
            :class="darkMode ? 
                'w-full inline-flex justify-center py-2 px-4 border border-gray-700 rounded-md shadow-sm bg-gray-700 text-sm font-medium text-white hover:bg-gray-600 transition-colors hover-scale' : 
                'w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors hover-scale'">
           <i class="fab fa-github text-lg" :class="darkMode ? 'text-white' : 'text-gray-800'"></i>
-        </a>
+        </button>
               
         <!-- Microsoft -->
-        <a href="/auth/microsoft" 
+        <button type="button" id="microsoft-login-btn"
            :class="darkMode ? 
                'w-full inline-flex justify-center py-2 px-4 border border-gray-700 rounded-md shadow-sm bg-gray-700 text-sm font-medium text-white hover:bg-gray-600 transition-colors hover-scale' : 
                'w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors hover-scale'">
           <i class="fab fa-microsoft text-lg" :class="darkMode ? 'text-white' : 'text-blue-600'"></i>
-        </a>
+        </button>
       </div>
     </div>
       

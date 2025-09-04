@@ -1,9 +1,0 @@
-<%# Usage:
-  <%- include('partials/components/input', { name: 'email', value: '', placeholder: 'Email' }) %>
-%>
-<div class="mb-3">
-  <% if (typeof label !== 'undefined') { %>
-    <label for="<%= name %>" class="block text-sm font-medium text-gray-700 mb-1"><%= label %></label>
-  <% } %>
-  <input id="<%= name %>" name="<%= name %>" value="<%= typeof value !== 'undefined' ? value : '' %>" placeholder="<%= typeof placeholder !== 'undefined' ? placeholder : '' %>" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-primary focus:border-primary sm:text-sm" />
-</div>

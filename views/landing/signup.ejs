@@ -27,28 +27,43 @@
     </div>
       
     <!-- Form Registrazione -->
-    <form class="mt-8 space-y-6" method="POST" action="/signup" x-data="{ isLoading: false }" @submit.prevent="isLoading = true; $el.submit()">
+    <div x-data="signupForm()" class="mt-8">
+      <form class="space-y-6" @submit.prevent="register" novalidate>
+        <template x-if="Object.keys(errors).length">
+          <div class="bg-red-50 p-4 rounded">
+            <template x-for="error in Object.values(errors)" :key="error">
+              <p x-text="error" class="text-red-600"></p>
+            </template>
+          </div>
+        </template>
       <!-- Workspace Name -->
       <div class="rounded-md shadow-sm -space-y-px">
         <div>
-          <label for="subdomain" class="sr-only">Nome Workspace</label>
+          <label for="workspaceName" class="sr-only">Nome Workspace</label>
           <div class="relative">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <i class="fas fa-globe" :class="darkMode ? 'text-gray-400' : 'text-gray-400'"></i>
             </div>
-            <input 
-              id="subdomain" 
-              name="subdomain" 
-              type="text" 
-              required 
-              :class="darkMode ? 
-                  'appearance-none rounded-t-md relative block w-full pl-10 pr-3 py-3 border border-gray-600 bg-gray-700 placeholder-gray-400 text-white focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm' : 
-                  'appearance-none rounded-t-md relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm'" 
-              placeholder="nome-workspace"
+              placeholder="Nome del tuo workspace"
+            x-model="workspaceName"
             >
             <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
               <span :class="darkMode ? 'text-gray-400' : 'text-gray-500'">.linkbaycms.com</span>
             </div>
+          </div>
+
+            <!-- Keep legacy subdomain field for backend compatibility -->
+            <input type="hidden" name="subdomain" :value="workspaceName">
+
+            <!-- Validation / Availability messages -->
+          <div class="mt-2 text-sm">
+            <p x-show="errors.workspaceName" x-text="errors.workspaceName" class="text-red-500" x-cloak></p>
+            <p x-show="checkingWorkspace" class="text-gray-500 flex items-center" x-cloak>
+              <svg class="animate-spin h-4 w-4 mr-2 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+              Verifica disponibilità...
+            </p>
+            <p x-show="workspaceAvailable===true" class="text-green-600">Nome disponibile</p>
+            <p x-show="workspaceAvailable===false" class="text-red-500">Nome già in uso</p>
           </div>
         </div>
       </div>
@@ -65,12 +80,14 @@
               id="email" 
               name="email" 
               type="email" 
+              x-model="email"
               required 
               :class="darkMode ? 
                   'appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-600 border-t-0 bg-gray-700 placeholder-gray-400 text-white focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm' : 
                   'appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-300 border-t-0 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm'" 
               placeholder="email@esempio.com"
             >
+            <p x-show="errors.email" x-text="errors.email" class="text-red-500 mt-1" x-cloak></p>
           </div>
         </div>
       </div>
@@ -87,12 +104,14 @@
               id="password" 
               name="password" 
               type="password" 
+              x-model="password"
               required 
               :class="darkMode ? 
                   'appearance-none rounded-b-md relative block w-full pl-10 pr-3 py-3 border border-gray-600 border-t-0 bg-gray-700 placeholder-gray-400 text-white focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm' : 
                   'appearance-none rounded-b-md relative block w-full pl-10 pr-3 py-3 border border-gray-300 border-t-0 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm'" 
               placeholder="password"
             >
+            <p x-show="errors.password" x-text="errors.password" class="text-red-500 mt-1" x-cloak></p>
           </div>
         </div>
       </div>
@@ -111,7 +130,8 @@
           <span x-show="isLoading" x-cloak>Creazione in corso...</span>
         </button>
       </div>
-    </form>
+      </form>
+    </div>
       
     <!-- Divisore -->
     <div class="relative mt-6">
@@ -185,4 +205,87 @@
       }
     }));
   });
+
+  // Signup form handler
+  function signupForm(){
+    return {
+      isLoading: false,
+      workspaceName: '',
+      email: '',
+      password: '',
+      errors: {},
+      checkingWorkspace: false,
+      workspaceAvailable: null,
+      validateWorkspace() {
+        const re = /^[a-zA-Z0-9-]+$/;
+        if (!this.workspaceName) { this.errors.workspaceName = 'Nome workspace obbligatorio'; return false; }
+        if (this.workspaceName.length < 3 || this.workspaceName.length > 63) { this.errors.workspaceName = 'Il nome deve essere tra 3 e 63 caratteri'; return false; }
+        if (!re.test(this.workspaceName)) { this.errors.workspaceName = 'Solo caratteri alfanumerici e trattini sono permessi'; return false; }
+        delete this.errors.workspaceName; return true;
+      },
+      checkWorkspaceAvailability() {
+        if (!this.validateWorkspace()) { this.workspaceAvailable = null; return; }
+        this.checkingWorkspace = true; this.workspaceAvailable = null; delete this.errors.workspaceName;
+        fetch('/api/tenants/check-subdomain?subdomain=' + encodeURIComponent(this.workspaceName))
+          .then(r => r.json())
+          .then(j => {
+            if (j && typeof j.available !== 'undefined') {
+              this.workspaceAvailable = !!j.available;
+              if (!this.workspaceAvailable) this.errors.workspaceName = 'Nome non disponibile';
+            } else {
+              this.workspaceAvailable = null;
+            }
+          })
+          .catch(() => { this.workspaceAvailable = null; this.errors.workspaceName = 'Errore verifica disponibilità'; })
+          .finally(() => { this.checkingWorkspace = false; });
+      },
+      async register(){
+        this.isLoading = true; this.errors = {};
+        // client-side validation
+        if (!this.validateWorkspace()) { this.isLoading = false; return; }
+        if (!this.email) { this.errors.email = 'Email obbligatoria'; this.isLoading = false; return; }
+        if (!this.password) { this.errors.password = 'Password obbligatoria'; this.isLoading = false; return; }
+
+        // Prepare form-encoded body (backend expects urlencoded)
+        const body = new URLSearchParams();
+        body.append('workspaceName', this.workspaceName);
+        body.append('subdomain', this.workspaceName); // legacy
+        body.append('email', this.email);
+        body.append('password', this.password);
+
+        try {
+          const res = await fetch('/signup', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+          const contentType = res.headers.get('content-type') || '';
+          if (res.ok) {
+            // If JSON returned, may include redirect
+            if (contentType.includes('application/json')) {
+              const j = await res.json();
+              if (j && j.redirect) { window.location.href = j.redirect; return; }
+              if (j && j.tenant) { window.location.href = '/'; return; }
+            }
+            // Otherwise follow Location header or reload
+            const loc = res.headers.get('location');
+            if (loc) { window.location.href = loc; return; }
+            window.location.reload();
+          } else {
+            // parse JSON structured errors if present
+            if (contentType.includes('application/json')) {
+              const j = await res.json();
+              if (j && j.errors) { this.errors = j.errors; }
+              else if (j && j.error) { this.errors._ = j.error; }
+              else { this.errors._ = 'Errore durante la registrazione'; }
+            } else {
+              // try to read text
+              const txt = await res.text();
+              this.errors._ = txt || 'Errore durante la registrazione';
+            }
+          }
+        } catch (e) {
+          this.errors._ = 'Errore di rete. Riprova.';
+        } finally {
+          this.isLoading = false;
+        }
+      }
+    };
+  }
 </script>
