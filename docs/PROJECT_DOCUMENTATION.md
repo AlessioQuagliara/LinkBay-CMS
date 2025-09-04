@@ -1,221 +1,60 @@
-Documentazione Tecnica Completa — LinkBay CMS
+Progetto semplificato — LinkBay CMS (minimal docs)
 
-Sommario
-Panoramica e Architettura
+Scopo
+-----
+Questo repository è stato semplificato su richiesta: rimangono solo le cartelle `views/` e `public/` con il contenuto statico/templating del frontend; tutto il resto del codice verrà ricreato partendo da una struttura minima. Questa documentazione riassume la struttura minima e le tecnologie che useremo.
 
-Requisiti di Sistema
+Struttura minima proposta
+-------------------------
+- views/       # EJS templates, layout e partials (lasciata com'è)
+- public/      # risorse statiche (css, immagini, media)
+- docs/        # documentazione (questo file)
+- package.json # manifest minimale
+- README.md
 
-Setup e Installazione
-3.1. Struttura del Repository
-3.2. Configurazione dell'Ambiente
-3.3. Inizializzazione del Database
+Tecnologie (confermate)
+-----------------------
+- Node.js + TypeScript
+- Express.js
+- EJS per server-side rendering
+- Tailwind CSS per styling
+- Knex.js per accesso a PostgreSQL
+- PostgreSQL come DB
+- Alpine.js + htmx
 
-Sviluppo Locale
-4.1. Build e Avvio
-4.2. Domini di Sviluppo (lvh.me)
+Setup rapido (sviluppo locale)
+--------------------------------
+1) Installa dipendenze:
 
-Architettura Multitenant
-5.1. Risoluzione del Tenant
-5.2. Isolamento dei Dati
+```bash
+npm install
+```
 
-Flussi di Autenticazione
-6.1. Panoramica dei Flussi
-6.2. Landing Pubblica e Login Cross-Domain
-6.3. OAuth2 (Google, GitHub)
-6.4. SAML 2.0
-6.5. Autenticazione JWT
+2) Variabili ambiente minime (esempio .env):
 
-Debugging e Troubleshooting
-7.1. Problemi Comuni
-7.2. Comandi di Debug Rapidi
+```
+NODE_ENV=development
+DATABASE_URL=postgres://user:pass@localhost:5432/linkbay_dev
+APP_URL=http://localhost:3001
+```
 
-File Chiave e Punti di Estensione
+3) Avviare l'app (script minimale da aggiungere a package.json):
 
-Monitoraggio e Observability (Sentry)
+```bash
+npm run dev
+```
 
-Workflow di Sviluppo
+Note sul backup
+----------------
+Prima di procedere con operazioni distruttive, esiste un branch di backup creato (se hai seguito lo script consigliato) chiamato `backup-before-simplify`. Se non c'è, crea un backup locale o remoto dei file che vuoi conservare.
 
-Deployment e Produzione
+Prossimi passi suggeriti
+------------------------
+1. Procedi con la cancellazione manuale come hai pianificato (mantieni `views/` e `public/`).
+2. Commit della pulizia su un nuovo branch `simplify-structure`.
+3. Re-introdurre gradualmente solo i componenti necessari nel nuovo design: server minimo (Express), routing base, DB layer con Knex, e test baseline.
 
-1. Panoramica e Architettura ///////////////////////////////////////////////////////////////////////////
-
-LinkBay CMS è una piattaforma SaaS multitenant completa costruita con Node.js e TypeScript. L'architettura segue il pattern "schema-per-tenant" su PostgreSQL, garantendo un forte isolamento dei dati.
-
-Componenti Principali:
-
-Backend: Express.js con TypeScript
-
-Database: PostgreSQL con schemi multipli
-
-Frontend: EJS per SSR, Tailwind CSS, Alpine.js, HTMX
-
-Autenticazione: JWT, OAuth2, SAML 2.0
-
-Pagamenti: Stripe Connect, PayPal Multiparty
-
-Editor: GrapesJS + CodeMirror
-
-Pattern di Deployment:
-
-Landing Pubblica (linkbay-cms.com): Sito marketing, login, registrazione.
-
-Backoffice Tenant ([tenant].yoursite-linkbay-cms.com): Applicazione CMS isolata per ogni cliente.
-
-2. Requisiti di Sistema ///////////////////////////////////////////////////////////////////////////
-Node.js: 18.x o superiore
-
-PostgreSQL: 12.x o superiore
-
-npm: 8.x o superiore
-
-Redis: 6.x (per caching e sessioni)
-
-Memoria: Minimo 2GB RAM consigliati
-
-Spazio Disco: Minimo 5GB liberi
-
-3. Setup e Installazione ///////////////////////////////////////////////////////////////////////////
-3.1. Struttura del Repository ---------------------------------------------------------------
-/LINKBAY-CMS
-.
-├── backups
-│   └── saml_changes_20250902.txt
-├── certs
-│   ├── test-idp-cert.pem
-│   └── test-idp-key.pem
-├── dist
-│   ├── app.js
-│   ├── cache
-│   │   └── index.js
-│   ├── controllers
-│   │   └── pageController.js
-│   ├── db.js
-│   ├── dbMultiTenant.js
-│   ├── graphql
-│   │   ├── index.js
-│   │   ├── resolvers.js
-│   │   └── schema.js
-│   ├── i18n.js
-│   ├── lib
-│   │   ├── abTest.js
-│   │   ├── analyticsConsumer.js
-│   │   ├── eventBus.js
-│   │   ├── hookRegistry.js
-│   │   ├── simpleCache.js
-│   │   ├── tenantResourceLimits.js
-│   │   ├── webhookConsumer.js
-│   │   └── workerTask.js
-│   ├── middleware
-│   │   ├── abTests.js
-│   │   ├── audit.js
-│   │   ├── authorize.js
-│   │   ├── contentLang.js
-│   │   ├── cookieConsent.js
-│   │   ├── dynamicCors.js
-│   │   ├── enforceStorageQuota.js
-│   │   ├── jwtAuth.js
-│   │   ├── partialCache.js
-│   │   ├── permissions.js
-│   │   ├── rateLimiters.js
-│   │   ├── requireApiKey.js
-│   │   ├── resolveTenant.js
-│   │   ├── tenantApiTimeout.js
-│   │   ├── tenantRateLimiter.js
-│   │   ├── tenantResolver.js
-│   │   └── trackBandwidth.js
-│   ├── models
-│   │   ├── refreshToken.js
-│   │   ├── tenant.js
-│   │   └── user.js
-│   ├── plugins
-│   │   ├── loader.js
-│   │   ├── pluginWorker.js
-│   │   ├── router.js
-│   │   ├── sandbox.js
-│   │   └── types.js
-│   ├── routes
-│   │   ├── admin.js
-│   │   ├── adminAnonymize.js
-│   │   ├── adminDataExport.js
-│   │   ├── analytics.js
-│   │   ├── api
-│   │   │   └── v1
-│   │   │       └── tenantProducts.js
-│   │   ├── auth.js
-│   │   ├── blockTemplates.js
-│   │   ├── cart.js
-│   │   ├── contentAudit.js
-│   │   ├── conversations.js
-│   │   ├── dashboard.js
-│   │   ├── editor.js
-│   │   ├── editorApi.js
-│   │   ├── health.js
-│   │   ├── integrations.js
-│   │   ├── marketplace.js
-│   │   ├── menus.js
-│   │   ├── oauth.js
-│   │   ├── onboarding.js
-│   │   ├── pages.js
-│   │   ├── pluginActivity.js
-│   │   ├── products.js
-│   │   ├── publicAuth.js
-│   │   ├── publicIntegrations.js
-│   │   ├── publicLanding.js
-│   │   ├── roles.js
-│   │   ├── saml.js
-│   │   ├── scheduledReports.js
-│   │   ├── settings.js
-│   │   ├── ssr.js
-│   │   ├── status.js
-│   │   ├── stripe.js
-│   │   ├── subprocessors.js
-│   │   ├── tenantCookieConsent.js
-│   │   ├── tenantDpia.js
-│   │   ├── tenantHealth.js
-│   │   ├── tenantSettings.js
-│   │   ├── tenantUsage.js
-│   │   ├── userPreferences.js
-│   │   ├── userRoles.js
-│   │   └── zapier.js
-│   ├── server.js
-│   ├── services
-│   │   ├── auth.js
-│   │   ├── mailer.js
-│   │   └── tenant.js
-│   ├── socket
-│   │   └── index.js
-│   └── types
-│       └── events.js
-├── docker-compose.yml
-├── Dockerfile
-├── docs
-│   ├── backup_restore.md
-│   ├── graphql.md
-│   ├── PROJECT_DOCUMENTATION.md
-│   ├── retention.md
-│   └── saml_local_setup.md
-├── knexfile.ts
-├── LICENSE
-├── locales
-│   ├── en
-│   │   └── common.json
-│   ├── es
-│   │   └── common.json
-│   └── it
-│       └── common.json
-├── migrations
-│   ├── 20250902_add_indexes.ts
-│   ├── 20250902_add_onboarding_to_users.ts
-│   ├── 20250902_add_page_language.ts
-│   ├── 20250902_add_sso_login_url_to_tenant_saml_providers.ts
-│   ├── 20250902_add_subscriptions_and_invoices.ts
-│   ├── 20250902_add_tracking_scripts_to_tenant_settings.ts
-│   ├── 20250902_create_ab_assignments.ts
-│   ├── 20250902_create_ab_tests.ts
-│   ├── 20250902_create_analytics_schema.ts
-│   ├── 20250902_create_audit_logs.ts
-│   ├── 20250902_create_base_tables.ts
-│   ├── 20250902_create_block_templates.ts
+Se vuoi, posso generare per te una bozza di `package.json`, un server Express minimale in `src/` e uno script `npm run dev` per partire subito dalla struttura semplificata. Dimmi se vuoi che lo faccia ora.
 │   ├── 20250902_create_menus.ts
 │   ├── 20250902_create_pages_table.ts
 │   ├── 20250902_create_plugins_and_tenant_plugins.ts

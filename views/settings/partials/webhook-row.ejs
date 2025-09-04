@@ -1,9 +1,0 @@
-<tr id="webhook-<%= w.id %>" class="border-t">
-  <td><%= w.url %></td>
-  <td><%= w.events %></td>
-  <td>
-    <form hx-delete="/api/settings/webhooks/<%= w.id %>" hx-target="#webhooks-rows" hx-swap="outerHTML">
-      <button type="submit" class="text-sm text-red-600 px-2 py-1 border rounded">Elimina</button>
-    </form>
-  </td>
-</tr>
