@@ -1,0 +1,123 @@
+{
+  "generatedAt": "2025-09-04T21:01:04.020Z",
+  "project": "linkbay-cms",
+  "overview": "CMS Professional",
+  "categories": {
+    "docs": [
+      {
+        "path": "docs/PROJECT_DOCUMENTATION.md",
+        "title": "Database",
+        "summary": "Progetto semplificato — LinkBay CMS (minimal docs)"
+      }
+    ],
+    "server": [
+      {
+        "path": "server/README.md",
+        "title": "Server folder (TypeScript)",
+        "summary": "Server folder (TypeScript)"
+      }
+    ]
+  },
+  "revisions": [
+    {
+      "date": "2025-09-04",
+      "author": "Alessio Quagliara",
+      "note": "feat(server): add server/ scaffold (app, controllers, middleware, migrations)"
+    },
+    {
+      "date": "2025-09-04",
+      "author": "Alessio Quagliara",
+      "note": "chore: clean tracked node_modules/.env and add simplified node/ts starter files"
+    },
+    {
+      "date": "2025-09-04",
+      "author": "Alessio Quagliara",
+      "note": "Modifiche"
+    },
+    {
+      "date": "2025-09-03",
+      "author": "Alessio Quagliara",
+      "note": "Summ"
+    },
+    {
+      "date": "2025-09-03",
+      "author": "Alessio Quagliara",
+      "note": "fatto"
+    },
+    {
+      "date": "2025-09-02",
+      "author": "Alessio Quagliara",
+      "note": "Node app refactoring"
+    },
+    {
+      "date": "2025-08-26",
+      "author": "Alessio Quagliara",
+      "note": "Caricamento"
+    },
+    {
+      "date": "2025-08-15",
+      "author": "Alessio Quagliara",
+      "note": "Editing design"
+    },
+    {
+      "date": "2025-08-09",
+      "author": "Alessio Quagliara",
+      "note": "Transition from ChatGPT to DeepSeek"
+    },
+    {
+      "date": "2025-08-09",
+      "author": "Alessio Quagliara",
+      "note": "Update README.md"
+    },
+    {
+      "date": "2025-08-07",
+      "author": "Alessio Quagliara",
+      "note": "Modifiche Minori"
+    },
+    {
+      "date": "2025-07-29",
+      "author": "AlessioSpotex",
+      "note": "miglioramento interfaccia"
+    },
+    {
+      "date": "2025-07-20",
+      "author": "Alessio Quagliara",
+      "note": "Modifiche minori grafiche"
+    },
+    {
+      "date": "2025-07-18",
+      "author": "Alessio Quagliara",
+      "note": "Summary"
+    },
+    {
+      "date": "2025-07-18",
+      "author": "Alessio Quagliara",
+      "note": "Create LICENSE"
+    },
+    {
+      "date": "2025-07-18",
+      "author": "Alessio Quagliara",
+      "note": "Modifiche minori ed introduzione di tutorial"
+    },
+    {
+      "date": "2025-07-17",
+      "author": "Alessio Quagliara",
+      "note": "New summary"
+    },
+    {
+      "date": "2025-07-16",
+      "author": "Alessio Quagliara",
+      "note": "Aggiornamento"
+    },
+    {
+      "date": "2025-06-17",
+      "author": "Alessio Quagliara",
+      "note": "utime modifiche"
+    },
+    {
+      "date": "2025-06-15",
+      "author": "Alessio Quagliara",
+      "note": "Continuo con WMS"
+    }
+  ]
+}
