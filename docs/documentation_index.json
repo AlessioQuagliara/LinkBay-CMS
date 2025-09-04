@@ -1,13 +1,43 @@
 {
-  "generatedAt": "2025-09-04T21:01:04.020Z",
+  "generatedAt": "2025-09-04T21:28:21.333Z",
   "project": "linkbay-cms",
   "overview": "CMS Professional",
   "categories": {
     "docs": [
       {
-        "path": "docs/PROJECT_DOCUMENTATION.md",
+        "path": "docs/00_OVERVIEW.md",
+        "title": "Overview",
+        "summary": "Overview"
+      },
+      {
+        "path": "docs/01_ARCHITECTURE.md",
+        "title": "Architettura e struttura del progetto",
+        "summary": "Architettura e struttura del progetto"
+      },
+      {
+        "path": "docs/02_TECHNOLOGIES.md",
+        "title": "Tecnologie",
+        "summary": "Tecnologie"
+      },
+      {
+        "path": "docs/03_SETUP_ENV.md",
+        "title": "Setup e ambiente di sviluppo",
+        "summary": "Setup e ambiente di sviluppo"
+      },
+      {
+        "path": "docs/04_DATABASE.md",
         "title": "Database",
-        "summary": "Progetto semplificato — LinkBay CMS (minimal docs)"
+        "summary": "Database"
+      },
+      {
+        "path": "docs/05_NEXT_STEPS.md",
+        "title": "Prossimi passi e TODO",
+        "summary": "Prossimi passi e TODO"
+      },
+      {
+        "path": "docs/PROJECT_DOCUMENTATION.md",
+        "title": "Project documentation index",
+        "summary": "Project documentation index"
       }
     ],
     "server": [
@@ -19,6 +49,11 @@
     ]
   },
   "revisions": [
+    {
+      "date": "2025-09-04",
+      "author": "Alessio Quagliara",
+      "note": "chore(node_transition): daily work summary — add docs index generator, expose docs, fix ts types, pricing UI fixes, Alpine toggle and CI workflow\\n\\nChanges included:\\n- Added generator script scripts/generate_documentation_index.js to auto-build docs/documentation_index.json from markdown and git history.\\n- Added GitHub Actions workflow .github/workflows/generate-doc-index.yml to run daily and commit updates.\\n- Exposed docs/ as static assets in server/app.ts so frontend can fetch /docs/documentation_index.json.\\n- Added types/** to tsconfig.json include to pick up custom declarations (fix for express-ejs-layouts).\\n- Fixed Alpine pricing toggle: moved registration and wrapped hero + pricing in x-data to share billingCycle.\\n- Updated views/landing/pricing.ejs, home.ejs and features.ejs with darkMode-aware classes.\\n- Created/updated docs/documentation_index.json with public-friendly overview and revisions list.\\n- Misc: updated package.json and package-lock (build/dev scripts), small UI tweaks and CSS wiring."
+    },
     {
       "date": "2025-09-04",
       "author": "Alessio Quagliara",
@@ -81,12 +116,12 @@
     },
     {
       "date": "2025-07-20",
-      "author": "Alessio Quagliara",
+      "author": "AlessioSpotex",
       "note": "Modifiche minori grafiche"
     },
     {
       "date": "2025-07-18",
-      "author": "Alessio Quagliara",
+      "author": "AlessioSpotex",
       "note": "Summary"
     },
     {
@@ -96,28 +131,23 @@
     },
     {
       "date": "2025-07-18",
-      "author": "Alessio Quagliara",
+      "author": "AlessioSpotex",
       "note": "Modifiche minori ed introduzione di tutorial"
     },
     {
       "date": "2025-07-17",
-      "author": "Alessio Quagliara",
+      "author": "AlessioSpotex",
       "note": "New summary"
     },
     {
       "date": "2025-07-16",
-      "author": "Alessio Quagliara",
+      "author": "AlessioSpotex",
       "note": "Aggiornamento"
     },
     {
       "date": "2025-06-17",
-      "author": "Alessio Quagliara",
+      "author": "AlessioSpotex",
       "note": "utime modifiche"
-    },
-    {
-      "date": "2025-06-15",
-      "author": "Alessio Quagliara",
-      "note": "Continuo con WMS"
     }
   ]
 }
