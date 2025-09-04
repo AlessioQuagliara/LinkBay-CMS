@@ -133,3 +133,351 @@
         </div>
     </div>
 </section>
+
+<!-- Sezione Clienti Target -->
+<section :class="darkMode ? 'py-16 bg-gray-900' : 'py-16 bg-gray-50'">
+    <div class="container mx-auto px-4">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            <h2 :class="darkMode ? 'text-3xl font-bold text-white mb-4' : 'text-3xl font-bold text-gray-900 mb-4'">Progettato per Professionisti B2B</h2>
+            <p :class="darkMode ? 'text-xl text-gray-300' : 'text-xl text-gray-700'">
+                LinkBay-CMS è la soluzione perfetta per chi gestisce multiple attività e-commerce
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div :class="darkMode ? 'bg-gray-800 rounded-xl p-6 text-center hover:shadow-lg transition-shadow' : 'bg-white rounded-xl p-6 text-center border border-gray-200 hover:shadow-lg transition-shadow'">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-building text-red-600 text-2xl"></i>
+                </div>
+                <h3 :class="darkMode ? 'text-white font-bold text-xl mb-3' : 'text-gray-900 font-bold text-xl mb-3'">Agenzie Digitali</h3>
+                <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'">
+                    Offri e-commerce white-label come servizio senza lo sforzo di sviluppare e mantenere una piattaforma propria.
+                </p>
+            </div>
+            
+            <div :class="darkMode ? 'bg-gray-800 rounded-xl p-6 text-center hover:shadow-lg transition-shadow' : 'bg-white rounded-xl p-6 text-center border border-gray-200 hover:shadow-lg transition-shadow'">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-code text-red-600 text-2xl"></i>
+                </div>
+                <h3 :class="darkMode ? 'text-white font-bold text-xl mb-3' : 'text-gray-900 font-bold text-xl mb-3'">Software House</h3>
+                <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'">
+                    Componente pronto all'uso per aggiungere funzionalità e-commerce multitenant alle tue offerte.
+                </p>
+            </div>
+            
+            <div :class="darkMode ? 'bg-gray-800 rounded-xl p-6 text-center hover:shadow-lg transition-shadow' : 'bg-white rounded-xl p-6 text-center border border-gray-200 hover:shadow-lg transition-shadow'">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-crown text-red-600 text-2xl"></i>
+                </div>
+                <h3 :class="darkMode ? 'text-white font-bold text-xl mb-3' : 'text-gray-900 font-bold text-xl mb-3'">Brand Affermati</h3>
+                <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'">
+                    Gestisci brand separati con logiche comuni (inventory, utenti) per multiple nicchie di mercato.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sezione Vantaggi Principali -->
+<section :class="darkMode ? 'py-16 bg-gray-800' : 'py-16 bg-white'">
+    <div class="container mx-auto px-4">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            <h2 :class="darkMode ? 'text-3xl font-bold text-white mb-4' : 'text-3xl font-bold text-gray-900 mb-4'">Vantaggi Competitivi Unici</h2>
+            <p :class="darkMode ? 'text-xl text-gray-300' : 'text-xl text-gray-700'">
+                Cosa rende LinkBay-CMS diverso e irraggiungibile per i competitor
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div :class="darkMode ? 'bg-gray-700 rounded-xl p-6' : 'bg-gray-50 rounded-xl p-6'">
+                <div class="flex items-start mb-4">
+                    <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mr-4">
+                        <i class="fas fa-layer-group text-white"></i>
+                    </div>
+                    <div>
+                        <h3 :class="darkMode ? 'text-white font-bold text-xl mb-2' : 'text-gray-900 font-bold text-xl mb-2'">Architettura Multitenant Nativa</h3>
+                        <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'">
+                            Gestisci 10 o 10.000 store dalla stessa dashboard, con isolamento completo e sicurezza garantita.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div :class="darkMode ? 'bg-gray-700 rounded-xl p-6' : 'bg-gray-50 rounded-xl p-6'">
+                <div class="flex items-start mb-4">
+                    <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mr-4">
+                        <i class="fas fa-tag text-white"></i>
+                    </div>
+                    <div>
+                        <h3 :class="darkMode ? 'text-white font-bold text-xl mb-2' : 'text-gray-900 font-bold text-xl mb-2'">White-Labeling Integrato</h3>
+                        <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'">
+                            Marchia la piattaforma come tua, rafforzando la tua brand identity verso i clienti finali.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div :class="darkMode ? 'bg-gray-700 rounded-xl p-6' : 'bg-gray-50 rounded-xl p-6'">
+                <div class="flex items-start mb-4">
+                    <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mr-4">
+                        <i class="fas fa-chart-line text-white"></i>
+                    </div>
+                    <div>
+                        <h3 :class="darkMode ? 'text-white font-bold text-xl mb-2' : 'text-gray-900 font-bold text-xl mb-2'">Modello di Ricavo Innovativo</h3>
+                        <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'">
+                            Oltre agli abbonamenti, genera ricavi attraverso commissioni sulle transazioni e marketplace interno.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div :class="darkMode ? 'bg-gray-700 rounded-xl p-6' : 'bg-gray-50 rounded-xl p-6'">
+                <div class="flex items-start mb-4">
+                    <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mr-4">
+                        <i class="fas fa-robot text-white"></i>
+                    </div>
+                    <div>
+                        <h3 :class="darkMode ? 'text-white font-bold text-xl mb-2' : 'text-gray-900 font-bold text-xl mb-2'">Automazione Completa</h3>
+                        <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'">
+                            Configurazione automatica di domini, SSL, deployment e gestione di pagamenti e inventory.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sezione Pricing -->
+<section id="pricing" :class="darkMode ? 'py-16 bg-gray-900' : 'py-16 bg-gray-50'">
+    <div class="container mx-auto px-4">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            <h2 :class="darkMode ? 'text-3xl font-bold text-white mb-4' : 'text-3xl font-bold text-gray-900 mb-4'">Piani Tariffari Trasparenti</h2>
+            <p :class="darkMode ? 'text-xl text-gray-300' : 'text-xl text-gray-700'">
+                Strategia di pricing premium B2B, allineata al valore generato per la tua agenzia
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Piano Agency Pro -->
+            <div :class="darkMode ? 'bg-gray-800 rounded-xl p-8 border-2 border-red-500 transform hover:scale-105 transition-transform' : 'bg-white rounded-xl p-8 border-2 border-red-500 shadow-xl transform hover:scale-105 transition-transform'">
+                <div class="text-center mb-6">
+                    <h3 class="text-2xl font-bold text-red-600 mb-2">Agency Pro</h3>
+                    <div :class="darkMode ? 'text-white text-4xl font-bold mb-1' : 'text-gray-900 text-4xl font-bold mb-1'">€299<span class="text-xl">/mese</span></div>
+                    <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'">Per agenzie in crescita</p>
+                </div>
+                
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <span :class="darkMode ? 'text-gray-300' : 'text-gray-700'">Fino a 10 negozi white-label</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <span :class="darkMode ? 'text-gray-300' : 'text-gray-700'">Supporto prioritario</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <span :class="darkMode ? 'text-gray-300' : 'text-gray-700'">Dashboard centrale</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <span :class="darkMode ? 'text-gray-300' : 'text-gray-700'">Automazione domini e SSL</span>
+                    </li>
+                </ul>
+                
+                <a href="/signup?plan=pro" class="block w-full bg-red-600 hover:bg-red-700 text-white text-center font-bold py-3 rounded-lg transition-colors">
+                    Inizia Prova Gratuita
+                </a>
+            </div>
+            
+            <!-- Piano Agency Scale -->
+            <div :class="darkMode ? 'bg-gray-800 rounded-xl p-8 border-2 border-red-500 transform hover:scale-105 transition-transform' : 'bg-white rounded-xl p-8 border-2 border-red-500 shadow-xl transform hover:scale-105 transition-transform'">
+                <div class="text-center mb-6">
+                    <div class="inline-block bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">PIÙ POPOLARE</div>
+                    <h3 class="text-2xl font-bold text-red-600 mb-2">Agency Scale</h3>
+                    <div :class="darkMode ? 'text-white text-4xl font-bold mb-1' : 'text-gray-900 text-4xl font-bold mb-1'">€999<span class="text-xl">/mese</span></div>
+                    <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'">Per agenzie che scalano</p>
+                </div>
+                
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <span :class="darkMode ? 'text-gray-300' : 'text-gray-700'">Fino a 50 negozi white-label</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <span :class="darkMode ? 'text-gray-300' : 'text-gray-700'">Funzionalità avanzate (WMS, marketplace)</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <span :class="darkMode ? 'text-gray-300' : 'text-gray-700'">Commissioni ridotte sul marketplace</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <span :class="darkMode ? 'text-gray-300' : 'text-gray-700'">Supporto dedicato 24/7</span>
+                    </li>
+                </ul>
+                
+                <a href="/signup?plan=scale" class="block w-full bg-red-600 hover:bg-red-700 text-white text-center font-bold py-3 rounded-lg transition-colors">
+                    Inizia Prova Gratuita
+                </a>
+            </div>
+            
+            <!-- Piano Enterprise -->
+            <div :class="darkMode ? 'bg-gray-800 rounded-xl p-8 border-2 border-gray-600 transform hover:scale-105 transition-transform' : 'bg-white rounded-xl p-8 border-2 border-gray-300 shadow-xl transform hover:scale-105 transition-transform'">
+                <div class="text-center mb-6">
+                    <h3 class="text-2xl font-bold text-red-600 mb-2">Enterprise</h3>
+                    <div :class="darkMode ? 'text-white text-4xl font-bold mb-1' : 'text-gray-900 text-4xl font-bold mb-1'">Personalizzato</div>
+                    <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'">Per grandi volumi e esigenze specifiche</p>
+                </div>
+                
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <span :class="darkMode ? 'text-gray-300' : 'text-gray-700'">Soluzione su misura per volume</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <span :class="darkMode ? 'text-gray-300' : 'text-gray-700'">Data residency e conformità</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <span :class="darkMode ? 'text-gray-300' : 'text-gray-700'">SLA garantiti</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <span :class="darkMode ? 'text-gray-300' : 'text-gray-700'">Integrazioni custom</span>
+                    </li>
+                </ul>
+                
+                <a href="/contact" class="block w-full bg-gray-600 hover:bg-gray-700 text-white text-center font-bold py-3 rounded-lg transition-colors">
+                    Contattaci
+                </a>
+            </div>
+        </div>
+        
+        <div class="text-center mt-8">
+            <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'">
+                Tutti i piani includono una prova gratuita di 14 giorni senza impegno
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Sezione ROI -->
+<section :class="darkMode ? 'py-16 bg-gray-800' : 'py-16 bg-white'">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row items-center gap-12">
+            <div class="w-full md:w-1/2">
+                <h2 :class="darkMode ? 'text-3xl font-bold text-white mb-6' : 'text-3xl font-bold text-gray-900 mb-6'">Calcola il tuo Ritorno sull'Investimento</h2>
+                <p :class="darkMode ? 'text-xl text-gray-300 mb-8' : 'text-xl text-gray-700 mb-8'">
+                    Quanto tempo e denaro perdi gestendo installazioni separate per ogni cliente?
+                </p>
+                
+                <div :class="darkMode ? 'bg-gray-700 rounded-xl p-6 mb-6' : 'bg-gray-50 rounded-xl p-6 mb-6'">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mr-4">
+                            <i class="fas fa-clock text-white"></i>
+                        </div>
+                        <div>
+                            <h3 :class="darkMode ? 'text-white font-bold' : 'text-gray-900 font-bold'">Risparmia fino a 20 ore a settimana</h3>
+                        </div>
+                    </div>
+                    <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'">
+                        Con la gestione centralizzata, automatizzi operazioni ripetitive e guadagni tempo per attività a maggior valore.
+                    </p>
+                </div>
+                
+                <div :class="darkMode ? 'bg-gray-700 rounded-xl p-6' : 'bg-gray-50 rounded-xl p-6'">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mr-4">
+                            <i class="fas fa-euro-sign text-white"></i>
+                        </div>
+                        <div>
+                            <h3 :class="darkMode ? 'text-white font-bold' : 'text-gray-900 font-bold'">Aumenta il tuo ARPU del 30%</h3>
+                        </div>
+                    </div>
+                    <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'">
+                        Offrendo servizi di valore aggiunto attraverso la nostra piattaforma, incrementi il ricavo medio per utente.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="w-full md:w-1/2">
+                <div x-data="roiCalculator()" :class="darkMode ? 'bg-gray-700 rounded-xl p-8' : 'bg-gray-50 rounded-xl p-8'">
+                    <h3 :class="darkMode ? 'text-white text-xl font-bold mb-6 text-center' : 'text-gray-900 text-xl font-bold mb-6 text-center'">Calcolatore ROI</h3>
+
+                    <div class="mb-6">
+                        <label :class="darkMode ? 'block text-gray-300 mb-2' : 'block text-gray-700 mb-2'">Numero di clienti e-commerce:</label>
+                        <input x-model.number="clients" type="range" min="5" max="50" class="w-full mb-2">
+                        <div :class="darkMode ? 'text-white text-center font-bold' : 'text-gray-900 text-center font-bold'"> <span x-text="clients"></span> clienti</div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label :class="darkMode ? 'block text-gray-300 mb-2' : 'block text-gray-700 mb-2'">Ore settimanali di gestione per cliente:</label>
+                        <input x-model.number="hoursPerClient" type="range" min="1" max="40" class="w-full mb-2">
+                        <div :class="darkMode ? 'text-white text-center font-bold' : 'text-gray-900 text-center font-bold'"> <span x-text="hoursPerClient"></span> ore/settimana</div>
+                    </div>
+
+                    <div :class="darkMode ? 'bg-red-600 rounded-lg p-4 text-center' : 'bg-red-100 rounded-lg p-4 text-center'">
+                        <div :class="darkMode ? 'text-white text-sm mb-2' : 'text-red-800 text-sm mb-2'">RISPARMIO STIMATO</div>
+                        <div :class="darkMode ? 'text-white text-2xl font-bold mb-2' : 'text-red-800 text-2xl font-bold mb-2'">€<span x-text="formattedSavings"></span>/mese</div>
+                    </div>
+
+                    <p :class="darkMode ? 'text-gray-400 text-sm mt-4 text-center' : 'text-gray-600 text-sm mt-4 text-center'">
+                        * Stima basata su un costo orario di €<input x-model.number="hourlyRate" type="number" min="0" step="1" class="w-20 inline-block text-center bg-transparent border-b border-gray-300 dark:border-gray-600">/ora
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Alpine.js ROI calculator component
+    function roiCalculator(){
+        return {
+            clients: 10,
+            hoursPerClient: 15,
+            hourlyRate: 50,
+            get monthlyHours(){
+                // clients * hours per client per week * 4.33 weeks per month
+                return this.clients * this.hoursPerClient * 4.33;
+            },
+            get savings(){
+                // simple model: hours saved * hourlyRate
+                return Math.round(this.monthlyHours * this.hourlyRate);
+            },
+            get formattedSavings(){
+                return this.savings.toLocaleString('it-IT');
+            }
+        }
+    }
+</script>
+
+<!-- Sezione Call to Action Finale -->
+<section :class="darkMode ? 'py-16 bg-gradient-to-r from-red-700 to-red-900' : 'py-16 bg-gradient-to-r from-red-600 to-red-800'">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Pronto a Rivoluzionare la Tua Agenzia?</h2>
+            <p class="text-xl text-red-100 mb-8">
+                Unisciti alle agenzie più innovative che stanno già utilizzando LinkBay-CMS per scalare il loro business.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row justify-center gap-4 mb-10">
+                <a href="/signup" class="bg-white hover:bg-gray-100 text-red-600 font-bold px-8 py-4 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center justify-center">
+                    <i class="fas fa-play-circle me-2"></i>Inizia la Prova Gratuita
+                </a>
+                <a href="/demo" :class="'border-2 border-white text-white hover:bg-white hover:text-red-600 font-bold px-6 py-4 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center justify-center'">
+                    <i class="fas fa-desktop me-2"></i>Richiedi una Demo
+                </a>
+            </div>
+            
+            <div class="flex items-center justify-center text-red-200">
+                <i class="fas fa-shield-alt me-2"></i>
+                <span>Dati protetti e sicuri • Nessuna carta di credito richiesta • Cancellazione immediata</span>
+            </div>
+        </div>
+    </div>
+</section>
