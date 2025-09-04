@@ -85,6 +85,9 @@ app.set('views', path_1.default.join(__dirname, '..', 'views'));
 app.set('view engine', 'ejs');
 app.use(express_ejs_layouts_1.default);
 app.use(dynamicCors_1.dynamicCors);
+// Ensure JSON and urlencoded body parsing is available for early-mounted public routes
+app.use(express_1.default.json());
+app.use(express_1.default.urlencoded({ extended: true }));
 // public landing (marketing) should be mounted before tenant resolution
 app.use('/', require('./routes/publicLanding').default);
 // public auth endpoints (cross-domain login) - mounted on public site
@@ -124,8 +127,6 @@ app.use((req, res, next) => {
 app.use(abTests_1.assignAbTestVariant);
 // i18n middleware
 app.use(i18n_1.middleware.handle(i18n_1.i18n));
-app.use(express_1.default.json());
-app.use(express_1.default.urlencoded({ extended: true }));
 app.use('/auth', tenantResolver_1.tenantResolver, auth_1.default);
 app.use('/editor', tenantResolver_1.tenantResolver, editor_1.default);
 // per-tenant rate limiter and api timeout (applies after tenant resolution)

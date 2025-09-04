@@ -19,7 +19,10 @@ router.get('/:provider', async (req:any, res) => {
   if (!tenant) return res.status(400).send('tenant_required');
   const cfg = await getProvider(tenant.id, provider);
   if (!cfg) return res.status(404).send('provider_not_configured');
-  const redirectUri = `${process.env.APP_URL || 'http://localhost:3001'}/auth/${provider}/callback`;
+  // Build redirect URI based on the incoming request host so it's tenant-scoped
+  const host = (req.headers && req.headers.host) ? req.headers.host : (process.env.APP_URL ? new URL(process.env.APP_URL).host : `localhost:${process.env.PORT || '3001'}`);
+  const scheme = req.protocol || (process.env.APP_URL ? new URL(process.env.APP_URL).protocol.replace(':','') : 'http');
+  const redirectUri = `${scheme}://${host}/auth/${provider}/callback`;
   if (provider === 'google'){
     const scope = cfg.scopes || 'openid email profile';
     const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${encodeURIComponent(cfg.client_id)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=consent`;
@@ -46,13 +49,20 @@ router.get('/:provider/callback', async (req:any, res) => {
     let profile:any = null;
     if (provider === 'google'){
       // exchange code for token
-      const tokenRes = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', headers: { 'Content-Type':'application/x-www-form-urlencoded' }, body: `code=${encodeURIComponent(code)}&client_id=${encodeURIComponent(cfg.client_id)}&client_secret=${encodeURIComponent(cfg.client_secret)}&redirect_uri=${encodeURIComponent(process.env.APP_URL + '/auth/google/callback')}&grant_type=authorization_code` });
+  // use the same tenant-scoped redirectUri built from request host
+  const host = (req.headers && req.headers.host) ? req.headers.host : (process.env.APP_URL ? new URL(process.env.APP_URL).host : `localhost:${process.env.PORT || '3001'}`);
+  const scheme = req.protocol || (process.env.APP_URL ? new URL(process.env.APP_URL).protocol.replace(':','') : 'http');
+  const tenantRedirectUri = `${scheme}://${host}/auth/google/callback`;
+  const tokenRes = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', headers: { 'Content-Type':'application/x-www-form-urlencoded' }, body: `code=${encodeURIComponent(code)}&client_id=${encodeURIComponent(cfg.client_id)}&client_secret=${encodeURIComponent(cfg.client_secret)}&redirect_uri=${encodeURIComponent(tenantRedirectUri)}&grant_type=authorization_code` });
       const tokenJson = await tokenRes.json();
       const userRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', { headers: { Authorization: `Bearer ${tokenJson.access_token}` } });
       profile = await userRes.json();
       // profile.email, profile.name, profile.id
     } else if (provider === 'github'){
-      const tokenRes = await fetch('https://github.com/login/oauth/access_token', { method: 'POST', headers: { Accept: 'application/json', 'Content-Type':'application/json' }, body: JSON.stringify({ client_id: cfg.client_id, client_secret: cfg.client_secret, code, redirect_uri: process.env.APP_URL + '/auth/github/callback' }) });
+  const host = (req.headers && req.headers.host) ? req.headers.host : (process.env.APP_URL ? new URL(process.env.APP_URL).host : `localhost:${process.env.PORT || '3001'}`);
+  const scheme = req.protocol || (process.env.APP_URL ? new URL(process.env.APP_URL).protocol.replace(':','') : 'http');
+  const tenantRedirectUri = `${scheme}://${host}/auth/github/callback`;
+  const tokenRes = await fetch('https://github.com/login/oauth/access_token', { method: 'POST', headers: { Accept: 'application/json', 'Content-Type':'application/json' }, body: JSON.stringify({ client_id: cfg.client_id, client_secret: cfg.client_secret, code, redirect_uri: tenantRedirectUri }) });
       const tokenJson = await tokenRes.json();
       const userRes = await fetch('https://api.github.com/user', { headers: { Authorization: `token ${tokenJson.access_token}`, Accept: 'application/vnd.github.v3+json' } });
       const user = await userRes.json();

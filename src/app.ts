@@ -49,6 +49,9 @@ app.set('views', path.join(__dirname, '..', 'views'));
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
 app.use(dynamicCors);
+// Ensure JSON and urlencoded body parsing is available for early-mounted public routes
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 // public landing (marketing) should be mounted before tenant resolution
 app.use('/', require('./routes/publicLanding').default);
 // public auth endpoints (cross-domain login) - mounted on public site
@@ -83,8 +86,6 @@ app.use((req: any, res, next) => {
 app.use(assignAbTestVariant);
 // i18n middleware
 app.use(i18nMiddleware.handle(i18n));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 app.use('/auth', tenantResolver, authRouter);
 app.use('/editor', tenantResolver, editorRouter);

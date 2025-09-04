@@ -23,27 +23,58 @@
     <!-- Titolo -->
     <div class="text-center">
       <h2 class="text-3xl font-bold" :class="darkMode ? 'text-white' : 'text-gray-900'">Accedi al tuo Workspace</h2>
-      <p class="mt-2 text-sm" :class="darkMode ? 'text-gray-300' : 'text-gray-600'">Inserisci il nome del tuo workspace per accedere</p>
+      <p class="mt-2 text-sm" :class="darkMode ? 'text-gray-300' : 'text-gray-600'">Inserisci la tua email aziendale per accedere</p>
     </div>
+
+<script>
+  // Handler per login via provider dalla landing: chiama API tenant-aware e reindirizza
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('google-login-btn');
+    if (!btn) return;
+    btn.addEventListener('click', async (ev) => {
+      ev.preventDefault();
+      try {
+        const emailInput = document.querySelector('input[name="email"]');
+        const email = emailInput ? emailInput.value.trim() : '';
+        const res = await fetch('/api/auth/provider-redirect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ provider: 'google', email })
+        });
+        const json = await res.json();
+        if (!res.ok || !json.redirect) {
+          const msg = (json && json.error) ? json.error : 'Impossibile risolvere il tenant per il login';
+          alert(msg);
+          return;
+        }
+        // naviga al redirect tenant-scoped
+        window.location.href = json.redirect;
+      } catch (err) {
+        console.error(err);
+        alert('Errore durante il reindirizzamento al provider');
+      }
+    });
+  });
+</script>
       
-    <!-- Form Login -->
-    <form class="mt-8 space-y-6" method="GET" action="/login-redirect" x-data="{ isLoading: false }" @submit.prevent="isLoading = true; $el.submit()">
+  <!-- Form Login -->
+  <form class="mt-8 space-y-6" method="POST" action="/login-redirect" x-data="{ isLoading: false }" @submit.prevent="isLoading = true; $el.submit()">
       <div class="rounded-md shadow-sm -space-y-px">
         <div>
-          <label for="workspace" class="sr-only">Nome Workspace</label>
+          <label for="email" class="sr-only">Email aziendale</label>
           <div class="relative">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <i class="fas fa-building" :class="darkMode ? 'text-gray-400' : 'text-gray-400'"></i>
+              <i class="fas fa-envelope" :class="darkMode ? 'text-gray-400' : 'text-gray-400'"></i>
             </div>
             <input 
-              id="workspace" 
-              name="tenant" 
-              type="text" 
+              id="email" 
+              name="email" 
+              type="email" 
               required 
               :class="darkMode ? 
                   'appearance-none rounded-t-md rounded-b-md relative block w-full pl-10 pr-3 py-3 border border-gray-600 bg-gray-700 placeholder-gray-400 text-white focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm' : 
                   'appearance-none rounded-t-md rounded-b-md relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm'" 
-              placeholder="es. il-tuo-workspace"
+              placeholder="es. nome@azienda.com"
             >
           </div>
         </div>
@@ -59,7 +90,7 @@
           <span class="absolute left-0 inset-y-0 flex items-center pl-3">
             <i class="fas fa-arrow-right text-white" :class="{ 'animate-pulse': isLoading }"></i>
           </span>
-          <span x-show="!isLoading">Accedi al Workspace</span>
+          <span x-show="!isLoading">Continua</span>
           <span x-show="isLoading" x-cloak>Caricamento...</span>
         </button>
       </div>
@@ -80,12 +111,13 @@
       <p class="text-center text-sm mb-3" :class="darkMode ? 'text-gray-300' : 'text-gray-600'">Accedi con il tuo account</p>
       <div class="grid grid-cols-3 gap-3">
         <!-- Google Workspace -->
-        <a href="/auth/google" 
+        <button type="button" id="google-login-btn"
            :class="darkMode ? 
                'w-full inline-flex justify-center py-2 px-4 border border-gray-700 rounded-md shadow-sm bg-gray-700 text-sm font-medium text-white hover:bg-gray-600 transition-colors hover-scale' : 
                'w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors hover-scale'">
+          <a href="/auth/google" class="sr-only">Fallback Google login</a>
           <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTcuNiA5LjJsLS4xLTEuOEg5djMuNGg0LjhDMTMuNiAxMiAxMyAxMyAxMiAxMy42djIuMmgzYTguOCA4LjggMCAwIDAgMi42LTYuNnoiIGZpbGw9IiM0Mjg1RjQiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik05IDE4YzIuNCAwIDQuNS0uOCA2LTIuMmwtMy0yLjJhNS40IDUuNCAwIDAgMS04LTIuOUgxVjEzYTkgOSAwIDAgMCA4IDV6IiBmaWxsPSIjMzRBODUzIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNIDQgMTAuN2E1LjQgNS40IDAgMCAxIDAtMy40VjVIMS45YzAtLjAyLjEtLjA1LjEtLjA1YTkgOSAwIDAgMCAwIDhsMy0yLjN6IiBmaWxsPSIjRkJCQzA1IiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNOSAzLjZjMS4zIDAgMi41LjQgMy40IDEuM0wxNSAyLjNBOSA5IDAgMCAwIDEgNWwzIDIuNGE1LjQgNS40IDAgMCAxIDUtMy43eiIgZmlsbD0iI0VBNDMzNSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZD0iTTAgMGgxOHYxOEgweiIvPjwvZz48L3N2Zz4=" alt="Google" class="h-5 w-5">
-        </a>
+        </button>
               
         <!-- GitHub -->
         <a href="/auth/github" 

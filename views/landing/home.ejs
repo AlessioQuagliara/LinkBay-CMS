@@ -35,7 +35,7 @@
                         <a href="/signup" class="bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-4 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center">
                             <i class="fas fa-play-circle me-2"></i>Prova Gratuita
                         </a>
-                        <a href="#features" class="border border-gray-600 hover:border-red-500 text-white font-bold px-6 py-4 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center">
+                        <a href="#features" :class="darkMode ? 'border border-gray-600 hover:border-red-500 text-white font-bold px-6 py-4 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center' : 'border border-gray-600 hover:border-red-500 text-dark font-bold px-6 py-4 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center'">
                             <i class="fas fa-cog me-2"></i>Scopri le Funzionalità
                         </a>
                     </div>
