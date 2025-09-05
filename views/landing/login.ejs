@@ -150,20 +150,7 @@
           <i class="fab fa-github text-lg" :class="darkMode ? 'text-white' : 'text-gray-800'"></i>
         </button>
               
-        <!-- Microsoft -->
-        <button 
-          type="button" 
-          id="microsoft-login-btn"
-          :class="[
-            'w-full inline-flex justify-center py-2 px-4 border rounded-md shadow-sm text-sm font-medium transition-colors hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary',
-            darkMode ? 
-              'border-gray-700 bg-gray-700 text-white hover:bg-gray-600 focus:ring-offset-gray-800' : 
-              'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-offset-white'
-          ]"
-          aria-label="Accedi con Microsoft"
-        >
-          <i class="fab fa-microsoft text-lg" :class="darkMode ? 'text-white' : 'text-blue-600'"></i>
-        </button>
+  <!-- Microsoft login removed -->
       </div>
     </div>
       
@@ -347,9 +334,6 @@
       startProvider('github');
     });
     
-    document.getElementById('microsoft-login-btn')?.addEventListener('click', function(ev) {
-      ev.preventDefault();
-      startProvider('microsoft');
-    });
+  // Microsoft login removed
   });
 </script>

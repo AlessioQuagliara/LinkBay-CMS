@@ -11,11 +11,17 @@ export default function setupPassport() {
     // parse allowed redirect URIs from env (comma separated)
     const appUrl = process.env.APP_URL || 'http://localhost:3001';
     const allowed = (process.env.GOOGLE_ALLOWED_REDIRECT_URIS || '').split(',').map(s => s.trim()).filter(Boolean);
-    // choose a callback that matches APP_URL if present, otherwise first allowed, otherwise default to APP_URL
-    let googleCallback = `${appUrl}/auth/google/callback`;
+    // ensure callback path is present; prefer an allowed uri that matches APP_URL, but append
+    // the callback path if the allowed value is origin-only
+    const callbackPath = '/auth/google/callback';
+    let googleCallback = `${appUrl}${callbackPath}`;
     if (allowed.length) {
+      // find allowed entry that refers to the same origin as APP_URL
       const match = allowed.find(u => u.startsWith(appUrl));
-      googleCallback = match || allowed[0] + '/auth/google/callback';
+      const pick = match || allowed[0];
+      // if pick already contains the callback path, use as-is, otherwise append
+      if (pick.endsWith(callbackPath)) googleCallback = pick;
+      else googleCallback = `${pick.replace(/\/$/, '')}${callbackPath}`;
     }
 
     passport.use(
@@ -45,24 +51,7 @@ export default function setupPassport() {
     );
   }
 
-  // Azure AD (Microsoft) - OIDC
-  if (process.env.AZURE_CLIENT_ID && process.env.AZURE_CLIENT_SECRET && process.env.AZURE_TENANT_ID) {
-    passport.use(
-      new AzureAdStrategy(
-        {
-          identityMetadata: `https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID}/v2.0/.well-known/openid-configuration`,
-          clientID: process.env.AZURE_CLIENT_ID!,
-          clientSecret: process.env.AZURE_CLIENT_SECRET!,
-          responseType: 'code',
-          responseMode: 'form_post',
-          redirectUrl: process.env.AZURE_CALLBACK_URL || `${process.env.APP_URL || 'http://localhost:3001'}/auth/microsoft/callback`,
-          allowHttpForRedirectUrl: true,
-          scope: ['profile', 'email', 'openid'],
-        },
-  (iss: any, sub: any, profile: any, accessToken: any, refreshToken: any, done: any) => done(null, { profile, accessToken })
-      )
-    );
-  }
+  // Microsoft/Azure login removed per request
 
   passport.serializeUser((user: any, done) => done(null, user));
   passport.deserializeUser((obj: any, done) => done(null, obj));

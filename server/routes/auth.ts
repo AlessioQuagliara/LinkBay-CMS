@@ -20,7 +20,6 @@ router.get('/:provider', (req: Request, res: Response, next) => {
   const provider = req.params.provider;
   if (provider === 'google') return passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
   if (provider === 'github') return passport.authenticate('github', { scope: ['user:email'] })(req, res, next);
-  if (provider === 'microsoft') return passport.authenticate('azuread-openidconnect')(req, res, next);
   return res.status(400).json({ ok: false, error: 'Unknown provider' });
 });
 
@@ -31,10 +30,13 @@ router.get('/:provider/callback', (req: Request, res: Response, next) => {
     // after passport handled, user info is in req.user normally
     // we'll just continue in the next middleware
   };
+  // log incoming OAuth callback params for debugging
+  // (code, state, error etc.)
+  // eslint-disable-next-line no-console
+  console.log(`[auth callback] provider=${provider} query=`, req.query, 'body=', req.body);
 
   if (provider === 'google') return passport.authenticate('google', { failureRedirect: '/login' })(req, res, next);
   if (provider === 'github') return passport.authenticate('github', { failureRedirect: '/login' })(req, res, next);
-  if (provider === 'microsoft') return passport.authenticate('azuread-openidconnect', { failureRedirect: '/login' })(req, res, next);
   return res.status(400).json({ ok: false, error: 'Unknown provider' });
 });
 
