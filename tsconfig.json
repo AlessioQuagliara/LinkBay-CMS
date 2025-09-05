@@ -4,6 +4,8 @@
 		"module": "CommonJS",
 		"outDir": "dist",
 		"rootDir": "./",
+		"allowJs": true,
+		"checkJs": false,
 		"strict": true,
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
@@ -12,5 +14,5 @@
 		"moduleResolution": "node",
 		"resolveJsonModule": true
 	},
-	"include": ["src/**/*", "server/**/*", "types/**/*"]
+	"include": ["src/**/*", "server/**/*", "types/**/*", "**/*.js"]
 }
