@@ -4,12 +4,12 @@ try {
   require('ts-node/register');
   require('./app.ts');
 } catch (e) {
-  // fallback: try to require compiled JS
+  // fallback: require the JS express app implementation
   try {
-    require('./app');
+    require('./app.server');
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.error('Failed to start app. Ensure server/app.ts or server/app.js exists.', err);
+    console.error('Failed to start app. Ensure server/app.ts or server/app.server.js exists.', err);
     process.exit(1);
   }
 }
