@@ -1,10 +1,10 @@
 # Overview
 
-Questo documento fornisce una panoramica di LinkBay CMS, uno starter CMS minimale pensato per demo e integrazioni.
+Sistema di Autenticazione Multitenant Centralizzato
 
-Contenuti:
-- Scopo del progetto
-- Architettura ad alto livello
-- Dove trovare i dettagli tecnici
+Funzionalità Principali
 
-...existing code...
+<ul> <li>Gestione tenant tramite subdominio con isolamento dati</li> <li>Autenticazione cross-domain con supporto OAuth2, SAML e JWT</li> <li>Landing page pubblica come punto di ingresso unico</li> <li>Backoffice dedicato per ogni tenant con dashboard specifiche</li> </ul>
+Flusso Principale di Autenticazione
+
+<ul> <li>Utente accede alla landing page pubblica</li> <li>Selezione del provider di autenticazione</li> <li>Identificazione del tenant associato all'email</li> <li>Reindirizzamento al subdominio tenant-specifico</li> <li>Completamento autenticazione e generazione sessione JWT</li> </ul>
