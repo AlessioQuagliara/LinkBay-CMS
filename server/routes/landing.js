@@ -18,8 +18,10 @@ async function renderWithLayout(name, req, res) {
       // ignore and use the raw content
     }
 
-    // render the layout and inject the content as `body`
-    return res.render('landing/_layout', { layout: false, body: content, title, path: routePath });
+  // render the layout file explicitly and inject the content as `body`
+  const layoutPath = path.join(__dirname, '..', '..', 'views', 'landing', '_layout.ejs');
+  const final = await ejs.renderFile(layoutPath, { body: content, title, path: routePath }, { async: true });
+  return res.send(final);
   } catch (err) {
     console.error('Error rendering landing template', name, err);
     res.status(500).send('Server error');
