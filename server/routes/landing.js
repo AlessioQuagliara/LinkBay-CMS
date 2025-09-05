@@ -18,9 +18,11 @@ async function renderWithLayout(name, req, res) {
       // ignore and use the raw content
     }
 
-  // render the layout file explicitly and inject the content as `body`
+  // render the layout file by reading it, replacing the body placeholder and rendering the combined template
   const layoutPath = path.join(__dirname, '..', '..', 'views', 'landing', '_layout.ejs');
-  const final = await ejs.renderFile(layoutPath, { body: content, title, path: routePath }, { async: true });
+  const layoutSrc = require('fs').readFileSync(layoutPath, 'utf8');
+  const combined = layoutSrc.replace(/<%-\s*body\s*%>/i, content);
+  const final = ejs.render(combined, { title, path: routePath }, { async: false });
   return res.send(final);
   } catch (err) {
     console.error('Error rendering landing template', name, err);
