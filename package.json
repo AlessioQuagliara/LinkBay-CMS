@@ -7,9 +7,10 @@
     "doc": "docs"
   },
   "scripts": {
-    "dev": "nodemon --watch server --exec node server/app.js",
+  "dev": "npm run build:css:watch & nodemon --watch server --exec node server/app.js",
     "init-db": "node ./scripts/init-db.js",
-    "build:css": "postcss public/css/input.css -o public/css/main.css",
+  "build:css": "postcss public/css/input.css -o public/css/main.css",
+  "build:css:watch": "postcss public/css/input.css -o public/css/main.css -w",
     "build": "npm run build:css",
     "start": "node server/app.js",
     "test": "jest"
