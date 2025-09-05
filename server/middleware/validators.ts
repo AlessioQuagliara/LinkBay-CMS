@@ -1,7 +1,7 @@
 import { body, validationResult, ValidationChain } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 
-const allowedProviders = ['google', 'github', 'microsoft'];
+const allowedProviders = ['google', 'github'];
 const allowedRoles = ['owner', 'admin', 'member'];
 const emailWhitelist = (process.env.EMAIL_WHITELIST || '').split(',').map(s => s.trim()).filter(Boolean); // domains
 

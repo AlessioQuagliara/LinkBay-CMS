@@ -17,14 +17,6 @@ const providers = {
     clientSecretEnv: 'GITHUB_CLIENT_SECRET',
     callbackPath: '/auth/github/callback',
   },
-  microsoft: {
-    name: 'microsoft',
-    authUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
-    scope: ['openid', 'profile', 'email'],
-    clientIdEnv: 'AZURE_CLIENT_ID',
-    clientSecretEnv: 'AZURE_CLIENT_SECRET',
-    callbackPath: '/auth/microsoft/callback',
-  },
 };
 
 function getProvider(name) {
