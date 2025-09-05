@@ -1,37 +1,19 @@
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
-
 const router = express.Router();
 
-const viewsDir = path.join(__dirname, '..', '..', 'views', 'landing');
-
-function getTemplates() {
-  try {
-    const files = fs.readdirSync(viewsDir);
-    return files.filter(f => f.endsWith('.ejs') && f !== '_layout.ejs').map(f => f.replace(/\.ejs$/, ''));
-  } catch (err) {
-    console.error('Error reading landing views', err);
-    return [];
-  }
+function renderTemplate(name, req, res) {
+  const routePath = name === 'home' ? '/' : `/${name}`;
+  const title = name === 'home' ? 'LinkBay CMS' : (name.charAt(0).toUpperCase() + name.slice(1));
+  return res.render(`landing/${name}`, { layout: 'landing/_layout', path: routePath, title });
 }
 
-const templates = getTemplates();
-
-templates.forEach(name => {
-  const routePath = name === 'home' ? '/' : `/${name}`;
-  router.get(routePath, (req, res) => {
-    // render using landing/_layout as layout
-    res.render(`landing/${name}`, { layout: 'landing/_layout', path: routePath });
-  });
-});
-
-module.exports = router;
-const express = require('express');
-const router = express.Router();
-
-router.get('/', (req, res) => {
-  return res.render('landing/home', { title: 'LinkBay CMS' });
-});
+router.get('/', (req, res) => renderTemplate('home', req, res));
+router.get('/accept_invite', (req, res) => renderTemplate('accept_invite', req, res));
+router.get('/docs', (req, res) => renderTemplate('docs', req, res));
+router.get('/features', (req, res) => renderTemplate('features', req, res));
+router.get('/login', (req, res) => renderTemplate('login', req, res));
+router.get('/pricing', (req, res) => renderTemplate('pricing', req, res));
+router.get('/signup', (req, res) => renderTemplate('signup', req, res));
+router.get('/verify_mfa', (req, res) => renderTemplate('verify_mfa', req, res));
 
 module.exports = router;
