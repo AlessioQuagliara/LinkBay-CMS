@@ -9,7 +9,14 @@ async function renderWithLayout(name, req, res) {
 
     // render the page template to a string
     const templatePath = path.join(__dirname, '..', '..', 'views', 'landing', `${name}.ejs`);
-    const content = await ejs.renderFile(templatePath, { title, path: routePath }, { async: true });
+    let content = await ejs.renderFile(templatePath, { title, path: routePath }, { async: true });
+
+    // if the template is a full HTML document, strip outer document tags and keep only the body
+    try {
+      content = content.replace(/^[\s\S]*?<body[^>]*>/i, '').replace(/<\/body>[\s\S]*$/i, '');
+    } catch (e) {
+      // ignore and use the raw content
+    }
 
     // render the layout and inject the content as `body`
     return res.render('landing/_layout', { layout: false, body: content, title, path: routePath });
