@@ -22,15 +22,6 @@
   <meta name="twitter:creator" content="@linkbaycms">
 
   <!-- Tailwind CSS -->
-  <script>
-    // Apply dark class early to avoid FOUC based on saved preference
-    try {
-      var _dm = localStorage.getItem('darkMode');
-      if (_dm === null) _dm = 'true';
-      if (JSON.parse(_dm)) document.documentElement.classList.add('dark');
-    } catch (e) {}
-  </script>
-  <script src="https://cdn.tailwindcss.com"></script>
   <!-- Favicons -->
   <link rel="apple-touch-icon" sizes="180x180" href="/media/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/media/favicon-32x32.png">
@@ -38,28 +29,12 @@
   <link rel="manifest" href="/site.webmanifest">
   <link rel="shortcut icon" href="/media/favicon.ico">
   <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            primary: {
-              DEFAULT: '#ff5758',
-              dark: '#e04a4a',
-              light: '#ff7a7a'
-            },
-            dark: {
-              DEFAULT: '#212529',
-              light: '#343a40',
-              lighter: '#495057'
-            }
-          },
-          fontFamily: {
-            'electrolize': ['Electrolize', 'sans-serif'],
-          }
-        }
-      }
-    }
+    // Apply dark class early to avoid FOUC based on saved preference
+    try {
+      var _dm = localStorage.getItem('darkMode');
+      if (_dm === null) _dm = 'true';
+      if (JSON.parse(_dm)) document.documentElement.classList.add('dark');
+    } catch (e) {}
   </script>
 
   <!-- Alpine.js & HTMX -->
