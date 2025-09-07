@@ -48,7 +48,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Electrolize&display=swap" rel="stylesheet">
 
   <!-- Compiled CSS -->
-  <link rel="stylesheet" href="/css/main.css">
+  <link href="/public/css/output.css" rel="stylesheet">
 
   <style>
   [x-cloak] { display: none !important; }
@@ -56,7 +56,7 @@
     .font-electrolize { font-family: 'Electrolize', sans-serif; }
   </style>
 </head>
-<body x-cloak :class="darkMode ? 'min-h-screen bg-gray-900 text-gray-100 font-electrolize' : 'min-h-screen bg-white text-gray-900 font-electrolize'">
+<body x-cloak class="min-h-screen bg-white text-gray-900 font-electrolize" :class="darkMode ? 'min-h-screen bg-gray-900 text-gray-100 font-electrolize' : 'min-h-screen bg-white text-gray-900 font-electrolize'">
   <!-- Navbar -->
   <header :class="darkMode ? 'bg-gray-800 shadow-lg sticky top-0 z-50' : 'bg-white shadow sticky top-0 z-50'">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -84,7 +84,12 @@
         </button>
 
             <a href="/login" :class="darkMode ? 'text-gray-300 hover:text-primary transition-colors' : 'text-gray-700 hover:text-primary transition-colors'"> <%= typeof t === 'function' ? t('login') : 'Login' %></a>
-            <a href="/signup" :class="darkMode ? 'bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors' : 'bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors'"> <%= typeof t === 'function' ? t('get-started') : 'Get Started' %></a>
+            <a href="/signup"
+              class="px-4 py-2 rounded-md transition-colors
+                   bg-primary text-white hover:bg-primary-dark
+                   dark:bg-primary dark:text-white dark:hover:bg-primary-dark">
+              <%= typeof t === 'function' ? t('get-started') : 'Get Started' %>
+            </a>
       </div>
 
       <!-- Mobile menu button -->

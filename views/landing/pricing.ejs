@@ -1,6 +1,6 @@
 <!-- Hero Section Pricing -->
 <div x-data="pricing()">
-<section :class="darkMode ? 'relative overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800 py-16 md:py-24' : 'relative overflow-hidden bg-white py-16 md:py-24'">
+<section class="relative overflow-hidden bg-white py-16 md:py-24" :class="darkMode ? 'relative overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800 py-16 md:py-24' : 'relative overflow-hidden bg-white py-16 md:py-24'">
     <!-- Background con pattern sottile -->
     <div class="absolute inset-0 opacity-10">
         <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDYwIDYwIj48ZyBmaWxsPSJub25lIiBzdHJva2U9IiNmZjU3NTgiIHN0cm9rZS13aWR0aD0iMiI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMTUiLz48L2c+PC9zdmc+')]"></div>
@@ -8,7 +8,7 @@
     
     <div class="container mx-auto px-4 relative z-10">
         <div class="text-center max-w-3xl mx-auto">
-            <h1 :class="darkMode ? 'text-4xl md:text-5xl font-bold text-white mb-6' : 'text-4xl md:text-5xl font-bold text-gray-900 mb-6'">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6" :class="darkMode ? 'text-4xl md:text-5xl font-bold text-white mb-6' : 'text-4xl md:text-5xl font-bold text-gray-900 mb-6'">
                 <span class="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">Piani per Agenzie</span> che Vogliono Scalare
             </h1>
             
@@ -46,7 +46,7 @@
     <div class="container mx-auto px-4">
     <div class="grid md:grid-cols-3 gap-8 lg:gap-5">
             <!-- Piano Agency Pro -->
-            <div :class="darkMode ? 'bg-gray-800 text-white rounded-2xl p-8 shadow-lg border border-gray-700 hover:border-red-500 transition-all duration-300 transform hover:-translate-y-2' : 'bg-white rounded-2xl p-8 shadow-lg border border-gray-200 hover:border-red-500 transition-all duration-300 transform hover:-translate-y-2'">
+            <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-200 hover:border-red-500 transition-all duration-300 transform hover:-translate-y-2" :class="darkMode ? 'bg-gray-800 text-white rounded-2xl p-8 shadow-lg border border-gray-700 hover:border-red-500 transition-all duration-300 transform hover:-translate-y-2' : 'bg-white rounded-2xl p-8 shadow-lg border border-gray-200 hover:border-red-500 transition-all duration-300 transform hover:-translate-y-2'">
                 <div class="text-center mb-8">
                     <h3 :class="darkMode ? 'text-2xl font-bold text-white mb-2' : 'text-2xl font-bold text-gray-900 mb-2'">Agency Pro</h3>
                     <div class="flex items-baseline justify-center">
@@ -85,14 +85,14 @@
                     </li>
                 </ul>
                 
-                <a href="/signup?plan=pro" :class="darkMode ? 'block w-full bg-red-600 hover:bg-red-700 text-white text-center font-bold py-3 px-6 rounded-lg transition-colors' : 'block w-full bg-red-600 hover:bg-red-700 text-white text-center font-bold py-3 px-6 rounded-lg transition-colors'">
+                <a href="/signup?plan=pro" class="block w-full bg-red-600 hover:bg-red-700 text-white text-center font-bold py-3 px-6 rounded-lg transition-colors" :class="darkMode ? 'block w-full bg-red-600 hover:bg-red-700 text-white text-center font-bold py-3 px-6 rounded-lg transition-colors' : 'block w-full bg-red-600 hover:bg-red-700 text-white text-center font-bold py-3 px-6 rounded-lg transition-colors'">
                     Inizia Prova Gratuita
                 </a>
                 <p class="text-center text-sm text-gray-600 mt-3">14 giorni gratuiti, nessuna carta richiesta</p>
             </div>
             
             <!-- Piano Agency Scale (Piano più popolare) -->
-            <div :class="darkMode ? 'bg-gray-800 text-white rounded-2xl p-8 shadow-xl border-2 border-red-500 relative transform hover:-translate-y-2 transition-all duration-300' : 'bg-white rounded-2xl p-8 shadow-xl border-2 border-red-500 relative transform hover:-translate-y-2 transition-all duration-300'">
+            <div class="bg-white rounded-2xl p-8 shadow-xl border-2 border-red-500 relative transform hover:-translate-y-2 transition-all duration-300" :class="darkMode ? 'bg-gray-800 text-white rounded-2xl p-8 shadow-xl border-2 border-red-500 relative transform hover:-translate-y-2 transition-all duration-300' : 'bg-white rounded-2xl p-8 shadow-xl border-2 border-red-500 relative transform hover:-translate-y-2 transition-all duration-300'">
                 <div class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-4 py-1 rounded-bl-lg rounded-tr-lg">
                     PIÙ POPOLARE
                 </div>
@@ -146,7 +146,7 @@
             </div>
             
             <!-- Piano Enterprise -->
-            <div :class="darkMode ? 'bg-gray-800 text-white rounded-2xl p-8 shadow-lg border border-gray-700 hover:border-red-500 transition-all duration-300 transform hover:-translate-y-2' : 'bg-white rounded-2xl p-8 shadow-lg border border-gray-200 hover:border-red-500 transition-all duration-300 transform hover:-translate-y-2'">
+            <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-200 hover:border-red-500 transition-all duration-300 transform hover:-translate-y-2" :class="darkMode ? 'bg-gray-800 text-white rounded-2xl p-8 shadow-lg border border-gray-700 hover:border-red-500 transition-all duration-300 transform hover:-translate-y-2' : 'bg-white rounded-2xl p-8 shadow-lg border border-gray-200 hover:border-red-500 transition-all duration-300 transform hover:-translate-y-2'">
                 <div class="text-center mb-8">
                     <h3 :class="darkMode ? 'text-2xl font-bold text-white mb-2' : 'text-2xl font-bold text-gray-900 mb-2'">Enterprise</h3>
                     <div class="flex items-baseline justify-center">

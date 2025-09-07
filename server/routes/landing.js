@@ -1,42 +1,89 @@
 const express = require('express');
+
 const router = express.Router();
-const ejs = require('ejs');
 
-async function renderWithLayout(name, req, res) {
-  try {
-    const routePath = name === 'home' ? '/' : `/${name}`;
-    const title = name === 'home' ? 'LinkBay CMS' : (name.charAt(0).toUpperCase() + name.slice(1));
+// ================== RENDER PAGINE Landing ==================
 
-    // render the page template to a string
-    const templatePath = path.join(__dirname, '..', '..', 'views', 'landing', `${name}.ejs`);
-    let content = await ejs.renderFile(templatePath, { title, path: routePath }, { async: true });
+// Redirect /index a /
+router.get('/index', (req, res) => {
+  res.redirect('/');
+});
 
-    // if the template is a full HTML document, strip outer document tags and keep only the body
-    try {
-      content = content.replace(/^[\s\S]*?<body[^>]*>/i, '').replace(/<\/body>[\s\S]*$/i, '');
-    } catch (e) {
-      // ignore and use the raw content
+// Home page
+router.get('/', (req, res) => {
+  res.render('index', {
+    layout: 'landing/_layout',
+    SEO: {
+      title: 'Home Page',
+      description: 'Benvenuto nella Home Page',
+      keywords: 'home, page, welcome',
+      sitoOnline
     }
+  });
+});
 
-  // render the layout file by reading it, replacing the body placeholder and rendering the combined template
-  const layoutPath = path.join(__dirname, '..', '..', 'views', 'landing', '_layout.ejs');
-  const layoutSrc = require('fs').readFileSync(layoutPath, 'utf8');
-  const combined = layoutSrc.replace(/<%-\s*body\s*%>/i, content);
-  const final = ejs.render(combined, { title, path: routePath }, { async: false });
-  return res.send(final);
-  } catch (err) {
-    console.error('Error rendering landing template', name, err);
-    res.status(500).send('Server error');
-  }
-}
+// Documentazione
+router.get('/docs', (req, res) => {
+  res.render('docs', {
+    layout: 'landing/_layout',
+    SEO: {
+      title: 'Documentazione',
+      description: 'Scopri di più sulla nostra documentazione',
+      keywords: 'documentazione, guide, API',
+      sitoOnline
+    }
+  });
+});
 
-router.get('/', (req, res) => renderWithLayout('home', req, res));
-router.get('/accept_invite', (req, res) => renderWithLayout('accept_invite', req, res));
-router.get('/docs', (req, res) => renderWithLayout('docs', req, res));
-router.get('/features', (req, res) => renderWithLayout('features', req, res));
-router.get('/login', (req, res) => renderWithLayout('login', req, res));
-router.get('/pricing', (req, res) => renderWithLayout('pricing', req, res));
-router.get('/signup', (req, res) => renderWithLayout('signup', req, res));
-router.get('/verify_mfa', (req, res) => renderWithLayout('verify_mfa', req, res));
+// Feature
+router.get('/feature', (req, res) => {
+  res.render('feature', {
+    layout: 'landing/_layout',
+    SEO: {
+      title: 'Feature',
+      description: 'Scopri di più sulle nostre funzionalità',
+      keywords: 'documentazione, guide, API',
+      sitoOnline
+    }
+  });
+});
 
-module.exports = router;
+// Prezzi
+router.get('/pricing', (req, res) => {
+  res.render('pricing', {
+    layout: 'landing/_layout',
+    SEO: {
+      title: 'Prezzi',
+      description: 'Scopri di più sui nostri piani e prezzi',
+      keywords: 'prezzi, costi, abbonamenti',
+      sitoOnline
+    }
+  });
+});
+
+// login
+router.get('/login', (req, res) => {
+  res.render('login', {
+    layout: 'landing/_layout',
+    SEO: {
+      title: 'Login',
+      description: 'Accedi al tuo account',
+      keywords: 'login, accesso, autenticazione',
+      sitoOnline
+    }
+  });
+});
+
+// signup
+router.get('/signup', (req, res) => {
+  res.render('signup', {
+    layout: 'landing/_layout',
+    SEO: {
+      title: 'Signup',
+      description: 'Crea un nuovo account',
+      keywords: 'signup, registrazione, account',
+      sitoOnline
+    }
+  });
+});
+
