@@ -1,58 +1,40 @@
 {
   "name": "linkbay-cms",
   "version": "1.0.0",
-  "description": "CMS Professional",
-  "main": "dist/app.js",
+  "main": "server/app.js",
   "directories": {
-    "doc": "docs"
+    "doc": "docs",
+    "public": "public",
+    "scripts": "scripts"
   },
   "scripts": {
-  "dev": "npm run build:css:watch & nodemon --watch server --exec node server/app.js",
-    "init-db": "node ./scripts/init-db.js",
-  "build:css": "postcss public/css/input.css -o public/css/main.css",
-  "build:css:watch": "postcss public/css/input.css -o public/css/main.css -w",
-    "build": "npm run build:css",
-    "start": "node server/app.js",
-    "test": "jest"
+    "test": "npm run dev",
+    "build:css": "tailwindcss build public/css/input.css -o public/css/output.css"
   },
-  "repository": {
-    "type": "git",
-    "url": "LinkBay-CMS"
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.13",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17"
   },
-  "keywords": [
-    "linkbay",
-    "CMS"
-  ],
-  "author": "Alessio Quagliara",
-  "license": "MIT",
   "dependencies": {
-    "alpinejs": "^3.15.0",
+    "body-parser": "^2.2.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "ejs": "^3.1.10",
-    "express": "^4.18.2",
+    "express": "^5.1.0",
     "express-ejs-layouts": "^2.5.1",
     "express-session": "^1.18.2",
-    "express-validator": "^7.2.1",
-    "htmx.org": "^2.0.6",
     "jsonwebtoken": "^9.0.2",
     "knex": "^3.1.0",
+    "method-override": "^3.0.0",
     "nodemailer": "^7.0.6",
-  "passport": "^0.7.0",
-    "passport-github2": "^0.1.12",
-    "passport-google-oauth20": "^2.0.0",
     "pg": "^8.16.3",
-    "speakeasy": "^2.0.0",
-  "cors": "^2.8.5"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss7-compat": "^2.2.17",
-    "autoprefixer": "^10.4.21",
-    "eslint": "^9.34.0",
-    "jest": "^30.1.3",
-    "nodemon": "^3.1.10",
-    "postcss": "^8.5.6",
-    "postcss-cli": "^11.0.1",
-    "prettier": "^3.6.2",
-    "tailwindcss": "^4.1.13"
+    "socket.io": "^4.8.1"
   }
 }
