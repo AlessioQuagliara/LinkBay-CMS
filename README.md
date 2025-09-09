@@ -2,7 +2,7 @@
 © 2024 Alessio Quagliara. Tutti i diritti riservati.  
 
 ## Licenza  
-Questo progetto è rilasciato sotto **[LICENZA MIT/GPL]** (vedi file `LICENSE`).  
+Questo progetto è rilasciato sotto **[LICENZA GPL]** (vedi file `LICENSE`).  
 
 ### Avviso importante  
 - **Il codice è di mia proprietà personale** e non è proprietà di altri.  
