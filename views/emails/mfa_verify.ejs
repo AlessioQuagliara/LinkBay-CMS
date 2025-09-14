@@ -1,5 +1,0 @@
-<%- include('generic', { tenantName: tenantName, brandColor: brandColor, brandTextColor: brandTextColor, customStyles: customStyles, body: (function(){ %>
-  <h3>Ciao <%= userName || '' %>,</h3>
-  <p>Per completare la registrazione per <strong><%= tenantName %></strong> clicca il pulsante qui sotto per verificare il tuo account MFA.</p>
-  <p><a class="btn" href="<%= verificationLink %>" style="background:<%= brandColor || '#2563eb' %>">Verifica il tuo account</a></p>
-<% }).call(this) %>
