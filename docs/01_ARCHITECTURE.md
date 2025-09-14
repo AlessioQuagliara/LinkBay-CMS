@@ -1,7 +1,0 @@
-# Architettura e struttura del progetto
-Architettura Multitenant
-
-<ul> <li>Risoluzione del tenant via subdominio tramite middleware dedicato<br> <code style="background-color:black; color:#ff5758; padding:3px">tenantResolver.ts</code> - Estrae il subdominio dalla richiesta e ricerca il tenant corrispondente nel database</li> <li>Isolamento dei dati garantito a livello applicativo - Ogni tenant ha i propri dati isolati tramite filtro per tenant_id</li> <li>Landing page pubblica separata dagli ambienti tenant-specifici - Separazione netta tra sito pubblico e backoffice dei tenant</li> </ul>
-Flusso Autenticazione Cross-Domain
-
-<ul> <li>Utente clicca "Login" dalla landing page pubblica</li> <li>La landing identifica il tenant associato all'email tramite <code style="background-color:black; color:#ff5758; padding:3px">POST /api/auth/provider-redirect</code></li> <li>Reindirizzamento al subdominio tenant-specifico (es. default.lvh.me:3001)</li> <li>Completamento autenticazione sul tenant con protocollo OAuth/SAML</li> <li>Generazione JWT cookie per sessioni tenant-scoped con verifica tramite middleware <code style="background-color:black; color:#ff5758; padding:3px">authenticateJWT</code></li> </ul>

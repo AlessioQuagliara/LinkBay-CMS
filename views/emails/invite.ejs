@@ -1,5 +1,0 @@
-<%- include('generic', { tenantName: tenantName, brandColor: brandColor, brandTextColor: brandTextColor, customStyles: customStyles, body: (function(){ %>
-  <h3>Ciao <%= userName || '' %>,</h3>
-  <p>Sei stato invitato a unirti a <strong><%= tenantName %></strong>.</p>
-  <p><a class="btn" href="<%= verificationLink %>" style="background:<%= brandColor || '#2563eb' %>">Accetta invito</a></p>
-<% }).call(this) %>
