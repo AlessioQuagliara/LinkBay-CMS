@@ -14,8 +14,8 @@ WORKDIR /app
 # Copia package files per layer caching
 COPY package*.json ./
 
-# Installa dipendenze
-RUN npm ci --only=production --silent && npm cache clean --force
+# Installa dipendenze (incluse dev per TypeScript)
+RUN npm ci --silent && npm cache clean --force
 
 # Copia source code
 COPY --chown=linkbay:nodejs . .
