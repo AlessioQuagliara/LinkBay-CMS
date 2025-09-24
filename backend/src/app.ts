@@ -64,6 +64,7 @@ app.get('/api', (req: Request, res: Response) => {
   res.json({ message: 'API endpoints will be implemented here' });
 });
 
+
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response<ErrorResponse>, next: NextFunction) => {
   console.error(err.stack);
