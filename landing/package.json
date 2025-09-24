@@ -10,8 +10,11 @@
     "preview": "vite preview --host 0.0.0.0 --port 3001"
   },
   "dependencies": {
+    "lucide-react": "^0.544.0",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-helmet-async": "^2.0.5",
+    "react-router-dom": "^7.9.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
