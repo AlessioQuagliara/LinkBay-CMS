@@ -1,5 +1,15 @@
-# 👉 Ambiente virtuale
-/node_modules/
+# Node.js dependencies (anywhere in the tree)
+node_modules/
+**/node_modules/
 
-# 👉 Configurazioni locali
+# Environment files (local credentials)
 .env
+.env.*
+*.env
+**/.env
+**/.env.*
+
+# Example env files (keep in repo if present)
+.env.example
+
+# --- keep any existing ignores below ---
