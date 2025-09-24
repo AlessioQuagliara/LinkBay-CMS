@@ -20,8 +20,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --silent
 COPY . .
-# Se hai un build step, decommentalo:
-# RUN npm run build
+# Compila TypeScript
+RUN npm run build
 
 # Stage 3: Production
 FROM base AS production
@@ -30,8 +30,10 @@ WORKDIR /app
 # Copia dipendenze dal stage deps
 COPY --from=deps --chown=linkbay:nodejs /app/node_modules ./node_modules
 
-# Copia source code
-COPY --chown=linkbay:nodejs . .
+# Copia il codice compilato dal stage build
+COPY --from=build --chown=linkbay:nodejs /app/dist ./dist
+COPY --from=build --chown=linkbay:nodejs /app/package*.json ./
+COPY --chown=linkbay:nodejs healthcheck.js .
 
 # Cambia utente
 USER linkbay
