@@ -1,0 +1,29 @@
+User-agent: *
+Allow: /
+
+# Percorsi riservati
+Disallow: /api/*
+Disallow: /admin/*
+Disallow: /*.json
+Disallow: /login
+Disallow: /register
+
+Sitemap: http://localhost:3001/sitemap.xml
+
+# Googlebot
+User-agent: Googlebot
+Allow: /
+
+# Bingbot
+User-agent: Bingbot
+Allow: /
+
+# Social Media Bots
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /

@@ -1,0 +1,50 @@
+# Backend Production Dockerfile - Multi-stage build
+FROM node:20-alpine AS base
+
+# Installa dumb-init
+RUN apk add --no-cache dumb-init
+
+# Crea user non-root
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S linkbay -u 1001
+
+# Stage 1: Dependencies
+FROM base AS deps
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production --silent && npm cache clean --force
+
+# Stage 2: Build
+FROM base AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --silent
+COPY . .
+# Compila TypeScript
+RUN npm run build
+
+# Stage 3: Production
+FROM base AS production
+WORKDIR /app
+
+# Copia dipendenze dal stage deps
+COPY --from=deps --chown=linkbay:nodejs /app/node_modules ./node_modules
+
+# Copia il codice compilato dal stage build
+COPY --from=build --chown=linkbay:nodejs /app/dist ./dist
+COPY --from=build --chown=linkbay:nodejs /app/package*.json ./
+COPY --chown=linkbay:nodejs healthcheck.ts .
+
+# Cambia utente
+USER linkbay
+
+# Esponi porta
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node healthcheck.ts || exit 1
+
+# Avvia in produzione
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["npm", "start"]

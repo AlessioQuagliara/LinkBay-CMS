@@ -1,0 +1,192 @@
+version: '3.8'
+
+services:
+  # Database PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: linkbay_postgres_dev
+    environment:
+      POSTGRES_DB: linkbaycms
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d linkbaycms"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - linkbay_network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: linkbay_redis_dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - linkbay_network
+
+  # Backend Node.js
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: linkbay_backend_dev
+    env_file:
+      - .env.docker
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgres://root:root@postgres:5432/linkbaycms
+      - DB_HOST=postgres
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.ts"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - linkbay_network
+
+  # Frontend Landing Page
+  landing:
+    build:
+      context: ./landing
+      dockerfile: Dockerfile.dev
+    container_name: linkbay_landing_dev
+    environment:
+      - VITE_API_URL=http://localhost:3000
+      - VITE_APP_ENV=development
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./landing:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - linkbay_network
+
+  # Frontend Agency
+  agency:
+    build:
+      context: ./agency
+      dockerfile: Dockerfile.dev
+    container_name: linkbay_agency_dev
+    environment:
+      - VITE_API_URL=http://localhost:3000
+      - VITE_APP_ENV=development
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./agency:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3002/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - linkbay_network
+
+  # Frontend Customer
+  customer:
+    build:
+      context: ./customer
+      dockerfile: Dockerfile.dev
+    container_name: linkbay_customer_dev
+    environment:
+      - VITE_API_URL=http://localhost:3000
+      - VITE_APP_ENV=development
+    ports:
+      - "3003:3003"
+    volumes:
+      - ./customer:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3003/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - linkbay_network
+
+  # Frontend Websites
+  websites:
+    build:
+      context: ./websites
+      dockerfile: Dockerfile.dev
+    container_name: linkbay_websites_dev
+    environment:
+      - VITE_API_URL=http://localhost:3000
+      - VITE_APP_ENV=development
+    ports:
+      - "3004:3004"
+    volumes:
+      - ./websites:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3004/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - linkbay_network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  linkbay_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
