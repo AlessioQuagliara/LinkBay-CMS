@@ -64,6 +64,16 @@ app.get('/api', (req: Request, res: Response) => {
   res.json({ message: 'API endpoints will be implemented here' });
 });
 
+// API Health check (for frontend proxy)
+app.get('/api/health', (req: Request, res: Response<HealthResponse>) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    version: '1.0.0'
+  });
+});
+
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response<ErrorResponse>, next: NextFunction) => {
