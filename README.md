@@ -371,11 +371,11 @@ Ogni frontend può avere le proprie variabili d'ambiente:
 
 ```bash
 # agency/.env
-VITE_API_URL=https://api.linkbay.com
+VITE_API_URL=https://api.linkbay-cms.com
 VITE_APP_NAME=LinkBay Agency
 
 # customer/.env  
-VITE_API_URL=https://api.linkbay.com
+VITE_API_URL=https://api.linkbay-cms.com
 VITE_APP_NAME=LinkBay Customer Portal
 ```
 
@@ -440,9 +440,9 @@ Questo progetto è rilasciato sotto **[LICENZA CUSTOM]** (vedi file `LICENSE`).
 
 ## 📞 Supporto
 
-- 📧 Email: alessio@linkbay.com
-- 🌐 Website: https://www.linkbay.com
-- 📱 LinkedIn: [Alessio Quagliara](https://linkedin.com/in/alessio-quagliara)
+- 📧 Email: quagliara.alessio@outlook.com
+- 🌐 Website: https://www.linkbay-cms.com
+- 📱 LinkedIn: [Alessio Quagliara](https://www.linkedin.com/in/alessio-quagliara-a1a91b1a8/)
 
 ---
 
