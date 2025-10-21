@@ -40,32 +40,6 @@ const SEO_DEFAULTS: SEODefaults = {
   locale: 'it_IT'
 };
 
-/**
- * Hook per gestire la SEO dinamica delle pagine
- * Utilizza react-helmet-async per aggiornare i meta tag
- * 
- * @param config - Configurazione SEO per la pagina corrente
- * @returns Componente Helmet da renderizzare nella pagina
- * 
- * @example
- * ```tsx
- * function HomePage() {
- *   const SEO = useSEO({
- *     title: 'Home - LinkBay CMS',
- *     description: 'Scopri la piattaforma...',
- *     keywords: ['cms', 'agenzia', 'web'],
- *     type: 'website'
- *   });
- * 
- *   return (
- *     <>
- *       {SEO}
- *       <div>Content...</div>
- *     </>
- *   );
- * }
- * ```
- */
 export const useSEO = (config: SEOConfig = {}) => {
   const {
     title,
@@ -87,36 +61,12 @@ export const useSEO = (config: SEOConfig = {}) => {
     jsonLd
   } = config;
 
-  // Costruisci il titolo finale
-  const finalTitle = title 
-    ? `${title} | ${siteName}`
-    : SEO_DEFAULTS.defaultTitle;
-
-  // URL completo
-  const fullUrl = url 
-    ? `${SEO_DEFAULTS.defaultUrl}${url}`
-    : SEO_DEFAULTS.defaultUrl;
-
-  // URL dell'immagine completo
-  const fullImage = image.startsWith('http') 
-    ? image 
-    : `${SEO_DEFAULTS.defaultUrl}${image}`;
-
-  // Canonical URL
-  const canonicalUrl = canonical 
-    ? `${SEO_DEFAULTS.defaultUrl}${canonical}`
-    : fullUrl;
-
-  // Robots meta
-  const robotsContent = [
-    noindex ? 'noindex' : 'index',
-    nofollow ? 'nofollow' : 'follow'
-  ].join(', ');
-
-  // Keywords string
-  const keywordsString = keywords.length > 0 
-    ? keywords.join(', ')
-    : undefined;
+  const finalTitle = title ? `${title} | ${siteName}` : SEO_DEFAULTS.defaultTitle;
+  const fullUrl = url ? `${SEO_DEFAULTS.defaultUrl}${url}` : SEO_DEFAULTS.defaultUrl;
+  const fullImage = image.startsWith('http') ? image : `${SEO_DEFAULTS.defaultUrl}${image}`;
+  const canonicalUrl = canonical ? `${SEO_DEFAULTS.defaultUrl}${canonical}` : fullUrl;
+  const robotsContent = `${noindex ? 'noindex' : 'index'}, ${nofollow ? 'nofollow' : 'follow'}`;
+  const keywordsString = keywords.join(', ') || undefined;
 
   return (
     <Helmet>
@@ -171,55 +121,38 @@ export const useSEO = (config: SEOConfig = {}) => {
   );
 };
 
-/**
- * Hook per creare structured data JSON-LD per organizzazione
- */
-export const useOrganizationJsonLd = () => {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "LinkBay CMS",
-    "url": SEO_DEFAULTS.defaultUrl,
-    "logo": `${SEO_DEFAULTS.defaultUrl}/logo.svg`,
-    "description": SEO_DEFAULTS.defaultDescription,
-    "sameAs": [
-      // Aggiungi qui i social media links quando disponibili
-    ]
-  };
-};
+export const useOrganizationJsonLd = () => ({
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "LinkBay CMS",
+  "url": SEO_DEFAULTS.defaultUrl,
+  "logo": `${SEO_DEFAULTS.defaultUrl}/logo.svg`,
+  "description": SEO_DEFAULTS.defaultDescription,
+  "sameAs": []
+});
 
-/**
- * Hook per creare structured data JSON-LD per website
- */
-export const useWebsiteJsonLd = () => {
-  return {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": SEO_DEFAULTS.siteName,
-    "url": SEO_DEFAULTS.defaultUrl,
-    "description": SEO_DEFAULTS.defaultDescription,
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": `${SEO_DEFAULTS.defaultUrl}/search?q={search_term_string}`,
-      "query-input": "required name=search_term_string"
-    }
-  };
-};
+export const useWebsiteJsonLd = () => ({
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": SEO_DEFAULTS.siteName,
+  "url": SEO_DEFAULTS.defaultUrl,
+  "description": SEO_DEFAULTS.defaultDescription,
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": `${SEO_DEFAULTS.defaultUrl}/search?q={search_term_string}`,
+    "query-input": "required name=search_term_string"
+  }
+});
 
-/**
- * Hook per creare breadcrumb JSON-LD
- */
-export const useBreadcrumbJsonLd = (items: Array<{ name: string; url: string }>) => {
-  return {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": items.map((item, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "name": item.name,
-      "item": `${SEO_DEFAULTS.defaultUrl}${item.url}`
-    }))
-  };
-};
+export const useBreadcrumbJsonLd = (items: Array<{ name: string; url: string }>) => ({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": items.map((item, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "name": item.name,
+    "item": `${SEO_DEFAULTS.defaultUrl}${item.url}`
+  }))
+});
 
 export default useSEO;

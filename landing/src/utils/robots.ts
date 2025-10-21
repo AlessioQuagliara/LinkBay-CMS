@@ -13,63 +13,27 @@ export const generateRobotsTxt = (config: RobotsConfig = {}): string => {
     crawlDelay
   } = config;
 
-  let robotsContent = 'User-agent: *\n';
-
-  if (allowAll) {
-    robotsContent += 'Allow: /\n';
-  } else {
-    robotsContent += 'Disallow: /\n';
-  }
-
-  // Aggiungi percorsi specifici da bloccare anche in produzione
-  const defaultDisallowPaths = [
-    '/api/*',
-    '/admin/*',
-    '/*.json',
-    '/*.xml',
-    '/login',
-    '/register'
-  ];
-
-  const allDisallowPaths = [...defaultDisallowPaths, ...disallowPaths];
+  const defaultPaths = ['/api/*', '/admin/*', '/*.json', '/*.xml', '/login', '/register'];
+  const allPaths = [...defaultPaths, ...disallowPaths];
   
-  if (allowAll && allDisallowPaths.length > 0) {
-    robotsContent += '\n# Percorsi riservati\n';
-    allDisallowPaths.forEach(path => {
-      robotsContent += `Disallow: ${path}\n`;
-    });
+  let content = `User-agent: *\n${allowAll ? 'Allow: /\n' : 'Disallow: /\n'}`;
+  
+  if (allowAll && allPaths.length > 0) {
+    content += '\n# Percorsi riservati\n' + allPaths.map(p => `Disallow: ${p}`).join('\n') + '\n';
   }
-
-  if (crawlDelay) {
-    robotsContent += `\nCrawl-delay: ${crawlDelay}\n`;
-  }
-
-  robotsContent += `\nSitemap: ${sitemapUrl}\n`;
-
-  // Aggiungi regole specifiche per bot comuni
+  
+  if (crawlDelay) content += `\nCrawl-delay: ${crawlDelay}\n`;
+  content += `\nSitemap: ${sitemapUrl}\n`;
+  
   if (allowAll) {
-    robotsContent += `
-# Googlebot
-User-agent: Googlebot
-Allow: /
-
-# Bingbot
-User-agent: Bingbot
-Allow: /
-
-# Social Media Bots
-User-agent: facebookexternalhit
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: LinkedInBot
-Allow: /
-`;
+    content += '\n# Googlebot\nUser-agent: Googlebot\nAllow: /\n';
+    content += '\n# Bingbot\nUser-agent: Bingbot\nAllow: /\n';
+    content += '\n# Social Bots\nUser-agent: facebookexternalhit\nAllow: /\n';
+    content += 'User-agent: Twitterbot\nAllow: /\n';
+    content += 'User-agent: LinkedInBot\nAllow: /\n';
   }
 
-  return robotsContent;
+  return content;
 };
 
 export const useRobots = () => {

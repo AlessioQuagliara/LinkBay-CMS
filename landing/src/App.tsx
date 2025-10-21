@@ -1,29 +1,23 @@
-import React, { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Layout } from './components/Layout/Layout'
 import { HomePage } from './pages/HomePage'
-import { PricingPage } from './pages/PricingPage';
-import { FeaturesPage } from './pages/FeaturesPage';
-import { AboutPage } from './pages/AboutPage';
-import { ContactPage } from './pages/ContactPage';
-import { PrivacyPage } from './pages/PrivacyPage';
-import { TermsPage } from './pages/TermsPage';
-import { LoginPage } from './pages/LoginPage';
-import { RegisterPage } from './pages/RegisterPage';
-import { NotFoundPage } from './pages/NotFoundPage';
-import { ApiDocsPage } from './pages/ApiDocsPage';
-import { BlogPage } from './pages/BlogPage';
-import { WorkWithUsPage } from './pages/WorkWithUsPage';
-import MarketplacePage from './pages/MarketplacePage';
-import { CookiePolicyPage } from './pages/CookiePolicyPage';
+import { PricingPage } from './pages/PricingPage'
+import { FeaturesPage } from './pages/FeaturesPage'
+import { AboutPage } from './pages/AboutPage'
+import { ContactPage } from './pages/ContactPage'
+import { PrivacyPage } from './pages/PrivacyPage'
+import { TermsPage } from './pages/TermsPage'
+import { LoginPage } from './pages/LoginPage'
+import { RegisterPage } from './pages/RegisterPage'
+import { NotFoundPage } from './pages/NotFoundPage'
+import { ApiDocsPage } from './pages/ApiDocsPage'
+import { BlogPage } from './pages/BlogPage'
+import { WorkWithUsPage } from './pages/WorkWithUsPage'
+import MarketplacePage from './pages/MarketplacePage'
+import { CookiePolicyPage } from './pages/CookiePolicyPage'
 import './App.css'
 
-
-function App(): React.ReactElement {
-  const [count, setCount] = useState<number>(0)
-
+function App() {
   return (
     <Router>
       <Layout>
