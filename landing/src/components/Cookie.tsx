@@ -18,95 +18,57 @@ const CookieConsentBanner: React.FC = () => {
 
   // Controlla lo stato del consenso all'avvio
   useEffect(() => {
-    const rawConsent = localStorage.getItem('cookieConsent');
-    const savedPreferences = localStorage.getItem('cookiePreferences');
+    const consent = localStorage.getItem('cookieConsent');
+    const saved = localStorage.getItem('cookiePreferences');
 
-    // Verifica che il valore sia uno di quelli attesi
-    if (rawConsent === 'pending' || rawConsent === 'custom' || rawConsent === 'denied') {
-      setConsentGiven(rawConsent);
-      if (savedPreferences) {
+    if (consent === 'pending' || consent === 'custom' || consent === 'denied') {
+      setConsentGiven(consent);
+      if (saved) {
         try {
-          setPreferences(JSON.parse(savedPreferences) as CookiePrefs);
-        } catch (e) {
-          // ignore parse errors
-        }
+          setPreferences(JSON.parse(saved));
+        } catch {}
       }
     } else {
       setShowBanner(true);
     }
   }, []);
 
-  const savePreferences = (newPreferences: CookiePrefs) => {
-    const finalPreferences: CookiePrefs = {
-      ...newPreferences,
-      necessary: true // I cookie necessari sono sempre attivi
-    };
-    
-    setPreferences(finalPreferences);
-    localStorage.setItem('cookiePreferences', JSON.stringify(finalPreferences));
+  const savePreferences = (prefs: CookiePrefs) => {
+    const final = { ...prefs, necessary: true };
+    setPreferences(final);
+    localStorage.setItem('cookiePreferences', JSON.stringify(final));
     localStorage.setItem('cookieConsent', 'custom');
     setConsentGiven('custom');
     
-    // Attiva/disattiva i cookie in base alle preferenze
-    manageCookies(finalPreferences);
+    // Gestione cookie
+    console.log(final.analytics ? 'Analytics attivati' : 'Analytics disattivati');
+    console.log(final.marketing ? 'Marketing attivati' : 'Marketing disattivati');
+  };
+
+  const closeBanner = () => {
+    setShowBanner(false);
+    setShowPreferences(false);
   };
 
   const handleAcceptAll = () => {
-    const allAccepted = {
-      necessary: true,
-      analytics: true,
-      marketing: true
-    };
-    
-    savePreferences(allAccepted);
-    setShowBanner(false);
-    setShowPreferences(false);
+    savePreferences({ necessary: true, analytics: true, marketing: true });
+    closeBanner();
   };
 
   const handleRejectAll = () => {
-    const onlyNecessary = {
-      necessary: true,
-      analytics: false,
-      marketing: false
-    };
-    
-    savePreferences(onlyNecessary);
-    setShowBanner(false);
-    setShowPreferences(false);
+    savePreferences({ necessary: true, analytics: false, marketing: false });
+    closeBanner();
   };
 
   const handleSavePreferences = () => {
     savePreferences(preferences);
-    setShowBanner(false);
-    setShowPreferences(false);
-  };
-
-  const manageCookies = (prefs: CookiePrefs) => {
-    // Implementa la logica per attivare/disattivare i cookie
-    if (prefs.analytics) {
-      // Attiva Google Analytics, PostHog, etc.
-      console.log('Attivati cookie analytics');
-    } else {
-      // Disattiva analytics
-      console.log('Disattivati cookie analytics');
-    }
-    
-    if (prefs.marketing) {
-      // Attiva cookie marketing
-      console.log('Attivati cookie marketing');
-    } else {
-      // Disattiva marketing
-      console.log('Disattivati cookie marketing');
-    }
+    closeBanner();
   };
 
   const togglePreference = (category: keyof CookiePrefs) => {
-    if (category === 'necessary') return; // Non si può disattivare
-
-    setPreferences(prev => ({
-      ...prev,
-      [category]: !prev[category]
-    } as CookiePrefs));
+    if (category !== 'necessary') {
+      setPreferences(prev => ({ ...prev, [category]: !prev[category] }));
+    }
   };
 
   // Modale Preferenze Cookie

@@ -9,25 +9,17 @@ interface SEOConfig {
   noindex?: boolean;
 }
 
-/**
- * Hook completo ma semplice per SEO dinamica
- * Include: title, description, keywords, Open Graph, robots
- * 
- * @example
- * ```tsx
- * function ProductPage() {
- *   useAdvancedSEO({
- *     title: "Prodotto - Il Meglio",
- *     description: "Descrizione dettagliata del prodotto",
- *     keywords: "prodotto, vendita, qualità",
- *     ogImage: "/product-image.jpg",
- *     ogType: "article"
- *   });
- * 
- *   return <div>Product content...</div>;
- * }
- * ```
- */
+const updateMeta = (attr: string, value: string, content: string) => {
+  const selector = attr === 'property' ? `meta[property="${value}"]` : `meta[name="${value}"]`;
+  let meta = document.querySelector(selector) as HTMLMetaElement;
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.setAttribute(attr, value);
+    document.head.appendChild(meta);
+  }
+  meta.content = content;
+};
+
 export const useAdvancedSEO = ({
   title,
   description,
@@ -38,58 +30,29 @@ export const useAdvancedSEO = ({
 }: SEOConfig = {}) => {
   useEffect(() => {
     const siteName = "LinkBay CMS";
-    const baseUrl = window.location.origin;
-    
-    // Helper per creare/aggiornare meta tag
-    const updateMetaTag = (selector: string, content: string) => {
-      let element = document.querySelector(selector) as HTMLMetaElement;
-      if (!element) {
-        element = document.createElement('meta');
-        if (selector.includes('property=')) {
-          element.setAttribute('property', selector.match(/property="([^"]+)"/)?.[1] || '');
-        } else {
-          element.setAttribute('name', selector.match(/name="([^"]+)"/)?.[1] || '');
-        }
-        document.head.appendChild(element);
-      }
-      element.setAttribute('content', content);
-    };
+    const fullTitle = title ? `${title} | ${siteName}` : siteName;
 
-    // Titolo
-    if (title) {
-      document.title = `${title} | ${siteName}`;
-      updateMetaTag('meta[property="og:title"]', `${title} | ${siteName}`);
-    }
-
-    // Descrizione
+    if (title) document.title = fullTitle;
     if (description) {
-      updateMetaTag('meta[name="description"]', description);
-      updateMetaTag('meta[property="og:description"]', description);
+      updateMeta('name', 'description', description);
+      updateMeta('property', 'og:description', description);
     }
+    if (keywords) updateMeta('name', 'keywords', keywords);
 
-    // Keywords
-    if (keywords) {
-      updateMetaTag('meta[name="keywords"]', keywords);
-    }
+    updateMeta('property', 'og:title', fullTitle);
+    updateMeta('property', 'og:type', ogType);
+    updateMeta('property', 'og:site_name', siteName);
+    updateMeta('property', 'og:url', window.location.href);
+    updateMeta('property', 'og:image', `${window.location.origin}${ogImage}`);
+    updateMeta('name', 'robots', noindex ? 'noindex, nofollow' : 'index, follow');
 
-    // Open Graph
-    updateMetaTag('meta[property="og:type"]', ogType);
-    updateMetaTag('meta[property="og:site_name"]', siteName);
-    updateMetaTag('meta[property="og:url"]', window.location.href);
-    updateMetaTag('meta[property="og:image"]', `${baseUrl}${ogImage}`);
-
-    // Robots
-    updateMetaTag('meta[name="robots"]', noindex ? 'noindex, nofollow' : 'index, follow');
-
-    // Canonical URL
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
     if (!canonical) {
       canonical = document.createElement('link');
-      canonical.setAttribute('rel', 'canonical');
+      canonical.rel = 'canonical';
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute('href', window.location.href);
-    
+    canonical.href = window.location.href;
   }, [title, description, keywords, ogImage, ogType, noindex]);
 };
 
