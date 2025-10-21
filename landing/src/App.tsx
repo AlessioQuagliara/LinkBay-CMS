@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Layout } from './components/Layout/Layout'
+import ScrollToTop from './components/ScrollToTop'
 import { HomePage } from './pages/HomePage'
 import { PricingPage } from './pages/PricingPage'
 import { FeaturesPage } from './pages/FeaturesPage'
@@ -20,6 +21,7 @@ import './App.css'
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Layout>
         <Routes>
           {/* Public Routes */}
@@ -32,10 +34,6 @@ function App() {
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/work-with-us" element={<WorkWithUsPage />} />
           <Route path="/marketplace" element={<MarketplacePage />} />
-
-          {/* Auth Routes */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
 
           {/* Legal Routes */}
           <Route path="/privacy" element={<PrivacyPage />} />

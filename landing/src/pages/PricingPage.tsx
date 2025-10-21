@@ -235,9 +235,9 @@ export const PricingPage: React.FC = () => {
         <p className="mb-6 text-blue-100">Unisciti alle agenzie che già navigano con LinkBay-CMS</p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link to="/register" className="px-8 py-3 font-bold rounded-lg bg-white text-[#343a4D] hover:bg-gray-100 transition-colors">
+          <a href="http://localhost:3003/register" target="_blank" rel="noopener noreferrer" className="px-8 py-3 font-bold rounded-lg bg-white text-[#343a4D] hover:bg-gray-100 transition-colors">
             🚀 Inizia la Prova Gratuita
-          </Link>
+          </a>
           <Link to="/demo" className="px-8 py-3 font-bold rounded-lg border-2 border-white text-white hover:bg-white/10 transition-colors">
             ⚓ Richiedi una Demo
           </Link>

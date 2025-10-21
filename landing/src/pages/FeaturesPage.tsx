@@ -98,7 +98,7 @@ export const FeaturesPage: React.FC = () => {
   <main className=" min-h-screen overflow-hidden">
     
       {/* Onde decorative */}
-      <div className="left-0 w-full overflow-hidden">
+      <div className="left-0 w-full overflow-hidden" id="top">
         <svg 
           viewBox="0 0 1200 120" 
           preserveAspectRatio="none" 

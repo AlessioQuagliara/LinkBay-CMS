@@ -196,12 +196,14 @@ export const Footer: React.FC = () => (
           La tua flotta di negozi ti aspetta.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            to="/register"
+          <a
+            href="http://localhost:3003/register"
+            target="_blank"
+            rel="noopener noreferrer"
             className="px-8 py-3 bg-[#ff5758] text-white rounded-xl hover:bg-[#e04e4e] transition-colors duration-300 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
           >
             Inizia Trial Gratuito
-          </Link>
+          </a>
           <Link
             to="/contact"
             className="px-8 py-3 border border-[#ff5758] text-[#ff5758] rounded-xl hover:bg-[#ff5758] hover:text-white transition-all duration-300 font-medium"

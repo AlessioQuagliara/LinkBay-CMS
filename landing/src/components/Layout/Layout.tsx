@@ -12,7 +12,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
       {/* aggiunto padding-top per evitare che l'header fisso copra il contenuto */}
-      <main className="flex-1 pt-16 md:pt-20">
+      <main className="flex-1 pt-16 md:pt-20" id="top">
         {children}
       </main>
       <Cookie />

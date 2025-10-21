@@ -42,11 +42,12 @@
 ```
 ✅ Frontend Landing:    ████████████████░░  85% Advanced
 ✅ Frontend Agency:     ████████████████░░  85% Advanced
+✅ Frontend Management: ██████████████████  100% Complete
 🚧 Frontend Customer:   ████████░░░░░░░░░░  40% In Progress
 🚧 Frontend Websites:   ████████░░░░░░░░░░  40% In Progress
 ✅ Backend Services:    ██████████████████  100% Complete
 ✅ Shared Components:   ████████████████░░  80% Advanced
-🎯 Overall:             ████████████████░░  85% ADVANCED DEVELOPMENT
+🎯 Overall:             ████████████████░░  87% ADVANCED DEVELOPMENT
 ```
 
 ### 🎪 Architettura Multi-Frontend
@@ -55,9 +56,10 @@ La piattaforma è strutturata con frontend specializzati e un backend scalabile:
 
 1. **Landing** (`landing/`) → Sito marketing e presentazione
 2. **Agency** (`agency/`) → Dashboard per agenzie e team
-3. **Customer** (`customer/`) → Portale clienti e gestione servizi
-4. **Websites** (`websites/`) → Gestione siti web e contenuti
-5. **Backend** (`backend/`) → API RESTful con architettura SOLID
+3. **Management** (`management/`) → Gestionale agenzie (login/register)
+4. **Customer** (`customer/`) → Portale clienti e gestione servizi
+5. **Websites** (`websites/`) → Gestione siti web e contenuti
+6. **Backend** (`backend/`) → API RESTful con architettura SOLID
 
 ### 📦 Repository Contents
 
@@ -65,6 +67,7 @@ Questo repository contiene il **sistema completo LinkBay CMS**:
 
 - **Frontend Landing** (`landing/`): Sito marketing ottimizzato SEO
 - **Frontend Agency** (`agency/`): Dashboard amministrativa con Shopify-style UI
+- **Frontend Management** (`management/`): Gestionale agenzie con autenticazione
 - **Frontend Customer** (`customer/`): Portale self-service per clienti
 - **Frontend Websites** (`websites/`): Gestione siti web e contenuti
 - **Backend Services** (`backend/`): API scalabile con PostgreSQL + Prisma
@@ -100,8 +103,9 @@ npm run dev      # Backend su http://localhost:3000
 # In terminali separate - Frontend
 cd ../landing && npm install && npm run dev    # Landing su http://localhost:3001
 cd ../agency && npm install && npm run dev     # Agency su http://localhost:3002
-cd ../customer && npm install && npm run dev   # Customer su http://localhost:3003
-cd ../websites && npm install && npm run dev   # Websites su http://localhost:3004
+cd ../management && npm install && npm run dev # Management su http://localhost:3003
+cd ../customer && npm install && npm run dev   # Customer su http://localhost:3004
+cd ../websites && npm install && npm run dev   # Websites su http://localhost:3005
 ```
 
 ### 🌐 Access Points
@@ -111,13 +115,14 @@ Once running, access:
 - **Backend API**: http://localhost:3000
 - **Landing**: http://localhost:3001
 - **Agency Dashboard**: http://localhost:3002
-- **Customer Portal**: http://localhost:3003
-- **Website Manager**: http://localhost:3004
+- **Management Portal**: http://localhost:3003
+- **Customer Portal**: http://localhost:3004
+- **Website Manager**: http://localhost:3005
 
 ### 🔐 Credenziali Demo
 
 ```
-Admin: admin@linkbaycms.com / admin123
+Admin: admin@linkbay-cms.com / admin123
 Agency: demo@agency.com / demo123
 ```
 
@@ -134,17 +139,17 @@ Agency: demo@agency.com / demo123
                       │
           ┌───────────┼───────────┐
           │           │           │
-┌─────────▼──┐ ┌─────▼─────┐ ┌───▼──────┐ ┌─────▼──────┐
-│   Landing  │ │   Agency  │ │ Customer  │ │  Websites  │
-│   (SEO)    │ │ (Dashboard)│ │ (Portal)  │ │  (CMS)     │
-│ • Marketing│ │ • Admin    │ │ • Client  │ │ • Content  │
-│ • Contact  │ │ • Stats    │ │ • Orders  │ │ • Editor   │
-│ • SEO Opt. │ │ • Users    │ │ • Support │ │ • Media    │
-└────────────┘ └────────────┘ └───────────┘ └────────────┘
-      │            │            │            │
-      └────────────┼────────────┼────────────┘
-                   │            │
-         ┌─────────▼────────────▼────────────┐
+┌─────────▼──┐ ┌─────▼─────┐ ┌───▼──────┐ ┌─────▼──────┐ ┌─────▼──────┐
+│   Landing  │ │   Agency  │ │Management │ │ Customer  │ │  Websites  │
+│   (SEO)    │ │ (Dashboard)│ │  (Auth)   │ │ (Portal)  │ │  (CMS)     │
+│ • Marketing│ │ • Admin    │ │ • Login    │ │ • Client  │ │ • Content  │
+│ • Contact  │ │ • Stats    │ │ • Register │ │ • Orders  │ │ • Editor   │
+│ • SEO Opt. │ │ • Users    │ │ • Portal   │ │ • Support │ │ • Media    │
+└────────────┘ └────────────┘ └───────────┘ └───────────┘ └────────────┘
+      │            │            │            │            │
+      └────────────┼────────────┼────────────┼────────────┘
+                   │            │            │
+         ┌─────────▼────────────▼────────────▼────────────┐
          │        Shared Components           │
          │  • UI Components (DRY)            │
          │  • TypeScript Types               │
@@ -193,6 +198,11 @@ Agency: demo@agency.com / demo123
 | **Tailwind CSS** | Styling | 3.4+ |
 | **React Router DOM** | Routing | 7.9+ |
 | **Lucide React** | Icons | Latest |
+
+#### 🎨 Frontend Management (Porta 3003)
+- **React Hook Form** - Form validation avanzata
+- **Zod** - Schema validation TypeScript-first
+- **SEO Hooks** - Gestione meta tags e noindex per privacy
 
 ### Backend (✅ Complete)
 
@@ -251,7 +261,26 @@ LinkBay-CMS/
 │   ├── package.json
 │   └── vite.config.ts
 │
-├── 👥 customer/                    # Portale Clienti (WIP)
+├── � management/                  # Gestionale Agenzie (Auth Portal)
+│   ├── src/
+│   │   ├── components/            # Componenti auth riutilizzabili
+│   │   ├── pages/
+│   │   │   ├── auth/             # Login e registrazione
+│   │   │   │   ├── LoginPage.tsx # Form login professionale
+│   │   │   │   └── RegisterPage.tsx # Registrazione agenzia
+│   │   │   ├── dashboard/        # Dashboard post-login
+│   │   │   ├── clients/          # Gestione clienti
+│   │   │   ├── websites/         # Gestione siti web
+│   │   │   └── billing/          # Fatturazione
+│   │   ├── hooks/                # SEO hooks e utilities
+│   │   └── utils/                # Helper functions
+│   ├── public/                   # Logo e assets
+│   ├── package.json
+│   ├── vite.config.ts
+│   ├── nginx.conf                # Reverse proxy config
+│   └── README.md                 # Documentazione specifica
+│
+├── �👥 customer/                    # Portale Clienti (WIP)
 │   ├── src/
 │   │   ├── components/            # Componenti portale cliente
 │   │   ├── pages/                # Pagine cliente
@@ -551,7 +580,18 @@ const useSEO = (config) => {
 - ✅ **Componenti riutilizzabili** (DRY principle)
 - ✅ **TypeScript strict** per type safety
 
-### 👥 Customer Portal (40% In Progress)
+### � Management Frontend (100% Complete)
+
+- ✅ **Login professionale** con form validazione avanzata
+- ✅ **Registrazione agenzia** con campi specifici (nome, descrizione, logo)
+- ✅ **SEO configurato** con noindex per privacy delle pagine auth
+- ✅ **UI moderna** con Tailwind CSS e Lucide React icons
+- ✅ **Form validation** con React Hook Form + Zod schemas
+- ✅ **Responsive design** ottimizzato per desktop e mobile
+- ✅ **TypeScript strict** per massima type safety
+- ✅ **Integrazione pronta** con backend API per autenticazione
+
+### �👥 Customer Portal (40% In Progress)
 
 - 🚧 **Profilo cliente personalizzabile**
 - 🚧 **Gestione ordini e servizi**
@@ -578,6 +618,35 @@ const useSEO = (config) => {
 - ✅ **Database seeding** per development
 - ✅ **TypeScript end-to-end** per type safety
 
+### 🔗 Management Frontend Integration
+
+**API Endpoints utilizzati dal Management Frontend:**
+
+```typescript
+// Auth endpoints (già implementati nel backend)
+POST /api/v1/auth/register  // Registrazione nuova agenzia
+POST /api/v1/auth/login     // Login agenzia esistente
+POST /api/v1/auth/refresh   // Refresh access token
+POST /api/v1/auth/logout    // Logout sicuro
+
+// User endpoints (per profilo agenzia)
+GET  /api/v1/users/me       // Recupera dati agenzia corrente
+PUT  /api/v1/users/me       // Aggiorna profilo agenzia
+```
+
+**Flusso di autenticazione:**
+1. **Registrazione**: Form → API register → JWT token → Dashboard
+2. **Login**: Form → API login → JWT token → Dashboard  
+3. **Sessione**: Token salvato in localStorage → Auto-login
+4. **Logout**: Clear localStorage → Redirect to login
+
+**Sicurezza implementata:**
+- ✅ **Token rotation** per refresh automatico
+- ✅ **Password hashing** con bcrypt nel backend
+- ✅ **Input validation** con Zod schemas
+- ✅ **Error handling** user-friendly
+- ✅ **No sensitive data** esposto nel frontend
+
 ---
 
 ## 🚢 Deployment
@@ -597,8 +666,9 @@ npm run dev          # Backend su http://localhost:3000
 # 2. Frontend Setup (terminali separate)
 cd ../landing && npm install && npm run dev    # http://localhost:3001
 cd ../agency && npm install && npm run dev     # http://localhost:3002
-cd ../customer && npm install && npm run dev   # http://localhost:3003
-cd ../websites && npm install && npm run dev   # http://localhost:3004
+cd ../management && npm install && npm run dev # http://localhost:3003
+cd ../customer && npm install && npm run dev   # http://localhost:3004
+cd ../websites && npm install && npm run dev   # http://localhost:3005
 ```
 
 ### Production Build
@@ -647,6 +717,39 @@ cd agency && npm run lint
 # Type checking
 cd agency && npm run type-check
 ```
+
+---
+
+## ⚠️ Note Importanti
+
+### 🔐 Management Frontend
+- **Pagine Auth Private**: Login e registrazione hanno `noindex` per privacy SEO
+- **Token Storage**: JWT salvati in localStorage (considerare httpOnly cookies per produzione)
+- **Form Validation**: Utilizza React Hook Form + Zod per validazione robusta
+- **UI Consistency**: Design system condiviso con altri frontend per coerenza
+- **API Integration**: Pronto per connessione con backend - attualmente mock data
+
+### 🔧 Troubleshooting
+
+**Errore "lucide-react not found"**
+```bash
+cd management
+npm install lucide-react
+npm run dev
+```
+
+**Porta 3003 occupata**
+```bash
+# Cambia porta in vite.config.ts
+export default defineConfig({
+  server: { port: 3006 }
+})
+```
+
+**API Connection Issues**
+- Verifica che backend sia attivo su porta 3000
+- Controlla `VITE_API_URL` nel file `.env`
+- Verifica CORS settings nel backend
 
 ---
 
