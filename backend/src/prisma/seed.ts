@@ -12,10 +12,10 @@ async function main() {
   // Crea utente admin
   const adminPassword = await bcrypt.hash('admin123', 10);
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@linkbaycms.com' },
+    where: { email: 'admin@linkbay-cms.com' },
     update: {},
     create: {
-      email: 'admin@linkbaycms.com',
+      email: 'admin@linkbay-cms.com',
       password: adminPassword,
       name: 'Admin User',
       role: 'ADMIN'
@@ -95,7 +95,7 @@ async function main() {
 
   console.log('\n🎉 Database seeding completed!\n');
   console.log('Login credentials:');
-  console.log('  Admin: admin@linkbaycms.com / admin123');
+  console.log('  Admin: admin@linkbay-cms.com / admin123');
   console.log('  Agency: demo@agency.com / demo123\n');
 }
 

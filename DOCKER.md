@@ -152,7 +152,7 @@ GITHUB_CLIENT_ID=Ov23lifj3WlS1oCtw4xE
 
 # SMTP (configurato)
 SMTP_HOST=smtps.aruba.it
-SMTP_USER=piattaforma@spotexsrl.com
+SMTP_USER=noreply@linkbay-cms.com
 ```
 
 ## 🛡️ Security Features

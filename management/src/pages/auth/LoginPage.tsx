@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Ship, Lock, Mail, Eye, EyeOff, Compass, Waves } from "lucide-react";
-import { useSEO } from "../hooks/useSimpleSEO";
+import { useSEO } from "../../hooks/useSimpleSEO";
 
 export const LoginPage: React.FC = () => {
   // SEO per la pagina di login (con noindex per privacy)
   useSEO({
     title: "Accedi",
     description: "Accedi alla dashboard LinkBay CMS per gestire i siti web dei tuoi clienti. Area riservata per agenzie e team autorizzati.",
-    keywords: "login linkbay, accesso dashboard, area riservata agenzia"
+    keywords: "login linkbay, accesso dashboard, area riservata agenzia",
+    noindex: true
   });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

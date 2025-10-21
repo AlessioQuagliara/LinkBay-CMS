@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="3000" height="3000" viewBox="0 0 3000 3000">
+  <defs>
+    <clipPath id="clip-favicon">
+      <rect width="3000" height="3000"/>
+    </clipPath>
+  </defs>
+  <g id="favicon" clip-path="url(#clip-favicon)">
+    <rect id="Rettangolo_3" data-name="Rettangolo 3" width="2500" height="2500" rx="600" transform="translate(250 250)" fill="#ff5759"/>
+    <text id="LB" transform="translate(910.5 1818)" fill="#fff" stroke="#fff" stroke-width="20" font-size="1000" font-family="Electrolize-Regular, Electrolize"><tspan x="0" y="0">LB</tspan></text>
+  </g>
+</svg>

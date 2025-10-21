@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Ship, Lock, Mail, Eye, EyeOff, User, Building, Check, Waves, Anchor } from "lucide-react";
-import { useSEO } from "../hooks/useSimpleSEO";
+import { useSEO } from "../../hooks/useSimpleSEO";
 
 export const RegisterPage: React.FC = () => {
   // SEO per la registrazione
   useSEO({
     title: "Registrati",
     description: "Registra la tua agenzia su LinkBay CMS. Prova gratuita 14 giorni per gestire tutti i siti dei tuoi clienti da un'unica piattaforma.",
-    keywords: "registrazione linkbay, prova gratuita cms, signup agenzia, trial gratuito"
+    keywords: "registrazione linkbay, prova gratuita cms, signup agenzia, trial gratuito",
+    noindex: true
   });
   const [form, setForm] = useState({ 
     name: "", 

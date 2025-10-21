@@ -66,20 +66,24 @@ export const Header: React.FC = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-3">
-            <Link
-              to="/login"
+            <a
+              href="http://localhost:3003/login"
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-5 py-2.5 text-sm font-medium text-[#343a4D] hover:text-[#ff5758] transition-colors duration-300 hover:scale-105 transform no-underline"
             >
               Sign In
-            </Link>
-            <Link
-              to="/register"
+            </a>
+            <a
+              href="http://localhost:3003/register"
+              target="_blank"
+              rel="noopener noreferrer"
               className="relative px-6 py-2.5 text-sm font-medium text-white bg-[#ff5758] rounded-xl hover:bg-[#e04e4e] transition-all duration-300 transform hover:scale-105 hover:shadow-lg shadow-md group overflow-hidden no-underline"
             >
               <span className="relative z-10">Start Free Trial</span>
               <div className="absolute inset-0 bg-[#e04e4e] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="absolute top-0 -inset-full w-full h-full bg-gradient-to-r from-transparent via-white to-transparent transform skew-x-12 group-hover:animate-shine transition-all duration-1000"></div>
-            </Link>
+            </a>
           </div>
 
           {/* Mobile menu button */}
@@ -123,20 +127,24 @@ export const Header: React.FC = () => {
               </Link>
             ))}
             <div className="pt-4 border-t border-gray-200/50 space-y-3">
-              <Link
-                to="/login"
+              <a
+                href="http://localhost:3003/login"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="block px-4 py-3 text-base font-medium text-[#343a4D] hover:text-[#ff5758] hover:bg-gray-50 rounded-xl transition-all duration-300 no-underline"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Sign In
-              </Link>
-              <Link
-                to="/register"
+              </a>
+              <a
+                href="http://localhost:3003/register"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="block px-4 py-3 text-base font-medium text-center text-white bg-[#ff5758] rounded-xl hover:bg-[#e04e4e] transition-all duration-300 transform hover:scale-105 shadow-md no-underline"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Start Free Trial
-              </Link>
+              </a>
             </div>
           </div>
         </div>
