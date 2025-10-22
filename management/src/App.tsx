@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Layout } from './components/Layout'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import DashboardPage from './pages/dashboard/DashboardPage'
@@ -11,18 +12,18 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Auth Routes */}
+        {/* Auth Routes - No Layout */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* Protected Routes */}
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/clients" element={<ClientsPage />} />
-        <Route path="/websites" element={<WebsitesPage />} />
-        <Route path="/billing" element={<BillingPage />} />
+        {/* Protected Routes - With Layout */}
+        <Route path="/" element={<Layout><DashboardPage /></Layout>} />
+        <Route path="/clients" element={<Layout><ClientsPage /></Layout>} />
+        <Route path="/websites" element={<Layout><WebsitesPage /></Layout>} />
+        <Route path="/billing" element={<Layout><BillingPage /></Layout>} />
 
         {/* 404 */}
-        <Route path="*" element={<NotFoundPage />} />
+        <Route path="*" element={<Layout><NotFoundPage /></Layout>} />
       </Routes>
     </Router>
   )
