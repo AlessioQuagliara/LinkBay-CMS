@@ -13,7 +13,7 @@ import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
-import Agency from '#models/agency'
+import UserManager from '#models/user_manager'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -21,11 +21,9 @@ const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
 })
 
 export default class User extends compose(BaseModel, AuthFinder) {
-  // ===== PRIMARY KEY =====
-  @column({ isPrimary: true })
-  declare id: string
+  @column({ isPrimary: true, columnName: 'user_id' })
+  declare id: number
 
-  // ===== BASIC FIELDS =====
   @column()
   declare name: string
 
@@ -36,22 +34,19 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare password: string
 
   @column()
-  declare role: 'AGENCY' | 'ADMIN'
+  declare role: 'agency' | 'admin' | 'superadmin'
 
-  @column()
+  @column({ columnName: 'is_active' })
   declare isActive: boolean
 
-  // ===== TIMESTAMPS =====
-  @column.dateTime({ autoCreate: true })
+  @column.dateTime({ autoCreate: true, columnName: 'created_at' })
   declare createdAt: DateTime
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  @column.dateTime({ autoCreate: true, autoUpdate: true, columnName: 'updated_at' })
   declare updatedAt: DateTime
 
-  // ===== RELATIONSHIPS =====
-  @hasMany(() => Agency)
-  declare agencies: HasMany<typeof Agency>
+  @hasMany(() => UserManager, { foreignKey: 'userId' })
+  declare managerRoles: HasMany<typeof UserManager>
 
-  // ===== AUTH TOKENS =====
   static accessTokens = DbAccessTokensProvider.forModel(User)
 }
