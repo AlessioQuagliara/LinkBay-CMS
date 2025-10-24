@@ -12,7 +12,6 @@ export default defineConfig({
   |
   */
   experimental: {
-    mergeMultipartFieldsAndFiles: true,
     shutdownInReverseOrder: true,
   },
 

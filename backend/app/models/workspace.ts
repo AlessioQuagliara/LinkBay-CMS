@@ -10,7 +10,7 @@ import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import AgencyTenant from '#models/agency_tenant'
 
 export default class Workspace extends BaseModel {
-  static table = 'workspace'
+  static table = 'workspaces'
 
   @column({ isPrimary: true, columnName: 'workspace_id' })
   declare workspaceId: string

@@ -43,17 +43,23 @@ new Ignitor(APP_ROOT, { importer: IMPORTER })
   })
   .testRunner()
   .configure(async (app) => {
-    const { runnerHooks, ...config } = await import('../tests/bootstrap.js')
+    const { runnerHooks, ...config } = await import('../tests/bootstrap')
 
     processCLIArgs(process.argv.splice(2))
-    configure({
-      ...app.rcFile.tests,
-      ...config,
-      ...{
-        setup: runnerHooks.setup,
-        teardown: runnerHooks.teardown.concat([() => app.terminate()]),
-      },
-    })
+    const testConfig = Object.fromEntries(
+      Object.entries({
+        ...config,
+        ...{
+          setup: runnerHooks.setup,
+          teardown: runnerHooks.teardown.concat([() => app.terminate()]),
+        },
+        suites: app.rcFile.tests?.suites || [],
+        forceExit: app.rcFile.tests?.forceExit ?? false,
+        timeout: app.rcFile.tests?.timeout ?? 2000,
+      }).filter(([_, value]) => value !== undefined)
+    )
+
+    configure(testConfig as any)
   })
   .run(() => run())
   .catch((error) => {
