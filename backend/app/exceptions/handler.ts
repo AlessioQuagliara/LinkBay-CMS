@@ -13,6 +13,33 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * response to the client
    */
   async handle(error: unknown, ctx: HttpContext) {
+    // Handle database errors
+    if (error && typeof error === 'object' && 'code' in error) {
+      const dbError = error as any
+
+      // Handle unique constraint violations
+      if (dbError.code === '23505') {
+        return ctx.response.status(409).json({
+          success: false,
+          error: {
+            message: 'Resource already exists',
+            code: 'DUPLICATE_ENTRY'
+          }
+        })
+      }
+
+      // Handle foreign key constraint violations
+      if (dbError.code === '23503') {
+        return ctx.response.status(400).json({
+          success: false,
+          error: {
+            message: 'Invalid reference',
+            code: 'FOREIGN_KEY_VIOLATION'
+          }
+        })
+      }
+    }
+
     return super.handle(error, ctx)
   }
 

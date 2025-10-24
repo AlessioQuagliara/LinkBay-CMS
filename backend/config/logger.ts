@@ -12,7 +12,7 @@ const loggerConfig = defineConfig({
   loggers: {
     app: {
       enabled: true,
-      name: env.get('APP_NAME'),
+      name: env.get('APP_NAME') || 'app',
       level: env.get('LOG_LEVEL'),
       transport: {
         targets: targets()

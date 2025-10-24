@@ -12,7 +12,7 @@ import Website from '#models/website'
 import DomainMap from '#models/domain_map'
 
 export default class AgencyTenant extends BaseModel {
-  static table = 'agency_tenant'
+  static table = 'agency_tenants'
 
   @column({ isPrimary: true, columnName: 'agency_id' })
   declare agencyId: string
