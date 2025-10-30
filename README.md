@@ -2,7 +2,7 @@
 
 
 
-**Ciao! Sono LinkBay, il tuo compagno per gestire siti web e clienti in modo semplice e professionale.****Ciao! Sono LinkBay, il tuo compagno per gestire siti web e clienti in modo semplice e professionale.**
+**Ciao! Sono LinkBay, il tuo compagno per gestire siti web e clienti in modo semplice e professionale.**
 
 
 
