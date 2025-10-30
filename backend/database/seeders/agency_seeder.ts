@@ -4,9 +4,34 @@ import Workspace from '#models/workspace'
 
 export default class extends BaseSeeder {
   async run() {
+    // Crea agenzia default
+    const defaultAgency = await AgencyTenant.create({
+      name: 'default', // Nome che corrisponde al subdomain
+      status: 'active',
+      whiteLabelConfig: {
+        primaryColor: '#343a4D',
+        logoUrl: 'https://example.com/logo.png',
+        companyName: 'LinkBay CMS',
+        customDomain: 'linkbay-cms.com',
+      },
+      subscriptionTier: 'professional',
+      maxWebsites: 10,
+    })
+
+    await Workspace.create({
+      agencyId: defaultAgency.agencyId,
+      slug: 'default-workspace',
+      name: 'Default Workspace',
+      config: {
+        timezone: 'Europe/Rome',
+        language: 'it',
+        currency: 'EUR',
+      },
+    })
+
     // Crea agenzia demo
     const agency = await AgencyTenant.create({
-      name: 'Agenzia Demo Srl',
+      name: 'demo', // Nome che corrisponde al subdomain
       status: 'active',
       whiteLabelConfig: {
         primaryColor: '#3B82F6',
@@ -32,7 +57,7 @@ export default class extends BaseSeeder {
 
     // Crea altre agenzie demo
     const agency2 = await AgencyTenant.create({
-      name: 'Web Solutions Italia',
+      name: 'websolutions', // Nome che corrisponde al subdomain
       status: 'active',
       whiteLabelConfig: {
         primaryColor: '#10B981',

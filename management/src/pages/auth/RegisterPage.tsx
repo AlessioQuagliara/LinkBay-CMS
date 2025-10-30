@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Ship, Lock, Mail, Eye, EyeOff, User, Building, Check, Waves, Anchor } from "lucide-react";
 import { useSEO } from "../../hooks/useSimpleSEO";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const RegisterPage: React.FC = () => {
   // SEO per la registrazione
@@ -11,6 +12,9 @@ export const RegisterPage: React.FC = () => {
     keywords: "registrazione linkbay, prova gratuita cms, signup agenzia, trial gratuito",
     noindex: true
   });
+
+  const { register } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState({ 
     name: "", 
     email: "", 
@@ -41,14 +45,14 @@ export const RegisterPage: React.FC = () => {
     setError(null);
 
     try {
-      // Simulazione chiamata API
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Qui chiamata API per nuova agency
-      console.log("Registration attempt:", form);
-      setSent(true);
-    } catch (err) {
-      setError("Errore durante la registrazione. Riprova.");
+      await register({
+        name: form.name,
+        email: form.email,
+        password: form.password
+      });
+      navigate("/");
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Errore durante la registrazione. Riprova.");
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +89,7 @@ export const RegisterPage: React.FC = () => {
             </div>
 
             <Link
-              to="/login"
+              to="/"
               className="inline-flex items-center justify-center w-full py-3 px-6 font-semibold rounded-xl bg-[#ff5758] text-white hover:bg-[#e04e4e] transition-colors duration-300"
             >
               <img src="/logo-white.svg" alt="LinkBay" className="h-5 w-auto mr-2" />

@@ -1,54 +1,342 @@
-# 🚀 LinkBay CMS - Multi-Frontend Web Management Platform
+# 🌊 LinkBay CMS# 🌊 LinkBay CMS
 
-<div align="center">
 
-**Piattaforma Multi-Frontend per la Gestione Completa di Siti Web e Clienti**
 
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-black)](https://github.com/AlessioQuagliara/LinkBay-CMS)
-[![Built with SOLID](https://img.shields.io/badge/Built%20with-SOLID-blue)](https://en.wikipedia.org/wiki/SOLID)
-[![Built with DRY](https://img.shields.io/badge/Built%20with-DRY-green)](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)
-[![Follows KISS](https://img.shields.io/badge/Follows-KISS-red)](https://en.wikipedia.org/wiki/KISS_principle)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-blue)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-20+-green)](https://nodejs.org/)
-[![React](https://img.shields.io/badge/React-18.3+-blue)](https://reactjs.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue)](https://www.postgresql.org/)
-[![Status](https://img.shields.io/badge/Status-Advanced_Development-orange)](#status)
+**Ciao! Sono LinkBay, il tuo compagno per gestire siti web e clienti in modo semplice e professionale.****Ciao! Sono LinkBay, il tuo compagno per gestire siti web e clienti in modo semplice e professionale.**
 
-</div>
 
----
 
-## 📋 Indice
+LinkBay CMS è una piattaforma pensata per le agenzie di marketing che vogliono offrire ai propri clienti un servizio completo di gestione siti web. Immagina di avere tutto sotto controllo: dai clienti ai siti, dalla fatturazione alle statistiche, tutto in un unico posto facile da usare.LinkBay CMS è una piattaforma pensata per le agenzie di marketing che vogliono offrire ai propri clienti un servizio completo di gestione siti web. Immagina di avere tutto sotto controllo: dai clienti ai siti, dalla fatturazione alle statistiche, tutto in un unico posto facile da usare.
 
-- [Panoramica](#-panoramica)
-- [Quick Start](#-quick-start)
-- [Architettura](#-architettura)
-- [Stack Tecnologico](#-stack-tecnologico)
-- [Struttura del Progetto](#-struttura-del-progetto)
-- [Backend API](#-backend-api)
-- [Funzionalità](#-funzionalità)
-- [Principi di Design](#-principi-di-design)
-- [Deployment](#-deployment)
-- [Licenza e Copyright](#-licenza-e-copyright)
 
----
 
-## 🎯 Panoramica
+------
 
-**LinkBay CMS** è una piattaforma moderna multi-frontend che offre soluzioni complete per la gestione di siti web, clienti e contenuti attraverso interfacce dedicate per diverse tipologie di utenti.
 
-### 📊 Status di Sviluppo
 
-```
-✅ Frontend Landing:    ████████████████░░  85% Advanced
-✅ Frontend Agency:     ████████████████░░  85% Advanced
-✅ Frontend Management: ██████████████████  100% Complete
-🚧 Frontend Customer:   ████████░░░░░░░░░░  40% In Progress
-🚧 Frontend Websites:   ████████░░░░░░░░░░  40% In Progress
-✅ Backend Services:    ██████████████████  100% Complete
-✅ Shared Components:   ████████████████░░  80% Advanced
-🎯 Overall:             ████████████████░░  87% ADVANCED DEVELOPMENT
-```
+## ✨ Cosa fa LinkBay?## ✨ Cosa fa LinkBay?
+
+
+
+### Per le Agenzie### Per le Agenzie
+
+- **Gestisci i tuoi clienti** in un'interfaccia dedicata- **Gestisci i tuoi clienti** in un'interfaccia dedicata
+
+- **Crea e modifica siti web** velocemente- **Crea e modifica siti web** velocemente
+
+- **Tieni traccia delle fatture** e dei pagamenti- **Tieni traccia delle fatture** e dei pagamenti
+
+- **Lavora in team** con colleghi e collaboratori- **Lavora in team** con colleghi e collaboratori
+
+
+
+### Per i Clienti### Per i Clienti
+
+- **Accedi al tuo portale personale** per vedere i tuoi siti- **Accedi al tuo portale personale** per vedere i tuoi siti
+
+- **Richiedi modifiche** o nuovi contenuti- **Richiedi modifiche** o nuovi contenuti
+
+- **Controlla lo stato** dei tuoi progetti- **Controlla lo stato** dei tuoi progetti
+
+
+
+### Per Tutti### Per Tutti
+
+- **Siti web pubblicati** automaticamente- **Siti web pubblicati** automaticamente
+
+- **Sicurezza garantita** con isolamento dei dati- **Sicurezza garantita** con isolamento dei dati
+
+- **Velocità e affidabilità** grazie a tecnologie moderne- **Velocità e affidabilità** grazie a tecnologie moderne
+
+
+
+------
+
+
+
+## 🚀 Come iniziare## 🚀 Come iniziare
+
+
+
+### Prerequisiti### Prerequisiti
+
+- **Node.js** versione 20 o superiore- **Node.js** versione 20 o superiore
+
+- **PostgreSQL** versione 17 o superiore- **PostgreSQL** versione 15 o superiore
+
+- **Yarn** per gestire i pacchetti- **Yarn** per gestire i pacchetti
+
+
+
+### Installazione Rapida### Installazione Rapida
+
+
+
+1. **Clona il progetto**1. **Clona il progetto**
+
+   ```bash   ```bash
+
+   git clone https://github.com/AlessioQuagliara/LinkBay-CMS.git   git clone https://github.com/AlessioQuagliara/LinkBay-CMS.git
+
+   cd LinkBay-CMS   cd LinkBay-CMS
+
+   ```   ```
+
+
+
+2. **Installa le dipendenze**2. **Installa le dipendenze**
+
+   ```bash   ```bash
+
+   # Backend   # Backend
+
+   cd backend && yarn install   cd backend && yarn install
+
+
+
+   # Frontend Landing   # Frontend Landing
+
+   cd ../landing && yarn install   cd ../landing && yarn install
+
+
+
+   # Frontend Management   # Frontend Management
+
+   cd ../management && yarn install   cd ../management && yarn install
+
+   ```   ```
+
+
+
+3. **Configura il database**3. **Configura il database**
+
+   ```bash   ```bash
+
+   # Crea database PostgreSQL   # Crea database PostgreSQL
+
+   createdb linkbaycms   createdb linkbaycms
+
+
+
+   # Esegui migrazioni   # Esegui migrazioni
+
+   cd backend && node ace migration:run   cd backend && node ace migration:run
+
+   ```   ```
+
+
+
+4. **Avvia i servizi**4. **Avvia i servizi**
+
+   ```bash   ```bash
+
+   # Terminale 1: Backend   # Terminale 1: Backend
+
+   cd backend && node ace serve   cd backend && node ace serve
+
+
+
+   # Terminale 2: Landing page   # Terminale 2: Landing page
+
+   cd landing && yarn dev   cd landing && yarn dev
+
+
+
+   # Terminale 3: Dashboard agenzia   # Terminale 3: Dashboard agenzia
+
+   cd management && yarn dev   cd management && yarn dev
+
+   ```   ```
+
+
+
+5. **Apri nel browser**5. **Apri nel browser**
+
+   - Landing: http://localhost:3001   - Landing: http://localhost:3001
+
+   - Dashboard: http://localhost:3003   - Dashboard: http://localhost:3003
+
+   - API: http://localhost:3000   - API: http://localhost:3000
+
+
+
+------
+
+
+
+## 🏗️ Come funziona dentro## 🏗️ Come funziona dentro
+
+
+
+LinkBay è costruito con un'architettura moderna e scalabile:LinkBay è costruito con un'architettura moderna e scalabile:
+
+
+
+### Il Cervello (Backend)### Il Cervello (Backend)
+
+- **AdonisJS**: Framework Node.js potente e sicuro- **AdonisJS**: Framework Node.js potente e sicuro
+
+- **PostgreSQL**: Database affidabile per i tuoi dati- **PostgreSQL**: Database affidabile per i tuoi dati
+
+- **API REST**: Interfacce pulite per comunicare con i frontend- **API REST**: Interfacce pulite per comunicare con i frontend
+
+
+
+### Le Interfacce (Frontend)### Le Interfacce (Frontend)
+
+- **Landing Page**: Il volto pubblico del tuo business- **Landing Page**: Il volto pubblico del tuo business
+
+- **Dashboard Agenzie**: Dove gestisci tutto- **Dashboard Agenzie**: Dove gestisci tutto
+
+- **Portale Clienti**: Per i tuoi clienti finali- **Portale Clienti**: Per i tuoi clienti finali
+
+- **Siti Pubblicati**: I siti web dei tuoi clienti- **Siti Pubblicati**: I siti web dei tuoi clienti
+
+
+
+### La Sicurezza### La Sicurezza
+
+- **Isolamento completo**: Ogni agenzia ha i suoi dati separati- **Isolamento completo**: Ogni agenzia ha i suoi dati separati
+
+- **Autenticazione sicura**: Login protetto con token- **Autenticazione sicura**: Login protetto con token
+
+- **Controllo accessi**: Solo chi deve vedere, vede- **Controllo accessi**: Solo chi deve vedere, vede
+
+
+
+------
+
+
+
+## 📊 Stato del Progetto## 📊 Stato del Progetto
+
+
+
+Ecco dove siamo con lo sviluppo:Ecco dove siamo con lo sviluppo:
+
+
+
+### ✅ Completato al 100%### ✅ Completato al 100%
+
+- **🌐 Landing Page**: Sito pubblico bello e funzionale- **🌐 Landing Page**: Sito pubblico bello e funzionale
+
+- **🔧 Backend Core**: API solide e sicure- **🔧 Backend Core**: API solide e sicure
+
+
+
+### 🚧 In Sviluppo (~49%)### 🚧 In Sviluppo (49%)
+
+- **🎛️ Dashboard Agenzie**: Gestione clienti e siti- **🎛️ Dashboard Agenzie**: Gestione clienti e siti
+
+- **👥 Portale Clienti**: Area riservata per i clienti- **👥 Portale Clienti**: Area riservata per i clienti
+
+- **🌍 Siti Pubblicati**: Generatore automatico di siti- **🌍 Siti Pubblicati**: Generatore automatico di siti
+
+- **📱 App Mobile**: Versione mobile (futuro)- **📱 App Mobile**: Versione mobile (futuro)
+
+
+
+### 🎯 Prossimi Passi### 🎯 Prossimi Passi
+
+- Completare le dashboard mancanti- Completare le dashboard mancanti
+
+- Aggiungere pagamenti automatici- Aggiungere pagamenti automatici
+
+- Migliorare l'esperienza utente- Migliorare l'esperienza utente
+
+- Preparare per il lancio pubblico- Preparare per il lancio pubblico
+
+
+
+------
+
+
+
+## 🛠️ Tecnologie Usate## 🛠️ Tecnologie Usate
+
+
+
+- **Frontend**: React, TypeScript, Tailwind CSS- **Frontend**: React, TypeScript, Tailwind CSS
+
+- **Backend**: AdonisJS, Node.js, PostgreSQL- **Backend**: AdonisJS, Node.js, PostgreSQL
+
+- **Deployment**: Docker, Nginx, CI/CD- **Deployment**: Docker, Nginx, CI/CD
+
+- **Testing**: Jest, Cypress per qualità garantita- **Testing**: Jest, Cypress per qualità garantita
+
+
+
+------
+
+
+
+## 🤝 Vuoi Contribuire?## 🤝 Vuoi Contribuire?
+
+
+
+LinkBay cresce grazie alla comunità! Se vuoi aiutare:LinkBay cresce grazie alla comunità! Se vuoi aiutare:
+
+
+
+1. **Segnala bug** o **idee** nelle Issues1. **Segnala bug** o **idee** nelle Issues
+
+2. **Proponi modifiche** con Pull Request2. **Proponi modifiche** con Pull Request
+
+3. **Condividi** il progetto con amici3. **Condividi** il progetto con amici
+
+
+
+### Come contribuire al codice### Come contribuire al codice
+
+1. Fork del repository1. Fork del repository
+
+2. Crea un branch per la tua feature2. Crea un branch per la tua feature
+
+3. Scrivi test per le tue modifiche3. Scrivi test per le tue modifiche
+
+4. Fai commit e push4. Fai commit e push
+
+5. Apri una Pull Request5. Apri una Pull Request
+
+
+
+------
+
+
+
+## 📄 Licenza## 📄 Licenza
+
+
+
+Questo progetto è **privato** e protetto da copyright. Tutti i diritti riservati a **Alessio Quagliara**.Questo progetto è **privato** e protetto da copyright. Tutti i diritti riservati a **Alessio Quagliara**.
+
+
+
+Per informazioni commerciali o partnership, contatta l'autore.Per informazioni commerciali o partnership, contatta l'autore.
+
+
+
+------
+
+
+
+## 🙋‍♂️ Chi c'è dietro?## 🙋‍♂️ Chi c'è dietro?
+
+
+
+**Alessio Quagliara** - Sviluppatore full-stack appassionato di web e tecnologia. LinkBay è il mio progetto per dimostrare come la tecnologia può semplificare la vita delle agenzie di marketing.**Alessio Quagliara** - Sviluppatore full-stack appassionato di web e tecnologia. LinkBay è il mio progetto per dimostrare come la tecnologia può semplificare la vita delle agenzie di marketing.
+
+
+
+*Con ❤️ e tanto ☕ per rendere il web un posto migliore.**Con ❤️ e tanto ☕ per rendere il web un posto migliore.*
+
+
+
+------
+
+
+
+*LinkBay CMS - Il tuo ponte verso il successo digitale* 🌉*LinkBay CMS - Il tuo ponte verso il successo digitale* 🌉
 
 ### 🎪 Architettura Multi-Frontend
 
@@ -70,7 +358,7 @@ Questo repository contiene il **sistema completo LinkBay CMS**:
 - **Frontend Management** (`management/`): Gestionale agenzie con autenticazione
 - **Frontend Customer** (`customer/`): Portale self-service per clienti
 - **Frontend Websites** (`websites/`): Gestione siti web e contenuti
-- **Backend Services** (`backend/`): API scalabile con PostgreSQL + Prisma
+- **Backend Services** (`backend/`): API scalabile con PostgreSQL + Lucid ORM
 - **Shared Libraries** (`shared/`): Componenti e configurazioni condivise
 
 ---
@@ -95,9 +383,8 @@ cd LinkBay-CMS
 cd backend
 npm install
 # Configura .env con DATABASE_URL
-npm run prisma:generate
-npm run prisma:migrate
-npm run db:seed  # (opzionale) dati demo
+node ace migration:run
+node ace db:seed  # (opzionale) dati demo
 npm run dev      # Backend su http://localhost:3000
 
 # In terminali separate - Frontend
@@ -168,7 +455,7 @@ Agency: demo@agency.com / demo123
          │  │ • Auth • User • CRUD    │  │
          │  └─────────────────────────┘  │
          │  ┌─────────────────────────┐  │
-         │  │   Database (Prisma)    │  │
+         │  │   Database (Lucid ORM) │  │
          │  │ • PostgreSQL • ORM     │  │
          │  └─────────────────────────┘  │
          └───────────────────────────────┘
@@ -209,23 +496,22 @@ Agency: demo@agency.com / demo123
 | Tecnologia | Uso | Versione |
 |------------|-----|----------|
 | **Node.js** | Runtime | 20+ |
-| **TypeScript** | Linguaggio | 5.9+ |
-| **Express** | Web Framework | 4.21+ |
-| **Prisma** | ORM | 6.2+ |
-| **PostgreSQL** | Database | 15+ |
+| **AdonisJS** | Web Framework | 6.0+ |
+| **Lucid ORM** | Database ORM | Latest |
+| **PostgreSQL** | Database | 17+ |
 | **JWT** | Authentication | 9.0+ |
 | **bcrypt** | Password Hashing | 5.1+ |
-| **Zod** | Validation | 3.24+ |
+| **VineJS** | Validation | Latest |
 | **CORS** | Cross-Origin | 2.8+ |
 
 ### Development Tools
 
 | Tecnologia | Uso |
 |------------|-----|
-| **tsx** | TypeScript Runner |
+| **Ace** | AdonisJS Command Runner |
 | **ESLint** | Code Linting |
 | **Prettier** | Code Formatting |
-| **Prisma Studio** | Database UI |
+| **Lucid Studio** | Database UI (opzionale) |
 | **Husky** | Git Hooks |
 
 ---
@@ -297,38 +583,29 @@ LinkBay-CMS/
 │   └── vite.config.ts
 │
 ├── 🔗 backend/                     # ⭐ BACKEND API (SOLID Complete)
-│   ├── prisma/
-│   │   └── schema.prisma          # Database schema PostgreSQL
-│   ├── src/
-│   │   ├── config/                # Configurazioni centralizzate
-│   │   │   ├── database.ts        # Prisma client singleton
-│   │   │   └── jwt.ts             # JWT utilities
+│   ├── app/
 │   │   ├── controllers/           # HTTP request handlers
-│   │   │   ├── auth.controller.ts # Auth endpoints
-│   │   │   └── user.controller.ts # User management
-│   │   ├── middlewares/           # Express middlewares
-│   │   │   ├── auth.middleware.ts # JWT authentication
-│   │   │   ├── error.middleware.ts# Error handling
-│   │   │   └── validate.middleware.ts # Zod validation
-│   │   ├── routes/                # API routes
-│   │   │   ├── auth.routes.ts     # Auth routes
-│   │   │   ├── user.routes.ts     # User routes
-│   │   │   └── index.ts           # Route aggregator
+│   │   │   ├── auth_controller.ts # Auth endpoints
+│   │   │   └── user_controller.ts # User management
+│   │   ├── models/                # Lucid ORM models
+│   │   │   ├── user.ts            # User model
+│   │   │   └── agency.ts          # Agency model
 │   │   ├── services/              # Business logic (SOLID)
-│   │   │   ├── auth.service.ts    # Authentication logic
-│   │   │   └── user.service.ts    # User CRUD operations
-│   │   ├── types/                 # TypeScript types
-│   │   │   └── index.ts           # Shared types
-│   │   ├── validators/            # Zod schemas
-│   │   │   └── schemas.ts         # Input validation
-│   │   ├── prisma/
-│   │   │   └── seed.ts            # Database seeding
-│   │   └── server.ts              # Express server setup
+│   │   │   ├── auth_service.ts    # Authentication logic
+│   │   │   └── user_service.ts    # User CRUD operations
+│   │   ├── validators/            # VineJS schemas
+│   │   │   └── auth_validator.ts  # Input validation
+│   │   └── middleware/            # AdonisJS middlewares
+│   ├── database/
+│   │   └── migrations/            # Lucid migrations
+│   ├── config/                    # AdonisJS configuration
+│   ├── start/                     # Application bootstrap
+│   ├── tests/                     # Test suite
 │   ├── .env.example
 │   ├── package.json
 │   ├── tsconfig.json
-│   ├── README.md                  # Backend documentation
-│   └── SETUP.md                   # Setup guide
+│   ├── ace.js                     # Ace command runner
+│   └── server.ts                  # AdonisJS server setup
 │
 ├── 📄 LICENSE                      # Licenza del progetto
 ├── 📖 README.md                    # Questo file
@@ -346,7 +623,7 @@ Il package `shared/` contiene:
 
 ### 🔗 Backend Architecture - SOLID Principles
 
-Il backend segue i principi **SOLID**:
+Il backend segue i principi **SOLID** con **AdonisJS + Lucid ORM**:
 
 - ✅ **Single Responsibility**: Ogni service/modulo ha una sola responsabilità
 - ✅ **Open/Closed**: Estensibile senza modificare codice esistente
@@ -360,7 +637,7 @@ Il backend segue i principi **SOLID**:
 
 ### Database Schema
 
-```prisma
+
 // Modelli principali
 User (Agency/Admin)
 ├── id, email, password (hashed), name, role
@@ -442,10 +719,11 @@ curl http://localhost:3000/api/v1/users/me \
 
 - ✅ **JWT Authentication** con refresh token rotation
 - ✅ **Password Hashing** con bcrypt (10 rounds)
-- ✅ **Input Validation** con Zod schemas
+- ✅ **Input Validation** con VineJS schemas
 - ✅ **CORS Protection** configurabile
 - ✅ **Error Sanitization** in produzione
-- ✅ **SQL Injection Protection** via Prisma ORM
+- ✅ **SQL Injection Protection** via Lucid ORM
+- ✅ **Type Safety** end-to-end con TypeScript
 
 ---
 
@@ -465,7 +743,7 @@ class UserController {
 // ✅ CORRECT: Separazione chiara
 class AuthController { /* Solo HTTP handling */ }
 class AuthService { /* Solo business logic */ }
-class PrismaUser { /* Solo database operations */ }
+class UserModel { /* Solo database operations */ }
 ```
 
 **Dependency Inversion**
@@ -570,7 +848,7 @@ const useSEO = (config) => {
 - ✅ **Cookie consent** GDPR compliant
 - ✅ **Performance ottimizzata** con lazy loading
 
-### 🏢 Agency Dashboard (85% Complete)
+### 🏢 Agency Dashboard (35% Complete)
 
 - ✅ **Dashboard con statistiche** e metriche in tempo reale
 - ✅ **Shopify-style UI** con sidebar fissa e header moderno
@@ -609,13 +887,13 @@ const useSEO = (config) => {
 
 ### 🔗 Backend API (100% Complete)
 
-- ✅ **Architettura SOLID** completamente implementata
+- ✅ **Architettura SOLID** completamente implementata con AdonisJS
 - ✅ **Autenticazione JWT** con refresh token
-- ✅ **Database PostgreSQL** con Prisma ORM
-- ✅ **API RESTful** con validazione Zod
+- ✅ **Database PostgreSQL** con Lucid ORM
+- ✅ **API RESTful** con validazione VineJS
 - ✅ **Gestione errori centralizzata**
 - ✅ **Middleware sicuri** (CORS, auth, validation)
-- ✅ **Database seeding** per development
+- ✅ **Database migrations** con Ace
 - ✅ **TypeScript end-to-end** per type safety
 
 ### 🔗 Management Frontend Integration
@@ -643,7 +921,7 @@ PUT  /api/v1/users/me       // Aggiorna profilo agenzia
 **Sicurezza implementata:**
 - ✅ **Token rotation** per refresh automatico
 - ✅ **Password hashing** con bcrypt nel backend
-- ✅ **Input validation** con Zod schemas
+- ✅ **Input validation** con VineJS schemas
 - ✅ **Error handling** user-friendly
 - ✅ **No sensitive data** esposto nel frontend
 
@@ -658,9 +936,8 @@ PUT  /api/v1/users/me       // Aggiorna profilo agenzia
 cd backend
 npm install
 cp .env.example .env  # Configura DATABASE_URL
-npm run prisma:generate
-npm run prisma:migrate
-npm run db:seed       # (opzionale) dati demo
+node ace migration:run
+node ace db:seed       # (opzionale) dati demo
 npm run dev          # Backend su http://localhost:3000
 
 # 2. Frontend Setup (terminali separate)

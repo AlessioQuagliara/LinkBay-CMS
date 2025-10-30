@@ -13,14 +13,15 @@ export default class UsersController {
    * Lista tutti gli utenti
    */
   async index({ request, response }: HttpContext) {
-    const page = request.input('page', 1)
-    const limit = request.input('limit', 20)
+    return response.ok({ message: 'Users endpoint working' })
+    // const page = request.input('page', 1)
+    // const limit = request.input('limit', 20)
 
-    const users = await User.query()
-      .preload('managerRoles')
-      .paginate(page, limit)
+    // const users = await User.query()
+    //   // .preload('managerRoles')
+    //   .paginate(page, limit)
 
-    return response.ok(users)
+    // return response.ok(users)
   }
 
   /**

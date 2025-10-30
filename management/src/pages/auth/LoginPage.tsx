@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Ship, Lock, Mail, Eye, EyeOff, Compass, Waves } from "lucide-react";
 import { useSEO } from "../../hooks/useSimpleSEO";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const LoginPage: React.FC = () => {
   // SEO per la pagina di login (con noindex per privacy)
@@ -11,6 +12,9 @@ export const LoginPage: React.FC = () => {
     keywords: "login linkbay, accesso dashboard, area riservata agenzia",
     noindex: true
   });
+
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -29,14 +33,10 @@ export const LoginPage: React.FC = () => {
     setError(null);
 
     try {
-      // Simulazione chiamata API
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Qui chiamata backend per login
-      console.log("Login attempt:", { email, password });
-      alert("Demo: login backend non implementato");
-    } catch (err) {
-      setError("Errore durante il login. Riprova.");
+      await login(email, password);
+      navigate("/");
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Errore durante il login. Riprova.");
     } finally {
       setIsLoading(false);
     }
