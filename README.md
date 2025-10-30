@@ -48,11 +48,6 @@ Ciao! Sono **LinkBay**, il tuo compagno intelligente per trasformare la gestione
 
 </div>
 
-# 🌊 LinkBay CMS
-
-
-
-**Ciao! Sono LinkBay, il tuo compagno per gestire siti web e clienti in modo semplice e professionale.**
 
 
 
@@ -178,34 +173,31 @@ LinkBay è costruito con un'architettura moderna e scalabile:
 
 ### Il Cervello (Backend)
 
-- **AdonisJS**: Framework Node.js potente e sicuro- **AdonisJS**: Framework Node.js potente e sicuro
+- **AdonisJS**: Framework Node.js potente e sicuro
 
-- **PostgreSQL**: Database affidabile per i tuoi dati- **PostgreSQL**: Database affidabile per i tuoi dati
+- **PostgreSQL**: Database affidabile per i tuoi dati
 
-- **API REST**: Interfacce pulite per comunicare con i frontend- **API REST**: Interfacce pulite per comunicare con i frontend
-
+- **API REST**: Interfacce pulite per comunicare con i frontend- 
 
 
 ### Le Interfacce (Frontend)
 
-- **Landing Page**: Il volto pubblico del tuo business- **Landing Page**: Il volto pubblico del tuo business
+- **Landing Page**: Il volto pubblico del tuo business- 
 
-- **Dashboard Agenzie**: Dove gestisci tutto- **Dashboard Agenzie**: Dove gestisci tutto
+- **Dashboard Agenzie**: Dove gestisci tutto
 
-- **Portale Clienti**: Per i tuoi clienti finali- **Portale Clienti**: Per i tuoi clienti finali
+- **Portale Clienti**: Per i tuoi clienti finali
 
-- **Siti Pubblicati**: I siti web dei tuoi clienti- **Siti Pubblicati**: I siti web dei tuoi clienti
-
+- **Siti Pubblicati**: I siti web dei tuoi clienti
 
 
 ### La Sicurezza
 
-- **Isolamento completo**: Ogni agenzia ha i suoi dati separati- **Isolamento completo**: Ogni agenzia ha i suoi dati separati
+- **Isolamento completo**: Ogni agenzia ha i suoi dati separati
 
-- **Autenticazione sicura**: Login protetto con token- **Autenticazione sicura**: Login protetto con token
+- **Autenticazione sicura**: Login protetto con token
 
-- **Controllo accessi**: Solo chi deve vedere, vede- **Controllo accessi**: Solo chi deve vedere, vede
-
+- **Controllo accessi**: Solo chi deve vedere, vede
 
 
 ------
@@ -222,21 +214,21 @@ Ecco dove siamo con lo sviluppo:Ecco dove siamo con lo sviluppo:
 
 ### ✅ Completato al 100%
 
-- **🌐 Landing Page**: Sito pubblico bello e funzionale- **🌐 Landing Page**: Sito pubblico bello e funzionale
+- **🌐 Landing Page**: Sito pubblico bello e funzionale
 
-- **🔧 Backend Core**: API solide e sicure- **🔧 Backend Core**: API solide e sicure
+- **🔧 Backend Core**: API solide e sicure
 
 
 
 ### 🚧 In Sviluppo (~49%)
 
-- **🎛️ Dashboard Agenzie**: Gestione clienti e siti- **🎛️ Dashboard Agenzie**: Gestione clienti e siti
+- **🎛️ Dashboard Agenzie**: Gestione clienti e siti
 
-- **👥 Portale Clienti**: Area riservata per i clienti- **👥 Portale Clienti**: Area riservata per i clienti
+- **👥 Portale Clienti**: Area riservata per i clienti
 
-- **🌍 Siti Pubblicati**: Generatore automatico di siti- **🌍 Siti Pubblicati**: Generatore automatico di siti
+- **🌍 Siti Pubblicati**: Generatore automatico di siti
 
-- **📱 App Mobile**: Versione mobile (futuro)- **📱 App Mobile**: Versione mobile (futuro)
+- **📱 App Mobile**: Versione mobile (futuro)
 
 
 
@@ -260,14 +252,13 @@ Ecco dove siamo con lo sviluppo:Ecco dove siamo con lo sviluppo:
 
 
 
-- **Frontend**: React, TypeScript, Tailwind CSS- **Frontend**: React, TypeScript, Tailwind CSS
+- **Frontend**: React, TypeScript, Tailwind CSS
 
-- **Backend**: AdonisJS, Node.js, PostgreSQL- **Backend**: AdonisJS, Node.js, PostgreSQL
+- **Backend**: AdonisJS, Node.js, PostgreSQL
 
-- **Deployment**: Docker, Nginx, CI/CD- **Deployment**: Docker, Nginx, CI/CD
+- **Deployment**: Docker, Nginx, CI/CD
 
-- **Testing**: Jest, Cypress per qualità garantita- **Testing**: Jest, Cypress per qualità garantita
-
+- **Testing**: Jest, Cypress per qualità garantita
 
 
 ------
@@ -282,11 +273,11 @@ LinkBay cresce grazie alla comunità! Se vuoi aiutare:LinkBay cresce grazie alla
 
 
 
-1. **Segnala bug** o **idee** nelle Issues1. **Segnala bug** o **idee** nelle Issues
+1. **Segnala bug** o **idee** nelle Issues1.
 
-2. **Proponi modifiche** con Pull Request2. **Proponi modifiche** con Pull Request
+2. **Proponi modifiche** con Pull Request2. 
 
-3. **Condividi** il progetto con amici3. **Condividi** il progetto con amici
+3. **Condividi** il progetto con amici3.
 
 
 
@@ -312,12 +303,9 @@ LinkBay cresce grazie alla comunità! Se vuoi aiutare:LinkBay cresce grazie alla
 
 
 
-Questo progetto è **privato** e protetto da copyright. Tutti i diritti riservati a **Alessio Quagliara**.Questo progetto è **privato** e protetto da copyright. Tutti i diritti riservati a **Alessio Quagliara**.
+Questo progetto è **privato** e protetto da copyright. Tutti i diritti riservati a **Alessio Quagliara**.
 
-
-
-Per informazioni commerciali o partnership, contatta l'autore.Per informazioni commerciali o partnership, contatta l'autore.
-
+Per informazioni commerciali o partnership, contatta l'autore.
 
 
 ------
@@ -328,13 +316,10 @@ Per informazioni commerciali o partnership, contatta l'autore.Per informazioni c
 
 
 
-**Alessio Quagliara** - Sviluppatore full-stack appassionato di web e tecnologia. LinkBay è il mio progetto per dimostrare come la tecnologia può semplificare la vita delle agenzie di marketing.**Alessio Quagliara** - Sviluppatore full-stack appassionato di web e tecnologia. LinkBay è il mio progetto per dimostrare come la tecnologia può semplificare la vita delle agenzie di marketing.
+**Alessio Quagliara** - Sviluppatore full-stack appassionato di web e tecnologia. LinkBay è il mio progetto per dimostrare come la tecnologia può semplificare la vita delle agenzie di marketing.
 
 
-
-*Con ❤️ e tanto ☕ per rendere il web un posto migliore.**Con ❤️ e tanto ☕ per rendere il web un posto migliore.*
-
-
+**Con ❤️ e tanto ☕ per rendere il web un posto migliore.**
 
 ------
 
