@@ -1,6 +1,7 @@
 // Header.tsx
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 interface HeaderProps {
   onMenuToggle: () => void;
@@ -8,6 +9,8 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   // Funzione per rilevare automaticamente il nome della pagina
   const getPageName = (pathname: string): string => {
@@ -45,6 +48,11 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
   const pageName = getPageName(location.pathname);
   const pageDescription = getPageDescription(location.pathname);
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 fixed top-0 left-0 right-0 z-40 lg:left-64">
       <div className="flex items-center justify-between px-6 py-4">
@@ -64,8 +72,14 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
           <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
             <span className="text-xl">🔔</span>
           </button>
-          <div className="w-8 h-8 bg-[#ff5758] rounded-full flex items-center justify-center">
-            <span className="text-white text-sm font-bold">A</span>
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-700">{user?.name}</span>
+            <button
+              onClick={handleLogout}
+              className="px-3 py-1 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+            >
+              Logout
+            </button>
           </div>
         </div>
       </div>

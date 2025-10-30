@@ -1,10 +1,12 @@
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import User from '#models/user'
+import UserManager from '#models/user_manager'
+import AgencyTenant from '#models/agency_tenant'
 
 export default class extends BaseSeeder {
   async run() {
     // Crea utente admin
-    await User.create({
+    const adminUser = await User.create({
       name: 'Admin LinkBay',
       email: 'admin@linkbay.com',
       password: 'admin123',
@@ -13,7 +15,7 @@ export default class extends BaseSeeder {
     })
 
     // Crea utente agenzia demo
-    await User.create({
+    const demoUser = await User.create({
       name: 'Agenzia Demo',
       email: 'agenzia@demo.com',
       password: 'agenzia123',
@@ -22,28 +24,54 @@ export default class extends BaseSeeder {
     })
 
     // Crea altri utenti demo
-    await User.createMany([
-      {
-        name: 'Mario Rossi',
-        email: 'mario@example.com',
-        password: 'password123',
-        role: 'agency',
-        isActive: true,
-      },
-      {
-        name: 'Laura Bianchi',
-        email: 'laura@example.com',
-        password: 'password123',
-        role: 'agency',
-        isActive: true,
-      },
-      {
-        name: 'Giuseppe Verdi',
-        email: 'giuseppe@example.com',
-        password: 'password123',
-        role: 'agency',
-        isActive: false, // Utente disattivato
-      },
-    ])
+    const marioUser = await User.create({
+      name: 'Mario Rossi',
+      email: 'mario@example.com',
+      password: 'password123',
+      role: 'agency',
+      isActive: true,
+    })
+
+    const lauraUser = await User.create({
+      name: 'Laura Bianchi',
+      email: 'laura@example.com',
+      password: 'password123',
+      role: 'agency',
+      isActive: true,
+    })
+
+    await User.create({
+      name: 'Giuseppe Verdi',
+      email: 'giuseppe@example.com',
+      password: 'password123',
+      role: 'agency',
+      isActive: false, // Utente disattivato
+    })
+
+    // Associa utenti alle agenzie
+    const demoAgency = await AgencyTenant.findBy('name', 'demo')
+    const defaultAgency = await AgencyTenant.findBy('name', 'default')
+
+    if (demoAgency) {
+      await UserManager.create({
+        userId: demoUser.id,
+        agencyId: demoAgency.agencyId,
+        role: 'owner',
+      })
+
+      await UserManager.create({
+        userId: marioUser.id,
+        agencyId: demoAgency.agencyId,
+        role: 'admin',
+      })
+    }
+
+    if (defaultAgency) {
+      await UserManager.create({
+        userId: lauraUser.id,
+        agencyId: defaultAgency.agencyId,
+        role: 'manager',
+      })
+    }
   }
 }

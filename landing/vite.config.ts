@@ -13,6 +13,12 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    port: 3001
+    port: 3001,
+    allowedHosts: [
+      'localhost',
+      '127.0.0.1',
+      'www.linkbay-cms.local',
+      'linkbay-cms.local'
+    ]
   }
 })
