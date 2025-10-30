@@ -1,4 +1,54 @@
-# 🌊 LinkBay CMS# 🌊 LinkBay CMS
+<div align="center">
+
+# 🌊 **LinkBay CMS**
+
+# 🌐 Website: https://www.linkbay-cms.com
+
+### **Il Ponte Verso il Successo Digitale** 🌉
+
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![AdonisJS](https://img.shields.io/badge/AdonisJS-6.0-green.svg)
+![React](https://img.shields.io/badge/React-18.0-blue.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15.0-blue.svg)
+![License](https://img.shields.io/badge/license-Proprietary-orange.svg)
+
+**Gestisci clienti, siti web e fatture in una piattaforma tutto-in-uno per agenzie di marketing**
+
+[🚀 **Inizia Ora**](#-come-iniziare) • [📖 **Documentazione**](#-architettura-del-sistema) • [🤝 **Contribuisci**](#-contribuire)
+
+![Separator](https://user-images.githubusercontent.com/12345678/123456789-abcdef00-1234-5678-90ab-cdef12345678.png)
+
+</div>
+
+## ✨ **Benvenuto in LinkBay!**
+
+Ciao! Sono **LinkBay**, il tuo compagno intelligente per trasformare la gestione dei siti web da caos a opportunità. Progettato specificamente per **agenzie di marketing** che vogliono offrire un servizio completo ai propri clienti.
+
+<div align="center">
+
+### 🎯 **Tutto ciò di cui hai bisogno, in un'unica piattaforma**
+
+| 🏢 **Per Agenzie** | 👥 **Per Clienti** | 🌟 **Per Tutti** |
+|:------------------|:------------------|:----------------|
+| Gestione clienti centralizzata | Portale personale | Siti web automatici |
+| Fatturazione integrata | Richieste di modifica | Sicurezza garantita |
+| Team collaboration | Tracking progetti | Performance ottimali |
+
+</div>
+
+<br>
+
+<div align="center">
+
+**📍 Navigazione Rapida**
+[🏗️ Architettura](#-architettura-del-sistema) • [🚀 Installazione](#-come-iniziare) • [🛠️ Tecnologie](#-stack-tecnologico) • [📊 Progresso](#-stato-del-progetto) • [🤝 Community](#-contribuire)
+
+---
+
+</div>
+
+# 🌊 LinkBay CMS
 
 
 
@@ -6,7 +56,7 @@
 
 
 
-LinkBay CMS è una piattaforma pensata per le agenzie di marketing che vogliono offrire ai propri clienti un servizio completo di gestione siti web. Immagina di avere tutto sotto controllo: dai clienti ai siti, dalla fatturazione alle statistiche, tutto in un unico posto facile da usare.LinkBay CMS è una piattaforma pensata per le agenzie di marketing che vogliono offrire ai propri clienti un servizio completo di gestione siti web. Immagina di avere tutto sotto controllo: dai clienti ai siti, dalla fatturazione alle statistiche, tutto in un unico posto facile da usare.
+LinkBay CMS è una piattaforma pensata per le agenzie di marketing che vogliono offrire ai propri clienti un servizio completo di gestione siti web. Immagina di avere tutto sotto controllo: dai clienti ai siti, dalla fatturazione alle statistiche, tutto in un unico posto facile da usare.
 
 
 
@@ -14,39 +64,31 @@ LinkBay CMS è una piattaforma pensata per le agenzie di marketing che vogliono 
 
 
 
-## ✨ Cosa fa LinkBay?## ✨ Cosa fa LinkBay?
+## ✨ Cosa fa LinkBay?
 
 
 
-### Per le Agenzie### Per le Agenzie
+### Per le Agenzie
 
-- **Gestisci i tuoi clienti** in un'interfaccia dedicata- **Gestisci i tuoi clienti** in un'interfaccia dedicata
-
-- **Crea e modifica siti web** velocemente- **Crea e modifica siti web** velocemente
-
-- **Tieni traccia delle fatture** e dei pagamenti- **Tieni traccia delle fatture** e dei pagamenti
-
-- **Lavora in team** con colleghi e collaboratori- **Lavora in team** con colleghi e collaboratori
+- **Gestisci i tuoi clienti** in un'interfaccia dedicata
+- **Crea e modifica siti web** velocemente
+- **Tieni traccia delle fatture** e dei pagamenti
+- **Lavora in team** con colleghi e collaboratori 
 
 
+### Per i Clienti
 
-### Per i Clienti### Per i Clienti
-
-- **Accedi al tuo portale personale** per vedere i tuoi siti- **Accedi al tuo portale personale** per vedere i tuoi siti
-
-- **Richiedi modifiche** o nuovi contenuti- **Richiedi modifiche** o nuovi contenuti
-
-- **Controlla lo stato** dei tuoi progetti- **Controlla lo stato** dei tuoi progetti
+- **Accedi al tuo portale personale** per vedere i tuoi siti
+- **Richiedi modifiche** o nuovi contenuti
+- **Controlla lo stato** dei tuoi progetti 
 
 
 
-### Per Tutti### Per Tutti
+### Per Tutti
 
-- **Siti web pubblicati** automaticamente- **Siti web pubblicati** automaticamente
-
-- **Sicurezza garantita** con isolamento dei dati- **Sicurezza garantita** con isolamento dei dati
-
-- **Velocità e affidabilità** grazie a tecnologie moderne- **Velocità e affidabilità** grazie a tecnologie moderne
+- **Siti web pubblicati** automaticamente
+- **Sicurezza garantita** con isolamento dei dati
+- **Velocità e affidabilità** grazie a tecnologie moderne 
 
 
 
@@ -54,109 +96,73 @@ LinkBay CMS è una piattaforma pensata per le agenzie di marketing che vogliono 
 
 
 
-## 🚀 Come iniziare## 🚀 Come iniziare
+## 🚀 Come iniziare
 
 
 
-### Prerequisiti### Prerequisiti
+### Prerequisiti
 
-- **Node.js** versione 20 o superiore- **Node.js** versione 20 o superiore
-
-- **PostgreSQL** versione 17 o superiore- **PostgreSQL** versione 15 o superiore
-
-- **Yarn** per gestire i pacchetti- **Yarn** per gestire i pacchetti
+- **Node.js** versione 20 o superiore
+- **PostgreSQL** versione 17 o superiore
+- **Yarn** per gestire i pacchetti
 
 
 
-### Installazione Rapida### Installazione Rapida
+### Installazione Rapida
 
 
 
-1. **Clona il progetto**1. **Clona il progetto**
-
-   ```bash   ```bash
-
-   git clone https://github.com/AlessioQuagliara/LinkBay-CMS.git   git clone https://github.com/AlessioQuagliara/LinkBay-CMS.git
-
-   cd LinkBay-CMS   cd LinkBay-CMS
-
-   ```   ```
+1. **Clona il progetto**
+   ```bash
+   git clone https://github.com/AlessioQuagliara/LinkBay-CMS.git
+   cd LinkBay-CMS
+   ```
 
 
 
-2. **Installa le dipendenze**2. **Installa le dipendenze**
+2. **Installa le dipendenze**
+   ```bash
+   # Backend
+   cd backend && yarn install
 
-   ```bash   ```bash
+   # Frontend Landing
+   cd ../landing && yarn install
 
-   # Backend   # Backend
-
-   cd backend && yarn install   cd backend && yarn install
-
-
-
-   # Frontend Landing   # Frontend Landing
-
-   cd ../landing && yarn install   cd ../landing && yarn install
+   # Frontend Management
+   cd ../management && yarn install
+   ```
 
 
 
-   # Frontend Management   # Frontend Management
+3. **Configura il database**
+   ```bash
+   # Crea database PostgreSQL
+   createdb linkbaycms
 
-   cd ../management && yarn install   cd ../management && yarn install
-
-   ```   ```
-
-
-
-3. **Configura il database**3. **Configura il database**
-
-   ```bash   ```bash
-
-   # Crea database PostgreSQL   # Crea database PostgreSQL
-
-   createdb linkbaycms   createdb linkbaycms
+   # Esegui migrazioni
+   cd backend && node ace migration:run
+   ```
 
 
 
-   # Esegui migrazioni   # Esegui migrazioni
+4. **Avvia i servizi**
+   ```bash
+   # Terminale 1: Backend
+   cd backend && node ace serve
 
-   cd backend && node ace migration:run   cd backend && node ace migration:run
+   # Terminale 2: Landing page
+   cd landing && yarn dev
 
-   ```   ```
-
-
-
-4. **Avvia i servizi**4. **Avvia i servizi**
-
-   ```bash   ```bash
-
-   # Terminale 1: Backend   # Terminale 1: Backend
-
-   cd backend && node ace serve   cd backend && node ace serve
+   # Terminale 3: Dashboard agenzia
+   cd management && yarn dev
+   ```
 
 
 
-   # Terminale 2: Landing page   # Terminale 2: Landing page
-
-   cd landing && yarn dev   cd landing && yarn dev
-
-
-
-   # Terminale 3: Dashboard agenzia   # Terminale 3: Dashboard agenzia
-
-   cd management && yarn dev   cd management && yarn dev
-
-   ```   ```
-
-
-
-5. **Apri nel browser**5. **Apri nel browser**
-
-   - Landing: http://localhost:3001   - Landing: http://localhost:3001
-
-   - Dashboard: http://localhost:3003   - Dashboard: http://localhost:3003
-
-   - API: http://localhost:3000   - API: http://localhost:3000
+5. **Apri nel browser**
+   - Landing: http://localhost:3001
+   - Dashboard: http://localhost:3003
+   - API: http://localhost:3000
 
 
 
@@ -164,15 +170,13 @@ LinkBay CMS è una piattaforma pensata per le agenzie di marketing che vogliono 
 
 
 
-## 🏗️ Come funziona dentro## 🏗️ Come funziona dentro
+## 🏗️ Come funziona dentro
+
+LinkBay è costruito con un'architettura moderna e scalabile:
 
 
 
-LinkBay è costruito con un'architettura moderna e scalabile:LinkBay è costruito con un'architettura moderna e scalabile:
-
-
-
-### Il Cervello (Backend)### Il Cervello (Backend)
+### Il Cervello (Backend)
 
 - **AdonisJS**: Framework Node.js potente e sicuro- **AdonisJS**: Framework Node.js potente e sicuro
 
@@ -182,7 +186,7 @@ LinkBay è costruito con un'architettura moderna e scalabile:LinkBay è costruit
 
 
 
-### Le Interfacce (Frontend)### Le Interfacce (Frontend)
+### Le Interfacce (Frontend)
 
 - **Landing Page**: Il volto pubblico del tuo business- **Landing Page**: Il volto pubblico del tuo business
 
@@ -194,7 +198,7 @@ LinkBay è costruito con un'architettura moderna e scalabile:LinkBay è costruit
 
 
 
-### La Sicurezza### La Sicurezza
+### La Sicurezza
 
 - **Isolamento completo**: Ogni agenzia ha i suoi dati separati- **Isolamento completo**: Ogni agenzia ha i suoi dati separati
 
@@ -208,7 +212,7 @@ LinkBay è costruito con un'architettura moderna e scalabile:LinkBay è costruit
 
 
 
-## 📊 Stato del Progetto## 📊 Stato del Progetto
+## 📊 Stato del Progetto
 
 
 
@@ -216,7 +220,7 @@ Ecco dove siamo con lo sviluppo:Ecco dove siamo con lo sviluppo:
 
 
 
-### ✅ Completato al 100%### ✅ Completato al 100%
+### ✅ Completato al 100%
 
 - **🌐 Landing Page**: Sito pubblico bello e funzionale- **🌐 Landing Page**: Sito pubblico bello e funzionale
 
@@ -224,7 +228,7 @@ Ecco dove siamo con lo sviluppo:Ecco dove siamo con lo sviluppo:
 
 
 
-### 🚧 In Sviluppo (~49%)### 🚧 In Sviluppo (49%)
+### 🚧 In Sviluppo (~49%)
 
 - **🎛️ Dashboard Agenzie**: Gestione clienti e siti- **🎛️ Dashboard Agenzie**: Gestione clienti e siti
 
@@ -236,7 +240,7 @@ Ecco dove siamo con lo sviluppo:Ecco dove siamo con lo sviluppo:
 
 
 
-### 🎯 Prossimi Passi### 🎯 Prossimi Passi
+### 🎯 Prossimi Passi
 
 - Completare le dashboard mancanti- Completare le dashboard mancanti
 
@@ -252,7 +256,7 @@ Ecco dove siamo con lo sviluppo:Ecco dove siamo con lo sviluppo:
 
 
 
-## 🛠️ Tecnologie Usate## 🛠️ Tecnologie Usate
+## 🛠️ Stack Tecnologico
 
 
 
@@ -270,7 +274,7 @@ Ecco dove siamo con lo sviluppo:Ecco dove siamo con lo sviluppo:
 
 
 
-## 🤝 Vuoi Contribuire?## 🤝 Vuoi Contribuire?
+## 🤝 Vuoi Contribuire?
 
 
 
@@ -304,7 +308,7 @@ LinkBay cresce grazie alla comunità! Se vuoi aiutare:LinkBay cresce grazie alla
 
 
 
-## 📄 Licenza## 📄 Licenza
+## 📄 Licenza
 
 
 
@@ -320,7 +324,7 @@ Per informazioni commerciali o partnership, contatta l'autore.Per informazioni c
 
 
 
-## 🙋‍♂️ Chi c'è dietro?## 🙋‍♂️ Chi c'è dietro?
+## 🙋‍♂️ Chi c'è dietro?
 
 
 
@@ -336,7 +340,7 @@ Per informazioni commerciali o partnership, contatta l'autore.Per informazioni c
 
 
 
-*LinkBay CMS - Il tuo ponte verso il successo digitale* 🌉*LinkBay CMS - Il tuo ponte verso il successo digitale* 🌉
+*LinkBay CMS - Il tuo ponte verso il successo digitale* 🌉
 
 ### 🎪 Architettura Multi-Frontend
 
@@ -858,7 +862,7 @@ const useSEO = (config) => {
 - ✅ **Componenti riutilizzabili** (DRY principle)
 - ✅ **TypeScript strict** per type safety
 
-### � Management Frontend (100% Complete)
+### � Management Frontend (10% Complete)
 
 - ✅ **Login professionale** con form validazione avanzata
 - ✅ **Registrazione agenzia** con campi specifici (nome, descrizione, logo)
@@ -869,7 +873,7 @@ const useSEO = (config) => {
 - ✅ **TypeScript strict** per massima type safety
 - ✅ **Integrazione pronta** con backend API per autenticazione
 
-### �👥 Customer Portal (40% In Progress)
+### �👥 Customer Portal (4% In Progress)
 
 - 🚧 **Profilo cliente personalizzabile**
 - 🚧 **Gestione ordini e servizi**
@@ -877,7 +881,7 @@ const useSEO = (config) => {
 - 🚧 **Dashboard self-service**
 - 🚧 **Fatturazione e pagamenti**
 
-### 🌐 Website Manager (40% In Progress)
+### 🌐 Website Manager (4% In Progress)
 
 - 🚧 **Editor di contenuti WYSIWYG**
 - 🚧 **Gestione media e risorse**
@@ -885,7 +889,7 @@ const useSEO = (config) => {
 - 🚧 **Pubblicazione e deployment**
 - 🚧 **Content management system**
 
-### 🔗 Backend API (100% Complete)
+### 🔗 Backend API (10% Complete)
 
 - ✅ **Architettura SOLID** completamente implementata con AdonisJS
 - ✅ **Autenticazione JWT** con refresh token
@@ -1075,7 +1079,7 @@ Questo progetto è rilasciato sotto **[LICENZA CUSTOM]** (vedi file `LICENSE`).
 ## 📞 Supporto
 
 - 📧 Email: quagliara.alessio@outlook.com
-- 🌐 Website: https://www.linkbay-cms.com
+- 🌐 Website: https://www.alessioquagliara.com
 - 📱 LinkedIn: [Alessio Quagliara](https://www.linkedin.com/in/alessio-quagliara-a1a91b1a8/)
 
 ---
