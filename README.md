@@ -25,3 +25,7 @@ Per avvio backend in sviluppo:
 bash''''
 cd cartella && npm run dev
 ''''
+
+## Architettura software
+Per visionare l'architettura rendere conto a questo file
+[visualizza architettura] (ARCHITECTURE.md)
