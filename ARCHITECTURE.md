@@ -10,7 +10,9 @@ Questa è la parte fondamentale dove si andranno a registrare le agenzie/softwar
 
 L'agency/software house può registrarsi su https://www.linkbay-cms.com/register
 
+### Flowchart Frontend
 ![frontend](stream/in/release/register_frontend.png)
+### Flowchart Backend
 ![backend](stream/in/release/register_backend.png)
 
 ## Login - tenant_agency
