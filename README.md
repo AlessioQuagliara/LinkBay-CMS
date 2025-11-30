@@ -33,4 +33,4 @@ Per visionare l'architettura rendere conto a questo file
 
 ## Schema Database
 Il Database è stato fatto adoperando PostgreSQL, molto veloce, stabile e scalabile
-[visualizza database schema](BD-SCHEMAS.md)
+[visualizza database schema](DB_SCHEMAS.md)
