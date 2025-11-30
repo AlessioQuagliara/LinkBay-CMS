@@ -1,6 +1,11 @@
-# Node.js dependencies (anywhere in the tree)
+# Node.js dependencies 
 node_modules/
 **/node_modules/
+
+# Python dependencies
+venv/
+**/venv/
+
 
 # Environment files (local credentials)
 .env
