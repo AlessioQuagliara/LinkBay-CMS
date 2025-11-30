@@ -10,7 +10,7 @@ Questa è la parte fondamentale dove si andranno a registrare le agenzie/softwar
 
 L'agency/software house può registrarsi su https://www.linkbay-cms.com/register
 
-[visualizza il flowchart] (stream/in/register_tenant_agency.drawio)
+[visualizza il flowchart](stream/in/register_tenant_agency.drawio)
 
 ## Login - tenant_agency
 Una volta registrate avranno accesso al loro tenant personalizzato inviato via email. 
@@ -21,7 +21,7 @@ Ogni agenzia/softwarehouse ha il proprio tenant, esempio su "Agenzia Alfa":
     4) L'agenzia accede al portale con le proprie credenziali come utente ROLE==superadmin;
     5) Grazie al multitenant c'è un filtro che garantisce isolamento dati e una esperienza da personalizzare.
 
-[visualizza il flowchart] (stream/in/login_tenant_agency.drawio)
+[visualizza il flowchart](stream/in/login_tenant_agency.drawio)
 
 ## Dashboard - tenant_agency
 Una volta entrati come superadmin qui entra in gioco la super-personalizzazione del loro "WorkSapce" e l'aggiunta del team:
@@ -30,4 +30,4 @@ Una volta entrati come superadmin qui entra in gioco la super-personalizzazione 
     3) tornando a superadmin, potrà personalizzare il workspace con il proprio logo, i propri colori e la propria disposizione degli elementi;
     4) avrà accesso ad un gestionale interno per scadenziari lavori e assegnazione degli stessi.
 
-[visualizza il flowchart] (stream/in/dashboard_tenant_agency.drawio)
+[visualizza il flowchart](stream/in/dashboard_tenant_agency.drawio)
