@@ -29,3 +29,8 @@ cd cartella && npm run dev
 ## Architettura software
 Per visionare l'architettura rendere conto a questo file
 [visualizza architettura](ARCHITECTURE.md)
+
+
+## Schema Database
+Il Database è stato fatto adoperando PostgreSQL, molto veloce, stabile e scalabile
+[visualizza database schema](BD-SCHEMAS.md)
