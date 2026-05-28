@@ -48,11 +48,9 @@ Il focus non e' solo tecnico: e' aiutare chi costruisce business digitali a lavo
 
 ### Backend
 
-- Framework Labels: FastAPI
+- Framework Labels: Laravel
 - Database Labels: PostgreSQL
 - Cache Labels: Redis
-- ORM Labels: SQLAlchemy
-- Migration Labels: Alembic
 - Billing Labels: Stripe
 - Security Labels: JWT, CSRF, Session Management, RBAC
 
@@ -67,8 +65,8 @@ Il focus non e' solo tecnico: e' aiutare chi costruisce business digitali a lavo
 
 - Container Labels: Docker, Docker Compose
 - Routing Labels: Traefik
-- Automation Labels: n8n
-- LLM Gateway Labels: LiteLLM
+- Automation Labels: NODE-RED
+- LLM Gateway Labels: TensorFlow
 
 ## Stato del progetto
 

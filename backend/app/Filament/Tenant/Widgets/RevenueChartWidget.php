@@ -13,13 +13,32 @@ class RevenueChartWidget extends ChartWidget
     protected int|string|array $columnSpan = 'full';
     protected static string $color = 'warning';
 
+    protected function getFilters(): ?array
+    {
+        return [
+            '7' => 'Ultimi 7 giorni',
+            '30' => 'Ultimi 30 giorni',
+            '90' => 'Ultimi 3 mesi',
+            'year' => 'Quest\'anno',
+        ];
+    }
+
     protected function getData(): array
     {
+        $filter = $this->getFilterValue('period') ?? '30';
+
+        $days = match ($filter) {
+            '7' => 6,
+            '90' => 89,
+            'year' => 364,
+            default => 29,
+        };
+
         $data = Order::select(
                 DB::raw('DATE(created_at) as date'),
                 DB::raw('SUM(total) as revenue')
             )
-            ->whereBetween('created_at', [now()->subDays(29), now()])
+            ->whereBetween('created_at', [now()->subDays($days), now()])
             ->whereNotIn('status', ['cancelled', 'refunded'])
             ->groupBy('date')
             ->orderBy('date')
@@ -27,7 +46,7 @@ class RevenueChartWidget extends ChartWidget
 
         $labels = [];
         $values = [];
-        for ($i = 29; $i >= 0; $i--) {
+        for ($i = $days; $i >= 0; $i--) {
             $date = now()->subDays($i)->format('Y-m-d');
             $labels[] = now()->subDays($i)->format('d/m');
             $values[] = round((float) ($data[$date] ?? 0), 2);

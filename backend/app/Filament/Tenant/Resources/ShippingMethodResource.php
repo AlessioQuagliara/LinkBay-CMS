@@ -15,7 +15,7 @@ class ShippingMethodResource extends Resource
 {
     protected static ?string $model = ShippingMethod::class;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-truck';
-    protected static string|\NITENUM|NULL $NAVIGATIONGROUP = 'Impostazioni';
+    protected static string|\UnitEnum|null $navigationGroup = 'Impostazioni';
     protected static ?string $modelLabel = 'Metodo spedizione';
     protected static ?string $pluralModelLabel = 'Metodi spedizione';
 

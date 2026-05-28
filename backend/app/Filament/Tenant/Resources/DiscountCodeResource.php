@@ -16,7 +16,7 @@ class DiscountCodeResource extends Resource
 {
     protected static ?string $model = DiscountCode::class;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
-    protected static string|\NITENUM|NULL $NAVIGATIONGROUP = 'Marketing';
+    protected static string|\UnitEnum|null $navigationGroup = 'Marketing';
     protected static ?string $modelLabel = 'Codice sconto';
     protected static ?string $pluralModelLabel = 'Codici sconto';
 

@@ -14,4 +14,8 @@ class ListProducts extends ListRecords
     {
         return [Actions\CreateAction::make()];
     }
+
+    public function getEmptyStateHeading(): string { return "Nessun prodotto"; }
+    public function getEmptyStateDescription(): string { return "Aggiungi il primo prodotto per iniziare a vendere."; }
+    public function getEmptyStateIcon(): string { return "heroicon-o-shopping-bag"; }
 }

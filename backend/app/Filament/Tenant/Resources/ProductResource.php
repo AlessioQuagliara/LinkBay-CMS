@@ -20,10 +20,27 @@ class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shopping-bag';
-    protected static string|\NITENUM|NULL $NAVIGATIONGROUP = 'Catalogo';
+    protected static string|\UnitEnum|null $navigationGroup = 'Catalogo';
     protected static ?string $modelLabel = 'Prodotto';
     protected static ?string $pluralModelLabel = 'Prodotti';
     protected static ?int $navigationSort = 1;
+
+    public static function getNavigationBadge(): ?string
+    {
+        $count = static::getModel()::where('stock', '<=', 5)->where('is_active', true)->count();
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        $count = static::getModel()::where('stock', 0)->count();
+        return $count > 0 ? 'danger' : 'warning';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Prodotti con stock ≤ 5';
+    }
 
     public static function form(Schema $schema): Schema
     {

@@ -14,7 +14,7 @@ class StoreSettings extends Page
     use InteractsWithForms;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
-    protected static string|\NITENUM|NULL $NAVIGATIONGROUP = 'Impostazioni';
+    protected static string|\UnitEnum|null $navigationGroup = 'Impostazioni';
     protected static ?string $navigationLabel = 'Impostazioni negozio';
     protected string $view = 'filament.tenant.pages.store-settings';
 

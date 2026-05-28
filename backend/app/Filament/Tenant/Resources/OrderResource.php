@@ -17,10 +17,26 @@ class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shopping-cart';
-    protected static string|\NITENUM|NULL $NAVIGATIONGROUP = 'Vendite';
+    protected static string|\UnitEnum|null $navigationGroup = 'Vendite';
     protected static ?string $modelLabel = 'Ordine';
     protected static ?string $pluralModelLabel = 'Ordini';
     protected static ?int $navigationSort = 1;
+
+    public static function getNavigationBadge(): ?string
+    {
+        $count = static::getModel()::where('status', 'pending')->count();
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return 'warning';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Ordini in attesa di conferma';
+    }
 
     public static function form(Schema $schema): Schema
     {
