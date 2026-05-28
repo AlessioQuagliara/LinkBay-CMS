@@ -83,9 +83,11 @@ class Agency extends Model
 
     public function panelDomain(): string
     {
+        // Prefer explicit custom_domain, then legacy domain, then auto-build from slug.
+        // Uses config('app.central_domain') so local and prod follow the same env var (CENTRAL_DOMAIN).
         return $this->custom_domain
             ?? $this->domain
-            ?? ($this->slug . '.' . config('tenancy.central_domains.2', 'linkbay-cms.com'));
+            ?? ($this->slug . '.' . config('app.central_domain', 'linkbay-cms.com'));
     }
 
     public function canUseFeature(string $feature): bool

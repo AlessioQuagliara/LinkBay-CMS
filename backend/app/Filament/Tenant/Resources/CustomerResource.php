@@ -5,11 +5,10 @@ namespace App\Filament\Tenant\Resources;
 use App\Filament\Tenant\Resources\CustomerResource\Pages;
 use App\Models\Tenant\Customer;
 use Filament\Forms;
-use Filament\Schemas\Schema;
-
 use Filament\Infolists;
-
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -30,7 +29,7 @@ class CustomerResource extends Resource
                 ->unique(Customer::class, 'email', ignoreRecord: true),
             Forms\Components\TextInput::make('phone')->label('Telefono'),
 
-            Forms\Components\Section::make('Indirizzo')
+            Section::make('Indirizzo')
                 ->schema([
                     Forms\Components\TextInput::make('address.street')->label('Via / N. civico'),
                     Forms\Components\TextInput::make('address.city')->label('Città'),

@@ -6,11 +6,12 @@ use App\Filament\Tenant\Resources\ProductResource\Pages;
 use App\Models\Tenant\Collection;
 use App\Models\Tenant\Product;
 use Filament\Forms;
-use Filament\Schemas\Schema;
-
 use Filament\Infolists;
-
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -45,14 +46,14 @@ class ProductResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
-            Forms\Components\Section::make('Informazioni base')
+            Section::make('Informazioni base')
                 ->schema([
                     Forms\Components\TextInput::make('name')
                         ->label('Nome')
                         ->required()
                         ->maxLength(255)
                         ->live(onBlur: true)
-                        ->afterStateUpdated(fn ($state, Forms\Set $set) =>
+                        ->afterStateUpdated(fn ($state, Set $set) =>
                             $set('slug', Str::slug($state))
                         ),
                     Forms\Components\TextInput::make('slug')
@@ -85,7 +86,7 @@ class ProductResource extends Resource
                         ->default(true),
                 ])->columns(2),
 
-            Forms\Components\Section::make('Organizzazione')
+            Section::make('Organizzazione')
                 ->schema([
                     Forms\Components\Select::make('collection_id')
                         ->label('Collezione')
@@ -96,7 +97,7 @@ class ProductResource extends Resource
                             Forms\Components\TextInput::make('name')
                                 ->required()
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(fn ($state, Forms\Set $set) =>
+                                ->afterStateUpdated(fn ($state, Set $set) =>
                                     $set('slug', Str::slug($state))
                                 ),
                             Forms\Components\TextInput::make('slug')->required(),
@@ -109,7 +110,7 @@ class ProductResource extends Resource
                         ->label('Metadati aggiuntivi'),
                 ])->columns(2),
 
-            Forms\Components\Section::make('Immagini')
+            Section::make('Immagini')
                 ->schema([
                     Forms\Components\Repeater::make('images')
                         ->label('Immagini prodotto')
