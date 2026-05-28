@@ -1,13 +1,19 @@
 # =============================================================================
-# root/compose.yaml
+# compose.yaml — BASE / PRODUZIONE
+# =============================================================================
+# Usare da solo solo in produzione / staging:
+#   docker compose -f compose.yaml up -d
+#
+# Per sviluppo locale aggiungere l'override:
+#   docker compose -f compose.yaml -f compose.override.local.yml up -d
+#
+# Questo file NON contiene domini .test o localhost.
+# Tutto ciò che è locale-only vive in compose.override.local.yml
 # =============================================================================
 
 services:
 
-# -------------------------------------------------------------------------------
-# TRAEFIK - Reverse Proxy + Multi-domain automatico
-# -------------------------------------------------------------------------------
-
+# ── Traefik ──────────────────────────────────────────────────────────────────
   traefik:
     image: traefik:v3.6.2
     container_name: traefik
@@ -18,10 +24,9 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
-    # HTTPS (abilitare in produzione)
+      # HTTPS — abilitare in produzione con certificato reale
       #- "--entrypoints.websecure.address=:443"
-      #- "--certificatesresolvers.le.acme.httpchallenge=true"
-      #- "--certificatesresolvers.le.acme.httpchallenge.entrypoints=web"
+      #- "--certificatesresolvers.le.acme.tlschallenge=true"
       #- "--certificatesresolvers.le.acme.email=quagliara.alessio@outlook.com"
       #- "--certificatesresolvers.le.acme.storage=/acme.json"
     ports:
@@ -34,10 +39,7 @@ services:
     networks:
       - web
 
-# -------------------------------------------------------------------------------
-# POSTGRES - DB centrale + schemi per tenant
-# -------------------------------------------------------------------------------
-
+# ── PostgreSQL ────────────────────────────────────────────────────────────────
   db:
     image: postgres:16-alpine
     container_name: saas_db
@@ -48,8 +50,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "5432:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -61,17 +61,12 @@ services:
       timeout: 5s
       retries: 5
 
-# -------------------------------------------------------------------------------
-# REDIS - Cache + Queue
-# -------------------------------------------------------------------------------
-
+# ── Redis ─────────────────────────────────────────────────────────────────────
   redis:
     image: redis:7-alpine
     container_name: saas_redis
     restart: unless-stopped
     command: redis-server --appendonly yes
-    ports:
-      - "6379:6379"
     volumes:
       - redis_data:/data
     networks:
@@ -82,10 +77,7 @@ services:
       timeout: 3s
       retries: 3
 
-# -------------------------------------------------------------------------------
-# PHP-FPM - Laravel 11 Backend
-# -------------------------------------------------------------------------------
-
+# ── PHP-FPM (Laravel) ─────────────────────────────────────────────────────────
   php:
     build:
       context: .
@@ -96,7 +88,7 @@ services:
       - .env
       - ./backend/.env
     environment:
-      APP_ENV: ${APP_ENV:-local}
+      APP_ENV: ${APP_ENV:-production}
       DB_CONNECTION: central
       DB_HOST: db
       DB_PORT: 5432
@@ -108,7 +100,15 @@ services:
       QUEUE_CONNECTION: redis
       CACHE_DRIVER: redis
       SESSION_DRIVER: redis
+      # CENTRAL_DOMAIN: governa panelDomain(), RegisterController redirect,
+      # Filament panel domain e Sanctum. In prod impostare nel root .env.
       CENTRAL_DOMAIN: ${CENTRAL_DOMAIN:-linkbay-cms.com}
+      SESSION_DOMAIN: ${SESSION_DOMAIN:-.linkbay-cms.com}
+      # Stripe: le chiavi vengono dal root .env (APP_STRIPE_*) e vengono
+      # rimappate ai nomi che Laravel config/services.php si aspetta.
+      STRIPE_KEY: ${APP_STRIPE_PUBLISHABLE_KEY}
+      STRIPE_SECRET: ${APP_STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${APP_STRIPE_WEBHOOK_SECRET}
     volumes:
       - ./backend:/var/www
       - laravel_storage:/var/www/storage
@@ -121,10 +121,7 @@ services:
     networks:
       - web
 
-# -------------------------------------------------------------------------------
-# NGINX - Web Server per Laravel (serve PHP-FPM)
-# -------------------------------------------------------------------------------
-
+# ── Nginx ─────────────────────────────────────────────────────────────────────
   nginx:
     image: nginx:1.27-alpine
     container_name: saas_nginx
@@ -139,23 +136,13 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.nginx-svc.loadbalancer.server.port=80"
-      # Tenant subdomains: *.linkbay-cms.com
-      - "traefik.http.routers.tenant-api.rule=HostRegexp(`{subdomain:.+}.linkbay-cms.com`)"
-      - "traefik.http.routers.tenant-api.entrypoints=web"
-      - "traefik.http.routers.tenant-api.service=nginx-svc"
-      # Agency/Tenant wildcard locale: *.localhost
-      - "traefik.http.routers.wildcard-local.rule=HostRegexp(`{subdomain:[a-z0-9-]+}.localhost`)"
-      - "traefik.http.routers.wildcard-local.entrypoints=web"
-      - "traefik.http.routers.wildcard-local.service=nginx-svc"
-      # Central API
-      - "traefik.http.routers.central-api.rule=Host(`api.linkbay-cms.com`) || Host(`api.localhost`)"
-      - "traefik.http.routers.central-api.entrypoints=web"
-      - "traefik.http.routers.central-api.service=nginx-svc"
+      # *.linkbay-cms.com → nginx (agency subdomain, tenant subdomain, app, admin)
+      # Traefik v3 RE2 syntax — dots must be escaped, no named capture groups
+      - "traefik.http.routers.prod-wildcard.rule=HostRegexp(`.+\\.linkbay-cms\\.com`)"
+      - "traefik.http.routers.prod-wildcard.entrypoints=web"
+      - "traefik.http.routers.prod-wildcard.service=nginx-svc"
 
-# -------------------------------------------------------------------------------
-# FRONTEND - Next.js Landing/Marketing
-# -------------------------------------------------------------------------------
-
+# ── Frontend (Next.js) ────────────────────────────────────────────────────────
   frontend:
     build:
       context: ./frontend
@@ -176,23 +163,18 @@ services:
       - ./frontend/postcss.config.mjs:/app/postcss.config.mjs
       - ./frontend/tsconfig.json:/app/tsconfig.json
     environment:
-      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://api.localhost}
+      # SSR runtime. Client-side NEXT_PUBLIC_* baked at build via frontend/.env.local
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-https://app.linkbay-cms.com}
     networks:
       - web
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.frontend-svc.loadbalancer.server.port=3000"
-      - "traefik.http.routers.frontend-local.rule=Host(`www.localhost`) || Host(`localhost`)"
-      - "traefik.http.routers.frontend-local.entrypoints=web"
-      - "traefik.http.routers.frontend-local.service=frontend-svc"
-      - "traefik.http.routers.frontend-prod.rule=Host(`www.linkbay-cms.com`) || Host(`linkbay-cms.com`)"
+      - "traefik.http.routers.frontend-prod.rule=Host(`linkbay-cms.com`) || Host(`www.linkbay-cms.com`)"
       - "traefik.http.routers.frontend-prod.entrypoints=web"
       - "traefik.http.routers.frontend-prod.service=frontend-svc"
 
-# -------------------------------------------------------------------------------
-# NODE-RED - Automazioni visive (sostituisce n8n)
-# -------------------------------------------------------------------------------
-
+# ── Node-RED ──────────────────────────────────────────────────────────────────
   nodered:
     image: nodered/node-red:latest
     container_name: saas_nodered
@@ -207,20 +189,15 @@ services:
       - web
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nodered.rule=Host(`nodered.localhost`) || Host(`nodered.linkbay-cms.com`)"
+      - "traefik.http.routers.nodered.rule=Host(`nodered.linkbay-cms.com`)"
       - "traefik.http.routers.nodered.entrypoints=web"
       - "traefik.http.services.nodered.loadbalancer.server.port=1880"
 
-# -------------------------------------------------------------------------------
-# TENSORFLOW SERVING - Inference ML (sostituisce LiteLLM)
-# -------------------------------------------------------------------------------
-
+# ── TensorFlow Serving (opt-in) ───────────────────────────────────────────────
   tensorflow:
     image: tensorflow/serving:latest
     container_name: saas_tensorflow
     restart: unless-stopped
-    # Attivare con: docker compose --profile ml up
-    # Non si avvia nel normale `docker compose up` finché non ci sono modelli.
     profiles: ["ml"]
     environment:
       - MODEL_NAME=${TF_MODEL_NAME:-linkbay_model}
@@ -230,7 +207,7 @@ services:
       - web
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.tensorflow.rule=Host(`tf.localhost`) || Host(`tf.linkbay-cms.com`)"
+      - "traefik.http.routers.tensorflow.rule=Host(`tf.linkbay-cms.com`)"
       - "traefik.http.routers.tensorflow.entrypoints=web"
       - "traefik.http.services.tensorflow.loadbalancer.server.port=8501"
 

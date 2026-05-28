@@ -15,6 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust Traefik reverse proxy so url() / route() generate correct URLs.
+        // '*' = trust all proxies (safe because only Traefik can reach the PHP container).
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'feature' => RequireFeature::class,
             'ai.credits' => CheckAiCredits::class,

@@ -15,9 +15,13 @@ return [
         '127.0.0.1',
         'localhost',
         'api.localhost',
-        env('CENTRAL_DOMAIN', 'linkbay-cms.com'),
-        'api.' . env('CENTRAL_DOMAIN', 'linkbay-cms.com'),
-        'admin.' . env('CENTRAL_DOMAIN', 'linkbay-cms.com'),
+        // Primary domain (env-driven — local=linkbay-cms.test, prod=linkbay-cms.com)
+        env('CENTRAL_DOMAIN', 'linkbay-cms.test'),
+        // Subdomains that serve central panels (not tenant/agency content)
+        'app.'   . env('CENTRAL_DOMAIN', 'linkbay-cms.test'),
+        'admin.' . env('CENTRAL_DOMAIN', 'linkbay-cms.test'),
+        // Legacy — keep for backward compatibility with old api.* routing
+        'api.'   . env('CENTRAL_DOMAIN', 'linkbay-cms.test'),
     ],
 
     /**

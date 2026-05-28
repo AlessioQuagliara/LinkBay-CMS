@@ -53,10 +53,12 @@ class RegisterController extends Controller
 
         $agency->update(['owner_user_id' => $user->id]);
 
-        $agencyDomain = $validated['slug'] . '.' . config('app.central_domain', 'linkbay-cms.com');
+        $agencyDomain = $validated['slug'] . '.' . config('app.central_domain', 'linkbay-cms.test');
 
         if ($status === 'active') {
-            $loginUrl = 'http://' . $agencyDomain . '/dashboard/login';
+            // Derive scheme from APP_URL so HTTP local and HTTPS prod both work.
+            $scheme = parse_url(config('app.url'), PHP_URL_SCHEME) ?? 'http';
+            $loginUrl = $scheme . '://' . $agencyDomain . '/dashboard/login';
             return redirect($loginUrl)->with(
                 'success',
                 'Account creato! Accedi alla tua dashboard.'

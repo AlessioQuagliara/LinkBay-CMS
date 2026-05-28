@@ -1,0 +1,100 @@
+# =============================================================================
+# compose.override.local.yml — LOCALE / DEV (Mac con /etc/hosts .test)
+# =============================================================================
+# Comando locale:
+#   docker compose -f compose.yaml -f compose.override.local.yml up -d
+#
+# Oppure symlink per carico automatico:
+#   ln -sf compose.override.local.yml docker-compose.override.yml
+#   docker compose up -d
+#
+# Cosa fa questo file:
+#   - sovrascrive i default di produzione con valori .test
+#   - aggiunge i router Traefik per i domini .test locali
+#   - espone le porte DB/Redis sull'host per strumenti GUI
+#   - aggiunge debug/log verbose
+#   - ha il Stripe CLI sidecar commentato (decommentare se serve)
+#
+# Domini locali supportati (richiedono /etc/hosts o dnsmasq):
+#   127.0.0.1  linkbay-cms.test
+#   127.0.0.1  app.linkbay-cms.test
+#   127.0.0.1  admin.linkbay-cms.test
+#   127.0.0.1  testagency.linkbay-cms.test
+#   127.0.0.1  clientalpha.linkbay-cms.test
+#
+# Protocollo: HTTP puro (porta 80). Nessun TLS locale.
+# =============================================================================
+
+services:
+
+  php:
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_LOG_LEVEL: debug
+      APP_URL: http://app.linkbay-cms.test
+      FRONTEND_URL: http://linkbay-cms.test
+      CENTRAL_DOMAIN: linkbay-cms.test
+      SESSION_DOMAIN: .linkbay-cms.test
+      SANCTUM_STATEFUL_DOMAINS: "linkbay-cms.test,app.linkbay-cms.test,admin.linkbay-cms.test,testagency.linkbay-cms.test,clientalpha.linkbay-cms.test"
+      # Incolla qui il whsec_... da `stripe listen` (si aggiorna ad ogni riavvio del CLI)
+      # STRIPE_WEBHOOK_SECRET: whsec_INCOLLA_OUTPUT_STRIPE_LISTEN
+
+  frontend:
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://app.linkbay-cms.test
+    labels:
+      # Override: aggiungi i router .test per il frontend locale
+      - "traefik.enable=true"
+      - "traefik.http.services.frontend-svc.loadbalancer.server.port=3000"
+      # linkbay-cms.test → Next.js (landing)
+      - "traefik.http.routers.frontend-test.rule=Host(`linkbay-cms.test`) || Host(`www.linkbay-cms.test`)"
+      - "traefik.http.routers.frontend-test.entrypoints=web"
+      - "traefik.http.routers.frontend-test.service=frontend-svc"
+      # Fallback localhost → Next.js
+      - "traefik.http.routers.frontend-local.rule=Host(`localhost`) || Host(`www.localhost`)"
+      - "traefik.http.routers.frontend-local.entrypoints=web"
+      - "traefik.http.routers.frontend-local.service=frontend-svc"
+
+  nginx:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.nginx-svc.loadbalancer.server.port=80"
+      # *.linkbay-cms.test → nginx → Laravel (agency, tenant, app, admin)
+      # Traefik v3 RE2: dots escaped, no named capture groups
+      - "traefik.http.routers.test-wildcard.rule=HostRegexp(`[a-z0-9-]+\\.linkbay-cms\\.test`)"
+      - "traefik.http.routers.test-wildcard.entrypoints=web"
+      - "traefik.http.routers.test-wildcard.service=nginx-svc"
+      # Fallback localhost → nginx (per curl diretti, Stripe CLI interno, ecc.)
+      - "traefik.http.routers.localhost-nginx.rule=HostRegexp(`[a-z0-9-]+\\.localhost`)"
+      - "traefik.http.routers.localhost-nginx.entrypoints=web"
+      - "traefik.http.routers.localhost-nginx.service=nginx-svc"
+
+  db:
+    # Espone Postgres sull'host per Postico / DBeaver / psql
+    ports:
+      - "5432:5432"
+
+  redis:
+    # Espone Redis sull'host per RedisInsight / redis-cli
+    ports:
+      - "6379:6379"
+
+  # ── Stripe CLI (sidecar opzionale) ───────────────────────────────────────────
+  # Decommentare per forwarding automatico eventi Stripe test al webhook locale.
+  # Richiede APP_STRIPE_SECRET_KEY nel root .env.
+  # Alternativa: eseguire manualmente `stripe listen` nel terminale.
+  #
+  # stripe-cli:
+  #   image: stripe/stripe-cli:latest
+  #   container_name: saas_stripe_cli
+  #   command: >
+  #     listen
+  #     --api-key ${APP_STRIPE_SECRET_KEY}
+  #     --forward-to http://nginx/api/stripe/webhook
+  #     --skip-verify
+  #   networks:
+  #     - web
+  #   depends_on:
+  #     - nginx
+  #   restart: unless-stopped

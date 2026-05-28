@@ -8,6 +8,9 @@ use App\Services\AiCreditsService;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -23,7 +26,7 @@ class AgencyResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
-            Forms\Components\Section::make('Anagrafica')
+            Section::make('Anagrafica')
                 ->schema([
                     Forms\Components\TextInput::make('name')->label('Nome')->required(),
                     Forms\Components\TextInput::make('slug')->label('Slug')->required()
@@ -36,7 +39,7 @@ class AgencyResource extends Resource
                         ->visibleOn('create'),
                 ])->columns(2),
 
-            Forms\Components\Section::make('Piano & Billing')
+            Section::make('Piano & Billing')
                 ->schema([
                     Forms\Components\Select::make('plan_id')
                         ->label('Piano')
@@ -56,7 +59,7 @@ class AgencyResource extends Resource
                         ->live(),
                     Forms\Components\TextInput::make('ltdcode')
                         ->label('Codice AppSumo LTD')
-                        ->visible(fn (Forms\Get $get) => $get('billing_type') === 'lifetime')
+                        ->visible(fn (Get $get) => $get('billing_type') === 'lifetime')
                         ->unique(Agency::class, 'ltdcode', ignoreRecord: true),
                     Forms\Components\Select::make('status')
                         ->options(['active' => 'Attiva', 'suspended' => 'Sospesa', 'cancelled' => 'Cancellata'])
@@ -64,7 +67,7 @@ class AgencyResource extends Resource
                         ->required(),
                 ])->columns(2),
 
-            Forms\Components\Section::make('Stripe Connect')
+            Section::make('Stripe Connect')
                 ->schema([
                     Forms\Components\TextInput::make('stripe_connect_account_id')
                         ->label('Stripe Account ID')

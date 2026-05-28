@@ -33,7 +33,7 @@ class DiscountCodeResource extends Resource
                     Forms\Components\Actions\Action::make('generate')
                         ->label('Genera')
                         ->icon('heroicon-o-arrow-path')
-                        ->action(fn (Forms\Set $set) => $set('code', strtoupper(Str::random(8))))
+                        ->action(fn (Set $set) => $set('code', strtoupper(Str::random(8))))
                 ),
             Forms\Components\Select::make('type')
                 ->label('Tipo')
@@ -49,7 +49,7 @@ class DiscountCodeResource extends Resource
                 ->label('Valore')
                 ->numeric()
                 ->required()
-                ->visible(fn (Forms\Get $get) => $get('type') !== 'free_shipping'),
+                ->visible(fn (Get $get) => $get('type') !== 'free_shipping'),
             Forms\Components\TextInput::make('usage_limit')
                 ->label('Limite utilizzi')
                 ->numeric()
