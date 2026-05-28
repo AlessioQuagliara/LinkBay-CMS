@@ -86,3 +86,6 @@ acme.json
 # Artefatti venv Python macOS
 # ==========================================================
 .python-version
+
+/vendor/
+vendor/
