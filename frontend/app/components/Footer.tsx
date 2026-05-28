@@ -197,7 +197,7 @@ export const Footer: React.FC = () => (
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
-            href="http://localhost:3003/register"
+            href={process.env.NEXT_PUBLIC_AGENCY_REGISTER_URL ?? "http://api.localhost/agency/register"}
             target="_blank"
             rel="noopener noreferrer"
             className="px-8 py-3 bg-[#ff5758] text-white rounded-xl hover:bg-[#e04e4e] transition-colors duration-300 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"

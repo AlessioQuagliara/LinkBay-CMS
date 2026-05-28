@@ -70,7 +70,7 @@ export const Header: React.FC = () => {
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-3">
             <a
-              href="http://localhost:3003/login"
+              href={process.env.NEXT_PUBLIC_AGENCY_LOGIN_URL ?? "http://api.localhost/linkbay-admin"}
               target="_blank"
               rel="noopener noreferrer"
               className="px-5 py-2.5 text-sm font-medium text-[#343a4D] hover:text-[#ff5758] transition-colors duration-300 hover:scale-105 transform no-underline"
@@ -78,7 +78,7 @@ export const Header: React.FC = () => {
               Sign In
             </a>
             <a
-              href="http://localhost:3003/register"
+              href={process.env.NEXT_PUBLIC_AGENCY_REGISTER_URL ?? "http://api.localhost/agency/register"}
               target="_blank"
               rel="noopener noreferrer"
               className="relative px-6 py-2.5 text-sm font-medium text-white bg-[#ff5758] rounded-xl hover:bg-[#e04e4e] transition-all duration-300 transform hover:scale-105 hover:shadow-lg shadow-md group overflow-hidden no-underline"
@@ -131,7 +131,7 @@ export const Header: React.FC = () => {
             ))}
             <div className="pt-4 border-t border-gray-200/50 space-y-3">
               <a
-                href="http://localhost:3003/login"
+                href={process.env.NEXT_PUBLIC_AGENCY_LOGIN_URL ?? "http://api.localhost/linkbay-admin"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block px-4 py-3 text-base font-medium text-[#343a4D] hover:text-[#ff5758] hover:bg-gray-50 rounded-xl transition-all duration-300 no-underline"
@@ -140,7 +140,7 @@ export const Header: React.FC = () => {
                 Sign In
               </a>
               <a
-                href="http://localhost:3003/register"
+                href={process.env.NEXT_PUBLIC_AGENCY_REGISTER_URL ?? "http://api.localhost/agency/register"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block px-4 py-3 text-base font-medium text-center text-white bg-[#ff5758] rounded-xl hover:bg-[#e04e4e] transition-all duration-300 transform hover:scale-105 shadow-md no-underline"

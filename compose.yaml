@@ -143,6 +143,10 @@ services:
       - "traefik.http.routers.tenant-api.rule=HostRegexp(`{subdomain:.+}.linkbay-cms.com`)"
       - "traefik.http.routers.tenant-api.entrypoints=web"
       - "traefik.http.routers.tenant-api.service=nginx-svc"
+      # Agency/Tenant wildcard locale: *.localhost
+      - "traefik.http.routers.wildcard-local.rule=HostRegexp(`{subdomain:[a-z0-9-]+}.localhost`)"
+      - "traefik.http.routers.wildcard-local.entrypoints=web"
+      - "traefik.http.routers.wildcard-local.service=nginx-svc"
       # Central API
       - "traefik.http.routers.central-api.rule=Host(`api.linkbay-cms.com`) || Host(`api.localhost`)"
       - "traefik.http.routers.central-api.entrypoints=web"
