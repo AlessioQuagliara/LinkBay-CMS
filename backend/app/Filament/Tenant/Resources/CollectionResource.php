@@ -16,7 +16,7 @@ class CollectionResource extends Resource
 {
     protected static ?string $model = Collection::class;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-folder';
-    protected static string|\NITENUM|NULL $NAVIGATIONGROUP = 'Catalogo';
+    protected static string|\UnitEnum|null $navigationGroup = 'Catalogo';
     protected static ?string $modelLabel = 'Collezione';
     protected static ?string $pluralModelLabel = 'Collezioni';
     protected static ?int $navigationSort = 2;

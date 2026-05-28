@@ -35,7 +35,7 @@ class TenantPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        [$brandName, $primaryColor, $logoUrl, $hideFooter] = $this->resolveBranding();
+        [$brandName, $primaryColor, $logoUrl, $hideFooter, $faviconUrl] = $this->resolveBranding();
 
         $built = $panel
             ->id('tenant')
@@ -83,11 +83,15 @@ class TenantPanelProvider extends PanelProvider
             ->authMiddleware([Authenticate::class])
             ->renderHook(
                 'panels::footer',
-                fn () => $hideFooter ? '' : '<p class="text-center text-xs text-gray-400 py-2">Powered by <a href="https://linkbay-cms.com" class="underline">LinkBay</a></p>',
+                fn () => $hideFooter ? '' : view('filament.partials.powered-by')->render(),
             );
 
         if ($logoUrl) {
             $built->brandLogo($logoUrl);
+        }
+
+        if ($faviconUrl) {
+            $built->favicon($faviconUrl);
         }
 
         return $built;
@@ -115,6 +119,7 @@ class TenantPanelProvider extends PanelProvider
                 Color::hex($agency->resolvedPrimaryColor()),
                 $agency->logo_url,
                 (bool) ($agency->plan?->limits['hide_linkbay_branding'] ?? false),
+                $agency->favicon_url,
             ];
         }
 
@@ -123,6 +128,6 @@ class TenantPanelProvider extends PanelProvider
             $storeName = \App\Models\Tenant\Setting::get('store_name', 'My Store') ?? 'My Store';
         } catch (\Throwable) {}
 
-        return [$storeName, Color::Amber, null, false];
+        return [$storeName, Color::Amber, null, false, null];
     }
 }
