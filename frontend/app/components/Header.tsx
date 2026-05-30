@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, ChevronDown, Ship } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+import { LogoMark } from './LogoMark';
 
 export const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -40,9 +41,8 @@ export const Header: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3 group">
-            <img src="/stretch-logo-std.png" alt="LinkBay CMS" className="h-12 w-auto" />
-            <span className="sr-only">LinkBay-CMS - Innovative Content Management</span>
+          <Link href="/" className="flex items-center group no-underline">
+            <LogoMark variant="dark" className="text-2xl" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -70,12 +70,12 @@ export const Header: React.FC = () => {
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-3">
             <a
-              href={process.env.NEXT_PUBLIC_AGENCY_LOGIN_URL ?? "http://api.localhost/linkbay-admin"}
+              href={process.env.NEXT_PUBLIC_AGENCY_FINDER_URL ?? "http://app.linkbay-cms.test/agency/find"}
               target="_blank"
               rel="noopener noreferrer"
               className="px-5 py-2.5 text-sm font-medium text-[#343a4D] hover:text-[#ff5758] transition-colors duration-300 hover:scale-105 transform no-underline"
             >
-              Sign In
+              Login
             </a>
             <a
               href={process.env.NEXT_PUBLIC_AGENCY_REGISTER_URL ?? "http://api.localhost/agency/register"}
@@ -83,7 +83,7 @@ export const Header: React.FC = () => {
               rel="noopener noreferrer"
               className="relative px-6 py-2.5 text-sm font-medium text-white bg-[#ff5758] rounded-xl hover:bg-[#e04e4e] transition-all duration-300 transform hover:scale-105 hover:shadow-lg shadow-md group overflow-hidden no-underline"
             >
-              <span className="relative z-10">Start Free Trial</span>
+              <span className="relative z-10">Start Now</span>
               <div className="absolute inset-0 bg-[#e04e4e] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="absolute top-0 -inset-full w-full h-full bg-gradient-to-r from-transparent via-white to-transparent transform skew-x-12 group-hover:animate-shine transition-all duration-1000"></div>
             </a>
@@ -131,13 +131,13 @@ export const Header: React.FC = () => {
             ))}
             <div className="pt-4 border-t border-gray-200/50 space-y-3">
               <a
-                href={process.env.NEXT_PUBLIC_AGENCY_LOGIN_URL ?? "http://api.localhost/linkbay-admin"}
+                href={process.env.NEXT_PUBLIC_AGENCY_FINDER_URL ?? "http://app.linkbay-cms.test/agency/find"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block px-4 py-3 text-base font-medium text-[#343a4D] hover:text-[#ff5758] hover:bg-gray-50 rounded-xl transition-all duration-300 no-underline"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Sign In
+                Login
               </a>
               <a
                 href={process.env.NEXT_PUBLIC_AGENCY_REGISTER_URL ?? "http://api.localhost/agency/register"}
@@ -146,7 +146,7 @@ export const Header: React.FC = () => {
                 className="block px-4 py-3 text-base font-medium text-center text-white bg-[#ff5758] rounded-xl hover:bg-[#e04e4e] transition-all duration-300 transform hover:scale-105 shadow-md no-underline"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Start Free Trial
+                Start Now
               </a>
             </div>
           </div>

@@ -21,3 +21,10 @@ Schedule::call(fn () => app(StripeConnectService::class)->syncOnboardingStatus()
     ->daily()
     ->name('stripe:sync-onboarding')
     ->withoutOverlapping();
+
+// Riprocessa billing_events bloccati — ogni 15 minuti
+Schedule::command('billing:reprocess-stuck-events', ['--minutes=15'])
+    ->everyFifteenMinutes()
+    ->name('billing:reprocess-stuck-events')
+    ->withoutOverlapping()
+    ->runInBackground();

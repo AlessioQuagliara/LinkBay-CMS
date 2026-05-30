@@ -61,7 +61,7 @@ class RegisterController extends Controller
             $loginUrl = $scheme . '://' . $agencyDomain . '/dashboard/login';
             return redirect($loginUrl)->with(
                 'success',
-                'Account creato! Accedi alla tua dashboard.'
+                'Account creato! Login alla tua dashboard.'
             );
         }
 

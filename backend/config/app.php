@@ -56,6 +56,8 @@ return [
 
     'central_domain' => env('CENTRAL_DOMAIN', 'linkbay-cms.com'),
 
+    'store_domain' => env('STORE_DOMAIN', 'yoursite-linkbay-cms.com'),
+
     'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
 
     /*
@@ -126,5 +128,7 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+
+    'terms_version' => env('TERMS_VERSION', '2026-01'),
 
 ];

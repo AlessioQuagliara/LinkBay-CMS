@@ -2,13 +2,14 @@
 
 namespace App\Filament\Agency\Pages;
 
-use App\Models\Central\Agency;
+use App\Filament\Agency\Concerns\ResolvesCurrentAgency;
 use App\Services\StripeConnectService;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 
 class AgencySettings extends Page
 {
+    use ResolvesCurrentAgency;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
     protected static ?string $navigationLabel = 'Impostazioni';
     protected string $view = 'filament.agency.pages.agency-settings';
@@ -24,7 +25,7 @@ class AgencySettings extends Page
                 'brand_name' => $agency->brand_name,
                 'logo_url' => $agency->logo_url,
                 'favicon_url' => $agency->favicon_url,
-                'primary_color' => $agency->primary_color ?? '#f59e0b',
+                'primary_color' => $agency->primary_color ?? '#ff5758',
                 'support_email' => $agency->support_email,
                 'support_url' => $agency->support_url,
             ];
@@ -90,8 +91,4 @@ class AgencySettings extends Page
         Notification::make()->title('Dominio salvato')->success()->send();
     }
 
-    private function agency(): ?Agency
-    {
-        return app()->has('current_agency') ? app('current_agency') : null;
-    }
 }

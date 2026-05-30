@@ -133,7 +133,7 @@ class AgencyResource extends Resource
             ->actions([
                 \Filament\Actions\EditAction::make(),
                 \Filament\Actions\Action::make('impersonate')
-                    ->label('Accedi')
+                    ->label('Login')
                     ->icon('heroicon-o-arrow-right-on-rectangle')
                     ->url(fn (Agency $record) => 'http://' . $record->panelDomain() . '/dashboard')
                     ->openUrlInNewTab(),

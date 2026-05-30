@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Pagina Non Trovata - 404 - LinkBay-CMS",
-  description: "La pagina richiesta non è stata trovata. Torna alla homepage di LinkBay CMS per esplorare la nostra piattaforma per agenzie.",
+  description: "La pagina richiesta non è stata trovata. Torna alla homepage di LinkBayCMS per esplorare la nostra piattaforma per agenzie.",
   robots: {
     index: false,
     follow: false,

@@ -22,6 +22,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
             'name',
             'plan_id',
             'agency_id',
+            'agency_client_id',
             'status',
         ];
     }
@@ -39,6 +40,11 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     public function agency()
     {
         return $this->belongsTo(Agency::class);
+    }
+
+    public function agencyClient()
+    {
+        return $this->belongsTo(AgencyClient::class);
     }
 
     public function brandName(): string

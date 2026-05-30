@@ -4,80 +4,70 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\Central\Agency;
-use App\Models\Central\AiCreditLedger;
-use App\Models\Central\AiCreditPackage;
-use App\Services\AiCreditsService;
+use App\Jobs\ProcessStripeWebhookJob;
+use App\Models\Central\BillingEvent;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Stripe\Event;
-use Stripe\Stripe;
+use Illuminate\Support\Facades\Log;
+use Stripe\Exception\SignatureVerificationException;
 use Stripe\Webhook;
 
 class StripeWebhookController extends Controller
 {
-    public function __construct(private readonly AiCreditsService $aiCredits) {}
-
+    /**
+     * Riceve webhook da Stripe.
+     *
+     * Regole:
+     * - Valida la firma PRIMA di fare qualsiasi cosa
+     * - Scrive il BillingEvent in modo idempotente (ON CONFLICT stripe_event_id → ignore)
+     * - Se già processato → 200 immediato
+     * - Dispatcha il job asincrono per il processing reale
+     * - Ritorna sempre 200 a Stripe (errori finiscono nel job/log, mai bloccano la response)
+     */
     public function handle(Request $request): Response
     {
-        Stripe::setApiKey(config('services.stripe.secret'));
+        // 1. Valida firma Stripe
+        $payload   = $request->getContent();
+        $sigHeader = $request->header('Stripe-Signature', '');
+        $secret    = config('services.stripe.webhook_secret');
 
         try {
-            $event = Webhook::constructEvent(
-                $request->getContent(),
-                $request->header('Stripe-Signature'),
-                config('services.stripe.webhook_secret')
-            );
-        } catch (\Throwable $e) {
+            $event = Webhook::constructEvent($payload, $sigHeader, $secret);
+        } catch (SignatureVerificationException $e) {
+            Log::warning('Stripe webhook invalid signature', ['error' => $e->getMessage()]);
             return response('Invalid signature', 400);
+        } catch (\Throwable $e) {
+            Log::error('Stripe webhook parse error', ['error' => $e->getMessage()]);
+            return response('Webhook error', 400);
         }
 
-        match ($event->type) {
-            'account.updated' => $this->handleAccountUpdated($event),
-            'payment_intent.succeeded' => $this->handlePaymentIntentSucceeded($event),
-            'customer.subscription.deleted' => $this->handleSubscriptionDeleted($event),
-            'checkout.session.completed' => $this->handleCheckoutCompleted($event),
-            default => null,
-        };
+        // 2. Scrivi BillingEvent in modo idempotente
+        // insertOrIgnore: se stripe_event_id già esiste, non fa nulla e non lancia eccezione
+        $inserted = BillingEvent::insertOrIgnore([
+            'stripe_event_id' => $event->id,
+            'event_type'      => $event->type,
+            'payload'         => json_encode($event->toArray()),
+            'processed_at'    => null,
+            'created_at'      => now(),
+        ]);
+
+        if (!$inserted) {
+            // Evento già registrato — controlla se già processato
+            $existing = BillingEvent::where('stripe_event_id', $event->id)->first();
+            if ($existing?->isProcessed()) {
+                return response('Already processed', 200);
+            }
+            // Non ancora processato (es. job fallito): ri-dispatcha
+            if ($existing) {
+                ProcessStripeWebhookJob::dispatch($existing->id);
+            }
+            return response('OK', 200);
+        }
+
+        // 3. Carica il record appena inserito e dispatcha il job
+        $billingEvent = BillingEvent::where('stripe_event_id', $event->id)->firstOrFail();
+        ProcessStripeWebhookJob::dispatch($billingEvent->id);
 
         return response('OK', 200);
-    }
-
-    private function handleAccountUpdated(Event $event): void
-    {
-        $account = $event->data->object;
-        Agency::where('stripe_connect_account_id', $account->id)
-            ->update([
-                'stripe_connect_onboarded' => $account->details_submitted && empty($account->requirements->currently_due),
-            ]);
-    }
-
-    private function handlePaymentIntentSucceeded(Event $event): void
-    {
-        // Log transaction — extend as needed for analytics
-    }
-
-    private function handleSubscriptionDeleted(Event $event): void
-    {
-        $subscription = $event->data->object;
-        // Find agency by Stripe customer and suspend if plan expired
-        // Implementation depends on how subscriptions are linked
-    }
-
-    private function handleCheckoutCompleted(Event $event): void
-    {
-        $session = $event->data->object;
-        $metadata = $session->metadata ?? [];
-
-        if (($metadata['type'] ?? '') !== 'ai_credits') {
-            return;
-        }
-
-        $agency = Agency::find($metadata['agency_id'] ?? null);
-        $package = AiCreditPackage::find($metadata['package_id'] ?? null);
-
-        if ($agency && $package) {
-            $this->aiCredits->purchase($agency, $package, $session->payment_intent ?? $session->id);
-        }
     }
 }

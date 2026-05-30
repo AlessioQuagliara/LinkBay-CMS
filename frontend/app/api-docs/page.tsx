@@ -2,22 +2,28 @@ import React from "react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "API Documentation - LinkBay CMS",
-  description: "Integra le funzionalità di LinkBay-CMS nei tuoi flussi aziendali, SaaS, marketplace e automazioni. API REST secure-by-design.",
-  keywords: "api linkbay, documentazione api, rest api, integrazione cms, api e-commerce"
+  title: "API Documentation — LinkBay-CMS",
+  description: "Integrate LinkBay-CMS into your agency workflows, automations, and SaaS operations using our REST API.",
+  keywords: "linkbay api, rest api, agency api, cms integration, store api, webhook"
 };
 
 export default function ApiDocsPage() {
   return (
     <main className="max-w-4xl mx-auto py-12 px-4">
+      {/* Hero */}
       <h1 className="text-4xl font-extrabold mb-3 text-gray-900 text-center">API Documentation</h1>
-      <p className="mb-10 text-lg text-gray-700 text-center">
-        Integra le funzionalità di <b><span className="font-linkbay">LinkBay-CMS</span></b> nei tuoi flussi aziendali, SaaS, marketplace e automazioni.<br/>
-        Tutte le API sono basate su principi REST e secure-by-design.<br />
-        <span className="italic">Contatta <a href="mailto:alessio@linkbay-cms.com" className="text-red-600">alessio@linkbay-cms.com</a> per onboarding e chiavi API ufficiali.</span>
+      <p className="mb-10 text-lg text-gray-700 text-center max-w-2xl mx-auto">
+        The <span className="font-linkbay">LinkBay-CMS</span> API lets you integrate agency and store operations
+        into your own workflows, automations, and SaaS tools.<br />
+        All endpoints follow REST conventions and require authenticated requests.<br />
+        <span className="italic text-base text-gray-500 block mt-2">
+          API access is currently available on request. Contact{" "}
+          <a href="mailto:info@linkbay-cms.com" className="text-red-600">info@linkbay-cms.com</a>{" "}
+          to get started.
+        </span>
       </p>
 
-      {/* API Quickstart */}
+      {/* Quickstart */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-3 text-gray-800">Quickstart</h2>
         <div className="bg-gray-900 rounded-lg px-5 py-4 mb-3">
@@ -25,83 +31,118 @@ export default function ApiDocsPage() {
 {`# Base URL
 https://api.linkbay-cms.com/v1/
 
-# Autenticazione (JWT)
-Authorization: Bearer <your-token>`}
+# Authentication header
+Authorization: Bearer <your-api-token>`}
           </pre>
         </div>
         <p className="text-gray-600 text-sm">
-          Accedi con le stesse credenziali agency/proprietario. I permessi sono segmentati per ruolo e tenant.<br />
-          Per test avanzati richiedi una API sandbox dedicata.
+          Authenticate using an API token issued for your agency account. Tokens are scoped by role
+          and isolated per agency — one agency cannot access another agency&apos;s data or stores.
         </p>
       </section>
 
-      {/* Endpoint Examples */}
+      {/* Authentication */}
+      <section className="mb-12">
+        <h2 className="text-xl font-bold mb-4 text-gray-900">Authentication</h2>
+        <p className="text-gray-700 mb-3">
+          Every request must include a Bearer token in the <code className="bg-gray-100 px-1 rounded text-sm">Authorization</code> header.
+          Tokens are issued per agency and carry role-based permissions (agency admin, editor, viewer).
+        </p>
+        <div className="bg-gray-900 rounded-lg px-5 py-4">
+          <pre className="text-green-200 text-sm whitespace-pre-line">
+{`curl -X GET "https://api.linkbay-cms.com/v1/stores" \\
+  -H "Authorization: Bearer <your-api-token>"`}
+          </pre>
+        </div>
+      </section>
+
+      {/* Core Endpoints */}
       <section className="mb-14">
-        <h2 className="text-xl font-bold mb-4 text-gray-900">Principali Endpoint REST</h2>
+        <h2 className="text-xl font-bold mb-4 text-gray-900">Core Endpoints</h2>
         <div className="space-y-7">
+
           <div className="bg-white border-l-4 border-red-500 rounded shadow p-5">
             <div className="flex justify-between items-center mb-1">
-              <div className="font-mono font-semibold text-red-600">GET /v1/websites</div>
-              <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">All tenants</span>
+              <div className="font-mono font-semibold text-red-600">GET /v1/stores</div>
+              <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">Agency-scoped</span>
             </div>
-            <p className="text-gray-700 mb-1">Restituisce la lista dei siti/e-commerce dell&apos;agenzia con dati multitenant e paginazione.</p>
-            <pre className="text-xs bg-gray-100 rounded px-2 py-1 text-gray-900 mb-0">curl -X GET &quot;https://api.linkbay-cms.com/v1/websites&quot; -H &quot;Authorization: Bearer &lt;token&gt;&quot;</pre>
+            <p className="text-gray-700 mb-2">Returns the list of stores managed by the authenticated agency, with pagination.</p>
+            <pre className="text-xs bg-gray-100 rounded px-2 py-1 text-gray-900">
+{`curl -X GET "https://api.linkbay-cms.com/v1/stores" \\
+  -H "Authorization: Bearer <token>"`}
+            </pre>
           </div>
+
           <div className="bg-white border-l-4 border-red-500 rounded shadow p-5">
             <div className="flex justify-between items-center mb-1">
-              <div className="font-mono font-semibold text-red-600">POST /v1/products</div>
-              <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">Tenant-specific</span>
+              <div className="font-mono font-semibold text-red-600">POST /v1/stores/{'{storeId}'}/products</div>
+              <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">Store-scoped</span>
             </div>
-            <p className="text-gray-700 mb-1">Crea un nuovo prodotto nello spazio del tenant. Richiede permesso editor/admin.</p>
-            <pre className="text-xs bg-gray-100 rounded px-2 py-1 text-gray-900 mb-0">{`curl -X POST "https://api.linkbay-cms.com/v1/products" -H "Authorization: Bearer <token>" -d '{"name":"T-shirt","price":19.90}'`}</pre>
+            <p className="text-gray-700 mb-2">Creates a new product in the specified store. Requires editor or admin role.</p>
+            <pre className="text-xs bg-gray-100 rounded px-2 py-1 text-gray-900">
+{`curl -X POST "https://api.linkbay-cms.com/v1/stores/abc/products" \\
+  -H "Authorization: Bearer <token>" \\
+  -d '{"name":"Product Name","price":29.90}'`}
+            </pre>
           </div>
+
           <div className="bg-white border-l-4 border-red-500 rounded shadow p-5">
             <div className="flex justify-between items-center mb-1">
-              <div className="font-mono font-semibold text-red-600">PATCH /v1/orders/{'{orderId}'}</div>
-              <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">Tenant-specific</span>
+              <div className="font-mono font-semibold text-red-600">PATCH /v1/stores/{'{storeId}'}/orders/{'{orderId}'}</div>
+              <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">Store-scoped</span>
             </div>
-            <p className="text-gray-700 mb-1">Aggiorna stato ordine (es. spedito, evaso, annullato).</p>
+            <p className="text-gray-700 mb-2">Updates an order status (e.g. shipped, fulfilled, cancelled).</p>
           </div>
+
           <div className="bg-white border-l-4 border-red-500 rounded shadow p-5">
             <div className="flex justify-between items-center mb-1">
               <div className="font-mono font-semibold text-red-600">POST /v1/domains/verify</div>
-              <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">Agency</span>
+              <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">Agency-scoped</span>
             </div>
-            <p className="text-gray-700 mb-1">Lancia la verifica DNS e il provisioning automatizzato SSL di un nuovo dominio.</p>
+            <p className="text-gray-700 mb-2">Triggers DNS verification and SSL provisioning for a custom domain attached to a store.</p>
           </div>
+
         </div>
       </section>
 
-      {/* Webhooks and Integrations */}
+      {/* Webhooks */}
       <section className="mb-14">
-        <h2 className="text-xl font-bold mb-3 text-gray-900">Webhook & Integrazioni</h2>
+        <h2 className="text-xl font-bold mb-3 text-gray-900">Webhooks & Integrations</h2>
+        <p className="text-gray-700 mb-3">
+          LinkBay-CMS can send webhook events to an endpoint of your choice. Useful for syncing data
+          with CRMs, accounting tools, or custom automations.
+        </p>
         <ul className="list-disc list-inside text-gray-700 space-y-2 mb-4">
-          <li>Webhook pagamenti completati per sincronizzazione con CRM/contabilità</li>
-          <li>Integrazione marketplace <span className="font-linkbay">LinkBay</span> per la gestione plugin e temi</li>
-          <li>Notifiche via webhook per eventi e-commerce (ordine completato, prodotto esaurito, registrazione cliente…)</li>
+          <li>Payment completed — sync with external accounting or CRM</li>
+          <li>Order status changed — trigger fulfillment or notification flows</li>
+          <li>Store provisioned — run post-setup scripts or onboarding automations</li>
+          <li>Customer registered — add to mailing list or CRM pipeline</li>
         </ul>
-        <div className="text-xs text-gray-500">
-          Presto disponibili anche <b>API GraphQL</b> (alpha, solo per clienti enterprise su richiesta).
-        </div>
+        <p className="text-xs text-gray-500">
+          Webhook configuration is available via the agency dashboard. A full event reference
+          will be published alongside the public API release.
+        </p>
       </section>
 
-      {/* Ruoli & Sicurezza */}
+      {/* Security */}
       <section className="mb-14">
-        <h2 className="text-xl font-bold mb-3 text-gray-900">Sicurezza & Ruoli</h2>
+        <h2 className="text-xl font-bold mb-3 text-gray-900">Security & Access Control</h2>
         <ul className="list-disc list-inside text-gray-700 space-y-1">
-          <li>Autenticazione JWT per ogni chiamata (Access/Refresh Token)</li>
-          <li>Scope e ruoli: superadmin, agency admin, editor, entwickler, viewer</li>
-          <li>Ogni endpoint è audit-logged e rate-limited</li>
-          <li>RBAC e full data isolation multitenant</li>
+          <li>All requests require a valid Bearer token</li>
+          <li>Role-based access: agency admin, editor, viewer</li>
+          <li>Each agency is fully isolated — no cross-agency data access</li>
+          <li>All API calls are rate-limited and logged</li>
+          <li>HTTPS only — plain HTTP requests are rejected</li>
         </ul>
       </section>
 
       {/* CTA */}
       <section className="py-10 text-center">
+        <p className="text-gray-600 mb-4">API access is available on request during the current access period.</p>
         <a
-          href="mailto:alessio@linkbay-cms.com?subject=API%20access"
+          href="mailto:info@linkbay-cms.com?subject=API%20access%20request"
           className="inline-block px-8 py-4 text-lg font-bold rounded-lg bg-red-600 text-white hover:bg-red-700 shadow">
-          Chiedi la tua API key personalizzata
+          Request API Access
         </a>
       </section>
     </main>

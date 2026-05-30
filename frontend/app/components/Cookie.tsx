@@ -247,17 +247,12 @@ const CookieConsentBanner: React.FC = () => {
 
   return (
     <>
-      {/* Overlay per il banner */}
-      {showBanner && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-30" onClick={handleRejectAll}></div>
-      )}
-      
-      {/* Banner Cookie */}
+      {/* Banner Cookie — nessun overlay, non blocca la navigazione */}
       {showBanner && <CookieBanner />}
-      
-      {/* Modale Preferenze */}
+
+      {/* Modale Preferenze — ha il proprio overlay */}
       {showPreferences && <PreferencesModal />}
-      
+
       {/* Pulsante fisso per riaprire le preferenze */}
       {!showBanner && consentGiven !== 'pending' && <FloatingPreferencesButton />}
     </>

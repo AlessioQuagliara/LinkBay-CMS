@@ -111,8 +111,8 @@ class AiCreditsService
                 'package_id' => $package->id,
                 'type' => 'ai_credits',
             ],
-            'success_url' => url('/central/api/ai-credits/success?session_id={CHECKOUT_SESSION_ID}'),
-            'cancel_url' => url('/credits/buy'),
+            'success_url' => route('filament.agency.pages.ai-credits') . '?purchased=1',
+            'cancel_url'  => route('filament.agency.pages.ai-credits'),
         ]);
     }
 }

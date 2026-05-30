@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Cookie Policy",
-  description: "Cookie Policy di LinkBay CMS. Scopri come utilizziamo i cookie e le tecnologie simili nel rispetto del GDPR.",
+  description: "Cookie Policy di LinkBayCMS. Scopri come utilizziamo i cookie e le tecnologie simili nel rispetto del GDPR.",
   keywords: "cookie policy, cookies, gdpr, privacy, tracciamento, analytics"
 };
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Central\Agency;
+use App\Models\Central\AiCreditLedger;
 use App\Models\Central\AiCreditPackage;
 use App\Services\AiCreditsService;
 use Illuminate\Http\JsonResponse;
@@ -50,7 +51,14 @@ class AiCreditsController extends Controller
         $package = AiCreditPackage::find($metadata->package_id ?? null);
 
         if ($agency && $package) {
-            $this->credits->purchase($agency, $package, $session->payment_intent ?? $sessionId);
+            $paymentIntentId = $session->payment_intent ?? $sessionId;
+
+            // Idempotenza: il webhook checkout.session.completed potrebbe aver già creditato
+            $alreadyCredited = AiCreditLedger::where('stripe_payment_intent_id', $paymentIntentId)->exists();
+            if (!$alreadyCredited) {
+                $this->credits->purchase($agency, $package, $paymentIntentId);
+            }
+
             return response()->json([
                 'message' => 'Credits added successfully',
                 'balance' => $this->credits->getBalance($agency),
