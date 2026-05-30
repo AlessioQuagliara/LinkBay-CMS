@@ -4,6 +4,9 @@ namespace App\Providers\Filament;
 
 use App\Filament\Admin\Resources\AgencyResource;
 use App\Filament\Admin\Resources\AiCreditPackageResource;
+use App\Filament\Admin\Resources\ContactSubmissionResource;
+use App\Filament\Admin\Resources\JobApplicationResource;
+use App\Filament\Admin\Resources\JobPositionResource;
 use App\Filament\Admin\Resources\PlanResource;
 use App\Filament\Admin\Resources\TenantResource;
 use App\Filament\Admin\Widgets\GlobalStatsWidget;
@@ -35,7 +38,7 @@ class AdminPanelProvider extends PanelProvider
                 : env('ADMIN_DOMAIN', 'app.linkbay-cms.test')
             )
             ->login()
-            ->brandName('LinkBay CMS - Admin')
+            ->brandName('LinkBayCMS - Admin')
             ->colors(['primary' => Color::Violet])
             ->darkMode(true)
             ->maxContentWidth('full')
@@ -46,6 +49,9 @@ class AdminPanelProvider extends PanelProvider
                 PlanResource::class,
                 TenantResource::class,
                 AiCreditPackageResource::class,
+                ContactSubmissionResource::class,
+                JobPositionResource::class,
+                JobApplicationResource::class,
             ])
             ->pages([Dashboard::class])
             ->widgets([GlobalStatsWidget::class])
@@ -53,6 +59,8 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make('Tenancy')->icon('heroicon-o-building-office-2'),
                 NavigationGroup::make('Billing')->icon('heroicon-o-credit-card'),
                 NavigationGroup::make('AI Credits')->icon('heroicon-o-sparkles'),
+                NavigationGroup::make('Operations')->icon('heroicon-o-inbox'),
+                NavigationGroup::make('Careers')->icon('heroicon-o-briefcase'),
                 NavigationGroup::make('System')->icon('heroicon-o-cog-6-tooth'),
             ])
             ->middleware([

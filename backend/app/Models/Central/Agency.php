@@ -26,6 +26,9 @@ class Agency extends Model
         'support_url',
         'stripe_connect_account_id',
         'stripe_connect_onboarded',
+        'stripe_customer_id',
+        'terms_accepted_version',
+        'max_stores_override',
         'owner_user_id',
         'plan_id',
         'billing_type',
@@ -35,7 +38,7 @@ class Agency extends Model
     ];
 
     protected $casts = [
-        'hide_linkbay_branding' => 'boolean',
+        'hide_linkbay_branding'    => 'boolean',
         'stripe_connect_onboarded' => 'boolean',
     ];
 
@@ -61,6 +64,31 @@ class Agency extends Model
         return $this->hasMany(AiCreditLedger::class);
     }
 
+    public function subscription()
+    {
+        return $this->hasOne(AgencySubscription::class);
+    }
+
+    public function commissions()
+    {
+        return $this->hasMany(CommissionRecord::class);
+    }
+
+    public function billingEvents()
+    {
+        return $this->hasMany(BillingEvent::class);
+    }
+
+    public function termsAcceptances()
+    {
+        return $this->hasMany(TermsAcceptance::class);
+    }
+
+    public function agencyClients()
+    {
+        return $this->hasMany(AgencyClient::class);
+    }
+
     // ── Scopes ─────────────────────────────────────────────────────────────────
 
     public function scopeActive($query)
@@ -77,8 +105,8 @@ class Agency extends Model
 
     public function resolvedPrimaryColor(): string
     {
-        $color = $this->primary_color ?? '#f59e0b';
-        return str_starts_with($color, '#') ? $color : '#f59e0b';
+        $color = $this->primary_color ?? '#ff5758';
+        return str_starts_with($color, '#') ? $color : '#ff5758';
     }
 
     public function panelDomain(): string

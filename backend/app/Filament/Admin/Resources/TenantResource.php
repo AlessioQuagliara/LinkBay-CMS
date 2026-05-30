@@ -31,7 +31,7 @@ class TenantResource extends Resource
                 ->label('Domain / ID')
                 ->required()
                 ->unique(Tenant::class, 'id', ignoreRecord: true)
-                ->helperText('Es: cliente1 → cliente1.linkbay-cms.com'),
+                ->helperText('Es: cliente1 → cliente1.' . config('app.store_domain', 'yoursite-linkbay-cms.com')),
             Forms\Components\Select::make('plan_id')
                 ->label('Piano')
                 ->relationship('plan', 'name')
@@ -65,7 +65,7 @@ class TenantResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('id')
                     ->label('Domain')
-                    ->formatStateUsing(fn ($state) => $state . '.linkbay-cms.com'),
+                    ->formatStateUsing(fn ($state) => $state . '.' . config('app.store_domain')),
                 Tables\Columns\TextColumn::make('plan.name')
                     ->label('Piano')
                     ->badge()
@@ -96,10 +96,9 @@ class TenantResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->action(function (Tenant $record) {
-                        app(TenantProvisioningService::class)->provision([
-                            'name' => $record->name,
-                            'domain' => $record->id,
-                        ]);
+                        $service = app(TenantProvisioningService::class);
+                        $service->registerDomain($record);
+                        $service->initializeDatabase($record);
                         Notification::make()->title('Tenant provisionato')->success()->send();
                     }),
                 \Filament\Actions\Action::make('suspend')

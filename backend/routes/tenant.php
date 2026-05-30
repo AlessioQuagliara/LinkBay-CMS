@@ -8,12 +8,12 @@ use App\Http\Controllers\Tenant\DiscountCodeController;
 use App\Http\Controllers\Tenant\OrderController;
 use App\Http\Controllers\Tenant\ProductController;
 use Illuminate\Support\Facades\Route;
-use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 Route::middleware([
     'api',
-    InitializeTenancyBySubdomain::class,
+    InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
 ])->prefix('api/v1')->group(function () {
 

@@ -15,10 +15,14 @@ class Plan extends Model
 
     protected $fillable = [
         'name',
+        'slug',
         'price',
+        'billing_interval',
+        'stripe_price_id',
         'features',
         'limits',
         'is_active',
+        'sort_order',
     ];
 
     protected $casts = [

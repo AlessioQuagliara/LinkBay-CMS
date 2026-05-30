@@ -1,4 +1,4 @@
-# Local Full-Flow Testing — LinkBay CMS
+# Local Full-Flow Testing — LinkBayCMS
 
 Guida passo-passo per testare in locale l'intero flusso:
 **Registrazione agency → Login → Dashboard → Creazione tenant → Stripe test mode**

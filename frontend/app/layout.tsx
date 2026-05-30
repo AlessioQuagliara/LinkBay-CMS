@@ -40,20 +40,24 @@ const electrolize = Electrolize({
 });
 
 export const metadata: Metadata = {
-  title: "LinkBay-CMS - L'Armaiolo delle Agenzie Digitali",
-  description: "Gestione multi-tenant, marketplace, automazione: il tuo arsenale per conquistare infinite nicchie di mercato.",
-  keywords: "CMS, multi-tenant, marketplace, e-commerce, agenzie digitali, LinkBay",
+  title: "LinkBay-CMS — Commerce infrastructure for digital agencies",
+  description: "Manage all your client stores from one dashboard. White-label delivery, recurring revenue, reusable layouts, and AI assistance for agencies running multiple stores.",
+  keywords: "agency CMS, white-label commerce, client store management, agency dashboard, recurring revenue, LinkBay",
   authors: [{ name: "Alessio Quagliara" }],
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+  },
   openGraph: {
     type: "website",
-    locale: "it_IT",
+    locale: "en_US",
     url: "https://linkbay-cms.com",
     siteName: "LinkBay-CMS",
-    title: "LinkBay-CMS - L'Armaiolo delle Agenzie Digitali",
-    description: "Gestione multi-tenant, marketplace, automazione: il tuo arsenale per conquistare infinite nicchie di mercato.",
+    title: "LinkBay-CMS — Commerce infrastructure for digital agencies",
+    description: "Manage all your client stores from one dashboard. White-label delivery, recurring revenue, reusable layouts, and AI assistance for agencies running multiple stores.",
     images: [
       {
-        url: "/stretch-logo-std.png",
+        url: "/logo.svg",
         width: 1200,
         height: 630,
         alt: "LinkBay-CMS",
@@ -62,9 +66,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "LinkBay-CMS - L'Armaiolo delle Agenzie Digitali",
-    description: "Gestione multi-tenant, marketplace, automazione: il tuo arsenale per conquistare infinite nicchie di mercato.",
-    images: ["/stretch-logo-std.png"],
+    title: "LinkBay-CMS — Commerce infrastructure for digital agencies",
+    description: "Manage all your client stores from one dashboard. White-label delivery, recurring revenue, reusable layouts, and AI assistance for agencies running multiple stores.",
+    images: ["/logo.svg"],
   },
 };
 
@@ -74,7 +78,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="it">
+    <html lang="en">
       <body
         className={`${dubai.variable} ${electrolize.variable} antialiased font-dubai`}
       >

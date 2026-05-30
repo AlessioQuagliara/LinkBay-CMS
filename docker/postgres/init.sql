@@ -1,4 +1,4 @@
--- LinkBay CMS - PostgreSQL initialization
+-- LinkBayCMS - PostgreSQL initialization
 -- The central database is created via POSTGRES_DB env var.
 -- Tenant schemas are created automatically by stancl/tenancy PostgreSQLSchemaManager.
 

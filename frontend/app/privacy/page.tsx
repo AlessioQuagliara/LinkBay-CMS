@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "Informativa sulla Privacy di LinkBay CMS. Scopri come proteggiamo e gestiamo i dati personali degli utenti e dei clienti.",
+  description: "Informativa sulla Privacy di LinkBayCMS. Scopri come proteggiamo e gestiamo i dati personali degli utenti e dei clienti.",
   keywords: "privacy policy, protezione dati, gdpr, informativa privacy, trattamento dati"
 };
 

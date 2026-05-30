@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Termini di Servizio",
-  description: "Termini e Condizioni di utilizzo di LinkBay CMS. Leggi le regole d'uso della piattaforma per agenzie web e sviluppatori.",
+  description: "Termini e Condizioni di utilizzo di LinkBayCMS. Leggi le regole d'uso della piattaforma per agenzie web e sviluppatori.",
   keywords: "termini servizio, condizioni uso, regole piattaforma, termini cms, contratto utilizzo"
 };
 

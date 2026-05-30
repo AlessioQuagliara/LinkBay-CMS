@@ -5,7 +5,13 @@ namespace App\Providers\Filament;
 use App\Filament\Agency\Pages\AgencyBillingPage;
 use App\Filament\Agency\Pages\AgencySettings;
 use App\Filament\Agency\Pages\AiCreditsPage;
+use App\Filament\Agency\Pages\CommissionsPage;
+use App\Filament\Agency\Pages\TermsAcceptancePage;
+use App\Filament\Agency\Resources\AgencyClientResource;
 use App\Filament\Agency\Resources\StoreResource;
+use App\Filament\Agency\Widgets\AgencyStatsWidget;
+use App\Filament\Agency\Widgets\PlanUpsellWidget;
+use App\Http\Middleware\RequireTermsAcceptance;
 use App\Models\Central\Agency;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -28,38 +34,62 @@ class AgencyPanelProvider extends PanelProvider
     {
         parent::register();
 
-        try {
-            $host = request()->getHost();
-            $agency = Agency::where('custom_domain', $host)
-                ->orWhere('slug', explode('.', $host)[0])
-                ->first();
-
-            app()->instance('current_agency', $agency);
-        } catch (\Throwable) {
-            app()->instance('current_agency', null);
-        }
+        // Lazy singleton: il DB query viene eseguito solo al primo accesso a app('current_agency'),
+        // non durante register() dove il resolver Eloquent potrebbe non essere ancora pronto.
+        $this->app->singleton('current_agency', function () {
+            try {
+                if (app()->runningInConsole()) {
+                    return null;
+                }
+                $host = request()->getHost();
+                return Agency::where('custom_domain', $host)
+                    ->orWhere('slug', explode('.', $host)[0])
+                    ->first();
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('AgencyPanelProvider: failed to resolve current_agency', [
+                    'error' => $e->getMessage(),
+                    'host'  => request()->getHost(),
+                ]);
+                return null;
+            }
+        });
     }
 
     public function panel(Panel $panel): Panel
     {
-        $agency = app()->has('current_agency') ? app('current_agency') : null;
+        $agency = app('current_agency');
+
+        $pages = [
+            Dashboard::class,
+            AgencySettings::class,
+            AgencyBillingPage::class,
+            AiCreditsPage::class,
+            CommissionsPage::class,
+            TermsAcceptancePage::class,
+        ];
+
+        $widgets = [
+            PlanUpsellWidget::class,
+            AgencyStatsWidget::class,
+        ];
 
         if (!$agency) {
-            // Fall back to defaults — the actual 404 is handled in boot()
             return $panel
                 ->id('agency')
                 ->path('dashboard')
                 ->login()
                 ->brandName('Agency Dashboard')
-                ->colors(['primary' => Color::Amber])
+                ->colors(['primary' => Color::hex('#ff5758')])
                 ->darkMode(true)
                 ->maxContentWidth('full')
                 ->sidebarCollapsibleOnDesktop()
+                ->viteTheme('resources/css/filament-agency.css')
                 ->authGuard('web')
-                ->resources([StoreResource::class])
-                ->pages([Dashboard::class, AgencySettings::class, AgencyBillingPage::class, AiCreditsPage::class])
+                ->resources([StoreResource::class, AgencyClientResource::class])
+                ->pages($pages)
+                ->widgets($widgets)
                 ->middleware($this->defaultMiddleware())
-                ->authMiddleware([Authenticate::class]);
+                ->authMiddleware([Authenticate::class, RequireTermsAcceptance::class]);
         }
 
         $built = $panel
@@ -71,11 +101,13 @@ class AgencyPanelProvider extends PanelProvider
             ->darkMode(true)
             ->maxContentWidth('full')
             ->sidebarCollapsibleOnDesktop()
+            ->viteTheme('resources/css/filament-agency.css')
             ->authGuard('web')
-            ->resources([StoreResource::class])
-            ->pages([Dashboard::class, AgencySettings::class, AgencyBillingPage::class, AiCreditsPage::class])
+            ->resources([StoreResource::class, AgencyClientResource::class])
+            ->pages($pages)
+            ->widgets($widgets)
             ->middleware($this->defaultMiddleware())
-            ->authMiddleware([Authenticate::class]);
+            ->authMiddleware([Authenticate::class, RequireTermsAcceptance::class]);
 
         if ($agency->logo_url) {
             $built->brandLogo($agency->logo_url);

@@ -16,11 +16,18 @@
 #   - ha il Stripe CLI sidecar commentato (decommentare se serve)
 #
 # Domini locali supportati (richiedono /etc/hosts o dnsmasq):
+#
+#   --- Agency panel (CENTRAL_DOMAIN) ---
 #   127.0.0.1  linkbay-cms.test
 #   127.0.0.1  app.linkbay-cms.test
 #   127.0.0.1  admin.linkbay-cms.test
 #   127.0.0.1  testagency.linkbay-cms.test
 #   127.0.0.1  clientalpha.linkbay-cms.test
+#
+#   --- Tenant/store cliente (STORE_DOMAIN) ---
+#   Aggiungere una riga per ogni store creato, es:
+#   127.0.0.1  acme.yoursite-linkbay-cms.test
+#   127.0.0.1  beta-store.yoursite-linkbay-cms.test
 #
 # Protocollo: HTTP puro (porta 80). Nessun TLS locale.
 # =============================================================================
@@ -35,6 +42,8 @@ services:
       APP_URL: http://app.linkbay-cms.test
       FRONTEND_URL: http://linkbay-cms.test
       CENTRAL_DOMAIN: linkbay-cms.test
+      # Dominio dei tenant/store cliente — separato da CENTRAL_DOMAIN
+      STORE_DOMAIN: yoursite-linkbay-cms.test
       SESSION_DOMAIN: .linkbay-cms.test
       SANCTUM_STATEFUL_DOMAINS: "linkbay-cms.test,app.linkbay-cms.test,admin.linkbay-cms.test,testagency.linkbay-cms.test,clientalpha.linkbay-cms.test"
       # Incolla qui il whsec_... da `stripe listen` (si aggiorna ad ogni riavvio del CLI)
@@ -60,11 +69,15 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.nginx-svc.loadbalancer.server.port=80"
-      # *.linkbay-cms.test → nginx → Laravel (agency, tenant, app, admin)
+      # *.linkbay-cms.test → nginx → Laravel (agency panel, app, admin)
       # Traefik v3 RE2: dots escaped, no named capture groups
       - "traefik.http.routers.test-wildcard.rule=HostRegexp(`[a-z0-9-]+\\.linkbay-cms\\.test`)"
       - "traefik.http.routers.test-wildcard.entrypoints=web"
       - "traefik.http.routers.test-wildcard.service=nginx-svc"
+      # *.yoursite-linkbay-cms.test → nginx → Laravel (tenant/store cliente)
+      - "traefik.http.routers.test-store-wildcard.rule=HostRegexp(`[a-z0-9-]+\\.yoursite-linkbay-cms\\.test`)"
+      - "traefik.http.routers.test-store-wildcard.entrypoints=web"
+      - "traefik.http.routers.test-store-wildcard.service=nginx-svc"
       # Fallback localhost → nginx (per curl diretti, Stripe CLI interno, ecc.)
       - "traefik.http.routers.localhost-nginx.rule=HostRegexp(`[a-z0-9-]+\\.localhost`)"
       - "traefik.http.routers.localhost-nginx.entrypoints=web"
