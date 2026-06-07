@@ -42,7 +42,7 @@ export const Header: React.FC = () => {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link href="/" className="flex items-center group no-underline">
-            <LogoMark variant="dark" className="text-2xl" />
+            <LogoMark variant="dark" className="text-2xl" registered />
           </Link>
 
           {/* Desktop Navigation */}

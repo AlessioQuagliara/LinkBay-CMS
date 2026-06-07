@@ -6,6 +6,7 @@ namespace App\Filament\Agency\Pages;
 
 use App\Filament\Agency\Concerns\ResolvesCurrentAgency;
 use App\Models\Central\AgencySubscription;
+use App\Models\Central\BillingEvent;
 use App\Models\Central\Plan;
 use App\Services\AgencySubscriptionService;
 use Filament\Notifications\Notification;
@@ -19,9 +20,19 @@ class AgencyBillingPage extends Page
     use ResolvesCurrentAgency;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-credit-card';
+
     protected static ?string $navigationLabel = 'Abbonamento';
+
     protected static ?string $slug = 'agency-billing';
+
     protected string $view = 'filament.agency.pages.agency-billing';
+
+    public static function canAccess(): bool
+    {
+        $member = static::currentMemberStatic();
+
+        return $member?->isOwner() ?? false;
+    }
 
     // ── Piano corrente ────────────────────────────────────────────────────────
 
@@ -33,22 +44,29 @@ class AgencyBillingPage extends Page
     public function planPrice(): string
     {
         $agency = $this->agency();
-        if (!$agency?->plan) return '—';
-        if ($agency->billing_type === 'lifetime') return 'Lifetime (AppSumo)';
+        if (! $agency?->plan) {
+            return '—';
+        }
+        if ($agency->billing_type === 'lifetime') {
+            return 'Lifetime (AppSumo)';
+        }
         $interval = $agency->plan->billing_interval === 'year' ? 'anno' : 'mese';
-        return '€' . number_format((float) $agency->plan->price, 2, ',', '.') . ' / ' . $interval;
+
+        return '€'.number_format((float) $agency->plan->price, 2, ',', '.').' / '.$interval;
     }
 
     public function maxStores(): string
     {
         $max = $this->agency()?->plan?->limits['max_stores'] ?? null;
+
         return $max === null ? 'Illimitati' : (string) $max;
     }
 
     public function transactionFee(): string
     {
         $pct = $this->agency()?->transactionFeePct() ?? 0.0;
-        return $pct . '%';
+
+        return $pct.'%';
     }
 
     public function features(): array
@@ -69,6 +87,7 @@ class AgencyBillingPage extends Page
     public function subscription(): ?AgencySubscription
     {
         $agency = $this->agency();
+
         return $agency ? AgencySubscription::where('agency_id', $agency->id)->first() : null;
     }
 
@@ -86,7 +105,44 @@ class AgencyBillingPage extends Page
 
     public function isStripeConfigured(): bool
     {
-        return !empty(config('services.stripe.secret'));
+        return ! empty(config('services.stripe.secret'));
+    }
+
+    public function hasStripeCustomer(): bool
+    {
+        return (bool) $this->agency()?->stripe_customer_id;
+    }
+
+    public function billingTypeLabel(): string
+    {
+        if ($this->isLifetime()) {
+            return 'Lifetime';
+        }
+
+        return match ($this->agency()?->plan?->billing_interval) {
+            'year' => 'Annuale',
+            default => 'Mensile',
+        };
+    }
+
+    /**
+     * Returns the most recent BillingEvent records for the current agency,
+     * ordered newest-first. Used for the payment history section.
+     *
+     * @return Collection<int, BillingEvent>
+     */
+    public function recentBillingEvents(int $limit = 8): Collection
+    {
+        $agency = $this->agency();
+
+        if (! $agency) {
+            return collect();
+        }
+
+        return BillingEvent::where('agency_id', $agency->id)
+            ->orderByDesc('created_at')
+            ->limit($limit)
+            ->get();
     }
 
     // ── Stripe Checkout per abbonamento ───────────────────────────────────────
@@ -102,19 +158,22 @@ class AgencyBillingPage extends Page
     public function subscribe(int $planId): void
     {
         $agency = $this->agency();
-        if (!$agency) {
+        if (! $agency) {
             Notification::make()->title('Errore: agency non trovata')->danger()->send();
+
             return;
         }
 
         $plan = Plan::find($planId);
-        if (!$plan || !$plan->stripe_price_id) {
+        if (! $plan || ! $plan->stripe_price_id) {
             Notification::make()->title('Piano non disponibile')->danger()->send();
+
             return;
         }
 
-        if (!$this->isStripeConfigured()) {
+        if (! $this->isStripeConfigured()) {
             Notification::make()->title('Stripe non configurato — contatta il supporto')->warning()->send();
+
             return;
         }
 
@@ -135,10 +194,11 @@ class AgencyBillingPage extends Page
                     ->send();
             } catch (\Throwable $e) {
                 Notification::make()
-                    ->title('Errore nel cambio piano: ' . $e->getMessage())
+                    ->title('Errore nel cambio piano: '.$e->getMessage())
                     ->danger()
                     ->send();
             }
+
             return;
         }
 
@@ -147,15 +207,15 @@ class AgencyBillingPage extends Page
             Stripe::setApiKey(config('services.stripe.secret'));
 
             $params = [
-                'mode'                 => 'subscription',
+                'mode' => 'subscription',
                 'payment_method_types' => ['card'],
-                'line_items'           => [['price' => $plan->stripe_price_id, 'quantity' => 1]],
-                'success_url'          => route('filament.agency.pages.agency-billing') . '?subscribed=1',
-                'cancel_url'           => route('filament.agency.pages.agency-billing'),
-                'metadata'             => [
+                'line_items' => [['price' => $plan->stripe_price_id, 'quantity' => 1]],
+                'success_url' => route('filament.agency.pages.agency-billing').'?subscribed=1',
+                'cancel_url' => route('filament.agency.pages.agency-billing'),
+                'metadata' => [
                     'agency_id' => $agency->id,
-                    'plan_id'   => $plan->id,
-                    'type'      => 'agency_subscription',
+                    'plan_id' => $plan->id,
+                    'type' => 'agency_subscription',
                 ],
             ];
 
@@ -172,7 +232,7 @@ class AgencyBillingPage extends Page
             $this->redirect($session->url, navigate: false);
         } catch (\Throwable $e) {
             Notification::make()
-                ->title('Errore Stripe: ' . $e->getMessage())
+                ->title('Errore Stripe: '.$e->getMessage())
                 ->danger()
                 ->send();
         }
@@ -184,8 +244,9 @@ class AgencyBillingPage extends Page
     public function openCustomerPortal(): void
     {
         $agency = $this->agency();
-        if (!$agency?->stripe_customer_id || !$this->isStripeConfigured()) {
+        if (! $agency?->stripe_customer_id || ! $this->isStripeConfigured()) {
             Notification::make()->title('Portale non disponibile')->warning()->send();
+
             return;
         }
 
@@ -193,14 +254,14 @@ class AgencyBillingPage extends Page
             Stripe::setApiKey(config('services.stripe.secret'));
 
             $session = \Stripe\BillingPortal\Session::create([
-                'customer'   => $agency->stripe_customer_id,
+                'customer' => $agency->stripe_customer_id,
                 'return_url' => route('filament.agency.pages.agency-billing'),
             ]);
 
             $this->redirect($session->url, navigate: false);
         } catch (\Throwable $e) {
             Notification::make()
-                ->title('Errore portale: ' . $e->getMessage())
+                ->title('Errore portale: '.$e->getMessage())
                 ->danger()
                 ->send();
         }

@@ -14,9 +14,9 @@ class RequireTermsAcceptance
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $agency = $this->resolveAgency($request);
+        $agency = $this->resolveAgency();
 
-        if (!$agency) {
+        if (! $agency) {
             return $next($request);
         }
 
@@ -45,36 +45,25 @@ class RequireTermsAcceptance
         // DB check completo
         if (TermsAcceptance::hasAccepted($agency->id)) {
             $agency->terms_accepted_version = $currentVersion; // aggiorna in-memory
+
             return $next($request);
         }
 
         return redirect()->to('/dashboard/terms-acceptance');
     }
 
-    private function resolveAgency(Request $request): ?Agency
+    private function resolveAgency(): ?Agency
     {
-        // Controlla prima il binding del container
-        if (app()->has('current_agency')) {
+        // EnsureValidAgencyDomain (earlier in the middleware stack) is the
+        // authoritative resolver and has already bound the agency instance.
+        if (app()->bound('current_agency')) {
             $agency = app('current_agency');
+
             if ($agency instanceof Agency) {
                 return $agency;
             }
         }
 
-        // Fallback: query diretta sull'host
-        try {
-            $host = $request->getHost();
-            $agency = Agency::where('custom_domain', $host)
-                ->orWhere('slug', explode('.', $host)[0])
-                ->first();
-
-            if ($agency) {
-                app()->instance('current_agency', $agency);
-            }
-
-            return $agency;
-        } catch (\Throwable) {
-            return null;
-        }
+        return null;
     }
 }
