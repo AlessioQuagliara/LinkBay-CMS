@@ -3,23 +3,26 @@
 namespace App\Filament\Agency\Resources;
 
 use App\Filament\Agency\Resources\StoreResource\Pages;
-use App\Models\Central\Agency;
 use App\Models\Central\AgencyClient;
 use App\Models\Central\Tenant;
 use App\Services\TenantProvisioningService;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Schemas\Schema;
-
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
 class StoreResource extends Resource
 {
     protected static ?string $model = Tenant::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shopping-bag';
+
     protected static ?string $modelLabel = 'Negozio';
+
     protected static ?string $pluralModelLabel = 'Negozi';
 
     public static function form(Schema $schema): Schema
@@ -30,7 +33,7 @@ class StoreResource extends Resource
                 ->label('Subdomain')
                 ->required()
                 ->unique(Tenant::class, 'id', ignoreRecord: true)
-                ->helperText('Es: mionegozio → mionegozio.' . config('app.store_domain', 'yoursite-linkbay-cms.com')),
+                ->helperText('Es: mionegozio → mionegozio.'.config('app.store_domain', 'yoursite-linkbay-cms.com')),
             Forms\Components\Select::make('status')
                 ->options(['active' => 'Attivo', 'suspended' => 'Sospeso'])
                 ->default('active'),
@@ -42,7 +45,8 @@ class StoreResource extends Resource
             Forms\Components\Select::make('agency_client_id')
                 ->label('Cliente')
                 ->options(function () {
-                    $agency = Agency::fromDomain(request()->getHost());
+                    $agency = app()->bound('current_agency') ? app('current_agency') : null;
+
                     return $agency
                         ? AgencyClient::where('agency_id', $agency->id)
                             ->where('status', 'active')
@@ -60,14 +64,15 @@ class StoreResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function ($query) {
-                $agency = Agency::fromDomain(request()->getHost());
+                $agency = app()->bound('current_agency') ? app('current_agency') : null;
+
                 return $agency ? $query->where('agency_id', $agency->id) : $query;
             })
             ->columns([
                 Tables\Columns\TextColumn::make('name')->label('Nome')->searchable(),
                 Tables\Columns\TextColumn::make('id')
                     ->label('Dominio')
-                    ->formatStateUsing(fn ($state) => $state . '.' . config('app.store_domain')),
+                    ->formatStateUsing(fn ($state) => $state.'.'.config('app.store_domain')),
                 Tables\Columns\TextColumn::make('agencyClient.name')
                     ->label('Cliente')
                     ->placeholder('—')
@@ -80,8 +85,8 @@ class StoreResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')->label('Creato')->date('d/m/Y'),
             ])
             ->actions([
-                \Filament\Actions\EditAction::make(),
-                \Filament\Actions\Action::make('provision')
+                EditAction::make(),
+                Action::make('provision')
                     ->label('Provisioning')
                     ->icon('heroicon-o-server')
                     ->color('success')
@@ -98,10 +103,10 @@ class StoreResource extends Resource
                         $service->initializeDatabase($record, $data['admin_email']);
                         Notification::make()->title('Negozio provisionato')->success()->send();
                     }),
-                \Filament\Actions\Action::make('access')
+                Action::make('access')
                     ->label('Login')
                     ->icon('heroicon-o-arrow-right-on-rectangle')
-                    ->url(fn (Tenant $record) => 'http://' . $record->id . '.' . config('app.store_domain') . '/admin')
+                    ->url(fn (Tenant $record) => 'http://'.$record->id.'.'.config('app.store_domain').'/admin')
                     ->openUrlInNewTab(),
             ]);
     }

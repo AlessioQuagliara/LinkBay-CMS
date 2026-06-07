@@ -12,7 +12,7 @@ use App\Filament\Tenant\Resources\ShippingMethodResource;
 use App\Filament\Tenant\Widgets\LatestOrdersWidget;
 use App\Filament\Tenant\Widgets\RevenueChartWidget;
 use App\Filament\Tenant\Widgets\TenantStatsOverviewWidget;
-use App\Models\Tenant\User;
+use App\Models\Tenant\Setting;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -70,6 +70,10 @@ class TenantPanelProvider extends PanelProvider
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
+                // Tenancy MUST initialise before session so the tenant_web guard
+                // reads users from the correct tenant DB, not the central DB.
+                InitializeTenancyByDomain::class,
+                PreventAccessFromCentralDomains::class,
                 StartSession::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
@@ -77,8 +81,6 @@ class TenantPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                InitializeTenancyByDomain::class,
-                PreventAccessFromCentralDomains::class,
             ])
             ->authMiddleware([Authenticate::class])
             ->renderHook(
@@ -111,7 +113,8 @@ class TenantPanelProvider extends PanelProvider
             if ($tenantInstance) {
                 $agency = $tenantInstance->agency;
             }
-        } catch (\Throwable) {}
+        } catch (\Throwable) {
+        }
 
         if ($agency && $agency->canUseFeature('white_label')) {
             return [
@@ -125,8 +128,9 @@ class TenantPanelProvider extends PanelProvider
 
         $storeName = 'My Store';
         try {
-            $storeName = \App\Models\Tenant\Setting::get('store_name', 'My Store') ?? 'My Store';
-        } catch (\Throwable) {}
+            $storeName = Setting::get('store_name', 'My Store') ?? 'My Store';
+        } catch (\Throwable) {
+        }
 
         return [$storeName, Color::Amber, null, false, null];
     }

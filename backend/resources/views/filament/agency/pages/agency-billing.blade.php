@@ -1,10 +1,13 @@
 <x-filament-panels::page>
     @php
-        $hasPlan       = $this->hasActivePlan();
-        $isLifetime    = $this->isLifetime();
-        $subscription  = $this->subscription();
-        $stripeOk      = $this->isStripeConfigured();
-        $plans         = $this->availablePlans();
+        $hasPlan          = $this->hasActivePlan();
+        $isLifetime       = $this->isLifetime();
+        $subscription     = $this->subscription();
+        $stripeOk         = $this->isStripeConfigured();
+        $hasCustomer      = $this->hasStripeCustomer();
+        $plans            = $this->availablePlans();
+        $billingTypeLabel = $this->billingTypeLabel();
+        $recentEvents     = $this->recentBillingEvents();
     @endphp
 
     {{-- ── PIANO CORRENTE ─────────────────────────────────────────────────── --}}
@@ -30,49 +33,80 @@
         @endif
 
         {{-- KPI principali --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 mb-6">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-5 mb-6">
             @php
                 $kpiItems = [
-                    ['label' => 'Piano', 'value' => $this->planName(), 'icon' => 'heroicon-o-document-text', 'color' => 'blue'],
-                    ['label' => 'Prezzo', 'value' => $this->planPrice(), 'icon' => 'heroicon-o-currency-euro', 'color' => 'emerald'],
-                    ['label' => 'Max Negozi', 'value' => $this->maxStores(), 'icon' => 'heroicon-o-building-storefront', 'color' => 'purple'],
-                    ['label' => 'Fee transazione', 'value' => $this->transactionFee(), 'icon' => 'heroicon-o-banknotes', 'color' => 'orange'],
+                    ['label' => 'Piano',            'value' => $this->planName()],
+                    ['label' => 'Prezzo',           'value' => $this->planPrice()],
+                    ['label' => 'Fatturazione',     'value' => $billingTypeLabel],
+                    ['label' => 'Max Negozi',       'value' => $this->maxStores()],
+                    ['label' => 'Fee transazione',  'value' => $this->transactionFee()],
                 ];
             @endphp
             @foreach($kpiItems as $kpi)
                 <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
                     <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{{ $kpi['label'] }}</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $kpi['value'] }}</p>
+                    <p class="text-xl font-bold text-gray-900 dark:text-white truncate">{{ $kpi['value'] }}</p>
                 </div>
             @endforeach
         </div>
 
-        {{-- Stato abbonamento e gestione --}}
-        @if($subscription)
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 shadow-inner">
-                <div class="flex items-center gap-3.5 flex-wrap">
+        {{-- Stato abbonamento e azioni --}}
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 shadow-inner">
+            <div class="flex items-center gap-3.5 flex-wrap">
+                @if($subscription)
                     @php
                         $statusColors = [
-                            'active' => 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-900/50',
-                            'past_due' => 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-900/50',
-                            'trialing' => 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-900/50',
+                            'active'    => 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-900/50',
+                            'past_due'  => 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-900/50',
+                            'trialing'  => 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-900/50',
+                            'cancelled' => 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600',
                         ];
                         $statusColor = $statusColors[$subscription->status] ?? 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600';
+                        $statusLabels = ['active' => 'Attivo', 'past_due' => 'Pagamento scaduto', 'trialing' => 'In prova', 'cancelled' => 'Cancellato'];
+                        $statusLabel = $statusLabels[$subscription->status] ?? ucfirst($subscription->status);
                     @endphp
                     <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border {{ $statusColor }}">
-                        {{ ucfirst($subscription->status) }}
+                        {{ $statusLabel }}
                     </span>
-                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $subscription->renewalLabel() }}</span>
-                </div>
-
-                @if($stripeOk && $this->agency()?->stripe_customer_id)
-                    <x-filament::button wire:click="openCustomerPortal" color="gray" size="sm" outlined class="shadow-sm w-full sm:w-auto">
-                        <x-heroicon-o-cog-8-tooth class="h-4 w-4 mr-1.5 shrink-0"/>
-                        Gestisci abbonamento
-                    </x-filament::button>
+                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                        {{ $subscription->renewalLabel() }}
+                    </span>
+                    @if($subscription->current_period_start)
+                        <span class="text-xs text-gray-400 dark:text-gray-500">
+                            Attivo dal {{ $subscription->current_period_start->format('d/m/Y') }}
+                        </span>
+                    @endif
+                @elseif($isLifetime)
+                    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-900/50">
+                        Lifetime
+                    </span>
+                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Accesso perpetuo</span>
+                @else
+                    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600">
+                        Nessun abbonamento
+                    </span>
+                    @if($hasPlan)
+                        <span class="text-sm text-gray-500 dark:text-gray-400">Piano assegnato senza abbonamento Stripe attivo</span>
+                    @endif
                 @endif
             </div>
-        @endif
+
+            @if($stripeOk && $hasCustomer)
+                <x-filament::button
+                    wire:click="openCustomerPortal"
+                    wire:loading.attr="disabled"
+                    color="gray"
+                    size="sm"
+                    outlined
+                    class="shadow-sm w-full sm:w-auto shrink-0"
+                >
+                    <x-heroicon-o-cog-8-tooth class="h-4 w-4 mr-1.5 shrink-0"/>
+                    <span wire:loading.remove wire:target="openCustomerPortal">Gestisci abbonamento</span>
+                    <span wire:loading wire:target="openCustomerPortal">Caricamento…</span>
+                </x-filament::button>
+            @endif
+        </div>
     </x-filament::section>
 
     {{-- ── FEATURE INCLUSE ────────────────────────────────────────────────── --}}
@@ -247,4 +281,92 @@
             </p>
         </x-filament::section>
     @endif
+
+    {{-- ── CRONOLOGIA PAGAMENTI ───────────────────────────────────────────── --}}
+    <x-filament::section class="!mt-10">
+        <x-slot name="heading">
+            <div class="flex items-center gap-2.5">
+                <x-heroicon-o-clock class="h-6 w-6 text-primary-500 shrink-0"/>
+                <span class="text-xl font-bold text-gray-950 dark:text-white">Cronologia eventi</span>
+            </div>
+        </x-slot>
+
+        @if($recentEvents->isEmpty())
+            <div class="flex flex-col items-center justify-center py-10 gap-3 text-center">
+                <x-heroicon-o-document-magnifying-glass class="h-10 w-10 text-gray-300 dark:text-gray-600"/>
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Nessun evento di fatturazione registrato</p>
+                @if($stripeOk && $hasCustomer)
+                    <p class="text-xs text-gray-400 dark:text-gray-500">
+                        Per visualizzare fatture e pagamenti usa il portale Stripe.
+                    </p>
+                    <x-filament::button
+                        wire:click="openCustomerPortal"
+                        color="gray"
+                        size="sm"
+                        outlined
+                        class="mt-2"
+                    >
+                        <x-heroicon-o-arrow-top-right-on-square class="h-4 w-4 mr-1.5"/>
+                        Apri portale Stripe
+                    </x-filament::button>
+                @endif
+            </div>
+        @else
+            @php
+                $eventLabels = [
+                    'invoice.paid'                          => 'Pagamento ricevuto',
+                    'invoice.payment_failed'                => 'Pagamento fallito',
+                    'invoice.payment_succeeded'             => 'Pagamento confermato',
+                    'invoice.payment_action_required'       => 'Azione richiesta',
+                    'customer.subscription.created'         => 'Abbonamento creato',
+                    'customer.subscription.updated'         => 'Abbonamento aggiornato',
+                    'customer.subscription.deleted'         => 'Abbonamento cancellato',
+                    'customer.subscription.trial_will_end'  => 'Fine trial imminente',
+                ];
+            @endphp
+            <div class="divide-y divide-gray-100 dark:divide-gray-800">
+                @foreach($recentEvents as $event)
+                    @php
+                        $label   = $eventLabels[$event->event_type] ?? $event->event_type;
+                        $isError = $event->error !== null;
+                        $isPending = $event->processed_at === null && ! $isError;
+                    @endphp
+                    <div class="flex items-center justify-between py-3.5 gap-4">
+                        <div class="flex items-center gap-3.5 min-w-0">
+                            @if($isError)
+                                <x-heroicon-o-x-circle class="h-5 w-5 text-red-500 shrink-0"/>
+                            @elseif($isPending)
+                                <x-heroicon-o-clock class="h-5 w-5 text-yellow-500 shrink-0"/>
+                            @else
+                                <x-heroicon-o-check-circle class="h-5 w-5 text-green-500 shrink-0"/>
+                            @endif
+                            <div class="min-w-0">
+                                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ $label }}</p>
+                                @if($isError)
+                                    <p class="text-xs text-red-500 truncate">{{ $event->error }}</p>
+                                @endif
+                            </div>
+                        </div>
+                        <span class="text-xs text-gray-400 dark:text-gray-500 shrink-0 tabular-nums">
+                            {{ $event->created_at->format('d/m/Y H:i') }}
+                        </span>
+                    </div>
+                @endforeach
+            </div>
+
+            @if($stripeOk && $hasCustomer)
+                <div class="mt-5 pt-5 border-t border-gray-100 dark:border-gray-800 text-center">
+                    <x-filament::button
+                        wire:click="openCustomerPortal"
+                        color="gray"
+                        size="sm"
+                        outlined
+                    >
+                        <x-heroicon-o-arrow-top-right-on-square class="h-4 w-4 mr-1.5"/>
+                        Scarica fatture complete su Stripe
+                    </x-filament::button>
+                </div>
+            @endif
+        @endif
+    </x-filament::section>
 </x-filament-panels::page>

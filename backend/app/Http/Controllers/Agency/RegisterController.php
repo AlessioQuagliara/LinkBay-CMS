@@ -6,11 +6,12 @@ namespace App\Http\Controllers\Agency;
 
 use App\Http\Controllers\Controller;
 use App\Models\Central\Agency;
+use App\Models\Central\AgencyMember;
 use App\Models\Central\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class RegisterController extends Controller
@@ -24,11 +25,11 @@ class RegisterController extends Controller
     {
         $validated = $request->validate([
             'agency_name' => ['required', 'string', 'max:255'],
-            'slug'        => ['required', 'string', 'max:63', 'regex:/^[a-z0-9][a-z0-9-]*[a-z0-9]$/', 'unique:agencies,slug'],
-            'email'       => ['required', 'email', 'unique:users,email'],
-            'password'    => ['required', 'string', 'min:8', 'confirmed'],
+            'slug' => ['required', 'string', 'max:63', 'regex:/^[a-z0-9][a-z0-9-]*[a-z0-9]$/', Rule::unique(Agency::class, 'slug')],
+            'email' => ['required', 'email', Rule::unique(User::class, 'email')],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ], [
-            'slug.regex'  => 'Lo slug può contenere solo lettere minuscole, numeri e trattini, e non può iniziare/terminare con un trattino.',
+            'slug.regex' => 'Lo slug può contenere solo lettere minuscole, numeri e trattini, e non può iniziare/terminare con un trattino.',
             'slug.unique' => 'Questo sottodominio è già in uso.',
             'email.unique' => 'Questa email è già registrata.',
         ]);
@@ -37,28 +38,37 @@ class RegisterController extends Controller
         $status = app()->isLocal() ? 'active' : 'pending';
 
         $agency = Agency::create([
-            'name'       => $validated['agency_name'],
-            'slug'       => $validated['slug'],
+            'name' => $validated['agency_name'],
+            'slug' => $validated['slug'],
             'brand_name' => $validated['agency_name'],
-            'status'     => $status,
+            'status' => $status,
             'billing_type' => 'monthly',
         ]);
 
         $user = User::create([
-            'name'           => $validated['agency_name'],
-            'email'          => $validated['email'],
-            'password'       => Hash::make($validated['password']),
+            'name' => $validated['agency_name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
             'is_super_admin' => false,
         ]);
 
         $agency->update(['owner_user_id' => $user->id]);
 
-        $agencyDomain = $validated['slug'] . '.' . config('app.central_domain', 'linkbay-cms.test');
+        AgencyMember::create([
+            'agency_id' => $agency->id,
+            'user_id' => $user->id,
+            'role' => AgencyMember::ROLE_OWNER,
+            'status' => AgencyMember::STATUS_ACTIVE,
+            'accepted_at' => now(),
+        ]);
+
+        $agencyDomain = $validated['slug'].'.'.config('app.central_domain', 'linkbay-cms.test');
 
         if ($status === 'active') {
             // Derive scheme from APP_URL so HTTP local and HTTPS prod both work.
             $scheme = parse_url(config('app.url'), PHP_URL_SCHEME) ?? 'http';
-            $loginUrl = $scheme . '://' . $agencyDomain . '/dashboard/login';
+            $loginUrl = $scheme.'://'.$agencyDomain.'/dashboard/login';
+
             return redirect($loginUrl)->with(
                 'success',
                 'Account creato! Login alla tua dashboard.'

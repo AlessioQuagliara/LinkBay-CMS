@@ -178,7 +178,13 @@
                                     <x-filament::button color="warning">Collega Stripe →</x-filament::button>
                                 </a>
                             @else
-                                <p class="text-xs text-red-500 mt-2">Configura STRIPE_SECRET nel file .env</p>
+                                <div class="flex items-start gap-2 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-sm mt-3">
+                                    <span class="text-red-700 dark:text-red-300">
+                                        Integrazione Stripe temporaneamente non disponibile.
+                                        Contatta il supporto su
+                                        <a href="mailto:support@linkbay-cms.com" class="underline font-medium">support@linkbay-cms.com</a>.
+                                    </span>
+                                </div>
                             @endif
                         </div>
                     @endif

@@ -38,7 +38,7 @@ class Agency extends Model
     ];
 
     protected $casts = [
-        'hide_linkbay_branding'    => 'boolean',
+        'hide_linkbay_branding' => 'boolean',
         'stripe_connect_onboarded' => 'boolean',
     ];
 
@@ -89,6 +89,11 @@ class Agency extends Model
         return $this->hasMany(AgencyClient::class);
     }
 
+    public function agencyMembers()
+    {
+        return $this->hasMany(AgencyMember::class);
+    }
+
     // ── Scopes ─────────────────────────────────────────────────────────────────
 
     public function scopeActive($query)
@@ -106,6 +111,7 @@ class Agency extends Model
     public function resolvedPrimaryColor(): string
     {
         $color = $this->primary_color ?? '#ff5758';
+
         return str_starts_with($color, '#') ? $color : '#ff5758';
     }
 
@@ -115,7 +121,7 @@ class Agency extends Model
         // Uses config('app.central_domain') so local and prod follow the same env var (CENTRAL_DOMAIN).
         return $this->custom_domain
             ?? $this->domain
-            ?? ($this->slug . '.' . config('app.central_domain', 'linkbay-cms.com'));
+            ?? ($this->slug.'.'.config('app.central_domain', 'linkbay-cms.com'));
     }
 
     public function canUseFeature(string $feature): bool
@@ -143,9 +149,30 @@ class Agency extends Model
 
     public static function fromDomain(string $domain): ?self
     {
-        return static::where('custom_domain', $domain)
+        // Exact custom-domain or legacy domain match.
+        $match = static::where('custom_domain', $domain)
             ->orWhere('domain', $domain)
-            ->orWhere('slug', explode('.', $domain)[0])
             ->first();
+
+        if ($match) {
+            return $match;
+        }
+
+        // Subdomain-based slug resolution: only when the host is a direct
+        // subdomain of the configured central domain.  Avoids matching an
+        // arbitrary first component of attacker-controlled domains.
+        $centralDomain = config('app.central_domain', 'linkbay-cms.com');
+
+        if (str_ends_with($domain, '.'.$centralDomain)) {
+            // Strip the trailing .central_domain to get the slug segment.
+            $slug = substr($domain, 0, strlen($domain) - strlen('.'.$centralDomain));
+
+            // Only accept single-level slugs (no dots).
+            if ($slug !== '' && ! str_contains($slug, '.')) {
+                return static::where('slug', $slug)->first();
+            }
+        }
+
+        return null;
     }
 }

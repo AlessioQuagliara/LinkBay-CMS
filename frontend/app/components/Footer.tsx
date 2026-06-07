@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { MapPin, Mail } from "lucide-react";
+import { BrandName } from "./BrandName";
 import { LogoMark } from "./LogoMark";
 
 export const Footer: React.FC = () => (
@@ -11,7 +12,7 @@ export const Footer: React.FC = () => (
         {/* Brand & tagline */}
         <div className="lg:col-span-1">
           <Link href="/" className="flex items-center mb-6 group no-underline">
-            <LogoMark variant="white" className="text-xl" />
+            <LogoMark variant="white" className="text-xl" registered />
           </Link>
           <p className="text-gray-300 text-sm leading-relaxed mb-6">
             Commerce infrastructure for agencies running multiple client stores from one control deck.
@@ -166,12 +167,17 @@ export const Footer: React.FC = () => (
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-gray-600 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-        <p className="text-gray-400 text-sm">
-          &copy; {new Date().getFullYear()} <span className="font-linkbay">LinkBay-CMS</span>.
-          <span className="text-[#ff5758] mx-1">⚓</span>
-          Developed by Alessio Quagliara. All rights reserved.
-        </p>
+      <div className="border-t border-gray-600 mt-12 pt-8 flex flex-col md:flex-row justify-between items-start gap-4">
+        <div className="space-y-1">
+          <p className="text-gray-400 text-sm">
+            &copy; {new Date().getFullYear()} <span className="font-linkbay">LinkBay-CMS</span>.
+            <span className="text-[#ff5758] mx-1">⚓</span>
+            Developed by Alessio Quagliara. All rights reserved.
+          </p>
+          <p className="text-gray-500 text-xs">
+            <BrandName registered /> è un marchio registrato di Alessio Quagliara.
+          </p>
+        </div>
         <div className="flex items-center space-x-6 text-gray-500 text-xs">
           <span>VAT: pending registration</span>
           <span>•</span>

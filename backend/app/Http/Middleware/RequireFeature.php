@@ -17,9 +17,9 @@ class RequireFeature
 
     public function handle(Request $request, Closure $next, string $feature): Response
     {
-        $agency = $this->resolveAgency($request);
+        $agency = $this->resolveAgency();
 
-        if (!$agency) {
+        if (! $agency) {
             return $next($request);
         }
 
@@ -42,14 +42,25 @@ class RequireFeature
         return $next($request);
     }
 
-    private function resolveAgency(Request $request): ?Agency
+    private function resolveAgency(): ?Agency
     {
+        // For tenant-panel routes, the agency comes from the tenant relation.
         try {
             if (tenancy()->initialized()) {
                 return tenant()->agency;
             }
-        } catch (\Throwable) {}
+        } catch (\Throwable) {
+        }
 
-        return app()->has('current_agency') ? app('current_agency') : null;
+        // For agency-panel routes, EnsureValidAgencyDomain has already bound it.
+        if (app()->bound('current_agency')) {
+            $agency = app('current_agency');
+
+            if ($agency instanceof Agency) {
+                return $agency;
+            }
+        }
+
+        return null;
     }
 }

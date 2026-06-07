@@ -41,7 +41,7 @@ export default function HomePage() {
           </div>
 
           <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 mb-6 leading-tight font-linkbay">
-            LinkBay<span className="text-red-600">CMS</span>
+            LinkBay<span className="text-red-600">CMS</span><sup aria-label="marchio registrato" className="text-[0.28em] align-super font-normal text-gray-400 ml-1 leading-none">®</sup>
           </h1>
 
           <p className="text-2xl md:text-3xl text-gray-700 mb-4 font-light">

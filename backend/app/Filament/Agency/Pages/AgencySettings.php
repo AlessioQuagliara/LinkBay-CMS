@@ -6,15 +6,27 @@ use App\Filament\Agency\Concerns\ResolvesCurrentAgency;
 use App\Services\StripeConnectService;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Support\Facades\Log;
 
 class AgencySettings extends Page
 {
     use ResolvesCurrentAgency;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+
     protected static ?string $navigationLabel = 'Impostazioni';
+
     protected string $view = 'filament.agency.pages.agency-settings';
 
+    public static function canAccess(): bool
+    {
+        $member = static::currentMemberStatic();
+
+        return $member?->isOwnerOrAdmin() ?? false;
+    }
+
     public array $brandData = [];
+
     public array $domainData = [];
 
     public function mount(): void
@@ -54,26 +66,32 @@ class AgencySettings extends Page
     public function getStripeConnectUrl(): ?string
     {
         $agency = $this->agency();
-        if (!$agency || $agency->stripe_connect_onboarded) {
+        if (! $agency || $agency->stripe_connect_onboarded) {
             return null;
         }
         try {
             return app(StripeConnectService::class)->createOnboardingLink($agency);
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            Log::error('StripeConnect onboarding link failed', [
+                'agency_id' => $agency->id,
+                'error' => $e->getMessage(),
+            ]);
+
             return null;
         }
     }
 
     public function currentTransactionFee(): string
     {
-        return $this->agency()?->transactionFeePct() . '%';
+        return $this->agency()?->transactionFeePct().'%';
     }
 
     public function saveBrand(): void
     {
         $agency = $this->agency();
-        if (!$agency?->canUseFeature('white_label')) {
+        if (! $agency?->canUseFeature('white_label')) {
             Notification::make()->title('Upgrade required per White-Label')->warning()->send();
+
             return;
         }
         $agency->update($this->brandData);
@@ -83,12 +101,12 @@ class AgencySettings extends Page
     public function saveDomain(): void
     {
         $agency = $this->agency();
-        if (!$agency?->canUseFeature('custom_domain')) {
+        if (! $agency?->canUseFeature('custom_domain')) {
             Notification::make()->title('Upgrade a Business per dominio custom')->warning()->send();
+
             return;
         }
         $agency->update(['custom_domain' => $this->domainData['custom_domain'] ?? null]);
         Notification::make()->title('Dominio salvato')->success()->send();
     }
-
 }
