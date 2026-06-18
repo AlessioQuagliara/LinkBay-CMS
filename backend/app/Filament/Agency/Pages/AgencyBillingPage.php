@@ -6,9 +6,11 @@ namespace App\Filament\Agency\Pages;
 
 use App\Filament\Agency\Concerns\ResolvesCurrentAgency;
 use App\Models\Central\AgencySubscription;
+use App\Models\Central\AuditEvent;
 use App\Models\Central\BillingEvent;
 use App\Models\Central\Plan;
 use App\Services\AgencySubscriptionService;
+use App\Services\AuditEventService;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Collection;
@@ -257,6 +259,11 @@ class AgencyBillingPage extends Page
                 'customer' => $agency->stripe_customer_id,
                 'return_url' => route('filament.agency.pages.agency-billing'),
             ]);
+
+            app(AuditEventService::class)->log(
+                event: AuditEvent::EVENT_BILLING_PORTAL_ACCESSED,
+                agencyId: $agency->id,
+            );
 
             $this->redirect($session->url, navigate: false);
         } catch (\Throwable $e) {

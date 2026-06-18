@@ -63,6 +63,101 @@
         </div>
     </x-filament::section>
 
+    {{-- ── Utilizzo per negozio ────────────────────────────────────────────── --}}
+    @php $breakdown = $this->storeBreakdown(); @endphp
+
+    <x-filament::section class="mt-6">
+        <x-slot name="heading">
+            <div class="flex items-center gap-2">
+                <x-heroicon-o-building-storefront class="h-5 w-5 text-primary-500 shrink-0"/>
+                <span>Utilizzo per negozio</span>
+            </div>
+        </x-slot>
+
+        <x-slot name="headerEnd">
+            {{-- Period filter pills --}}
+            <div class="flex items-center gap-1 text-xs">
+                @foreach(['30d' => '30 gg', '90d' => '90 gg', 'all' => 'Tutto'] as $val => $label)
+                    <button
+                        wire:click="$set('filterPeriod', '{{ $val }}')"
+                        class="px-2.5 py-1 rounded-full font-medium transition-colors
+                            {{ $filterPeriod === $val
+                                ? 'bg-primary-500 text-white'
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}"
+                    >{{ $label }}</button>
+                @endforeach
+            </div>
+        </x-slot>
+
+        @if($breakdown->isEmpty())
+            <div class="flex flex-col items-center justify-center py-10 gap-2 text-center">
+                <x-heroicon-o-sparkles class="h-10 w-10 text-gray-300 dark:text-gray-600"/>
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    Nessun consumo registrato
+                </p>
+                <p class="text-xs text-gray-400 dark:text-gray-500 max-w-xs">
+                    I crediti AI vengono consumati quando i negozi utilizzano funzionalità AI.
+                    Nessun utilizzo nei {{ $this->filterPeriodLabel() }}.
+                </p>
+            </div>
+        @else
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-100 dark:border-gray-800">
+                            <th class="text-left py-2.5 pr-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Negozio</th>
+                            <th class="text-right py-2.5 pr-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Crediti</th>
+                            <th class="text-right py-2.5 pr-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Utilizzi</th>
+                            <th class="text-left py-2.5 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Ultimo utilizzo</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50 dark:divide-gray-800/60">
+                        @foreach($breakdown as $row)
+                            <tr class="group hover:bg-gray-50/60 dark:hover:bg-gray-800/40 transition-colors">
+                                <td class="py-3 pr-4">
+                                    <div class="flex items-center gap-2">
+                                        @if($row->tenant_id)
+                                            <x-heroicon-o-building-storefront class="h-4 w-4 text-gray-400 shrink-0"/>
+                                        @else
+                                            <x-heroicon-o-cog-6-tooth class="h-4 w-4 text-gray-300 shrink-0"/>
+                                        @endif
+                                        <span class="font-medium text-gray-900 dark:text-white">{{ $row->store_name }}</span>
+                                        @if($row->tenant_id)
+                                            <span class="text-xs text-gray-400 font-mono">{{ $row->tenant_id }}</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="py-3 pr-4 text-right">
+                                    <span class="font-semibold tabular-nums text-amber-600 dark:text-amber-400">
+                                        {{ number_format($row->credits_consumed) }}
+                                    </span>
+                                </td>
+                                <td class="py-3 pr-4 text-right tabular-nums text-gray-600 dark:text-gray-400">
+                                    {{ number_format($row->event_count) }}
+                                </td>
+                                <td class="py-3 text-xs text-gray-500 dark:text-gray-500 tabular-nums whitespace-nowrap">
+                                    {{ $row->last_used_at?->format('d/m/Y H:i') ?? '—' }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                    <tfoot>
+                        <tr class="border-t border-gray-200 dark:border-gray-700">
+                            <td class="pt-2.5 pr-4 text-xs font-medium text-gray-500 uppercase tracking-wide">Totale</td>
+                            <td class="pt-2.5 pr-4 text-right font-bold tabular-nums text-amber-600 dark:text-amber-400">
+                                {{ number_format($breakdown->sum('credits_consumed')) }}
+                            </td>
+                            <td class="pt-2.5 pr-4 text-right tabular-nums text-gray-600 dark:text-gray-400">
+                                {{ number_format($breakdown->sum('event_count')) }}
+                            </td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        @endif
+    </x-filament::section>
+
     {{-- ── Storico ──────────────────────────────────────────────────────────── --}}
     <x-filament::section heading="Storico (ultimi 20)" class="mt-6">
         @php $ledger = $this->ledger(); @endphp

@@ -5,6 +5,12 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Central\Tenant;
+use App\Models\Tenant\Collection;
+use App\Models\Tenant\Setting;
+use App\Models\Tenant\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class TenantProvisioningService
 {
@@ -16,12 +22,12 @@ class TenantProvisioningService
     public function provision(array $data): Tenant
     {
         $tenant = Tenant::create([
-            'id'               => $data['domain'],
-            'name'             => $data['name'],
-            'plan_id'          => $data['plan_id'] ?? null,
-            'agency_id'        => $data['agency_id'] ?? null,
+            'id' => $data['domain'],
+            'name' => $data['name'],
+            'plan_id' => $data['plan_id'] ?? null,
+            'agency_id' => $data['agency_id'] ?? null,
             'agency_client_id' => $data['agency_client_id'] ?? null,
-            'status'           => 'active',
+            'status' => 'active',
         ]);
 
         $this->registerDomain($tenant);
@@ -37,7 +43,7 @@ class TenantProvisioningService
     public function registerDomain(Tenant $tenant): void
     {
         $storeDomain = config('app.store_domain', 'yoursite-linkbay-cms.com');
-        $fullDomain  = $tenant->id . '.' . $storeDomain;
+        $fullDomain = $tenant->id.'.'.$storeDomain;
 
         if (! $tenant->domains()->where('domain', $fullDomain)->exists()) {
             $tenant->domains()->create(['domain' => $fullDomain]);
@@ -47,23 +53,30 @@ class TenantProvisioningService
     /**
      * Initializes the tenant database schema and seeds defaults.
      * Can be called independently for re-provisioning or recovery.
+     *
+     * Returns the plaintext password-reset token when an adminEmail is provided
+     * (for use in the welcome email), or null otherwise.
      */
-    public function initializeDatabase(Tenant $tenant, ?string $adminEmail = null): void
+    public function initializeDatabase(Tenant $tenant, ?string $adminEmail = null): ?string
     {
         $email = $adminEmail
             ?? (isset($tenant->admin_email) ? $tenant->admin_email : null)
-            ?? 'admin@' . $tenant->id . '.test';
+            ?? 'admin@'.$tenant->id.'.test';
 
         tenancy()->initialize($tenant);
+        $resetToken = null;
         try {
-            $this->seedTenantDefaults([
-                'name'        => $tenant->name,
+            $resetToken = $this->seedTenantDefaults([
+                'name' => $tenant->name,
                 'admin_email' => $email,
             ]);
         } finally {
             // Always restore central connection, even if seeding throws.
             tenancy()->end();
         }
+
+        // Return token only when caller supplied a real admin email.
+        return ($adminEmail !== null) ? $resetToken : null;
     }
 
     public function deprovision(Tenant $tenant): void
@@ -71,17 +84,41 @@ class TenantProvisioningService
         $tenant->delete();
     }
 
-    private function seedTenantDefaults(array $data): void
+    /**
+     * Seeds initial data into the tenant database while tenancy is active.
+     * Creates the admin user and generates a password-reset token.
+     *
+     * Returns the plaintext reset token (caller must send via email; never log).
+     */
+    private function seedTenantDefaults(array $data): string
     {
-        \App\Models\Tenant\Collection::create([
-            'name'      => 'Default',
-            'slug'      => 'default',
+        Collection::create([
+            'name' => 'Default',
+            'slug' => 'default',
             'is_active' => true,
         ]);
 
-        \App\Models\Tenant\Setting::set('store_name', $data['name'] ?? 'My Store');
-        \App\Models\Tenant\Setting::set('currency', 'EUR');
-        \App\Models\Tenant\Setting::set('timezone', 'Europe/Rome');
-        \App\Models\Tenant\Setting::set('admin_email', $data['admin_email']);
+        Setting::set('store_name', $data['name'] ?? 'My Store');
+        Setting::set('currency', 'EUR');
+        Setting::set('timezone', 'Europe/Rome');
+        Setting::set('admin_email', $data['admin_email']);
+
+        // Create the store admin user with a locked password so they must
+        // use the reset link in the welcome email to gain access.
+        User::create([
+            'name' => 'Store Admin',
+            'email' => $data['admin_email'],
+            'password' => Str::random(32),
+        ]);
+
+        // Generate a password-reset token and store it in the tenant DB.
+        $token = Str::random(64);
+        DB::table('password_reset_tokens')->insert([
+            'email' => $data['admin_email'],
+            'token' => Hash::make($token),
+            'created_at' => now(),
+        ]);
+
+        return $token;
     }
 }

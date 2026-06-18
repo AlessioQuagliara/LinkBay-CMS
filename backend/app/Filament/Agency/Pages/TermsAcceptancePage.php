@@ -5,17 +5,23 @@ declare(strict_types=1);
 namespace App\Filament\Agency\Pages;
 
 use App\Filament\Agency\Concerns\ResolvesCurrentAgency;
+use App\Models\Central\AuditEvent;
 use App\Models\Central\TermsAcceptance;
+use App\Services\AuditEventService;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Database\UniqueConstraintViolationException;
 
 class TermsAcceptancePage extends Page
 {
     use ResolvesCurrentAgency;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-check';
+
     protected static ?string $navigationLabel = 'Termini & Condizioni';
+
     protected static ?string $slug = 'terms-acceptance';
+
     protected string $view = 'filament.agency.pages.terms-acceptance';
 
     // Mai in sidebar: è solo un gate, non una destinazione di navigazione
@@ -37,10 +43,11 @@ class TermsAcceptancePage extends Page
     public function accept(): void
     {
         $agency = $this->agency();
-        $user   = auth()->user();
+        $user = auth()->user();
 
-        if (!$agency || !$user) {
+        if (! $agency || ! $user) {
             Notification::make()->title('Errore: sessione non valida')->danger()->send();
+
             return;
         }
 
@@ -48,15 +55,22 @@ class TermsAcceptancePage extends Page
             TermsAcceptance::record(
                 agency: $agency,
                 userId: $user->id,
-                ip:     request()->ip() ?? '0.0.0.0',
-                ua:     request()->userAgent(),
+                ip: request()->ip() ?? '0.0.0.0',
+                ua: request()->userAgent(),
             );
-        } catch (\Illuminate\Database\UniqueConstraintViolationException) {
+        } catch (UniqueConstraintViolationException) {
             // Double-click o doppio submit: i T&C erano già stati accettati, procedi comunque
         }
 
         // Aggiorna il campo in-memory per far funzionare il fast-path nel middleware
         $agency->update(['terms_accepted_version' => TermsAcceptance::currentVersion()]);
+
+        app(AuditEventService::class)->log(
+            event: AuditEvent::EVENT_TERMS_ACCEPTED,
+            agencyId: $agency->id,
+            userId: $user->id,
+            newValues: ['terms_version' => TermsAcceptance::currentVersion()],
+        );
 
         Notification::make()
             ->title('Termini accettati — benvenuto in LinkBay!')
@@ -70,5 +84,4 @@ class TermsAcceptancePage extends Page
     {
         return TermsAcceptance::currentVersion();
     }
-
 }

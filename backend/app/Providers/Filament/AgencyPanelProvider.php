@@ -5,13 +5,17 @@ namespace App\Providers\Filament;
 use App\Filament\Agency\Pages\AgencyBillingPage;
 use App\Filament\Agency\Pages\AgencySettings;
 use App\Filament\Agency\Pages\AiCreditsPage;
+use App\Filament\Agency\Pages\AuditLogPage;
 use App\Filament\Agency\Pages\CommissionsPage;
 use App\Filament\Agency\Pages\PayoutsPage;
 use App\Filament\Agency\Pages\TermsAcceptancePage;
 use App\Filament\Agency\Resources\AgencyClientResource;
 use App\Filament\Agency\Resources\AgencyMemberResource;
+use App\Filament\Agency\Resources\LayoutTemplateResource;
 use App\Filament\Agency\Resources\StoreResource;
+use App\Filament\Agency\Resources\ThemePresetResource;
 use App\Filament\Agency\Widgets\AgencyStatsWidget;
+use App\Filament\Agency\Widgets\DashboardAlertsWidget;
 use App\Filament\Agency\Widgets\PlanUpsellWidget;
 use App\Http\Middleware\EnsureValidAgencyDomain;
 use App\Http\Middleware\RequireTermsAcceptance;
@@ -74,7 +78,7 @@ class AgencyPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop()
             ->viteTheme('resources/css/filament-agency.css')
             ->authGuard('web')
-            ->resources([StoreResource::class, AgencyClientResource::class, AgencyMemberResource::class])
+            ->resources([StoreResource::class, AgencyClientResource::class, AgencyMemberResource::class, LayoutTemplateResource::class, ThemePresetResource::class])
             ->pages([
                 Dashboard::class,
                 AgencySettings::class,
@@ -82,9 +86,10 @@ class AgencyPanelProvider extends PanelProvider
                 AiCreditsPage::class,
                 CommissionsPage::class,
                 PayoutsPage::class,
+                AuditLogPage::class,
                 TermsAcceptancePage::class,
             ])
-            ->widgets([PlanUpsellWidget::class, AgencyStatsWidget::class])
+            ->widgets([DashboardAlertsWidget::class, PlanUpsellWidget::class, AgencyStatsWidget::class])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

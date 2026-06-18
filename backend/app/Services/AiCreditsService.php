@@ -8,8 +8,10 @@ use App\Exceptions\InsufficientCreditsException;
 use App\Models\Central\Agency;
 use App\Models\Central\AiCreditLedger;
 use App\Models\Central\AiCreditPackage;
+use App\Models\Central\Tenant;
+use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Stripe\Checkout\Session;
 use Stripe\Stripe;
 
@@ -95,6 +97,49 @@ class AiCreditsService
             });
     }
 
+    /**
+     * Consumption breakdown grouped by store, ordered by highest consumption first.
+     *
+     * Rows with tenant_id = null (consumption not tied to a specific store) are
+     * included and labelled "Sistema" — they represent valid consumption events
+     * called without a store context.
+     *
+     * Only this agency's stores are resolved for names; tenant_ids that no longer
+     * exist in the tenants table fall back to "Store #<id>".
+     *
+     * @return Collection<int, object{tenant_id: string|null, store_name: string, credits_consumed: int, event_count: int, last_used_at: Carbon|null}>
+     */
+    public function storeBreakdown(Agency $agency, ?Carbon $since = null): Collection
+    {
+        $rows = AiCreditLedger::where('agency_id', $agency->id)
+            ->where('type', AiCreditLedger::TYPE_CONSUMPTION)
+            ->when($since, fn ($q) => $q->where('created_at', '>=', $since))
+            ->selectRaw('tenant_id, ABS(SUM(amount)) as credits_consumed, COUNT(*) as event_count, MAX(created_at) as last_used_at')
+            ->groupBy('tenant_id')
+            ->orderByRaw('ABS(SUM(amount)) DESC')
+            ->get();
+
+        // Batch-load store names, scoped to this agency for security.
+        $tenantIds = $rows->pluck('tenant_id')->filter()->unique()->values()->toArray();
+
+        $storeNames = $tenantIds
+            ? Tenant::whereIn('id', $tenantIds)
+                ->where('agency_id', $agency->id)
+                ->pluck('name', 'id')
+                ->all()
+            : [];
+
+        return $rows->map(fn ($row) => (object) [
+            'tenant_id' => $row->tenant_id,
+            'store_name' => $row->tenant_id
+                ? ($storeNames[$row->tenant_id] ?? "Store #{$row->tenant_id}")
+                : 'Sistema',
+            'credits_consumed' => (int) $row->credits_consumed,
+            'event_count' => (int) $row->event_count,
+            'last_used_at' => $row->last_used_at ? Carbon::parse($row->last_used_at) : null,
+        ]);
+    }
+
     public function createCheckoutSession(Agency $agency, AiCreditPackage $package): Session
     {
         Stripe::setApiKey(config('services.stripe.secret'));
@@ -111,8 +156,8 @@ class AiCreditsService
                 'package_id' => $package->id,
                 'type' => 'ai_credits',
             ],
-            'success_url' => route('filament.agency.pages.ai-credits') . '?purchased=1',
-            'cancel_url'  => route('filament.agency.pages.ai-credits'),
+            'success_url' => route('filament.agency.pages.ai-credits').'?purchased=1',
+            'cancel_url' => route('filament.agency.pages.ai-credits'),
         ]);
     }
 }
