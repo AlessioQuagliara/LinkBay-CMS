@@ -47,6 +47,8 @@ class TenantPanelProvider extends PanelProvider
             ->maxContentWidth('full')
             ->sidebarCollapsibleOnDesktop()
             ->authGuard('tenant_web')
+            ->passwordReset()
+            ->authPasswordBroker('tenant_users')
             ->resources([
                 ProductResource::class,
                 CollectionResource::class,

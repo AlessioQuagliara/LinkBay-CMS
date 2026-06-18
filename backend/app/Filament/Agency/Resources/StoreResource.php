@@ -4,7 +4,9 @@ namespace App\Filament\Agency\Resources;
 
 use App\Filament\Agency\Resources\StoreResource\Pages;
 use App\Models\Central\AgencyClient;
+use App\Models\Central\AuditEvent;
 use App\Models\Central\Tenant;
+use App\Services\AuditEventService;
 use App\Services\TenantProvisioningService;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -101,6 +103,17 @@ class StoreResource extends Resource
                         $service = app(TenantProvisioningService::class);
                         $service->registerDomain($record);
                         $service->initializeDatabase($record, $data['admin_email']);
+
+                        app(AuditEventService::class)->log(
+                            event: AuditEvent::EVENT_STORE_PROVISIONED,
+                            subjectType: 'store',
+                            subjectId: $record->id,
+                            metadata: [
+                                'store_name' => $record->name,
+                                'admin_email' => $data['admin_email'],
+                            ],
+                        );
+
                         Notification::make()->title('Negozio provisionato')->success()->send();
                     }),
                 Action::make('access')

@@ -7,7 +7,9 @@ namespace App\Filament\Agency\Resources\StoreResource\Pages;
 use App\Filament\Agency\Resources\StoreResource;
 use App\Jobs\ProvisionTenantDatabaseJob;
 use App\Models\Central\AgencyClient;
+use App\Models\Central\AuditEvent;
 use App\Models\Central\Tenant;
+use App\Services\AuditEventService;
 use App\Services\TenantProvisioningService;
 use Filament\Forms;
 use Filament\Notifications\Notification;
@@ -179,6 +181,22 @@ class CreateStore extends CreateRecord
 
         // DB initialization must run outside Livewire — dispatched to the queue.
         ProvisionTenantDatabaseJob::dispatch($tenant->id, $adminEmail);
+
+        app(AuditEventService::class)->log(
+            event: AuditEvent::EVENT_STORE_CREATED,
+            subjectType: 'store',
+            subjectId: $tenant->id,
+            newValues: [
+                'name' => $tenant->name,
+                'id' => $tenant->id,
+                'status' => $tenant->status,
+            ],
+            metadata: [
+                'admin_email' => $adminEmail,
+                'agency_client_id' => $tenant->agency_client_id,
+                'provisioning_queued' => true,
+            ],
+        );
     }
 
     protected function getRedirectUrl(): string

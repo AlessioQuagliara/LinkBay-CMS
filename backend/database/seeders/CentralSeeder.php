@@ -49,5 +49,7 @@ class CentralSeeder extends Seeder
         }
 
         $this->command->info('Central seeder: piani creati.');
+
+        $this->call(ThemePresetSeeder::class);
     }
 }

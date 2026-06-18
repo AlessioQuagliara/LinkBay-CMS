@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Agency\Resources\AgencyClientResource\RelationManagers;
 
+use App\Models\Central\AuditEvent;
 use App\Models\Central\Tenant;
+use App\Services\AuditEventService;
 use App\Services\ClientInviteService;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -121,6 +123,18 @@ class ContactsRelationManager extends RelationManager
 
                         try {
                             app(ClientInviteService::class)->generateInvite($record, $tenant);
+
+                            app(AuditEventService::class)->log(
+                                event: AuditEvent::EVENT_CLIENT_CONTACT_INVITED,
+                                subjectType: 'agency_client_contact',
+                                subjectId: (string) $record->id,
+                                metadata: [
+                                    'contact_name' => $record->name,
+                                    'contact_email' => $record->email,
+                                    'tenant_id' => $tenant->id,
+                                    'tenant_name' => $tenant->name,
+                                ],
+                            );
 
                             Notification::make()
                                 ->title('Invito inviato a '.$record->email)

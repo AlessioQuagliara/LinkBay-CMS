@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Mail\AgencyMemberInviteMail;
 use App\Models\Central\Agency;
 use App\Models\Central\AgencyMember;
+use App\Models\Central\AuditEvent;
 use App\Models\Central\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -15,6 +16,8 @@ use Illuminate\Support\Str;
 class AgencyMemberService
 {
     public const TTL_HOURS = 72;
+
+    public function __construct(private readonly AuditEventService $audit) {}
 
     /**
      * Create a pending AgencyMember record, generate an invite token, and
@@ -59,6 +62,15 @@ class AgencyMemberService
 
         Mail::to($email)->send(new AgencyMemberInviteMail($member, $agency, $token));
 
+        $this->audit->log(
+            event: AuditEvent::EVENT_MEMBER_INVITED,
+            agencyId: $agency->id,
+            userId: $invitedBy->id,
+            subjectType: 'agency_member',
+            subjectId: $member->id,
+            newValues: ['email' => $email, 'role' => $role],
+        );
+
         return $member;
     }
 
@@ -96,6 +108,15 @@ class AgencyMemberService
             'invite_expires_at' => null,
         ]);
 
+        $this->audit->log(
+            event: AuditEvent::EVENT_MEMBER_ACCEPTED,
+            agencyId: $member->agency_id,
+            userId: $user->id,
+            subjectType: 'agency_member',
+            subjectId: $member->id,
+            newValues: ['name' => $name, 'role' => $member->role],
+        );
+
         return $user;
     }
 
@@ -107,6 +128,8 @@ class AgencyMemberService
      */
     public function changeRole(AgencyMember $member, string $newRole): void
     {
+        $oldRole = $member->role;
+
         if ($newRole === AgencyMember::ROLE_OWNER) {
             // Demote existing owner(s) to admin.
             AgencyMember::where('agency_id', $member->agency_id)
@@ -116,6 +139,15 @@ class AgencyMemberService
         }
 
         $member->update(['role' => $newRole]);
+
+        $this->audit->log(
+            event: AuditEvent::EVENT_MEMBER_ROLE_CHANGED,
+            agencyId: $member->agency_id,
+            subjectType: 'agency_member',
+            subjectId: $member->id,
+            oldValues: ['role' => $oldRole],
+            newValues: ['role' => $newRole],
+        );
     }
 
     /**
@@ -130,6 +162,16 @@ class AgencyMemberService
         }
 
         $member->update(['status' => AgencyMember::STATUS_SUSPENDED]);
+
+        $this->audit->log(
+            event: AuditEvent::EVENT_MEMBER_SUSPENDED,
+            agencyId: $member->agency_id,
+            subjectType: 'agency_member',
+            subjectId: $member->id,
+            oldValues: ['status' => AgencyMember::STATUS_ACTIVE],
+            newValues: ['status' => AgencyMember::STATUS_SUSPENDED],
+            metadata: ['email' => $member->user?->email ?? $member->invited_email],
+        );
     }
 
     /**
@@ -138,6 +180,15 @@ class AgencyMemberService
     public function reactivateMember(AgencyMember $member): void
     {
         $member->update(['status' => AgencyMember::STATUS_ACTIVE]);
+
+        $this->audit->log(
+            event: AuditEvent::EVENT_MEMBER_REACTIVATED,
+            agencyId: $member->agency_id,
+            subjectType: 'agency_member',
+            subjectId: $member->id,
+            oldValues: ['status' => AgencyMember::STATUS_SUSPENDED],
+            newValues: ['status' => AgencyMember::STATUS_ACTIVE],
+        );
     }
 
     /**
@@ -151,6 +202,20 @@ class AgencyMemberService
             throw new \RuntimeException('Non è possibile rimuovere il proprietario. Trasferisci prima la proprietà.');
         }
 
+        // Capture data before deletion so it appears in the audit log.
+        $agencyId = $member->agency_id;
+        $memberId = $member->id;
+        $email = $member->user?->email ?? $member->invited_email;
+        $role = $member->role;
+
         $member->delete();
+
+        $this->audit->log(
+            event: AuditEvent::EVENT_MEMBER_REMOVED,
+            agencyId: $agencyId,
+            subjectType: 'agency_member',
+            subjectId: $memberId,
+            oldValues: ['email' => $email, 'role' => $role],
+        );
     }
 }

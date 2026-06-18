@@ -94,6 +94,16 @@ class Agency extends Model
         return $this->hasMany(AgencyMember::class);
     }
 
+    public function layoutTemplates()
+    {
+        return $this->hasMany(LayoutTemplate::class);
+    }
+
+    public function themePresets()
+    {
+        return $this->hasMany(ThemePreset::class);
+    }
+
     // ── Scopes ─────────────────────────────────────────────────────────────────
 
     public function scopeActive($query)

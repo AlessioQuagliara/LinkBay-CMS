@@ -8,6 +8,7 @@ use App\Filament\Agency\Pages\AgencyBillingPage;
 use App\Models\Central\Agency;
 use App\Models\Central\AgencyMember;
 use App\Models\Central\AgencySubscription;
+use App\Models\Central\AuditEvent;
 use App\Models\Central\BillingEvent;
 use App\Models\Central\Plan;
 use App\Models\Central\User;
@@ -281,5 +282,14 @@ class AgencyBillingPageTest extends CentralTestCase
         // openCustomerPortal() calls $this->redirect() which requires Livewire context.
         // Test just verifies that the guard condition (isStripeConfigured) works correctly.
         $this->assertFalse($page->isStripeConfigured());
+    }
+
+    public function test_billing_portal_accessed_event_constant_is_defined_and_labelled(): void
+    {
+        $this->assertEquals('billing.portal_accessed', AuditEvent::EVENT_BILLING_PORTAL_ACCESSED);
+        $this->assertArrayHasKey(
+            AuditEvent::EVENT_BILLING_PORTAL_ACCESSED,
+            AuditEvent::EVENT_LABELS,
+        );
     }
 }
