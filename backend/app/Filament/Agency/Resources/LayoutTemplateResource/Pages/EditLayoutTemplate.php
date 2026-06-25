@@ -7,7 +7,10 @@ namespace App\Filament\Agency\Resources\LayoutTemplateResource\Pages;
 use App\Filament\Agency\Resources\LayoutTemplateResource;
 use App\Models\Central\AuditEvent;
 use App\Models\Central\LayoutTemplate;
+use App\Models\Central\UsageEvent;
 use App\Services\AuditEventService;
+use App\Services\LayoutBlockSchema;
+use App\Services\UsageEventService;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
@@ -69,10 +72,28 @@ class EditLayoutTemplate extends EditRecord
     protected function beforeSave(): void
     {
         $this->auditOldValues = $this->record->only(['name', 'slug', 'status']);
+
+        $agency = app()->has('current_agency') ? app('current_agency') : null;
+
+        if ($agency) {
+            $blocks = $this->data['blocks'] ?? [];
+            $violation = LayoutBlockSchema::premiumViolation($blocks, $agency);
+
+            if ($violation !== null) {
+                Notification::make()->title('Blocco premium non autorizzato')->body($violation)->danger()->send();
+                $this->halt();
+            }
+        }
     }
 
     protected function afterSave(): void
     {
+        app(UsageEventService::class)->track(
+            eventType: UsageEvent::EVENT_LAYOUT_SAVED,
+            subjectType: 'layout_template',
+            subjectId: $this->record->id,
+        );
+
         $newValues = $this->record->only(['name', 'slug', 'status']);
         $changed = array_diff_assoc($newValues, $this->auditOldValues);
 

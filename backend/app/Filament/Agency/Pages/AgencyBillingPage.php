@@ -9,8 +9,11 @@ use App\Models\Central\AgencySubscription;
 use App\Models\Central\AuditEvent;
 use App\Models\Central\BillingEvent;
 use App\Models\Central\Plan;
+use App\Models\Central\UsageEvent;
 use App\Services\AgencySubscriptionService;
 use App\Services\AuditEventService;
+use App\Services\PremiumPackConfig;
+use App\Services\UsageEventService;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Collection;
@@ -147,6 +150,19 @@ class AgencyBillingPage extends Page
             ->get();
     }
 
+    // ── Add-on premium disponibili ────────────────────────────────────────────
+
+    /**
+     * Returns premium packs the agency does not currently have access to.
+     * Used for the add-on discovery block on the billing page.
+     *
+     * @return array<int, array{featureCode: string, label: string, description: string, type: string, includes: string[], ctaLabel: string}>
+     */
+    public function premiumAddons(): array
+    {
+        return PremiumPackConfig::unavailableFor($this->agency());
+    }
+
     // ── Stripe Checkout per abbonamento ───────────────────────────────────────
 
     /**
@@ -262,6 +278,11 @@ class AgencyBillingPage extends Page
 
             app(AuditEventService::class)->log(
                 event: AuditEvent::EVENT_BILLING_PORTAL_ACCESSED,
+                agencyId: $agency->id,
+            );
+
+            app(UsageEventService::class)->track(
+                eventType: UsageEvent::EVENT_BILLING_PORTAL_OPENED,
                 agencyId: $agency->id,
             );
 

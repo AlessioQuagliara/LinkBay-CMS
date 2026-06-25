@@ -358,7 +358,7 @@ class LayoutManagerTest extends CentralTestCase
 
     // ── LayoutBlockSchema ─────────────────────────────────────────────────────
 
-    public function test_known_types_covers_all_seven_v1_blocks(): void
+    public function test_known_types_covers_all_v1_free_blocks(): void
     {
         $types = LayoutBlockSchema::knownTypes();
 
@@ -367,7 +367,8 @@ class LayoutManagerTest extends CentralTestCase
             $this->assertContains($type, $types, "Block type '{$type}' must be in knownTypes()");
         }
 
-        $this->assertCount(7, $types);
+        // knownTypes() covers ALL blocks (free + premium) for the renderer whitelist
+        $this->assertGreaterThanOrEqual(7, count($types));
     }
 
     // ── AuditEvent constants ──────────────────────────────────────────────────

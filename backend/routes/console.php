@@ -28,3 +28,16 @@ Schedule::command('billing:reprocess-stuck-events', ['--minutes=15'])
     ->name('billing:reprocess-stuck-events')
     ->withoutOverlapping()
     ->runInBackground();
+
+// Scade entitlements con ends_at passato — ogni ora
+Schedule::command('entitlements:expire')
+    ->hourly()
+    ->name('entitlements:expire')
+    ->withoutOverlapping();
+
+// Valuta early warnings per tutte le agency — ogni giorno alle 07:00
+Schedule::command('agency:health-alerts', ['--days' => 30])
+    ->dailyAt('07:00')
+    ->name('agency:health-alerts')
+    ->withoutOverlapping()
+    ->runInBackground();

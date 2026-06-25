@@ -66,6 +66,12 @@ class AuditEvent extends Model
 
     public const EVENT_THEME_ASSIGNED = 'theme.assigned';
 
+    public const EVENT_ENTITLEMENT_GRANTED = 'entitlement.granted';
+
+    public const EVENT_ENTITLEMENT_REVOKED = 'entitlement.revoked';
+
+    public const EVENT_ENTITLEMENT_EXPIRED = 'entitlement.expired';
+
     /** All known event types, keyed by constant value, value = human label. */
     public const EVENT_LABELS = [
         self::EVENT_MEMBER_INVITED => 'Membro invitato',
@@ -92,6 +98,9 @@ class AuditEvent extends Model
         self::EVENT_THEME_ACTIVATED => 'Tema attivato/disattivato',
         self::EVENT_THEME_DUPLICATED => 'Tema duplicato',
         self::EVENT_THEME_ASSIGNED => 'Tema assegnato a store',
+        self::EVENT_ENTITLEMENT_GRANTED => 'Entitlement concesso',
+        self::EVENT_ENTITLEMENT_REVOKED => 'Entitlement revocato',
+        self::EVENT_ENTITLEMENT_EXPIRED => 'Entitlement scaduto (automatico)',
     ];
 
     protected $fillable = [

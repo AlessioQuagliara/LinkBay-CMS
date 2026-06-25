@@ -3,10 +3,12 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Agency\Pages\AgencyBillingPage;
+use App\Filament\Agency\Pages\AgencyInsightsPage;
 use App\Filament\Agency\Pages\AgencySettings;
 use App\Filament\Agency\Pages\AiCreditsPage;
 use App\Filament\Agency\Pages\AuditLogPage;
 use App\Filament\Agency\Pages\CommissionsPage;
+use App\Filament\Agency\Pages\MyEntitlementsPage;
 use App\Filament\Agency\Pages\PayoutsPage;
 use App\Filament\Agency\Pages\TermsAcceptancePage;
 use App\Filament\Agency\Resources\AgencyClientResource;
@@ -87,6 +89,8 @@ class AgencyPanelProvider extends PanelProvider
                 CommissionsPage::class,
                 PayoutsPage::class,
                 AuditLogPage::class,
+                MyEntitlementsPage::class,
+                AgencyInsightsPage::class,
                 TermsAcceptancePage::class,
             ])
             ->widgets([DashboardAlertsWidget::class, PlanUpsellWidget::class, AgencyStatsWidget::class])

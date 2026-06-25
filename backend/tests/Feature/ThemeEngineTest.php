@@ -425,14 +425,19 @@ class ThemeEngineTest extends CentralTestCase
 
     // ── 19. System presets coverage ───────────────────────────────────────────
 
-    public function test_system_presets_define_all_three_built_in_themes(): void
+    public function test_system_presets_define_all_built_in_themes(): void
     {
         $presets = ThemeConfigSchema::systemPresets();
 
-        $this->assertCount(3, $presets);
+        // 4 core + 3 premium pack — all are isSystem = true
+        $this->assertCount(7, $presets);
         $this->assertArrayHasKey('ocean', $presets);
         $this->assertArrayHasKey('slate', $presets);
         $this->assertArrayHasKey('sand', $presets);
+        $this->assertArrayHasKey('midnight', $presets);
+        $this->assertArrayHasKey('noir', $presets);
+        $this->assertArrayHasKey('atelier', $presets);
+        $this->assertArrayHasKey('meridian', $presets);
 
         foreach ($presets as $slug => $preset) {
             $this->assertEquals($slug, $preset['slug']);

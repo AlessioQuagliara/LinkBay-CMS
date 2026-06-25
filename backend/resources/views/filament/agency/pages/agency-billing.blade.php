@@ -155,6 +155,66 @@
         </x-filament::section>
     @endif
 
+    {{-- ── ADD-ON DISPONIBILI ─────────────────────────────────────────────── --}}
+    @php $premiumAddons = $this->premiumAddons(); @endphp
+    @if(count($premiumAddons) > 0)
+        <x-filament::section class="!mt-10">
+            <x-slot name="heading">
+                <div class="flex items-center gap-2.5">
+                    <x-heroicon-o-puzzle-piece class="h-6 w-6 text-purple-500 shrink-0"/>
+                    <span class="text-xl font-bold text-gray-950 dark:text-white">Add-on disponibili</span>
+                </div>
+            </x-slot>
+
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                Estendi le funzionalità del tuo account con i pack premium. Contatta il supporto per richiedere l'attivazione.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                @foreach($premiumAddons as $addon)
+                    <div class="flex gap-4 p-5 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 shadow-sm">
+                        <div class="shrink-0 mt-0.5">
+                            @if($addon['type'] === 'theme_pack')
+                                <div class="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                                    <x-heroicon-o-swatch class="h-5 w-5 text-purple-600 dark:text-purple-400"/>
+                                </div>
+                            @elseif($addon['type'] === 'block_pack')
+                                <div class="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30">
+                                    <x-heroicon-o-squares-2x2 class="h-5 w-5 text-orange-600 dark:text-orange-400"/>
+                                </div>
+                            @else
+                                <div class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700">
+                                    <x-heroicon-o-puzzle-piece class="h-5 w-5 text-gray-500 dark:text-gray-400"/>
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $addon['label'] }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{{ $addon['description'] }}</p>
+
+                            <div class="mt-3 flex flex-wrap gap-1.5">
+                                @foreach($addon['includes'] as $item)
+                                    <span class="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium bg-white text-gray-600 border-gray-200 dark:bg-gray-700/50 dark:text-gray-300 dark:border-gray-600">
+                                        {{ $item }}
+                                    </span>
+                                @endforeach
+                            </div>
+
+                            <a
+                                href="mailto:{{ config('mail.from.address', 'support@linkbay.it') }}"
+                                class="mt-3 inline-flex items-center text-sm font-semibold text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
+                            >
+                                {{ $addon['ctaLabel'] }}
+                                <x-heroicon-o-arrow-right class="w-3.5 h-3.5 ml-1"/>
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </x-filament::section>
+    @endif
+
     {{-- ── PIANI DISPONIBILI ──────────────────────────────────────────────── --}}
     @if(!$isLifetime)
         <x-filament::section class="!mt-10">

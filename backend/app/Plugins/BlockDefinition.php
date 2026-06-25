@@ -31,6 +31,7 @@ use Filament\Forms\Components\Field;
  * @param  string  $icon  Heroicon name for the block picker
  * @param  string|null  $category  Optional grouping key (used in v2 block library)
  * @param  int  $columns  Number of columns for the block's form grid
+ * @param  string|null  $featureCode  PluginCatalogItem code required to use this block (null = free)
  */
 class BlockDefinition
 {
@@ -41,6 +42,7 @@ class BlockDefinition
         public readonly string $icon = 'heroicon-o-cube',
         public readonly ?string $category = null,
         public readonly int $columns = 1,
+        public readonly ?string $featureCode = null,
     ) {}
 
     /**

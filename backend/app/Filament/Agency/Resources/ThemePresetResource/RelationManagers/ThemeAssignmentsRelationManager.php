@@ -6,6 +6,8 @@ namespace App\Filament\Agency\Resources\ThemePresetResource\RelationManagers;
 
 use App\Models\Central\Tenant;
 use App\Models\Central\ThemeAssignment;
+use App\Models\Central\UsageEvent;
+use App\Services\UsageEventService;
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
@@ -66,13 +68,24 @@ class ThemeAssignmentsRelationManager extends RelationManager
                         $agency = app()->has('current_agency') ? app('current_agency') : null;
 
                         // Upsert: replace any existing theme assignment for this tenant.
-                        return ThemeAssignment::updateOrCreate(
+                        $assignment = ThemeAssignment::updateOrCreate(
                             ['tenant_id' => $data['tenant_id']],
                             [
                                 'agency_id' => $agency?->id,
                                 'theme_preset_id' => $this->ownerRecord->id,
                             ],
                         );
+
+                        app(UsageEventService::class)->track(
+                            eventType: UsageEvent::EVENT_THEME_ASSIGNED,
+                            agencyId: $agency?->id,
+                            tenantId: $data['tenant_id'],
+                            subjectType: 'theme_preset',
+                            subjectId: $this->ownerRecord->id,
+                            meta: ['theme_slug' => $this->ownerRecord->slug],
+                        );
+
+                        return $assignment;
                     })
                     ->before(function (array $data): void {
                         // Cross-agency security: tenant must belong to the current agency.

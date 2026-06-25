@@ -7,6 +7,8 @@ namespace App\Filament\Agency\Resources\LayoutTemplateResource\Pages;
 use App\Filament\Agency\Resources\LayoutTemplateResource;
 use App\Models\Central\AuditEvent;
 use App\Services\AuditEventService;
+use App\Services\LayoutBlockSchema;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateLayoutTemplate extends CreateRecord
@@ -18,6 +20,13 @@ class CreateLayoutTemplate extends CreateRecord
         $agency = app()->has('current_agency') ? app('current_agency') : null;
 
         if (! $agency) {
+            $this->halt();
+        }
+
+        $violation = LayoutBlockSchema::premiumViolation($data['blocks'] ?? [], $agency);
+
+        if ($violation !== null) {
+            Notification::make()->title('Blocco premium non autorizzato')->body($violation)->danger()->send();
             $this->halt();
         }
 

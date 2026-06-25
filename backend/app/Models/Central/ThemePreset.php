@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\Central;
 
+use App\Plugins\PluginRegistry;
 use App\Services\ThemeConfigSchema;
+use App\Services\ThemeForkResolver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -25,11 +27,14 @@ class ThemePreset extends Model
         'status',
         'is_system',
         'config',
+        'parent_theme_slug',
+        'override_config',
     ];
 
     protected $casts = [
         'config' => 'array',
         'is_system' => 'boolean',
+        'override_config' => 'array',
     ];
 
     // ── Relations ─────────────────────────────────────────────────────────────
@@ -61,6 +66,11 @@ class ThemePreset extends Model
         return $this->status === self::STATUS_ACTIVE;
     }
 
+    public function isFork(): bool
+    {
+        return $this->parent_theme_slug !== null;
+    }
+
     public function activate(): void
     {
         $this->update(['status' => self::STATUS_ACTIVE]);
@@ -72,17 +82,41 @@ class ThemePreset extends Model
     }
 
     /**
-     * Return the normalized config. Unknown keys dropped, invalid enums replaced with defaults.
+     * Return the authoritative renderable config.
+     *
+     * - Standalone preset: normalize(config)
+     * - Fork: merge(parent registry defaultConfig, override_config)
+     *   Locked fields always come from the parent; overrides are applied on top.
+     *   This means the fork always reflects the current state of the parent theme,
+     *   even if the parent was updated after the fork was created.
+     *
+     * @return array<string, mixed>
+     */
+    public function resolvedConfig(): array
+    {
+        if (! $this->isFork()) {
+            return ThemeConfigSchema::normalize($this->config ?? []);
+        }
+
+        $parentDef = app(PluginRegistry::class)->getTheme($this->parent_theme_slug);
+        $baseConfig = ThemeConfigSchema::normalize($parentDef?->defaultConfig ?? []);
+
+        return ThemeForkResolver::applyOverrides($baseConfig, $this->override_config ?? []);
+    }
+
+    /**
+     * Return the normalized config. Delegates to resolvedConfig() so forks
+     * automatically use inheritance + override logic.
      *
      * @return array<string, mixed>
      */
     public function normalizedConfig(): array
     {
-        return ThemeConfigSchema::normalize($this->config ?? []);
+        return $this->resolvedConfig();
     }
 
     /**
-     * Duplicate this preset as an agency-owned draft.
+     * Duplicate this preset as a flat agency-owned draft (no inheritance link).
      * System presets can be duplicated; the copy is editable by the agency.
      */
     public function duplicate(int $agencyId, string $newName): self
@@ -106,7 +140,39 @@ class ThemePreset extends Model
             'slug' => $slug,
             'status' => self::STATUS_DRAFT,
             'is_system' => false,
-            'config' => ThemeConfigSchema::normalize($this->config ?? []),
+            'config' => $this->resolvedConfig(),
+        ]);
+    }
+
+    /**
+     * Create an inheriting fork of this system theme.
+     * The fork starts with no overrides — all values inherited from the parent.
+     * Only forkable from system presets; enforced by ThemeForkResolver::canFork().
+     */
+    public function fork(int $agencyId, string $name): self
+    {
+        $baseSlug = Str::slug($name);
+        $slug = $baseSlug;
+        $counter = 1;
+
+        while (
+            self::where('agency_id', $agencyId)
+                ->where('slug', $slug)
+                ->exists()
+        ) {
+            $slug = "{$baseSlug}-{$counter}";
+            $counter++;
+        }
+
+        return self::create([
+            'agency_id' => $agencyId,
+            'name' => $name,
+            'slug' => $slug,
+            'status' => self::STATUS_DRAFT,
+            'is_system' => false,
+            'parent_theme_slug' => $this->slug,
+            'override_config' => [],
+            'config' => $this->resolvedConfig(), // snapshot for fallback
         ]);
     }
 

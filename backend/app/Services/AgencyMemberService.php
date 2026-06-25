@@ -8,6 +8,7 @@ use App\Mail\AgencyMemberInviteMail;
 use App\Models\Central\Agency;
 use App\Models\Central\AgencyMember;
 use App\Models\Central\AuditEvent;
+use App\Models\Central\UsageEvent;
 use App\Models\Central\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -17,7 +18,10 @@ class AgencyMemberService
 {
     public const TTL_HOURS = 72;
 
-    public function __construct(private readonly AuditEventService $audit) {}
+    public function __construct(
+        private readonly AuditEventService $audit,
+        private readonly UsageEventService $usage,
+    ) {}
 
     /**
      * Create a pending AgencyMember record, generate an invite token, and
@@ -69,6 +73,13 @@ class AgencyMemberService
             subjectType: 'agency_member',
             subjectId: $member->id,
             newValues: ['email' => $email, 'role' => $role],
+        );
+
+        $this->usage->track(
+            eventType: UsageEvent::EVENT_TEAM_MEMBER_INVITED,
+            agencyId: $agency->id,
+            userId: $invitedBy->id,
+            meta: ['role' => $role],
         );
 
         return $member;
