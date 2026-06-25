@@ -8,7 +8,9 @@ use App\Filament\Agency\Concerns\ResolvesCurrentAgency;
 use App\Filament\Agency\Resources\LayoutTemplateResource\Pages;
 use App\Filament\Agency\Resources\LayoutTemplateResource\RelationManagers;
 use App\Models\Central\LayoutTemplate;
+use App\Services\FeatureAccessService;
 use App\Services\LayoutBlockSchema;
+use App\Services\PremiumPackConfig;
 use Filament\Forms;
 use Filament\Forms\Components\Builder;
 use Filament\Notifications\Notification;
@@ -18,6 +20,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
 class LayoutTemplateResource extends Resource
@@ -87,12 +90,47 @@ class LayoutTemplateResource extends Resource
                 ])
                 ->columns(3),
 
+            Section::make('Marketing Block Pack non incluso')
+                ->icon('heroicon-o-lock-closed')
+                ->iconColor('warning')
+                ->description('Questo account non ha accesso al Marketing Block Pack. Il Builder mostra solo i blocchi gratuiti.')
+                ->schema([
+                    Forms\Components\Placeholder::make('block_pack_nudge')
+                        ->label('')
+                        ->content(function (): HtmlString {
+                            $pack = PremiumPackConfig::forCode('block_pack_marketing');
+                            $items = implode(', ', $pack['includes'] ?? []);
+                            $entitlementsUrl = route('filament.agency.pages.my-entitlements');
+                            $supportEmail = config('mail.from.address', 'support@linkbay.it');
+
+                            return new HtmlString(
+                                '<p class="text-sm text-gray-600 dark:text-gray-400">Blocchi inclusi nel pack: <span class="font-medium">'.e($items).'</span>.</p>'.
+                                '<div class="mt-3 flex flex-wrap items-center gap-4">'.
+                                '<a href="'.e($entitlementsUrl).'" class="text-sm font-semibold text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors">Vedi i miei entitlement →</a>'.
+                                '<span class="text-gray-300 dark:text-gray-600 select-none">·</span>'.
+                                '<a href="mailto:'.e($supportEmail).'" class="text-sm font-medium text-gray-600 hover:text-gray-500 dark:text-gray-400 transition-colors">Richiedi attivazione</a>'.
+                                '</div>'
+                            );
+                        })
+                        ->columnSpanFull(),
+                ])
+                ->visible(function (): bool {
+                    $agency = app()->has('current_agency') ? app('current_agency') : null;
+                    if (! $agency) {
+                        return false;
+                    }
+
+                    return ! app(FeatureAccessService::class)->canUseFeature($agency, 'block_pack_marketing');
+                }),
+
             Section::make('Blocchi contenuto')
                 ->description('Componi la pagina aggiungendo e ordinando i blocchi. Le modifiche vengono salvate con il pulsante "Salva".')
                 ->schema([
                     Builder::make('blocks')
                         ->label('')
-                        ->blocks(LayoutBlockSchema::blocks())
+                        ->blocks(LayoutBlockSchema::blocksForAgency(
+                            app()->has('current_agency') ? app('current_agency') : null
+                        ))
                         ->addActionLabel('Aggiungi blocco')
                         ->collapsible()
                         ->cloneable()

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { PremiumThemesSection } from "../components/PremiumThemesSection";
 
 export const metadata: Metadata = {
   title: "Features — LinkBay",
@@ -237,7 +238,10 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* ── E. AI agents ─────────────────────────────────────────────────────── */}
+      {/* ── E. Premium Design & Themes ──────────────────────────────────────── */}
+      <PremiumThemesSection />
+
+      {/* ── F. AI agents ─────────────────────────────────────────────────────── */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-14">
@@ -274,7 +278,7 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* ── F. Technical architecture ────────────────────────────────────────── */}
+      {/* ── G. Technical architecture ───────────────────────────────────────── */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">

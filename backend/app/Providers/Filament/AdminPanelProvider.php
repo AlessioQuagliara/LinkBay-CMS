@@ -2,12 +2,17 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Admin\Pages\AgencyHealthPage;
+use App\Filament\Admin\Pages\UsageAnalyticsPage;
+use App\Filament\Admin\Resources\AgencyEntitlementResource;
+use App\Filament\Admin\Resources\AgencyHealthAlertResource;
 use App\Filament\Admin\Resources\AgencyResource;
 use App\Filament\Admin\Resources\AiCreditPackageResource;
 use App\Filament\Admin\Resources\ContactSubmissionResource;
 use App\Filament\Admin\Resources\JobApplicationResource;
 use App\Filament\Admin\Resources\JobPositionResource;
 use App\Filament\Admin\Resources\PlanResource;
+use App\Filament\Admin\Resources\PluginCatalogItemResource;
 use App\Filament\Admin\Resources\TenantResource;
 use App\Filament\Admin\Widgets\GlobalStatsWidget;
 use Filament\Http\Middleware\Authenticate;
@@ -34,7 +39,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('linkbay-admin')
             ->domain(app()->isProduction()
-                ? 'admin.' . config('app.central_domain', 'linkbay-cms.com')
+                ? 'admin.'.config('app.central_domain', 'linkbay-cms.com')
                 : env('ADMIN_DOMAIN', 'app.linkbay-cms.test')
             )
             ->login()
@@ -52,8 +57,11 @@ class AdminPanelProvider extends PanelProvider
                 ContactSubmissionResource::class,
                 JobPositionResource::class,
                 JobApplicationResource::class,
+                PluginCatalogItemResource::class,
+                AgencyEntitlementResource::class,
+                AgencyHealthAlertResource::class,
             ])
-            ->pages([Dashboard::class])
+            ->pages([Dashboard::class, UsageAnalyticsPage::class, AgencyHealthPage::class])
             ->widgets([GlobalStatsWidget::class])
             ->navigationGroups([
                 NavigationGroup::make('Tenancy')->icon('heroicon-o-building-office-2'),
@@ -61,7 +69,9 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make('AI Credits')->icon('heroicon-o-sparkles'),
                 NavigationGroup::make('Operations')->icon('heroicon-o-inbox'),
                 NavigationGroup::make('Careers')->icon('heroicon-o-briefcase'),
+                NavigationGroup::make('Insights')->icon('heroicon-o-chart-bar'),
                 NavigationGroup::make('System')->icon('heroicon-o-cog-6-tooth'),
+                NavigationGroup::make('Marketplace')->icon('heroicon-o-puzzle-piece'),
             ])
             ->middleware([
                 EncryptCookies::class,

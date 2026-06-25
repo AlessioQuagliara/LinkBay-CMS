@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 use App\Http\Controllers\AiCreditsController;
 use App\Http\Controllers\CareersApiController;
+use App\Http\Controllers\StorefrontFeaturesController;
 use App\Http\Controllers\StripeWebhookController;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 
 // Stripe webhook — deve essere senza CSRF e auth
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])
-    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])
+    ->withoutMiddleware([VerifyCsrfToken::class])
     ->name('stripe.webhook');
+
+// ── Storefront: public feature flags for a given tenant (Next.js SSR) ────────
+Route::get('/storefront/{tenantId}/features', StorefrontFeaturesController::class)
+    ->name('api.storefront.features');
 
 // ── Careers: public published positions for Next.js ───────────────────────────
 Route::get('/careers/positions', [CareersApiController::class, 'positions'])

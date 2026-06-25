@@ -26,12 +26,14 @@ class ThemeDefinition
      * @param  string  $label  Human-readable name shown in the panel
      * @param  bool  $isSystem  True = system preset (visible to all agencies, read-only)
      * @param  array  $defaultConfig  Raw config array — normalized by ThemeConfigSchema::normalize()
+     * @param  string|null  $featureCode  PluginCatalogItem code required to use this theme (null = free)
      */
     public function __construct(
         public readonly string $key,
         public readonly string $label,
         public readonly bool $isSystem = true,
         public readonly array $defaultConfig = [],
+        public readonly ?string $featureCode = null,
     ) {}
 
     /**

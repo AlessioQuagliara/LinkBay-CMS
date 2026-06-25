@@ -101,7 +101,7 @@ class PluginSystemTest extends CentralTestCase
 
     // ── 2. Core blocks registered ─────────────────────────────────────────────
 
-    public function test_all_seven_core_blocks_are_registered(): void
+    public function test_all_core_free_blocks_are_registered(): void
     {
         $registry = $this->registry();
         $expected = ['hero', 'feature_grid', 'rich_text', 'cta', 'faq', 'testimonial', 'spacer'];
@@ -110,21 +110,23 @@ class PluginSystemTest extends CentralTestCase
             $this->assertTrue($registry->hasBlock($key), "Core block '{$key}' must be registered");
         }
 
-        $this->assertCount(7, $registry->blocks(), 'Exactly 7 core blocks must be registered');
+        // 7 free (core) + 5 premium (marketing pack) = 12 total
+        $this->assertCount(12, $registry->blocks(), '12 blocks must be registered (7 free + 5 premium)');
     }
 
     // ── 3. Core themes registered ─────────────────────────────────────────────
 
-    public function test_all_three_core_themes_are_registered(): void
+    public function test_all_core_themes_are_registered(): void
     {
         $registry = $this->registry();
-        $expected = ['ocean', 'slate', 'sand'];
+        $expected = ['ocean', 'slate', 'sand', 'midnight', 'noir', 'atelier', 'meridian'];
 
         foreach ($expected as $key) {
-            $this->assertTrue($registry->hasTheme($key), "Core theme '{$key}' must be registered");
+            $this->assertTrue($registry->hasTheme($key), "Theme '{$key}' must be registered");
         }
 
-        $this->assertCount(3, $registry->themes(), 'Exactly 3 core themes must be registered');
+        // 4 core (ocean, slate, sand, midnight) + 3 premium pack (noir, atelier, meridian)
+        $this->assertCount(7, $registry->themes(), 'Exactly 7 themes must be registered (4 core + 3 premium pack)');
     }
 
     // ── 4. Duplicate block key → exception ───────────────────────────────────
@@ -349,15 +351,20 @@ class PluginSystemTest extends CentralTestCase
         }
     }
 
-    // ── 16. Regression: systemPresets still has 3 v1 themes ──────────────────
+    // ── 16. Regression: systemPresets includes all v1 themes + midnight premium ─
 
-    public function test_regression_system_presets_still_has_all_three_v1_themes(): void
+    public function test_regression_system_presets_includes_all_themes(): void
     {
         $presets = ThemeConfigSchema::systemPresets();
 
-        $this->assertCount(3, $presets, 'systemPresets() must still return exactly 3 v1 themes');
+        // 4 core + 3 premium pack — all are isSystem = true
+        $this->assertCount(7, $presets, 'systemPresets() must return all 7 system themes');
         $this->assertArrayHasKey('ocean', $presets);
         $this->assertArrayHasKey('slate', $presets);
         $this->assertArrayHasKey('sand', $presets);
+        $this->assertArrayHasKey('midnight', $presets);
+        $this->assertArrayHasKey('noir', $presets);
+        $this->assertArrayHasKey('atelier', $presets);
+        $this->assertArrayHasKey('meridian', $presets);
     }
 }

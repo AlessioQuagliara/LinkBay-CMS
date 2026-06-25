@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { PremiumPacksSection } from "../components/PremiumPacksSection";
 
 export const metadata: Metadata = {
   title: "Pricing — LinkBay",
@@ -261,6 +262,9 @@ export default function PricingPage() {
           </div>
         </div>
       </section>
+
+      {/* ── Premium packs ───────────────────────────────────────────────────────── */}
+      <PremiumPacksSection />
 
       {/* ── Final CTA ─────────────────────────────────────────────────────────── */}
       <section className="max-w-3xl mx-auto px-4 py-8">

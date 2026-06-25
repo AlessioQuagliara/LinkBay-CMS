@@ -15,7 +15,7 @@ use Illuminate\Support\ServiceProvider;
  * ThemePresetSeeder reads from the registry via ThemeConfigSchema::systemPresets()
  * and creates the corresponding DB records on deploy/seed.
  *
- * Theme keys registered: ocean, slate, sand.
+ * Theme keys registered: ocean, slate, sand (free), midnight (premium — requires theme_pack_editorial).
  * Design principle: B2B-sober, neutral, professional — no primary color clashes.
  */
 class CoreThemesServiceProvider extends ServiceProvider
@@ -94,6 +94,28 @@ class CoreThemesServiceProvider extends ServiceProvider
                     'section_style' => 'default',
                     'header_style' => 'centered',
                 ],
+            ),
+
+            new ThemeDefinition(
+                key: 'midnight',
+                label: 'Midnight',
+                isSystem: true,
+                defaultConfig: [
+                    'palette' => [
+                        'primary' => '#818cf8',
+                        'secondary' => '#6366f1',
+                        'accent' => '#c084fc',
+                        'surface' => '#0f172a',
+                        'text' => '#e2e8f0',
+                    ],
+                    'typography' => ['heading_font' => 'dm_serif', 'body_font' => 'inter', 'scale' => 'lg'],
+                    'radius' => 'full',
+                    'spacing' => 'spacious',
+                    'buttons' => 'pill',
+                    'section_style' => 'card',
+                    'header_style' => 'centered',
+                ],
+                featureCode: 'theme_pack_editorial',
             ),
         ];
     }

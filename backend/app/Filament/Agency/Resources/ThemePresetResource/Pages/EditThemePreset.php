@@ -7,8 +7,10 @@ namespace App\Filament\Agency\Resources\ThemePresetResource\Pages;
 use App\Filament\Agency\Resources\ThemePresetResource;
 use App\Models\Central\AuditEvent;
 use App\Models\Central\ThemePreset;
+use App\Plugins\PluginRegistry;
 use App\Services\AuditEventService;
 use App\Services\ThemeConfigSchema;
+use App\Services\ThemeForkResolver;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
@@ -33,14 +35,32 @@ class EditThemePreset extends EditRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        // Unpack nested config into flat form fields for the color pickers / selects.
-        return array_merge($data, ThemeConfigSchema::flattenForForm($data['config'] ?? []));
+        // For forks: fill form with the RESOLVED config (parent base + existing overrides)
+        // so inherited values are pre-populated and the agency sees the full effective config.
+        $config = $this->record->isFork()
+            ? $this->record->resolvedConfig()
+            : ($data['config'] ?? []);
+
+        return array_merge($data, ThemeConfigSchema::flattenForForm($config));
     }
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        // Pack flat form fields into a normalized config, then strip the flat fields.
-        $data['config'] = ThemeConfigSchema::normalize(ThemeConfigSchema::packFromForm($data));
+        $newConfig = ThemeConfigSchema::normalize(ThemeConfigSchema::packFromForm($data));
+
+        if ($this->record->isFork()) {
+            // Compute what the agency actually changed vs. the parent base config.
+            // Only differences are persisted — no redundant storage of inherited values.
+            $parentDef = app(PluginRegistry::class)->getTheme($this->record->parent_theme_slug);
+            $baseConfig = ThemeConfigSchema::normalize($parentDef?->defaultConfig ?? []);
+
+            $data['override_config'] = ThemeForkResolver::computeOverrides($baseConfig, $newConfig);
+            // Update config snapshot = resolved (base + current overrides) for backward compat
+            $data['config'] = ThemeForkResolver::applyOverrides($baseConfig, $data['override_config']);
+        } else {
+            $data['config'] = $newConfig;
+        }
+
         foreach (ThemeConfigSchema::formFieldNames() as $field) {
             unset($data[$field]);
         }

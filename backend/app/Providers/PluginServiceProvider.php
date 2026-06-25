@@ -6,7 +6,9 @@ namespace App\Providers;
 
 use App\Plugins\CoreBlocks\CoreBlocksServiceProvider;
 use App\Plugins\CoreThemes\CoreThemesServiceProvider;
+use App\Plugins\MarketingBlockPack\MarketingBlockPackServiceProvider;
 use App\Plugins\PluginRegistry;
+use App\Plugins\PremiumThemePack\PremiumThemePackServiceProvider;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -31,6 +33,8 @@ class PluginServiceProvider extends ServiceProvider
     protected array $pluginProviders = [
         CoreBlocksServiceProvider::class,
         CoreThemesServiceProvider::class,
+        MarketingBlockPackServiceProvider::class,
+        PremiumThemePackServiceProvider::class,
     ];
 
     public function register(): void
