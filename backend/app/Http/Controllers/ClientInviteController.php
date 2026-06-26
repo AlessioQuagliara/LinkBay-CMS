@@ -31,14 +31,13 @@ class ClientInviteController extends Controller
         try {
             $storeName = $contact->inviteTenant?->name ?? '—';
         } catch (\Throwable) {
-            // tenants table lives on a different connection in some environments
             $storeName = '—';
         }
 
         return view('client-invite.show', [
-            'contact' => $contact,
+            'contact'   => $contact,
             'storeName' => $storeName,
-            'token' => $token,
+            'token'     => $token,
         ]);
     }
 
@@ -53,6 +52,20 @@ class ClientInviteController extends Controller
             return redirect()->route('client-invite.invalid')->with('reason', 'expired');
         }
 
+        // ── Cross-agency guard ────────────────────────────────────────────────
+        // Se l'utente è autenticato, il contatto deve appartenere alla sua agenzia.
+        // Questo previene che un membro di Agency B possa accettare un invite di Agency A.
+        if ($request->user()) {
+            $contactAgencyId = $contact->agencyClient?->agency_id;
+            $userAgencyId    = $request->user()->agencyMembers()
+                ->where('status', 'active')
+                ->value('agency_id');
+
+            if ($contactAgencyId && $userAgencyId && $contactAgencyId !== $userAgencyId) {
+                abort(403, 'Non hai i permessi per accettare questo invito.');
+            }
+        }
+
         $request->validate([
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
@@ -65,8 +78,8 @@ class ClientInviteController extends Controller
 
         return redirect()->route('client-invite.accepted')->with([
             'storeName' => $tenant?->name,
-            'storeUrl' => $storeUrl,
-            'email' => $contact->email,
+            'storeUrl'  => $storeUrl,
+            'email'     => $contact->email,
         ]);
     }
 
@@ -77,8 +90,8 @@ class ClientInviteController extends Controller
     {
         return view('client-invite.accepted', [
             'storeName' => session('storeName', ''),
-            'storeUrl' => session('storeUrl', ''),
-            'email' => session('email', ''),
+            'storeUrl'  => session('storeUrl', ''),
+            'email'     => session('email', ''),
         ]);
     }
 
@@ -91,6 +104,8 @@ class ClientInviteController extends Controller
             'reason' => session('reason', 'invalid'),
         ]);
     }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
     private function resolveStoreUrl(?object $tenant): string
     {
