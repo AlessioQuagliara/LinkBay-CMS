@@ -1,0 +1,137 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ─────────────────────────────────────────
+  # Job 1 — Backend: Laravel / PHPUnit
+  # ─────────────────────────────────────────
+  backend:
+    name: Backend Tests (PHP 8.4)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: linkbay_test
+          POSTGRES_USER: linkbay
+          POSTGRES_PASSWORD: secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo, pdo_pgsql, pgsql, redis, mbstring, dom, fileinfo, bcmath, intl
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: backend/vendor
+          key: composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Copy .env for CI
+        run: cp .env.example .env.testing
+
+      - name: Override .env.testing for CI environment
+        run: |
+          sed -i 's/^APP_ENV=.*/APP_ENV=testing/' .env.testing
+          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=pgsql/' .env.testing
+          sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env.testing
+          sed -i 's/^DB_PORT=.*/DB_PORT=5432/' .env.testing
+          sed -i 's/^DB_DATABASE=.*/DB_DATABASE=linkbay_test/' .env.testing
+          sed -i 's/^DB_USERNAME=.*/DB_USERNAME=linkbay/' .env.testing
+          sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=secret/' .env.testing
+          sed -i 's/^REDIS_HOST=.*/REDIS_HOST=127.0.0.1/' .env.testing
+          sed -i 's/^CACHE_DRIVER=.*/CACHE_DRIVER=redis/' .env.testing
+          sed -i 's/^QUEUE_CONNECTION=.*/QUEUE_CONNECTION=sync/' .env.testing
+          sed -i 's/^MAIL_MAILER=.*/MAIL_MAILER=log/' .env.testing
+          sed -i 's|^STRIPE_SECRET=.*|STRIPE_SECRET=sk_test_placeholder|' .env.testing
+          sed -i 's|^STRIPE_WEBHOOK_SECRET=.*|STRIPE_WEBHOOK_SECRET=whsec_placeholder|' .env.testing
+
+      - name: Generate application key
+        run: php artisan key:generate --env=testing
+
+      - name: Run migrations
+        run: php artisan migrate --env=testing --force
+
+      - name: Run PHPUnit tests
+        run: php artisan test --env=testing --parallel
+        env:
+          APP_ENV: testing
+
+  # ─────────────────────────────────────────
+  # Job 2 — Frontend: Next.js build + lint
+  # ─────────────────────────────────────────
+  frontend:
+    name: Frontend Build (Next.js 16)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+        continue-on-error: true  # lint warnings non bloccano la CI — rimuovi quando il codice è lint-clean
+
+      - name: Type check
+        run: npx tsc --noEmit
+        continue-on-error: true  # rimuovi dopo aver risolto eventuali type errors
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: https://app.linkbay-cms.com
+          # Aggiungi qui altre NEXT_PUBLIC_* necessarie per la build
