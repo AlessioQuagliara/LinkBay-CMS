@@ -52,7 +52,7 @@ class AgencyHealthService
      */
     public function summaryForAllAgencies(int $days = 30): Collection
     {
-        $agencies = Agency::all();
+        $agencies = Agency::select(['id', 'name'])->get();
 
         if ($agencies->isEmpty()) {
             return collect();
