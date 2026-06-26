@@ -70,6 +70,10 @@ class ThemePresetResource extends Resource
     /**
      * Returns true when this is a premium system preset the current agency
      * cannot use yet — i.e., it should be shown in "Preview" mode only.
+     *
+     * Result is cached on the model instance via a WeakMap so repeated calls
+     * within the same table-row render (badge + 3 action visibility closures)
+     * only hit the database once per record.
      */
     public static function isPremiumPreview(ThemePreset $record): bool
     {
@@ -77,19 +81,27 @@ class ThemePresetResource extends Resource
             return false;
         }
 
+        /** @var \WeakMap<ThemePreset, bool> $cache */
+        static $cache = null;
+        $cache ??= new \WeakMap;
+
+        if (isset($cache[$record])) {
+            return $cache[$record];
+        }
+
         $def = app(PluginRegistry::class)->getTheme($record->slug);
 
         if ($def?->featureCode === null) {
-            return false;
+            return $cache[$record] = false;
         }
 
         $agency = app()->has('current_agency') ? app('current_agency') : null;
 
         if (! $agency) {
-            return true;
+            return $cache[$record] = true;
         }
 
-        return ! app(FeatureAccessService::class)->canUseFeature($agency, $def->featureCode);
+        return $cache[$record] = ! app(FeatureAccessService::class)->canUseFeature($agency, $def->featureCode);
     }
 
     // ── Form ─────────────────────────────────────────────────────────────────
