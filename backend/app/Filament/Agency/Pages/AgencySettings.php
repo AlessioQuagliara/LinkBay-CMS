@@ -7,10 +7,13 @@ use App\Services\StripeConnectService;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Livewire\TemporaryUploadedFile;
+use Livewire\WithFileUploads;
 
 class AgencySettings extends Page
 {
-    use ResolvesCurrentAgency;
+    use ResolvesCurrentAgency, WithFileUploads;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
@@ -28,6 +31,12 @@ class AgencySettings extends Page
     public array $brandData = [];
 
     public array $domainData = [];
+
+    /** @var TemporaryUploadedFile|null */
+    public $logoFile = null;
+
+    /** @var TemporaryUploadedFile|null */
+    public $faviconFile = null;
 
     public function mount(): void
     {
@@ -94,8 +103,45 @@ class AgencySettings extends Page
 
             return;
         }
+
+        if ($this->logoFile) {
+            $this->validateOnly('logoFile', ['logoFile' => ['nullable', 'image', 'max:2048']]);
+            $path = $this->logoFile->store("agency/{$agency->id}/logo", 'public');
+            $this->brandData['logo_url'] = Storage::disk('public')->url($path);
+            $this->logoFile = null;
+        }
+
+        if ($this->faviconFile) {
+            $this->validateOnly('faviconFile', ['faviconFile' => ['nullable', 'image', 'max:512']]);
+            $path = $this->faviconFile->store("agency/{$agency->id}/favicon", 'public');
+            $this->brandData['favicon_url'] = Storage::disk('public')->url($path);
+            $this->faviconFile = null;
+        }
+
         $agency->update($this->brandData);
         Notification::make()->title('Brand aggiornato')->success()->send();
+    }
+
+    public function clearLogo(): void
+    {
+        $agency = $this->agency();
+        if (! $agency?->canUseFeature('white_label')) {
+            return;
+        }
+        $this->brandData['logo_url'] = null;
+        $agency->update(['logo_url' => null]);
+        Notification::make()->title('Logo rimosso')->success()->send();
+    }
+
+    public function clearFavicon(): void
+    {
+        $agency = $this->agency();
+        if (! $agency?->canUseFeature('white_label')) {
+            return;
+        }
+        $this->brandData['favicon_url'] = null;
+        $agency->update(['favicon_url' => null]);
+        Notification::make()->title('Favicon rimossa')->success()->send();
     }
 
     public function saveDomain(): void

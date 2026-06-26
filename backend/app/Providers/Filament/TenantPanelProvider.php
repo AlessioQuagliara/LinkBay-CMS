@@ -3,12 +3,14 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Tenant\Pages\StoreSettings;
+use App\Filament\Tenant\Pages\TeamPage;
 use App\Filament\Tenant\Resources\CollectionResource;
 use App\Filament\Tenant\Resources\CustomerResource;
 use App\Filament\Tenant\Resources\DiscountCodeResource;
 use App\Filament\Tenant\Resources\OrderResource;
 use App\Filament\Tenant\Resources\ProductResource;
 use App\Filament\Tenant\Resources\ShippingMethodResource;
+use App\Filament\Tenant\Resources\StorePageResource;
 use App\Filament\Tenant\Widgets\LatestOrdersWidget;
 use App\Filament\Tenant\Widgets\RevenueChartWidget;
 use App\Filament\Tenant\Widgets\TenantStatsOverviewWidget;
@@ -56,8 +58,9 @@ class TenantPanelProvider extends PanelProvider
                 CustomerResource::class,
                 DiscountCodeResource::class,
                 ShippingMethodResource::class,
+                StorePageResource::class,
             ])
-            ->pages([Dashboard::class, StoreSettings::class])
+            ->pages([Dashboard::class, StoreSettings::class, TeamPage::class])
             ->widgets([
                 TenantStatsOverviewWidget::class,
                 RevenueChartWidget::class,

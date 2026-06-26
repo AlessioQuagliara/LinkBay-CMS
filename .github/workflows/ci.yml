@@ -11,50 +11,42 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # ─────────────────────────────────────────
-  # Job 1 — Backend: Laravel / PHPUnit
-  # ─────────────────────────────────────────
-  backend:
+  # ── Detect which areas changed ─────────────────────────────────────────────
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            frontend:
+              - 'frontend/**'
+
+  # ── Backend: Laravel / PHPUnit ─────────────────────────────────────────────
+  # Tests use SQLite :memory: (see backend/phpunit.xml) — no Postgres or Redis needed.
+  backend-tests:
     name: Backend Tests (PHP 8.4)
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: backend
 
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: linkbay_test
-          POSTGRES_USER: linkbay
-          POSTGRES_PASSWORD: secret
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup PHP 8.4
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          extensions: pdo, pdo_pgsql, pgsql, redis, mbstring, dom, fileinfo, bcmath, intl
+          extensions: pdo, pdo_sqlite, mbstring, dom, fileinfo, bcmath, intl
           coverage: none
           tools: composer:v2
 
@@ -68,49 +60,64 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Copy .env for CI
-        run: cp .env.example .env.testing
-
-      - name: Override .env.testing for CI environment
-        run: |
-          sed -i 's/^APP_ENV=.*/APP_ENV=testing/' .env.testing
-          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=pgsql/' .env.testing
-          sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env.testing
-          sed -i 's/^DB_PORT=.*/DB_PORT=5432/' .env.testing
-          sed -i 's/^DB_DATABASE=.*/DB_DATABASE=linkbay_test/' .env.testing
-          sed -i 's/^DB_USERNAME=.*/DB_USERNAME=linkbay/' .env.testing
-          sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=secret/' .env.testing
-          sed -i 's/^REDIS_HOST=.*/REDIS_HOST=127.0.0.1/' .env.testing
-          sed -i 's/^CACHE_DRIVER=.*/CACHE_DRIVER=redis/' .env.testing
-          sed -i 's/^QUEUE_CONNECTION=.*/QUEUE_CONNECTION=sync/' .env.testing
-          sed -i 's/^MAIL_MAILER=.*/MAIL_MAILER=log/' .env.testing
-          sed -i 's|^STRIPE_SECRET=.*|STRIPE_SECRET=sk_test_placeholder|' .env.testing
-          sed -i 's|^STRIPE_WEBHOOK_SECRET=.*|STRIPE_WEBHOOK_SECRET=whsec_placeholder|' .env.testing
-
       - name: Generate application key
-        run: php artisan key:generate --env=testing
+        run: |
+          cp .env.example .env
+          php artisan key:generate --force
 
-      - name: Run migrations
-        run: php artisan migrate --env=testing --force
-
-      - name: Run PHPUnit tests
-        run: php artisan test --env=testing --parallel
+      - name: Validate migrations (SQLite in-memory sanity check)
+        run: php artisan migrate --force
         env:
           APP_ENV: testing
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ':memory:'
+          CENTRAL_DB_DRIVER: sqlite
+          CENTRAL_DB_DATABASE: ':memory:'
+          STRIPE_SECRET: sk_test_placeholder
+          STRIPE_WEBHOOK_SECRET: whsec_placeholder
+          TERMS_VERSION: test-v1
 
-  # ─────────────────────────────────────────
-  # Job 2 — Frontend: Next.js build + lint
-  # ─────────────────────────────────────────
-  frontend:
+      - name: Run PHPUnit tests
+        run: php artisan test --parallel
+
+  # ── Backend: Vite / Filament assets ────────────────────────────────────────
+  backend-assets:
+    name: Backend Assets (Vite)
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Vite assets
+        run: npm run build
+
+  # ── Frontend: Next.js marketing site ───────────────────────────────────────
+  frontend-build:
     name: Frontend Build (Next.js 16)
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: frontend
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js 20
         uses: actions/setup-node@v4
@@ -124,14 +131,13 @@ jobs:
 
       - name: Lint
         run: npm run lint
-        continue-on-error: true  # lint warnings non bloccano la CI — rimuovi quando il codice è lint-clean
+        continue-on-error: true  # remove once the codebase is lint-clean
 
       - name: Type check
         run: npx tsc --noEmit
-        continue-on-error: true  # rimuovi dopo aver risolto eventuali type errors
+        continue-on-error: true  # remove once all type errors are resolved
 
       - name: Build
         run: npm run build
         env:
           NEXT_PUBLIC_API_URL: https://app.linkbay-cms.com
-          # Aggiungi qui altre NEXT_PUBLIC_* necessarie per la build

@@ -7,6 +7,7 @@ use App\Http\Controllers\Tenant\CustomerController;
 use App\Http\Controllers\Tenant\DiscountCodeController;
 use App\Http\Controllers\Tenant\OrderController;
 use App\Http\Controllers\Tenant\ProductController;
+use App\Http\Controllers\Tenant\TenantImpersonateController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -47,4 +48,13 @@ Route::middleware([
         // Analytics
         Route::get('/analytics/summary', [AnalyticsController::class, 'summary']);
     });
+});
+
+Route::middleware([
+    'web',
+    InitializeTenancyByDomain::class,
+    PreventAccessFromCentralDomains::class,
+])->group(function () {
+    Route::get('/_impersonate/{token}', [TenantImpersonateController::class, 'handle'])
+        ->name('tenant.impersonate');
 });

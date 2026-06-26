@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\RefreshDatabaseState;
 
 /**
  * Base per test che usano le tabelle del central DB.
@@ -12,7 +13,25 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
  */
 abstract class CentralTestCase extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase {
+        refreshDatabase as protected doRefreshDatabase;
+    }
+
+    /**
+     * Force re-migration when the central-connection PDO is not yet cached.
+     *
+     * RefreshDatabaseState::$migrated is process-wide static. If TenantTestCase
+     * ran first and set it to true using tenant-only migrations, this class would
+     * otherwise skip migrating the central schema entirely.
+     */
+    public function refreshDatabase(): void
+    {
+        if (! isset(RefreshDatabaseState::$inMemoryConnections['central'])) {
+            RefreshDatabaseState::$migrated = false;
+        }
+
+        $this->doRefreshDatabase();
+    }
 
     /**
      * Run migrations with --database=central so that:
