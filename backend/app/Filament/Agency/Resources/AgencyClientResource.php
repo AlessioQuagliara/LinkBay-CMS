@@ -7,6 +7,11 @@ namespace App\Filament\Agency\Resources;
 use App\Filament\Agency\Resources\AgencyClientResource\Pages;
 use App\Filament\Agency\Resources\AgencyClientResource\RelationManagers;
 use App\Models\Central\AgencyClient;
+use App\Models\Central\AgencyClientContact;
+use App\Services\ClientInviteService;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -19,9 +24,13 @@ use Illuminate\Database\Eloquent\Builder;
 class AgencyClientResource extends Resource
 {
     protected static ?string $model = AgencyClient::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-users';
+
     protected static ?string $modelLabel = 'Cliente';
+
     protected static ?string $pluralModelLabel = 'Clienti';
+
     protected static ?int $navigationSort = 1;
 
     // ── Security: scope every query to the current agency ────────────────────
@@ -66,8 +75,8 @@ class AgencyClientResource extends Resource
                     Forms\Components\Select::make('status')
                         ->label('Stato')
                         ->options([
-                            'active'     => 'Attivo',
-                            'suspended'  => 'Sospeso',
+                            'active' => 'Attivo',
+                            'suspended' => 'Sospeso',
                             'offboarded' => 'Offboarded',
                         ])
                         ->default('active')
@@ -103,16 +112,16 @@ class AgencyClientResource extends Resource
                     ->label('Stato')
                     ->badge()
                     ->color(fn (string $state) => match ($state) {
-                        'active'     => 'success',
-                        'suspended'  => 'warning',
+                        'active' => 'success',
+                        'suspended' => 'warning',
                         'offboarded' => 'gray',
-                        default      => 'gray',
+                        default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state) => match ($state) {
-                        'active'     => 'Attivo',
-                        'suspended'  => 'Sospeso',
+                        'active' => 'Attivo',
+                        'suspended' => 'Sospeso',
                         'offboarded' => 'Offboarded',
-                        default      => $state,
+                        default => $state,
                     }),
                 Tables\Columns\TextColumn::make('stores_count')
                     ->label('Store')
@@ -129,27 +138,88 @@ class AgencyClientResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'active'     => 'Attivo',
-                        'suspended'  => 'Sospeso',
+                        'active' => 'Attivo',
+                        'suspended' => 'Sospeso',
                         'offboarded' => 'Offboarded',
                     ]),
             ])
             ->actions([
-                \Filament\Actions\EditAction::make()->label('Dettaglio'),
-                \Filament\Actions\Action::make('suspend')
+                EditAction::make()->label('Dettaglio'),
+                Action::make('invite_owner')
+                    ->label('Invita store owner')
+                    ->icon('heroicon-o-envelope')
+                    ->color('primary')
+                    ->visible(fn (AgencyClient $record) => $record->stores()->exists())
+                    ->form(function (AgencyClient $record): array {
+                        $stores = $record->stores()->get();
+                        $fields = [
+                            Forms\Components\TextInput::make('email')
+                                ->label('Email store owner')
+                                ->email()
+                                ->required(),
+                        ];
+                        if ($stores->count() > 1) {
+                            $fields[] = Forms\Components\Select::make('tenant_id')
+                                ->label('Store')
+                                ->options($stores->pluck('name', 'id'))
+                                ->required();
+                        }
+
+                        return $fields;
+                    })
+                    ->action(function (AgencyClient $record, array $data): void {
+                        $tenant = isset($data['tenant_id'])
+                            ? $record->stores()->find($data['tenant_id'])
+                            : $record->stores()->first();
+
+                        if (! $tenant) {
+                            Notification::make()->title('Nessuno store disponibile')->danger()->send();
+
+                            return;
+                        }
+
+                        $contact = AgencyClientContact::firstOrCreate(
+                            ['agency_client_id' => $record->id, 'email' => $data['email']],
+                            ['name' => $data['email'], 'can_access_tenant' => false],
+                        );
+
+                        app(ClientInviteService::class)->generateInvite($contact, $tenant);
+
+                        Notification::make()
+                            ->title('Invito inviato a '.$data['email'])
+                            ->body('Il link è valido per 72 ore.')
+                            ->success()
+                            ->send();
+                    }),
+                Action::make('access_store')
+                    ->label('Accedi al pannello')
+                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->color('gray')
+                    ->url(function (AgencyClient $record): ?string {
+                        $tenant = $record->stores()->first();
+                        if (! $tenant) {
+                            return null;
+                        }
+                        $scheme = app()->isProduction() ? 'https' : 'http';
+
+                        return "{$scheme}://{$tenant->id}.".config('app.store_domain').'/admin';
+                    })
+                    ->openUrlInNewTab()
+                    ->visible(fn (AgencyClient $record) => $record->stores()->exists()),
+                Action::make('suspend')
                     ->label('Sospendi')
                     ->icon('heroicon-o-pause-circle')
                     ->color('warning')
                     ->requiresConfirmation()
                     ->visible(fn (AgencyClient $record) => $record->status === 'active')
                     ->action(fn (AgencyClient $record) => $record->update(['status' => 'suspended'])),
-                \Filament\Actions\Action::make('reactivate')
+                Action::make('reactivate')
                     ->label('Riattiva')
                     ->icon('heroicon-o-play-circle')
                     ->color('success')
                     ->visible(fn (AgencyClient $record) => $record->status !== 'active')
                     ->action(fn (AgencyClient $record) => $record->update(['status' => 'active'])),
-                \Filament\Actions\DeleteAction::make(),
+                DeleteAction::make(),
             ])
             ->emptyStateHeading('Nessun cliente')
             ->emptyStateDescription('Crea il primo cliente per iniziare a gestire i progetti della tua agency.')
@@ -171,9 +241,9 @@ class AgencyClientResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListAgencyClients::route('/'),
+            'index' => Pages\ListAgencyClients::route('/'),
             'create' => Pages\CreateAgencyClient::route('/create'),
-            'edit'   => Pages\EditAgencyClient::route('/{record}/edit'),
+            'edit' => Pages\EditAgencyClient::route('/{record}/edit'),
         ];
     }
 }

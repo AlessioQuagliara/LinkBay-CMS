@@ -50,12 +50,39 @@
                                         <x-filament::input.wrapper label="Brand Name">
                                             <x-filament::input type="text" wire:model="brandData.brand_name" />
                                         </x-filament::input.wrapper>
-                                        <x-filament::input.wrapper label="Logo URL">
-                                            <x-filament::input type="url" wire:model="brandData.logo_url" />
-                                        </x-filament::input.wrapper>
-                                        <x-filament::input.wrapper label="Favicon URL">
-                                            <x-filament::input type="url" wire:model="brandData.favicon_url" />
-                                        </x-filament::input.wrapper>
+
+                                        {{-- Logo upload --}}
+                                        <div class="space-y-1">
+                                            <p class="text-sm font-medium text-gray-700 dark:text-gray-200">Logo</p>
+                                            @if(!empty($brand['logo_url']))
+                                                <div class="flex items-center gap-2">
+                                                    <img src="{{ $brand['logo_url'] }}" alt="Logo" class="h-8 w-auto object-contain rounded border bg-white p-0.5"/>
+                                                    <button wire:click="clearLogo" type="button" class="text-xs text-red-500 hover:underline">Rimuovi</button>
+                                                </div>
+                                            @endif
+                                            <input type="file" wire:model="logoFile" accept="image/*"
+                                                   class="block w-full text-sm text-gray-600 dark:text-gray-400 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"/>
+                                            @error('logoFile') <p class="text-xs text-red-500">{{ $message }}</p> @enderror
+                                            <p class="text-xs text-gray-400">Oppure incolla URL:</p>
+                                            <x-filament::input type="url" wire:model="brandData.logo_url" placeholder="https://..." />
+                                        </div>
+
+                                        {{-- Favicon upload --}}
+                                        <div class="space-y-1">
+                                            <p class="text-sm font-medium text-gray-700 dark:text-gray-200">Favicon</p>
+                                            @if(!empty($brand['favicon_url']))
+                                                <div class="flex items-center gap-2">
+                                                    <img src="{{ $brand['favicon_url'] }}" alt="Favicon" class="h-6 w-6 object-contain rounded border bg-white p-0.5"/>
+                                                    <button wire:click="clearFavicon" type="button" class="text-xs text-red-500 hover:underline">Rimuovi</button>
+                                                </div>
+                                            @endif
+                                            <input type="file" wire:model="faviconFile" accept="image/*"
+                                                   class="block w-full text-sm text-gray-600 dark:text-gray-400 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"/>
+                                            @error('faviconFile') <p class="text-xs text-red-500">{{ $message }}</p> @enderror
+                                            <p class="text-xs text-gray-400">Oppure incolla URL:</p>
+                                            <x-filament::input type="url" wire:model="brandData.favicon_url" placeholder="https://..." />
+                                        </div>
+
                                         <x-filament::input.wrapper label="Colore primario">
                                             <input type="color" wire:model="brandData.primary_color" class="w-12 h-10 rounded border" />
                                         </x-filament::input.wrapper>

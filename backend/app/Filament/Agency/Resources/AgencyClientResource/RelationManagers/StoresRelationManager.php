@@ -4,7 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Agency\Resources\AgencyClientResource\RelationManagers;
 
+use App\Http\Controllers\Tenant\TenantImpersonateController;
 use App\Models\Central\Tenant;
+use Filament\Actions\Action;
+use Filament\Actions\AssociateAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DissociateAction;
+use Filament\Actions\DissociateBulkAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables;
@@ -14,7 +20,9 @@ use Illuminate\Database\Eloquent\Builder;
 class StoresRelationManager extends RelationManager
 {
     protected static string $relationship = 'stores';
+
     protected static ?string $title = 'Store associati';
+
     protected static ?string $recordTitleAttribute = 'name';
 
     public function form(Schema $schema): Schema
@@ -33,7 +41,7 @@ class StoresRelationManager extends RelationManager
                     ->weight('medium'),
                 Tables\Columns\TextColumn::make('id')
                     ->label('Subdomain')
-                    ->formatStateUsing(fn (string $state) => $state . '.' . config('app.store_domain')),
+                    ->formatStateUsing(fn (string $state) => $state.'.'.config('app.store_domain')),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Stato')
                     ->badge()
@@ -41,7 +49,7 @@ class StoresRelationManager extends RelationManager
                     ->formatStateUsing(fn (string $state) => $state === 'active' ? 'Attivo' : 'Sospeso'),
             ])
             ->headerActions([
-                \Filament\Actions\AssociateAction::make()
+                AssociateAction::make()
                     ->label('Associa store')
                     ->recordSelectOptionsQuery(function (Builder $query) {
                         // Only show stores from this client's agency that aren't yet linked to any client
@@ -51,11 +59,35 @@ class StoresRelationManager extends RelationManager
                     }),
             ])
             ->actions([
-                \Filament\Actions\DissociateAction::make()->label('Rimuovi'),
+                Action::make('access_store')
+                    ->label('Accedi come cliente')
+                    ->icon('heroicon-o-identification')
+                    ->color('primary')
+                    ->url(function (Tenant $record): string {
+                        $token = TenantImpersonateController::generateToken(
+                            auth()->user()->email,
+                            $record->id,
+                        );
+                        $scheme = app()->isProduction() ? 'https' : 'http';
+
+                        return "{$scheme}://{$record->id}.".config('app.store_domain')."/_impersonate/{$token}";
+                    })
+                    ->openUrlInNewTab(),
+                Action::make('access_panel')
+                    ->label('Apri pannello')
+                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->color('gray')
+                    ->url(function (Tenant $record): string {
+                        $scheme = app()->isProduction() ? 'https' : 'http';
+
+                        return "{$scheme}://{$record->id}.".config('app.store_domain').'/admin';
+                    })
+                    ->openUrlInNewTab(),
+                DissociateAction::make()->label('Rimuovi'),
             ])
             ->bulkActions([
-                \Filament\Actions\BulkActionGroup::make([
-                    \Filament\Actions\DissociateBulkAction::make(),
+                BulkActionGroup::make([
+                    DissociateBulkAction::make(),
                 ]),
             ])
             ->emptyStateHeading('Nessuno store associato')

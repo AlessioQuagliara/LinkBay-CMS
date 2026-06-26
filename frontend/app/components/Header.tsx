@@ -11,7 +11,10 @@ export const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
 
-  const isActive = (path: string): boolean => pathname === path;
+  const isActive = (path: string): boolean => {
+    if (path === '/') return pathname === '/';
+    return pathname === path || pathname.startsWith(path + '/');
+  };
 
   const toggleMenu = (): void => setIsMenuOpen(!isMenuOpen);
 
@@ -28,6 +31,7 @@ export const Header: React.FC = () => {
     { path: '/', label: 'Home' },
     { path: '/features', label: 'Features' },
     { path: '/pricing', label: 'Pricing' },
+    { path: '/docs', label: 'Docs' },
     { path: '/about', label: 'About' },
     { path: '/contact', label: 'Contact' },
   ];
