@@ -9,6 +9,7 @@ use App\Providers\TenancyServiceProvider;
 
 return [
     AppServiceProvider::class,
+    \App\Providers\EventServiceProvider::class,
     PluginServiceProvider::class,
     TenancyServiceProvider::class,
     AdminPanelProvider::class,

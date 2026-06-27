@@ -2,6 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Tenant\Pages\BrandSettingsPage;
+use App\Filament\Tenant\Pages\LanguageSettingsPage;
+use App\Filament\Tenant\Pages\MediaLibraryPage;
 use App\Filament\Tenant\Pages\StoreSettings;
 use App\Filament\Tenant\Pages\TeamPage;
 use App\Filament\Tenant\Resources\CollectionResource;
@@ -60,7 +63,14 @@ class TenantPanelProvider extends PanelProvider
                 ShippingMethodResource::class,
                 StorePageResource::class,
             ])
-            ->pages([Dashboard::class, StoreSettings::class, TeamPage::class])
+            ->pages([
+                Dashboard::class,
+                StoreSettings::class,
+                TeamPage::class,
+                BrandSettingsPage::class,
+                LanguageSettingsPage::class,
+                MediaLibraryPage::class,
+            ])
             ->widgets([
                 TenantStatsOverviewWidget::class,
                 RevenueChartWidget::class,

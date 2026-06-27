@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models\Tenant;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\Translatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Collection extends Model
 {
-    use HasFactory;
+    use HasFactory, Translatable;
 
     protected $fillable = [
         'name',

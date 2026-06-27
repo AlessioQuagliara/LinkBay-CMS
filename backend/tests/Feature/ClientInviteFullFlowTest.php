@@ -8,7 +8,9 @@ use App\Mail\ClientInviteMail;
 use App\Models\Central\Agency;
 use App\Models\Central\AgencyClient;
 use App\Models\Central\AgencyClientContact;
+use App\Models\Central\AgencyMember;
 use App\Models\Central\Tenant;
+use App\Models\Central\User;
 use App\Models\Tenant\User as TenantUser;
 use App\Services\ClientInviteService;
 use Illuminate\Support\Facades\Mail;
@@ -24,7 +26,7 @@ use Tests\CentralTestCase;
  *  4. Expired token → redirect to client-invite.invalid
  *  5. Already-used (invalidated) token → redirect to client-invite.invalid
  *  6. Double acceptance of same token → idempotent (no error, valid redirect)
- *  7. TODO — cross-agency token acceptance protection (not currently enforced)
+ *  7. Authenticated user from a different agency → 403
  */
 class ClientInviteFullFlowTest extends CentralTestCase
 {
@@ -258,32 +260,41 @@ class ClientInviteFullFlowTest extends CentralTestCase
 
     // ── Test 7 ────────────────────────────────────────────────────────────────
 
-    // TODO — ClientInviteController does not currently enforce cross-agency protection.
-    // A token belongs to a contact which belongs to an agency. If a contact from
-    // Agency B tries to accept an invite issued by Agency A, the token lookup by
-    // string match would still find it. Add protection and implement this test:
-    //
-    // public function test_contact_from_different_agency_cannot_accept_invite(): void
-    // {
-    //     $agencyA  = $this->makeAgency();
-    //     $clientA  = $this->makeClient($agencyA);
-    //     $contactA = $this->makeContact($clientA);
-    //
-    //     // Agency A issues invite
-    //     Mail::fake();
-    //     $this->service()->generateInvite($contactA, $this->fakeTenant());
-    //     $contactA->refresh();
-    //
-    //     $agencyB  = $this->makeAgency();
-    //     $clientB  = $this->makeClient($agencyB);
-    //     $contactB = $this->makeContact($clientB);
-    //
-    //     // Contact from Agency B tries to accept Agency A's token
-    //     $response = $this->actingAs($contactB)->post(
-    //         route('client-invite.accept', $contactA->invite_token), [...]
-    //     );
-    //     $response->assertForbidden();
-    // }
+    public function test_accept_returns_403_if_authenticated_user_belongs_to_different_agency(): void
+    {
+        Mail::fake();
+
+        $agencyA = $this->makeAgency();
+        $clientA = $this->makeClient($agencyA);
+        $contactA = $this->makeContact($clientA);
+
+        $this->service()->generateInvite($contactA, $this->fakeTenant());
+        $contactA->refresh();
+
+        $agencyB = $this->makeAgency();
+
+        self::$seq++;
+        $ownerB = User::create([
+            'name' => 'Owner B '.self::$seq,
+            'email' => 'ownerb'.self::$seq.'@example.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        AgencyMember::create([
+            'agency_id' => $agencyB->id,
+            'user_id' => $ownerB->id,
+            'role' => AgencyMember::ROLE_OWNER,
+            'status' => AgencyMember::STATUS_ACTIVE,
+            'accepted_at' => now(),
+        ]);
+
+        $response = $this->actingAs($ownerB)->post(
+            route('client-invite.accept', $contactA->invite_token),
+            ['password' => 'password123', 'password_confirmation' => 'password123'],
+        );
+
+        $response->assertStatus(403);
+    }
 
     // ── Service: token helpers ────────────────────────────────────────────────
 

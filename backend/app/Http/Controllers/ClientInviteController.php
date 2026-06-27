@@ -35,9 +35,9 @@ class ClientInviteController extends Controller
         }
 
         return view('client-invite.show', [
-            'contact'   => $contact,
+            'contact' => $contact,
             'storeName' => $storeName,
-            'token'     => $token,
+            'token' => $token,
         ]);
     }
 
@@ -56,8 +56,8 @@ class ClientInviteController extends Controller
         // Se l'utente è autenticato, il contatto deve appartenere alla sua agenzia.
         // Questo previene che un membro di Agency B possa accettare un invite di Agency A.
         if ($request->user()) {
-            $contactAgencyId = $contact->agencyClient?->agency_id;
-            $userAgencyId    = $request->user()->agencyMembers()
+            $contactAgencyId = $contact->client?->agency_id;
+            $userAgencyId = $request->user()->agencyMemberships()
                 ->where('status', 'active')
                 ->value('agency_id');
 
@@ -78,8 +78,8 @@ class ClientInviteController extends Controller
 
         return redirect()->route('client-invite.accepted')->with([
             'storeName' => $tenant?->name,
-            'storeUrl'  => $storeUrl,
-            'email'     => $contact->email,
+            'storeUrl' => $storeUrl,
+            'email' => $contact->email,
         ]);
     }
 
@@ -90,8 +90,8 @@ class ClientInviteController extends Controller
     {
         return view('client-invite.accepted', [
             'storeName' => session('storeName', ''),
-            'storeUrl'  => session('storeUrl', ''),
-            'email'     => session('email', ''),
+            'storeUrl' => session('storeUrl', ''),
+            'email' => session('email', ''),
         ]);
     }
 

@@ -10,8 +10,10 @@ use App\Models\Central\AiCreditPackage;
 use App\Models\Central\BillingEvent;
 use App\Models\Central\CommissionRecord;
 use App\Models\Central\PayoutRecord;
+use App\Services\AgencyBillingService;
 use App\Services\AgencySubscriptionService;
 use App\Services\AiCreditsService;
+use App\Services\DashboardAlertService;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -38,6 +40,7 @@ class ProcessStripeWebhookJob implements ShouldQueue
 
     public function handle(
         AgencySubscriptionService $subscriptionService,
+        AgencyBillingService $billingService,
         AiCreditsService $aiCredits,
     ): void {
         $billingEvent = BillingEvent::find($this->billingEventId);
@@ -53,7 +56,7 @@ class ProcessStripeWebhookJob implements ShouldQueue
         }
 
         try {
-            $this->processEvent($billingEvent, $subscriptionService, $aiCredits);
+            $this->processEvent($billingEvent, $subscriptionService, $billingService, $aiCredits);
             $billingEvent->markProcessed();
         } catch (\Throwable $e) {
             $billingEvent->markFailed($e->getMessage());
@@ -72,6 +75,7 @@ class ProcessStripeWebhookJob implements ShouldQueue
     private function processEvent(
         BillingEvent $billingEvent,
         AgencySubscriptionService $subscriptionService,
+        AgencyBillingService $billingService,
         AiCreditsService $aiCredits,
     ): void {
         $payload = $billingEvent->payload;
@@ -82,11 +86,15 @@ class ProcessStripeWebhookJob implements ShouldQueue
             'payment_intent.succeeded' => $this->onPaymentIntentSucceeded($obj),
             'payment_intent.payment_failed' => $this->onPaymentIntentFailed($obj),
             'customer.subscription.created',
-            'customer.subscription.updated' => $this->onSubscriptionUpsert($obj, $subscriptionService),
+            'customer.subscription.updated' => $this->onSubscriptionUpsert($obj, $subscriptionService, $billingService),
             'customer.subscription.deleted' => $this->onSubscriptionDeleted($obj, $subscriptionService),
-            'invoice.paid' => $this->onInvoicePaid($obj, $subscriptionService),
+            'customer.subscription.trial_will_end' => $this->onTrialWillEnd($obj),
+            'invoice.paid',
+            'invoice.payment_succeeded' => $this->onInvoicePaid($obj, $subscriptionService, $billingService),
             'invoice.payment_failed' => $this->onInvoicePaymentFailed($obj, $subscriptionService),
             'checkout.session.completed' => $this->onCheckoutCompleted($obj, $aiCredits, $subscriptionService),
+            'payment_method.attached' => $this->onPaymentMethodAttached($obj),
+            'customer.updated' => $this->onCustomerUpdated($obj),
             'account.updated' => $this->onAccountUpdated($obj),
             'charge.refunded' => $this->onChargeRefunded($obj),
             'charge.dispute.created' => $this->onDisputeCreated($obj),
@@ -130,18 +138,46 @@ class ProcessStripeWebhookJob implements ShouldQueue
             ->update(['status' => CommissionRecord::STATUS_FAILED]);
     }
 
-    private function onSubscriptionUpsert(array $obj, AgencySubscriptionService $svc): void
-    {
-        // Swallow: upsert è idempotente, se fallisce verrà reprocessato dallo schedule
+    private function onSubscriptionUpsert(
+        array $obj,
+        AgencySubscriptionService $svc,
+        AgencyBillingService $billingService,
+    ): void {
         try {
             $stripeSub = Subscription::constructFrom($obj);
             $svc->syncFromStripe($stripeSub);
+
+            // Also sync Agency billing fields (stripe_status, dates, payment method)
+            $agency = Agency::where('stripe_customer_id', $obj['customer'] ?? null)->first();
+            if ($agency) {
+                $billingService->syncSubscriptionFromStripe($agency, $stripeSub);
+            }
         } catch (\Throwable $e) {
             Log::warning('subscription upsert sync failed', [
                 'obj_id' => $obj['id'] ?? null,
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    private function onTrialWillEnd(array $obj): void
+    {
+        $customerId = $obj['customer'] ?? null;
+        if (! $customerId) {
+            return;
+        }
+
+        $agency = Agency::where('stripe_customer_id', $customerId)->first();
+        if (! $agency) {
+            return;
+        }
+
+        Log::info('AgencySubscription: trial will end', [
+            'agency_id' => $agency->id,
+            'trial_end' => $obj['trial_end'] ?? null,
+        ]);
+
+        // DashboardAlertService can surface this as an alert type if configured
     }
 
     private function onSubscriptionDeleted(array $obj, AgencySubscriptionService $svc): void
@@ -151,11 +187,20 @@ class ProcessStripeWebhookJob implements ShouldQueue
         $svc->handleDeleted($stripeSub);
     }
 
-    private function onInvoicePaid(array $obj, AgencySubscriptionService $svc): void
-    {
+    private function onInvoicePaid(
+        array $obj,
+        AgencySubscriptionService $svc,
+        AgencyBillingService $billingService,
+    ): void {
         try {
             $invoice = Invoice::constructFrom($obj);
             $svc->handleInvoicePaid($invoice);
+
+            // Persist invoice record
+            $agency = Agency::where('stripe_customer_id', $obj['customer'] ?? null)->first();
+            if ($agency) {
+                $billingService->upsertInvoice($agency, $invoice);
+            }
         } catch (\Throwable $e) {
             Log::warning('invoice.paid handling failed', ['error' => $e->getMessage()]);
         }
@@ -168,6 +213,49 @@ class ProcessStripeWebhookJob implements ShouldQueue
             $svc->handleInvoicePaymentFailed($invoice);
         } catch (\Throwable $e) {
             Log::warning('invoice.payment_failed handling failed', ['error' => $e->getMessage()]);
+        }
+    }
+
+    private function onPaymentMethodAttached(array $obj): void
+    {
+        $customerId = $obj['customer'] ?? null;
+        if (! $customerId) {
+            return;
+        }
+
+        $agency = Agency::where('stripe_customer_id', $customerId)->first();
+        if (! $agency) {
+            return;
+        }
+
+        $agency->update([
+            'payment_method_last4' => $obj['card']['last4'] ?? null,
+            'payment_method_brand' => $obj['card']['brand'] ?? $obj['type'] ?? null,
+        ]);
+    }
+
+    private function onCustomerUpdated(array $obj): void
+    {
+        $customerId = $obj['id'] ?? null;
+        if (! $customerId) {
+            return;
+        }
+
+        $agency = Agency::where('stripe_customer_id', $customerId)->first();
+        if (! $agency) {
+            return;
+        }
+
+        $updates = [];
+        if (! empty($obj['email'])) {
+            $updates['billing_email'] = $obj['email'];
+        }
+        if (! empty($obj['name'])) {
+            $updates['billing_name'] = $obj['name'];
+        }
+
+        if ($updates) {
+            $agency->update($updates);
         }
     }
 
