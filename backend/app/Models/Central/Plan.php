@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models\Central;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Plan extends Model
 {
@@ -19,8 +19,15 @@ class Plan extends Model
         'price',
         'billing_interval',
         'stripe_price_id',
+        'stripe_product_id',
+        'stripe_price_id_monthly',
+        'stripe_price_id_yearly',
+        'trial_days',
         'features',
         'limits',
+        'max_stores',
+        'max_members',
+        'storage_gb',
         'is_active',
         'sort_order',
     ];
@@ -30,6 +37,10 @@ class Plan extends Model
         'limits' => 'array',
         'is_active' => 'boolean',
         'price' => 'decimal:2',
+        'trial_days' => 'integer',
+        'max_stores' => 'integer',
+        'max_members' => 'integer',
+        'storage_gb' => 'integer',
     ];
 
     public function tenants()
@@ -50,5 +61,23 @@ class Plan extends Model
     public function getLimit(string $key, mixed $default = null): mixed
     {
         return $this->limits[$key] ?? $default;
+    }
+
+    public function stripePriceFor(string $interval): ?string
+    {
+        return match ($interval) {
+            'monthly' => $this->stripe_price_id_monthly ?? $this->stripe_price_id,
+            'yearly' => $this->stripe_price_id_yearly,
+            default => $this->stripe_price_id,
+        };
+    }
+
+    public function priceForInterval(string $interval): float
+    {
+        if ($interval === 'yearly') {
+            return (float) $this->price * 10; // 2 months free
+        }
+
+        return (float) $this->price;
     }
 }

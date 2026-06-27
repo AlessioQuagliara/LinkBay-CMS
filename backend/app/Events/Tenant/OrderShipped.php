@@ -1,0 +1,22 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Events\Tenant;
+
+use App\Models\Tenant\Order;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class OrderShipped
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public function __construct(
+        public readonly Order $order,
+        public readonly string $trackingNumber,
+        public readonly string $carrierName,
+        public readonly string $trackingUrl,
+    ) {}
+}

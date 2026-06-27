@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-primary: #111827;
+    --color-secondary: #6b7280;
+    --font-sans: system-ui, -apple-system, sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: #111827;
+    background-color: #ffffff;
+  }
+}
+
+@layer utilities {
+  .ring-brand {
+    --tw-ring-color: var(--color-primary);
+  }
+}

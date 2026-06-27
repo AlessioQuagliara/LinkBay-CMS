@@ -2,29 +2,38 @@
 
 namespace App\Filament\Tenant\Resources;
 
+use App\Events\Tenant\OrderShipped;
 use App\Filament\Tenant\Resources\OrderResource\Pages;
 use App\Models\Tenant\Order;
+use App\Services\Tenant\StorePaymentService;
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
-use Filament\Schemas\Schema;
-
 use Filament\Infolists;
-
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shopping-cart';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Vendite';
+
     protected static ?string $modelLabel = 'Ordine';
+
     protected static ?string $pluralModelLabel = 'Ordini';
+
     protected static ?int $navigationSort = 1;
 
     public static function getNavigationBadge(): ?string
     {
         $count = static::getModel()::where('status', 'pending')->count();
+
         return $count > 0 ? (string) $count : null;
     }
 
@@ -49,7 +58,7 @@ class OrderResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('#')
-                    ->formatStateUsing(fn ($state) => '#' . str_pad($state, 4, '0', STR_PAD_LEFT))
+                    ->formatStateUsing(fn ($state) => '#'.str_pad($state, 4, '0', STR_PAD_LEFT))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('customer.name')
@@ -58,7 +67,7 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->label('Stato')
                     ->badge()
-                    ->color(fn (string $state) => match($state) {
+                    ->color(fn (string $state) => match ($state) {
                         'pending' => 'gray',
                         'confirmed' => 'info',
                         'processing' => 'warning',
@@ -75,11 +84,21 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('payment_status')
                     ->label('Pagamento')
                     ->badge()
-                    ->color(fn (string $state) => match($state) {
+                    ->color(fn (string $state) => match ($state) {
                         'paid' => 'success',
                         'pending' => 'warning',
                         'failed' => 'danger',
+                        'partially_refunded' => 'orange',
+                        'refunded' => 'gray',
                         default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state) => match ($state) {
+                        'paid' => 'Pagato',
+                        'pending' => 'In attesa',
+                        'failed' => 'Fallito',
+                        'partially_refunded' => 'Rimborsato parzialmente',
+                        'refunded' => 'Rimborsato',
+                        default => $state,
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Data')
@@ -87,6 +106,15 @@ class OrderResource extends Resource
                     ->sortable(),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('payment_status')
+                    ->label('Stato pagamento')
+                    ->options([
+                        'paid' => 'Pagato',
+                        'pending' => 'In attesa',
+                        'failed' => 'Fallito',
+                        'partially_refunded' => 'Rimborsato parz.',
+                        'refunded' => 'Rimborsato',
+                    ]),
                 Tables\Filters\SelectFilter::make('status')
                     ->label('Stato')
                     ->options([
@@ -112,8 +140,8 @@ class OrderResource extends Resource
                     ),
             ])
             ->actions([
-                \Filament\Actions\ViewAction::make(),
-                \Filament\Actions\Action::make('update_status')
+                ViewAction::make(),
+                Action::make('update_status')
                     ->label('Aggiorna stato')
                     ->icon('heroicon-o-arrow-path')
                     ->form([
@@ -132,6 +160,100 @@ class OrderResource extends Resource
                             ->label('Tracking number'),
                     ])
                     ->action(fn (Order $record, array $data) => $record->update($data)),
+
+                Action::make('mark_shipped')
+                    ->label('Segna come spedito')
+                    ->icon('heroicon-o-truck')
+                    ->color('info')
+                    ->visible(fn (Order $record): bool => in_array($record->status, [
+                        Order::STATUS_CONFIRMED,
+                        Order::STATUS_PROCESSING,
+                    ], true))
+                    ->form([
+                        Forms\Components\TextInput::make('tracking_number')
+                            ->label('Numero di tracking')
+                            ->required()
+                            ->maxLength(100),
+                        Forms\Components\TextInput::make('carrier_name')
+                            ->label('Corriere')
+                            ->default('DHL')
+                            ->required()
+                            ->maxLength(100),
+                        Forms\Components\TextInput::make('tracking_url')
+                            ->label('URL di tracking')
+                            ->url()
+                            ->nullable(),
+                    ])
+                    ->action(function (Order $record, array $data): void {
+                        $record->update([
+                            'status' => Order::STATUS_SHIPPED,
+                            'tracking_number' => $data['tracking_number'],
+                        ]);
+
+                        event(new OrderShipped(
+                            $record,
+                            $data['tracking_number'],
+                            $data['carrier_name'],
+                            $data['tracking_url'] ?? '',
+                        ));
+
+                        Notification::make()->title('Ordine segnato come spedito')->success()->send();
+                    }),
+
+                Action::make('capture_payment')
+                    ->label('Cattura pagamento')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->visible(fn (Order $record): bool => $record->payment_status === Order::PAYMENT_STATUS_PENDING
+                        && $record->stripe_payment_intent_id !== null
+                    )
+                    ->action(function (Order $record): void {
+                        try {
+                            app(StorePaymentService::class)->capturePayment($record);
+                            Notification::make()->title('Pagamento catturato')->success()->send();
+                        } catch (\Throwable $e) {
+                            Notification::make()->title('Errore: '.$e->getMessage())->danger()->send();
+                        }
+                    }),
+
+                Action::make('refund')
+                    ->label('Rimborsa')
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->color('warning')
+                    ->visible(fn (Order $record): bool => in_array($record->payment_status, [
+                        Order::PAYMENT_STATUS_PAID,
+                        Order::PAYMENT_STATUS_PARTIALLY_REFUNDED,
+                    ], true)
+                    )
+                    ->form([
+                        Forms\Components\TextInput::make('amount')
+                            ->label('Importo da rimborsare (€)')
+                            ->helperText('Lascia vuoto per rimborso totale')
+                            ->numeric()
+                            ->minValue(0.01)
+                            ->nullable(),
+                        Forms\Components\Select::make('reason')
+                            ->label('Motivo')
+                            ->options([
+                                'requested_by_customer' => 'Richiesta del cliente',
+                                'duplicate' => 'Pagamento duplicato',
+                                'fraudulent' => 'Frode',
+                            ])
+                            ->nullable(),
+                    ])
+                    ->action(function (Order $record, array $data): void {
+                        try {
+                            app(StorePaymentService::class)->refundOrder(
+                                $record,
+                                ! empty($data['amount']) ? (float) $data['amount'] : null,
+                                $data['reason'] ?? null,
+                            );
+                            Notification::make()->title('Rimborso effettuato')->success()->send();
+                        } catch (\Throwable $e) {
+                            Notification::make()->title('Errore rimborso: '.$e->getMessage())->danger()->send();
+                        }
+                    }),
             ])
             ->defaultSort('created_at', 'desc');
     }
@@ -143,7 +265,7 @@ class OrderResource extends Resource
                 ->schema([
                     Infolists\Components\TextEntry::make('id')
                         ->label('Numero ordine')
-                        ->formatStateUsing(fn ($state) => '#' . str_pad($state, 4, '0', STR_PAD_LEFT)),
+                        ->formatStateUsing(fn ($state) => '#'.str_pad($state, 4, '0', STR_PAD_LEFT)),
                     Infolists\Components\TextEntry::make('status')
                         ->label('Stato')
                         ->badge(),

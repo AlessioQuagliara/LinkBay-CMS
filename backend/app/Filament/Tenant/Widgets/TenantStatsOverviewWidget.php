@@ -1,64 +1,96 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Tenant\Widgets;
 
-use App\Models\Tenant\Customer;
-use App\Models\Tenant\Order;
+use App\Services\Tenant\AnalyticsService;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Carbon;
+use Livewire\Attributes\On;
 
 class TenantStatsOverviewWidget extends BaseWidget
 {
     protected static ?int $sort = 1;
 
+    protected static ?string $pollingInterval = '60s';
+
+    public ?string $analyticsFrom = null;
+
+    public ?string $analyticsTo = null;
+
+    #[On('analyticsDateChanged')]
+    public function updateDateRange(string $from, string $to): void
+    {
+        $this->analyticsFrom = $from;
+        $this->analyticsTo = $to;
+    }
+
     protected function getStats(): array
     {
-        $now = now();
-        $start = $now->copy()->subDays(30);
-        $prevStart = $now->copy()->subDays(60);
-        $prevEnd = $now->copy()->subDays(30);
+        $analytics = app(AnalyticsService::class);
 
-        $revenue = Order::whereBetween('created_at', [$start, $now])
-            ->whereNotIn('status', ['cancelled', 'refunded'])
-            ->sum('total');
+        [$from, $to] = $this->resolveRange();
 
-        $prevRevenue = Order::whereBetween('created_at', [$prevStart, $prevEnd])
-            ->whereNotIn('status', ['cancelled', 'refunded'])
-            ->sum('total');
-
-        $revenueTrend = $prevRevenue > 0
-            ? round((($revenue - $prevRevenue) / $prevRevenue) * 100, 1)
-            : 0;
-
-        $orders = Order::whereBetween('created_at', [$start, $now])->count();
-        $prevOrders = Order::whereBetween('created_at', [$prevStart, $prevEnd])->count();
-        $ordersTrend = $prevOrders > 0
-            ? round((($orders - $prevOrders) / $prevOrders) * 100, 1)
-            : 0;
-
-        $newCustomers = Customer::whereBetween('created_at', [$start, $now])->count();
-
-        $pendingOrders = Order::where('status', 'pending')->count();
+        $revenue = $analytics->compareWithPreviousPeriod('getRevenueTotal', $from, $to);
+        $orders = $analytics->compareWithPreviousPeriod('getOrdersCount', $from, $to);
+        $aov = $analytics->compareWithPreviousPeriod('getAverageOrderValue', $from, $to);
+        $customers = $analytics->compareWithPreviousPeriod('getNewCustomersCount', $from, $to);
 
         return [
-            Stat::make('Fatturato (30gg)', '€ ' . number_format($revenue, 2, ',', '.'))
-                ->description($revenueTrend >= 0 ? "+{$revenueTrend}% vs mese prec." : "{$revenueTrend}% vs mese prec.")
-                ->descriptionIcon($revenueTrend >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
-                ->color($revenueTrend >= 0 ? 'success' : 'danger'),
+            Stat::make('Fatturato', '€ '.number_format((float) $revenue['current'], 2, ',', '.'))
+                ->description($this->trendLabel($revenue))
+                ->descriptionIcon($revenue['trend'] === 'up' ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
+                ->color($revenue['trend'] === 'up' ? 'success' : 'danger')
+                ->chart($this->sparkline($analytics, $from, $to)),
 
-            Stat::make('Ordini (30gg)', $orders)
-                ->description($ordersTrend >= 0 ? "+{$ordersTrend}% vs mese prec." : "{$ordersTrend}% vs mese prec.")
-                ->descriptionIcon($ordersTrend >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
-                ->color($ordersTrend >= 0 ? 'success' : 'danger'),
+            Stat::make('Ordini', (string) (int) $orders['current'])
+                ->description($this->trendLabel($orders))
+                ->descriptionIcon($orders['trend'] === 'up' ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
+                ->color($orders['trend'] === 'up' ? 'success' : 'danger'),
 
-            Stat::make('Nuovi clienti (30gg)', $newCustomers)
-                ->description('Ultimi 30 giorni')
+            Stat::make('Valore medio ordine', '€ '.number_format((float) $aov['current'], 2, ',', '.'))
+                ->description($this->trendLabel($aov))
+                ->descriptionIcon($aov['trend'] === 'up' ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
+                ->color($aov['trend'] === 'up' ? 'success' : 'warning'),
+
+            Stat::make('Nuovi clienti', (string) (int) $customers['current'])
+                ->description($this->trendLabel($customers))
+                ->descriptionIcon($customers['trend'] === 'up' ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color('info'),
-
-            Stat::make('Ordini in attesa', $pendingOrders)
-                ->description($pendingOrders > 0 ? 'Richiede attenzione' : 'Tutto ok')
-                ->color($pendingOrders > 0 ? 'danger' : 'success')
-                ->descriptionIcon($pendingOrders > 0 ? 'heroicon-m-exclamation-circle' : 'heroicon-m-check-circle'),
         ];
+    }
+
+    /** @param  array{change_percent: float, trend: string}  $comparison */
+    private function trendLabel(array $comparison): string
+    {
+        $pct = abs($comparison['change_percent']);
+        $prefix = $comparison['trend'] === 'up' ? '+' : ($comparison['trend'] === 'down' ? '-' : '');
+
+        return "{$prefix}{$pct}% vs periodo prec.";
+    }
+
+    /** @return array<int, float> */
+    private function sparkline(AnalyticsService $analytics, Carbon $from, Carbon $to): array
+    {
+        $sparkFrom = now()->subDays(6)->startOfDay();
+        $sparkTo = now()->endOfDay();
+
+        return $analytics->getRevenuePeriod($sparkFrom, $sparkTo, 'day')
+            ->pluck('revenue')
+            ->map(fn ($v) => (float) $v)
+            ->values()
+            ->all();
+    }
+
+    /** @return array{0: Carbon, 1: Carbon} */
+    private function resolveRange(): array
+    {
+        if ($this->analyticsFrom && $this->analyticsTo) {
+            return [Carbon::parse($this->analyticsFrom), Carbon::parse($this->analyticsTo)];
+        }
+
+        return [now()->subDays(29)->startOfDay(), now()->endOfDay()];
     }
 }

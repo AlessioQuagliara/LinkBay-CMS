@@ -27,6 +27,16 @@ class Agency extends Model
         'stripe_connect_account_id',
         'stripe_connect_onboarded',
         'stripe_customer_id',
+        'stripe_subscription_id',
+        'stripe_status',
+        'trial_ends_at',
+        'subscription_ends_at',
+        'payment_method_last4',
+        'payment_method_brand',
+        'billing_email',
+        'billing_name',
+        'vat_number',
+        'billing_address',
         'terms_accepted_version',
         'max_stores_override',
         'owner_user_id',
@@ -40,6 +50,9 @@ class Agency extends Model
     protected $casts = [
         'hide_linkbay_branding' => 'boolean',
         'stripe_connect_onboarded' => 'boolean',
+        'trial_ends_at' => 'datetime',
+        'subscription_ends_at' => 'datetime',
+        'billing_address' => 'array',
     ];
 
     // ── Relations ─────────────────────────────────────────────────────────────
@@ -77,6 +90,27 @@ class Agency extends Model
     public function billingEvents()
     {
         return $this->hasMany(BillingEvent::class);
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(AgencyInvoice::class)->orderByDesc('created_at');
+    }
+
+    public function hasActiveSubscription(): bool
+    {
+        return in_array($this->stripe_status, ['active', 'trialing'], true);
+    }
+
+    public function paymentMethodLabel(): string
+    {
+        if (! $this->payment_method_last4) {
+            return '—';
+        }
+
+        $brand = ucfirst($this->payment_method_brand ?? 'Card');
+
+        return "{$brand} •••• {$this->payment_method_last4}";
     }
 
     public function termsAcceptances()

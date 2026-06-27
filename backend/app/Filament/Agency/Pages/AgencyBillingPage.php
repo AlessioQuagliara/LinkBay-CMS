@@ -294,4 +294,117 @@ class AgencyBillingPage extends Page
                 ->send();
         }
     }
+
+    // ── Payment Method ─────────────────────────────────────────────────────────
+
+    public function paymentMethodLabel(): string
+    {
+        return $this->agency()?->paymentMethodLabel() ?? '—';
+    }
+
+    /**
+     * Returns a Stripe SetupIntent client_secret for the Stripe Elements modal.
+     * Called via wire:click so it must return a value the Livewire JS can use.
+     */
+    public function createSetupIntentSecret(): ?string
+    {
+        $agency = $this->agency();
+        if (! $agency || ! $this->isStripeConfigured()) {
+            return null;
+        }
+
+        try {
+            return app(AgencyBillingService::class)->createSetupIntent($agency);
+        } catch (\Throwable $e) {
+            Notification::make()
+                ->title('Errore: '.$e->getMessage())
+                ->danger()
+                ->send();
+
+            return null;
+        }
+    }
+
+    // ── Invoices ───────────────────────────────────────────────────────────────
+
+    /**
+     * @return Collection<int, AgencyInvoice>
+     */
+    public function invoices(): Collection
+    {
+        $agency = $this->agency();
+
+        return $agency
+            ? AgencyInvoice::where('agency_id', $agency->id)->orderByDesc('created_at')->limit(20)->get()
+            : collect();
+    }
+
+    public function upcomingInvoice(): array
+    {
+        $agency = $this->agency();
+        if (! $agency?->stripe_customer_id || ! $this->isStripeConfigured()) {
+            return ['amount_due' => 0, 'currency' => 'eur', 'next_payment_attempt' => null, 'lines' => []];
+        }
+
+        try {
+            return app(AgencyBillingService::class)->getUpcomingInvoice($agency);
+        } catch (\Throwable) {
+            return ['amount_due' => 0, 'currency' => 'eur', 'next_payment_attempt' => null, 'lines' => []];
+        }
+    }
+
+    // ── Cancel Subscription ────────────────────────────────────────────────────
+
+    public function cancelSubscription(bool $immediately = false): void
+    {
+        $agency = $this->agency();
+        if (! $agency || ! $agency->stripe_subscription_id) {
+            Notification::make()->title('Nessuna subscription attiva')->warning()->send();
+
+            return;
+        }
+
+        try {
+            app(AgencyBillingService::class)->cancelSubscription($agency, $immediately);
+
+            Notification::make()
+                ->title($immediately ? 'Abbonamento cancellato' : 'Cancellazione pianificata a fine periodo')
+                ->success()
+                ->send();
+        } catch (\Throwable $e) {
+            Notification::make()->title('Errore: '.$e->getMessage())->danger()->send();
+        }
+    }
+
+    // ── Resume Subscription ────────────────────────────────────────────────────
+
+    public function resumeSubscription(): void
+    {
+        $agency = $this->agency();
+        if (! $agency) {
+            return;
+        }
+
+        try {
+            app(AgencyBillingService::class)->resumeSubscription($agency);
+            Notification::make()->title('Abbonamento ripristinato')->success()->send();
+        } catch (\Throwable $e) {
+            Notification::make()->title('Errore: '.$e->getMessage())->danger()->send();
+        }
+    }
+
+    // ── Stripe status helpers ──────────────────────────────────────────────────
+
+    public function subscriptionStatusBadge(): array
+    {
+        return match ($this->agency()?->stripe_status) {
+            'active' => ['label' => 'Attivo', 'color' => 'success'],
+            'trialing' => ['label' => 'Trial', 'color' => 'info'],
+            'past_due' => ['label' => 'Pagamento scaduto', 'color' => 'danger'],
+            'canceled' => ['label' => 'Cancellato', 'color' => 'gray'],
+            'paused' => ['label' => 'In pausa', 'color' => 'warning'],
+            'incomplete' => ['label' => 'Incompleto', 'color' => 'warning'],
+            default => ['label' => '—', 'color' => 'gray'],
+        };
+    }
 }
