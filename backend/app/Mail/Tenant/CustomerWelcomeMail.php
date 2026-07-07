@@ -17,8 +17,6 @@ class CustomerWelcomeMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public string $queue = 'emails';
-
     public int $tries = 3;
 
     public int $timeout = 60;
@@ -27,6 +25,7 @@ class CustomerWelcomeMail extends Mailable implements ShouldQueue
 
     public function __construct(public readonly Customer $customer)
     {
+        $this->onQueue('emails');
         $this->brand = BrandSetting::current();
     }
 

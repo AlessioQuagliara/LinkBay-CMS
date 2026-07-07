@@ -14,6 +14,7 @@ function CollectionContent({ collectionSlug }: { collectionSlug: string }) {
     page: Number(params.get('page') ?? 1),
     sort_by: (params.get('sort_by') as 'price' | 'name' | 'created_at') ?? 'created_at',
     sort_dir: (params.get('sort_dir') as 'asc' | 'desc') ?? 'desc',
+    collection_slug: collectionSlug,
   }
 
   const { data, isFetching } = useProducts(queryParams)

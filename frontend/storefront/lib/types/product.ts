@@ -65,9 +65,14 @@ export interface ProductListParams {
   per_page?: number
   search?: string
   category?: string
+  category_slug?: string
   collection_id?: number
+  collection_slug?: string
   min_price?: number
   max_price?: number
+  in_stock?: boolean
   sort_by?: 'created_at' | 'price' | 'name'
   sort_dir?: 'asc' | 'desc'
+  sort?: string
+  q?: string
 }

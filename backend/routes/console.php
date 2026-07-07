@@ -41,3 +41,17 @@ Schedule::command('agency:health-alerts', ['--days' => 30])
     ->name('agency:health-alerts')
     ->withoutOverlapping()
     ->runInBackground();
+
+// Pre-calcola cache analytics per tutti i tenant — ogni ora
+Schedule::command('analytics:warm-cache')
+    ->hourly()
+    ->name('analytics:warm-cache')
+    ->withoutOverlapping()
+    ->runInBackground();
+
+// Controlla prodotti con stock in esaurimento — ogni giorno alle 08:00
+Schedule::command('products:check-low-stock')
+    ->dailyAt('08:00')
+    ->name('products:check-low-stock')
+    ->withoutOverlapping()
+    ->runInBackground();

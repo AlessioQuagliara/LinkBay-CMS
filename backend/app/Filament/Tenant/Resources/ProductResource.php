@@ -2,6 +2,7 @@
 
 namespace App\Filament\Tenant\Resources;
 
+use App\Exports\Tenant\ProductExport;
 use App\Filament\Tenant\Resources\ProductResource\Pages;
 use App\Models\Tenant\Product;
 use Filament\Actions\Action;
@@ -9,7 +10,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ExportBulkAction;
 use Filament\Forms;
 use Filament\Infolists;
 use Filament\Resources\Resource;
@@ -19,7 +19,9 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductResource extends Resource
 {
@@ -290,7 +292,16 @@ class ProductResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    ExportBulkAction::make(),
+                    Tables\Actions\BulkAction::make('export_selected')
+                        ->label('Esporta selezionati')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->deselectRecordsAfterCompletion()
+                        ->action(function (Collection $records): StreamedResponse {
+                            $ids = $records->pluck('id')->all();
+
+                            return app(ProductExport::class)
+                                ->download(Product::whereIn('id', $ids)->with(['categories:id,slug', 'productImages']));
+                        }),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

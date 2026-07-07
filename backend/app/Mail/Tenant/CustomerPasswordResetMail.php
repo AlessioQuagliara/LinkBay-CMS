@@ -17,8 +17,6 @@ class CustomerPasswordResetMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public string $queue = 'emails';
-
     public int $tries = 3;
 
     public int $timeout = 60;
@@ -29,6 +27,7 @@ class CustomerPasswordResetMail extends Mailable implements ShouldQueue
         public readonly Customer $customer,
         public readonly string $resetUrl,
     ) {
+        $this->onQueue('emails');
         $this->brand = BrandSetting::current();
     }
 

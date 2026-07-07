@@ -17,8 +17,6 @@ class OrderRefundedMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public string $queue = 'emails';
-
     public int $tries = 3;
 
     public int $timeout = 60;
@@ -31,6 +29,7 @@ class OrderRefundedMail extends Mailable implements ShouldQueue
         public readonly Order $order,
         public readonly float $refundAmount,
     ) {
+        $this->onQueue('emails');
         $this->brand = BrandSetting::current();
         $this->orderNumber = '#'.str_pad((string) $order->id, 4, '0', STR_PAD_LEFT);
         $this->order->loadMissing(['customer']);

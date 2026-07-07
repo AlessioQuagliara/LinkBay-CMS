@@ -15,6 +15,8 @@ use App\Http\Controllers\Tenant\CustomerController;
 use App\Http\Controllers\Tenant\DiscountCodeController;
 use App\Http\Controllers\Tenant\OrderController;
 use App\Http\Controllers\Tenant\ProductController;
+use App\Http\Controllers\Tenant\ShippingMethodController;
+use App\Http\Controllers\Tenant\SitemapController;
 use App\Http\Controllers\Tenant\Storefront\BrandSettingController;
 use App\Http\Controllers\Tenant\Storefront\LanguageController;
 use App\Http\Controllers\Tenant\Storefront\MediaController;
@@ -116,6 +118,7 @@ Route::middleware([
 
     // Catalog
     Route::get('/products', [ProductController::class, 'storefront']);
+    Route::get('/search/suggestions', [ProductController::class, 'suggestions']);
     Route::get('/products/{product:slug}', [ProductController::class, 'show']);
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::get('/categories/{slug}/products', [CategoryController::class, 'products']);
@@ -133,6 +136,9 @@ Route::middleware([
     Route::get('/checkout/{checkout}', [CheckoutController::class, 'show']);
     Route::post('/checkout/{checkout}/payment-intent', [CheckoutController::class, 'createPaymentIntent']);
     Route::post('/checkout/{checkout}/confirm', [CheckoutController::class, 'confirm']);
+
+    // Shipping
+    Route::get('/shipping-methods', [ShippingMethodController::class, 'index']);
 
     // Brand & appearance
     Route::get('/brand', [BrandSettingController::class, 'show']);
@@ -155,6 +161,9 @@ Route::middleware([
 ])->group(function () {
     Route::get('/_impersonate/{token}', [TenantImpersonateController::class, 'handle'])
         ->name('tenant.impersonate');
+
+    Route::get('/sitemap.xml', [SitemapController::class, 'index']);
+    Route::get('/robots.txt', [SitemapController::class, 'robots']);
 });
 
 // ─── Stripe webhooks — tenant-scoped (no CSRF, verify via Stripe signature) ──

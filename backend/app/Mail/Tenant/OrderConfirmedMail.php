@@ -17,8 +17,6 @@ class OrderConfirmedMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public string $queue = 'emails';
-
     public int $tries = 3;
 
     public int $timeout = 60;
@@ -29,6 +27,7 @@ class OrderConfirmedMail extends Mailable implements ShouldQueue
 
     public function __construct(public readonly Order $order)
     {
+        $this->onQueue('emails');
         $this->brand = BrandSetting::current();
         $this->orderNumber = '#'.str_pad((string) $order->id, 4, '0', STR_PAD_LEFT);
         $this->order->loadMissing(['customer', 'items.product', 'shippingMethod']);

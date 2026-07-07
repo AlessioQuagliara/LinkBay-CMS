@@ -14,9 +14,12 @@ use App\Filament\Tenant\Resources\OrderResource;
 use App\Filament\Tenant\Resources\ProductResource;
 use App\Filament\Tenant\Resources\ShippingMethodResource;
 use App\Filament\Tenant\Resources\StorePageResource;
+use App\Filament\Tenant\Widgets\AnalyticsDateFilterWidget;
 use App\Filament\Tenant\Widgets\LatestOrdersWidget;
+use App\Filament\Tenant\Widgets\LowStockWidget;
 use App\Filament\Tenant\Widgets\RevenueChartWidget;
 use App\Filament\Tenant\Widgets\TenantStatsOverviewWidget;
+use App\Filament\Tenant\Widgets\TopProductsWidget;
 use App\Models\Tenant\Setting;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -72,8 +75,11 @@ class TenantPanelProvider extends PanelProvider
                 MediaLibraryPage::class,
             ])
             ->widgets([
+                AnalyticsDateFilterWidget::class,
                 TenantStatsOverviewWidget::class,
                 RevenueChartWidget::class,
+                TopProductsWidget::class,
+                LowStockWidget::class,
                 LatestOrdersWidget::class,
             ])
             ->navigationGroups([
