@@ -4,6 +4,8 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\AiCreditPackageResource\Pages;
 use App\Models\Central\AiCreditPackage;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -13,9 +15,13 @@ use Filament\Tables\Table;
 class AiCreditPackageResource extends Resource
 {
     protected static ?string $model = AiCreditPackage::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-sparkles';
+
     protected static string|\UnitEnum|null $navigationGroup = 'AI Credits';
+
     protected static ?string $modelLabel = 'Pacchetto AI';
+
     protected static ?string $pluralModelLabel = 'Pacchetti AI';
 
     public static function form(Schema $schema): Schema
@@ -48,22 +54,22 @@ class AiCreditPackageResource extends Resource
                 Tables\Columns\TextColumn::make('name')->label('Nome')->sortable(),
                 Tables\Columns\TextColumn::make('credits')
                     ->label('Crediti')
-                    ->formatStateUsing(fn ($state) => number_format($state) . ' cr'),
+                    ->formatStateUsing(fn ($state) => number_format($state).' cr'),
                 Tables\Columns\TextColumn::make('price_cents')
                     ->label('Prezzo')
-                    ->formatStateUsing(fn ($state) => '€' . number_format($state / 100, 2, ',', '.')),
+                    ->formatStateUsing(fn ($state) => '€'.number_format($state / 100, 2, ',', '.')),
                 Tables\Columns\TextColumn::make('price_per_1k')
                     ->label('€/1K cr')
                     ->state(fn ($record) => $record->credits > 0
-                        ? '€' . number_format(($record->price_cents / 100) / ($record->credits / 1000), 3, ',', '.')
+                        ? '€'.number_format(($record->price_cents / 100) / ($record->credits / 1000), 3, ',', '.')
                         : '—'),
                 Tables\Columns\ToggleColumn::make('is_active')->label('Attivo'),
                 Tables\Columns\TextColumn::make('sort_order')->label('Ordine')->sortable(),
             ])
             ->reorderable('sort_order')
             ->actions([
-                \Filament\Actions\EditAction::make(),
-                \Filament\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ]);
     }
 

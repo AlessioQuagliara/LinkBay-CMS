@@ -4,19 +4,24 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\PlanResource\Pages;
 use App\Models\Central\Plan;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Schemas\Schema;
-
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
 class PlanResource extends Resource
 {
     protected static ?string $model = Plan::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-credit-card';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Billing';
+
     protected static ?string $modelLabel = 'Piano';
+
     protected static ?string $pluralModelLabel = 'Piani';
 
     public static function form(Schema $schema): Schema
@@ -57,7 +62,7 @@ class PlanResource extends Resource
                 Tables\Columns\TextColumn::make('name')->label('Nome')->sortable(),
                 Tables\Columns\TextColumn::make('price')
                     ->label('Prezzo')
-                    ->formatStateUsing(fn ($state, $record) => '€' . $state . ' / ' . $record->billing_interval),
+                    ->formatStateUsing(fn ($state, $record) => '€'.$state.' / '.$record->billing_interval),
                 Tables\Columns\TextColumn::make('tenants_count')
                     ->label('Tenant')
                     ->counts('tenants')
@@ -68,8 +73,8 @@ class PlanResource extends Resource
             ])
             ->reorderable('sort_order')
             ->actions([
-                \Filament\Actions\EditAction::make(),
-                \Filament\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ]);
     }
 

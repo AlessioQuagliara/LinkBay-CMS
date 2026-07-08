@@ -25,9 +25,9 @@ class AgencySubscription extends Model
 
     protected $casts = [
         'current_period_start' => 'datetime',
-        'current_period_end'   => 'datetime',
-        'trial_ends_at'        => 'datetime',
-        'cancelled_at'         => 'datetime',
+        'current_period_end' => 'datetime',
+        'trial_ends_at' => 'datetime',
+        'cancelled_at' => 'datetime',
     ];
 
     public function agency()
@@ -61,10 +61,10 @@ class AgencySubscription extends Model
             return 'Lifetime — non scade';
         }
 
-        if (!$this->current_period_end) {
+        if (! $this->current_period_end) {
             return '—';
         }
 
-        return 'Rinnovo il ' . $this->current_period_end->format('d/m/Y');
+        return 'Rinnovo il '.$this->current_period_end->format('d/m/Y');
     }
 }

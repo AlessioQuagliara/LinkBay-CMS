@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Tenant;
 
+use App\Notifications\Tenant\CustomerVerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,9 +12,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class Customer extends Authenticatable implements MustVerifyEmail
 {
+    use HasApiTokens;
     use HasFactory;
     use Notifiable;
 
@@ -74,5 +77,10 @@ class Customer extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Product::class, 'customer_wishlist')
             ->withTimestamps()
             ->orderByPivot('created_at', 'desc');
+    }
+
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new CustomerVerifyEmail);
     }
 }

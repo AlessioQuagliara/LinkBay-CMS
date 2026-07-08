@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { useAuthStore } from '@/storefront/lib/store/authStore'
 import { updateProfile, getAddresses, addAddress } from '@/storefront/lib/api/account'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { Plus, MapPin, Star } from 'lucide-react'
 import type { Address } from '@/storefront/lib/types/order'
 
@@ -73,7 +73,6 @@ function AddAddressForm({ onSuccess }: { onSuccess: () => void }) {
 export default function ProfilePage() {
   const router = useRouter()
   const { token, customer, fetchProfile } = useAuthStore()
-  const qc = useQueryClient()
   const [name, setName] = useState('')
   const [showAddForm, setShowAddForm] = useState(false)
 
@@ -82,7 +81,12 @@ export default function ProfilePage() {
       router.replace('/account/login')
       return
     }
-    if (customer?.name) setName(customer.name)
+    // customer arriva in modo asincrono dallo store auth (fetchProfile), non è
+    // disponibile al render iniziale: va sincronizzato quando si popola.
+    if (customer?.name) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync da store async, non calcolabile al render
+      setName(customer.name)
+    }
   }, [token, customer, router])
 
   const { data: addresses = [], refetch: refetchAddresses } = useQuery({

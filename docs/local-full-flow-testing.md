@@ -51,7 +51,19 @@ docker compose -f compose.yaml up -d
 | Super Admin panel | `http://app.linkbay-cms.test/linkbay-admin` | `https://app.linkbay-cms.com/linkbay-admin` |
 | Registrazione agency | `http://app.linkbay-cms.test/agency/register` | `https://app.linkbay-cms.com/agency/register` |
 | Agency dashboard | `http://testagency.linkbay-cms.test/dashboard` | `https://testagency.linkbay-cms.com/dashboard` |
-| Tenant store admin | `http://clientalpha.linkbay-cms.test/admin` | `https://clientalpha.linkbay-cms.com/admin` |
+| Storefront del tenant (Next.js) | `http://clientalpha.linkbay-cms.test/` | `https://clientalpha.linkbay-cms.com/` |
+| Tenant store admin | `http://clientalpha.yoursite-linkbay-cms.test/admin` | `https://clientalpha.yoursite-linkbay-cms.com/admin` |
+
+> **Attenzione — due domini diversi per lo stesso store**: il pannello
+> Filament del tenant e le sue API (`api/store/*`, `api/v1/*`) vivono su
+> `STORE_DOMAIN` (`yoursite-linkbay-cms.test`/`.com`), un dominio **diverso**
+> da `CENTRAL_DOMAIN` — vedi `TenantProvisioningService::registerDomain()`.
+> Una versione precedente di questa tabella/guida usava
+> `clientalpha.linkbay-cms.test/admin` per il pannello tenant: non funziona,
+> perché quel dominio non viene mai registrato per nessun tenant dal codice
+> reale (solo un tinker manuale che scrive un domain "sbagliato" può farlo
+> sembrare funzionante, vedi Step 4 più sotto). `clientalpha.linkbay-cms.test`
+> (senza `yoursite-`) è invece corretto per la **storefront** Next.js.
 
 ---
 
@@ -73,11 +85,19 @@ Traefik :80  (tutti i domini → 127.0.0.1 via /etc/hosts)
   │
   ├─ testagency.linkbay-cms.test/*      → nginx-svc → php-fpm
   │    /dashboard                       → Filament Agency Panel
-  │    (agency identificata da slug dal hostname)
+  │    (nessun domain-lock: qualunque host centrale funziona, l'agency è
+  │     risolta dall'utente loggato, non dal subdomain)
   │
-  └─ clientalpha.linkbay-cms.test/*     → nginx-svc → php-fpm
+  ├─ clientalpha.linkbay-cms.test/*     → frontend-svc (Next.js :3000)
+  │    Storefront del tenant (shop/cart/checkout/account) — QUALSIASI
+  │    subdomain di linkbay-cms.test che non sia app./admin./api. finisce
+  │    qui (Traefik priority), poi middleware.ts fa il rewrite a /storefront
+  │
+  └─ clientalpha.yoursite-linkbay-cms.test/*  → nginx-svc → php-fpm
        /admin                           → Filament Tenant Panel
-       (tenant identificato da domain nel DB)
+       /api/store/*, /api/v1/*          → API consumate dalla storefront sopra
+       (tenant identificato da domain nel DB — dominio STORE_DOMAIN, diverso
+        dalla riga precedente anche se lo slug "clientalpha" è lo stesso)
 ```
 
 ---
@@ -93,6 +113,7 @@ Traefik :80  (tutti i domini → 127.0.0.1 via /etc/hosts)
 127.0.0.1   admin.linkbay-cms.test
 127.0.0.1   testagency.linkbay-cms.test
 127.0.0.1   clientalpha.linkbay-cms.test
+127.0.0.1   clientalpha.yoursite-linkbay-cms.test
 ```
 
 dnsmasq (alternativa wildcard):
@@ -192,11 +213,19 @@ docker compose -f compose.yaml -f compose.override.local.yml exec php php artisa
 ```bash
 docker compose -f compose.yaml -f compose.override.local.yml exec php php artisan tinker --execute="
 \$tenant = \App\Models\Central\Tenant::create(['id' => 'clientalpha', 'name' => 'Client Alpha']);
-\$tenant->domains()->create(['domain' => 'clientalpha.linkbay-cms.test']);
+app(\App\Services\TenantProvisioningService::class)->registerDomain(\$tenant);
 echo 'done';
 "
 ```
-- Poi accedi: **http://clientalpha.linkbay-cms.test/admin**
+Usa sempre `registerDomain()` invece di scrivere il domain a mano — registra
+`{tenant_id}.STORE_DOMAIN` (`clientalpha.yoursite-linkbay-cms.test` in
+locale), lo stesso meccanismo usato dal wizard reale in
+`CreateStore::afterCreate()`. Scrivere manualmente
+`clientalpha.linkbay-cms.test` come domain "funzionerebbe" per stancl/tenancy
+ma non corrisponde a come l'app crea davvero i tenant, e quel host è comunque
+instradato alla storefront Next.js, non a Laravel (vedi diagramma sopra).
+
+- Poi accedi: **http://clientalpha.yoursite-linkbay-cms.test/admin**
 
 ---
 
@@ -205,8 +234,9 @@ echo 'done';
 | URL | Codice | Motivazione |
 |---|---|---|
 | `testagency.linkbay-cms.test/dashboard/login` prima della registrazione | 200 | Filament serve la login page anche senza agency in DB |
-| `clientalpha.linkbay-cms.test/admin` senza tenant nel DB | **500** `TenantCouldNotBeIdentifiedException` | **Atteso** — il tenant non esiste, stancl/tenancy lancia eccezione |
-| `clientalpha.linkbay-cms.test/admin` dopo creazione tenant | 200/302 | Funziona dopo `db:seed` o creazione manuale |
+| `clientalpha.yoursite-linkbay-cms.test/admin` senza tenant nel DB | **500** `TenantCouldNotBeIdentifiedException` | **Atteso** — il tenant non esiste, stancl/tenancy lancia eccezione |
+| `clientalpha.yoursite-linkbay-cms.test/admin` dopo creazione tenant | 200/302 | Funziona dopo `db:seed` o creazione manuale (con `registerDomain()`, non un domain scritto a mano) |
+| `clientalpha.linkbay-cms.test/` (storefront) prima di impostare `NEXT_PUBLIC_MAIN_DOMAIN` | Sito marketing invece della storefront, o 404 su `/shop` | **Anomalo ma comune** — vedi `frontend/.env.local.example`, non è un bug del codice |
 | Qualsiasi `.test` restituisce Traefik `404 page not found` | 404 Traefik | **Anomalo** — significa che il routing in `compose.override.local.yml` non è caricato |
 
 ---

@@ -9,22 +9,22 @@ use Tests\CentralTestCase;
 
 class BillingEventIdempotencyTest extends CentralTestCase
 {
-    public function test_insertOrIgnore_does_not_create_duplicate_on_same_stripe_event_id(): void
+    public function test_insert_or_ignore_does_not_create_duplicate_on_same_stripe_event_id(): void
     {
-        $eventId = 'evt_test_' . uniqid();
+        $eventId = 'evt_test_'.uniqid();
 
         $count1 = BillingEvent::insertOrIgnore([
             'stripe_event_id' => $eventId,
-            'event_type'      => 'payment_intent.succeeded',
-            'payload'         => json_encode(['data' => ['object' => []]]),
-            'created_at'      => now(),
+            'event_type' => 'payment_intent.succeeded',
+            'payload' => json_encode(['data' => ['object' => []]]),
+            'created_at' => now(),
         ]);
 
         $count2 = BillingEvent::insertOrIgnore([
             'stripe_event_id' => $eventId,
-            'event_type'      => 'payment_intent.succeeded',
-            'payload'         => json_encode(['data' => ['object' => []]]),
-            'created_at'      => now(),
+            'event_type' => 'payment_intent.succeeded',
+            'payload' => json_encode(['data' => ['object' => []]]),
+            'created_at' => now(),
         ]);
 
         $this->assertEquals(1, $count1, 'Primo inserimento deve creare 1 riga');
@@ -35,9 +35,9 @@ class BillingEventIdempotencyTest extends CentralTestCase
     public function test_billing_event_is_marked_processed(): void
     {
         $event = BillingEvent::create([
-            'stripe_event_id' => 'evt_test_' . uniqid(),
-            'event_type'      => 'account.updated',
-            'payload'         => ['data' => ['object' => []]],
+            'stripe_event_id' => 'evt_test_'.uniqid(),
+            'event_type' => 'account.updated',
+            'payload' => ['data' => ['object' => []]],
         ]);
 
         $this->assertFalse($event->isProcessed());
@@ -52,9 +52,9 @@ class BillingEventIdempotencyTest extends CentralTestCase
     public function test_billing_event_saves_error_on_failure(): void
     {
         $event = BillingEvent::create([
-            'stripe_event_id' => 'evt_err_' . uniqid(),
-            'event_type'      => 'checkout.session.completed',
-            'payload'         => ['data' => ['object' => []]],
+            'stripe_event_id' => 'evt_err_'.uniqid(),
+            'event_type' => 'checkout.session.completed',
+            'payload' => ['data' => ['object' => []]],
         ]);
 
         $event->markFailed('Agency not found for customer cus_xxx');

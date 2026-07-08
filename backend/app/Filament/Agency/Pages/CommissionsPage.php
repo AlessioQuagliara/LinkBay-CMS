@@ -10,8 +10,10 @@ use App\Models\Central\PlatformFeeRule;
 use App\Models\Central\Tenant;
 use App\Services\PlatformFeeService;
 use Filament\Pages\Page;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CommissionsPage extends Page
@@ -19,27 +21,34 @@ class CommissionsPage extends Page
     use ResolvesCurrentAgency;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
+
     protected static ?string $navigationLabel = 'Commissioni';
+
     protected static ?string $slug = 'commissions';
+
     protected string $view = 'filament.agency.pages.commissions';
 
     public string $filterPeriod = 'month';
-    public string $filterStore  = '';
+
+    public string $filterStore = '';
 
     public function currentFeeRule(): ?PlatformFeeRule
     {
         $agency = $this->agency();
-        if (!$agency) return null;
+        if (! $agency) {
+            return null;
+        }
 
         try {
             return app(PlatformFeeService::class)->resolveRule($agency);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning('CommissionsPage: no fee rule', [
-                'agency_id'    => $agency->id,
-                'plan_id'      => $agency->plan_id,
+            Log::warning('CommissionsPage: no fee rule', [
+                'agency_id' => $agency->id,
+                'plan_id' => $agency->plan_id,
                 'billing_type' => $agency->billing_type,
-                'error'        => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -68,7 +77,7 @@ class CommissionsPage extends Page
     public function aggregateTotals(): array
     {
         $agency = $this->agency();
-        if (!$agency) {
+        if (! $agency) {
             return ['gross' => 0, 'fee' => 0, 'net' => 0, 'count' => 0];
         }
 
@@ -93,8 +102,8 @@ class CommissionsPage extends Page
 
         return [
             'gross' => (int) ($settled->gross ?? 0),
-            'fee'   => (int) ($settled->fee ?? 0) + (int) ($refunds->fee ?? 0),
-            'net'   => (int) ($settled->net ?? 0),
+            'fee' => (int) ($settled->fee ?? 0) + (int) ($refunds->fee ?? 0),
+            'net' => (int) ($settled->net ?? 0),
             'count' => (int) ($settled->cnt ?? 0),
         ];
     }
@@ -102,7 +111,9 @@ class CommissionsPage extends Page
     public function stores(): Collection
     {
         $agency = $this->agency();
-        if (!$agency) return collect();
+        if (! $agency) {
+            return collect();
+        }
 
         return Tenant::where('agency_id', $agency->id)
             ->orderBy('name')
@@ -116,7 +127,7 @@ class CommissionsPage extends Page
             ->orderByDesc('created_at')
             ->get();
 
-        $filename = 'commissioni-' . now()->format('Y-m-d') . '.csv';
+        $filename = 'commissioni-'.now()->format('Y-m-d').'.csv';
 
         return response()->streamDownload(function () use ($rows) {
             $handle = fopen('php://output', 'w');
@@ -141,7 +152,7 @@ class CommissionsPage extends Page
                     $row->created_at->format('d/m/Y H:i'),
                     $row->tenant_id ?? '—',
                     number_format($row->gross_amount_cents / 100, 2, ',', '.'),
-                    number_format((float) $row->fee_pct * 100, 1, ',', '.') . '%',
+                    number_format((float) $row->fee_pct * 100, 1, ',', '.').'%',
                     number_format($row->fee_amount_cents / 100, 2, ',', '.'),
                     number_format($row->net_to_agency_cents / 100, 2, ',', '.'),
                     strtoupper($row->currency),
@@ -157,7 +168,7 @@ class CommissionsPage extends Page
 
     // ── Internals ─────────────────────────────────────────────────────────────
 
-    private function buildBaseQuery(): \Illuminate\Database\Eloquent\Builder
+    private function buildBaseQuery(): Builder
     {
         $agency = $this->agency();
 

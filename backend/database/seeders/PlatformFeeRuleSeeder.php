@@ -36,8 +36,9 @@ class PlatformFeeRuleSeeder extends Seeder
         foreach ($rules as $ruleData) {
             $plan = Plan::where('slug', $ruleData['slug'])->first();
 
-            if (!$plan) {
+            if (! $plan) {
                 $this->command->warn("Piano '{$ruleData['slug']}' non trovato — skipping.");
+
                 continue;
             }
 
@@ -48,17 +49,18 @@ class PlatformFeeRuleSeeder extends Seeder
 
             if ($existing) {
                 $this->command->line("  → Regola per '{$ruleData['slug']}' già presente (id={$existing->id}) — skip.");
+
                 continue;
             }
 
             PlatformFeeRule::create([
-                'plan_id'      => $plan->id,
+                'plan_id' => $plan->id,
                 'billing_type' => $ruleData['billing_type'],
-                'fee_pct'      => $ruleData['fee_pct'],
-                'fee_type'     => 'platform_share',
-                'valid_from'   => $validFrom,
-                'valid_until'  => null,
-                'description'  => $ruleData['description'],
+                'fee_pct' => $ruleData['fee_pct'],
+                'fee_type' => 'platform_share',
+                'valid_from' => $validFrom,
+                'valid_until' => null,
+                'description' => $ruleData['description'],
             ]);
 
             $this->command->info("  ✓ Regola fee '{$ruleData['slug']}': {$ruleData['fee_pct']}");

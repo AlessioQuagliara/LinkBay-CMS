@@ -1,7 +1,7 @@
 'use client'
 
 import axios, { AxiosError } from 'axios'
-import { getClientTenantSlug } from '@/storefront/lib/utils/tenant'
+import { getClientTenantSlug, tenantApiUrl } from '@/storefront/lib/utils/tenant'
 
 export class ValidationError extends Error {
   constructor(public readonly errors: Record<string, string[]>) {
@@ -26,9 +26,12 @@ export const apiClient = axios.create({
 // ── Request interceptors ───────────────────────────────────────────────────
 
 apiClient.interceptors.request.use((config) => {
-  // Tenant slug from subdomain
+  // Tenant slug from subdomain — the Laravel backend resolves the tenant by
+  // Host header (stancl/tenancy domain-based resolution), so requests must
+  // target the tenant's own API domain, not a shared/central base URL.
   const tenantSlug = getClientTenantSlug()
   if (tenantSlug) {
+    config.baseURL = tenantApiUrl(tenantSlug)
     config.headers['X-Tenant-Slug'] = tenantSlug
   }
 

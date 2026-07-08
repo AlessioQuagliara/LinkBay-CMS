@@ -22,7 +22,12 @@ class CartController extends Controller
     public function store(Request $request): JsonResponse
     {
         $sessionId = $request->input('session_id', (string) Str::uuid());
-        $customerId = $request->input('customer_id');
+        // Derived from the bearer token, never trusted from the request body —
+        // this route has no auth middleware (guest checkout must work), so a
+        // client-supplied customer_id would let anyone attribute a cart/order
+        // to an arbitrary customer. Sanctum resolves the guard from the
+        // Authorization header regardless of route middleware.
+        $customerId = auth('customer')->id();
 
         $cart = $this->cartService->getOrCreateCart($sessionId, $customerId);
         $cart->loadMissing('cartItems.product');
@@ -94,7 +99,7 @@ class CartController extends Controller
     {
         $cart = CartSession::where('session_id', $sessionId)->firstOrFail();
 
-        $result = $this->cartService->applyDiscount($cart, $request->string('code'));
+        $result = $this->cartService->applyDiscount($cart, $request->string('code')->value());
 
         $status = $result['success'] ? 200 : 422;
 

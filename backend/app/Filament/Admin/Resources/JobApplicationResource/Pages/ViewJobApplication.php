@@ -28,6 +28,7 @@ class ViewJobApplication extends EditRecord
             $this->record->update(['status' => 'reviewing']);
             $data['status'] = 'reviewing';
         }
+
         return $data;
     }
 

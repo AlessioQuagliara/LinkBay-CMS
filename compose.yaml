@@ -133,14 +133,38 @@ services:
       - php
     networks:
       - web
+    healthcheck:
+      # /up runs App\Listeners\CheckApplicationHealth (central DB + Redis) —
+      # a non-200 here means the backend is actually broken, not just "nginx is up".
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost/up"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.nginx-svc.loadbalancer.server.port=80"
-      # *.linkbay-cms.com → nginx (agency subdomain, tenant subdomain, app, admin)
-      # Traefik v3 RE2 syntax — dots must be escaped, no named capture groups
-      - "traefik.http.routers.prod-wildcard.rule=HostRegexp(`.+\\.linkbay-cms\\.com`)"
-      - "traefik.http.routers.prod-wildcard.entrypoints=web"
-      - "traefik.http.routers.prod-wildcard.service=nginx-svc"
+      # Central Laravel hosts only (app/admin/api) — NOT a bare *.linkbay-cms.com
+      # wildcard. A tenant's storefront PAGES live on this same parent domain
+      # ({slug}.linkbay-cms.com, see frontend's NEXT_PUBLIC_MAIN_DOMAIN/middleware.ts)
+      # and must reach the `frontend` container below, not Laravel — Laravel has
+      # no storefront views, only the api/store/* JSON API (served on the
+      # separate STORE_DOMAIN, *.yoursite-linkbay-cms.com, via test-store-wildcard-
+      # style rule further down). Explicit priority so this wins over the
+      # frontend wildcard for these 3 hosts specifically; see config/tenancy.php
+      # central_domains for the matching Laravel-side list.
+      - "traefik.http.routers.prod-central.rule=Host(`app.${CENTRAL_DOMAIN:-linkbay-cms.com}`) || Host(`admin.${CENTRAL_DOMAIN:-linkbay-cms.com}`) || Host(`api.${CENTRAL_DOMAIN:-linkbay-cms.com}`)"
+      - "traefik.http.routers.prod-central.entrypoints=web"
+      - "traefik.http.routers.prod-central.service=nginx-svc"
+      - "traefik.http.routers.prod-central.priority=100"
+      # Tenant/store domain family — Filament tenant /admin panel + api/store/*
+      # + api/v1/* (see TenantProvisioningService::registerDomain, {tenant_id}.STORE_DOMAIN).
+      # STORE_DOMAIN must be set in the root .env to a real domain/subdomain you
+      # control (see .env.example) — without both this var AND this router, tenant
+      # stores are unreachable in production even though the Laravel side is correct.
+      - "traefik.http.routers.prod-store-wildcard.rule=HostRegexp(`.+\\.${STORE_DOMAIN:-yoursite-linkbay-cms.com}`)"
+      - "traefik.http.routers.prod-store-wildcard.entrypoints=web"
+      - "traefik.http.routers.prod-store-wildcard.service=nginx-svc"
 
 # ── Frontend (Next.js) ────────────────────────────────────────────────────────
   frontend:
@@ -163,16 +187,29 @@ services:
       - ./frontend/postcss.config.mjs:/app/postcss.config.mjs
       - ./frontend/tsconfig.json:/app/tsconfig.json
     environment:
-      # SSR runtime. Client-side NEXT_PUBLIC_* baked at build via frontend/.env.local
-      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-https://app.linkbay-cms.com}
+      # SSR runtime (server components read this per-request via process.env —
+      # see app/storefront/page.tsx and friends). Client-side NEXT_PUBLIC_* is
+      # separately baked in at build time via frontend/.env.local.
+      # MUST contain {slug} and point at STORE_DOMAIN, not CENTRAL_DOMAIN — a
+      # central host here is rejected by PreventAccessFromCentralDomains on every
+      # tenant route (see frontend/.env.example for the full explanation).
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-https://{slug}.yoursite-linkbay-cms.com}
     networks:
       - web
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.frontend-svc.loadbalancer.server.port=3000"
-      - "traefik.http.routers.frontend-prod.rule=Host(`linkbay-cms.com`) || Host(`www.linkbay-cms.com`)"
+      - "traefik.http.routers.frontend-prod.rule=Host(`${CENTRAL_DOMAIN:-linkbay-cms.com}`) || Host(`www.${CENTRAL_DOMAIN:-linkbay-cms.com}`)"
       - "traefik.http.routers.frontend-prod.entrypoints=web"
       - "traefik.http.routers.frontend-prod.service=frontend-svc"
+      # Tenant storefront PAGES: any other subdomain of CENTRAL_DOMAIN
+      # ({slug}.linkbay-cms.com — middleware.ts resolves the slug and rewrites
+      # to /storefront/*). Lower priority than nginx's prod-central router above,
+      # so app./admin./api. still go to Laravel; every other subdomain lands here.
+      - "traefik.http.routers.frontend-wildcard.rule=HostRegexp(`.+\\.${CENTRAL_DOMAIN:-linkbay-cms.com}`)"
+      - "traefik.http.routers.frontend-wildcard.entrypoints=web"
+      - "traefik.http.routers.frontend-wildcard.service=frontend-svc"
+      - "traefik.http.routers.frontend-wildcard.priority=1"
 
 # ── Node-RED ──────────────────────────────────────────────────────────────────
   nodered:

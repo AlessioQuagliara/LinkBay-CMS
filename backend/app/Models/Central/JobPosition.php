@@ -28,11 +28,11 @@ class JobPosition extends Model
     ];
 
     protected $casts = [
-        'requirements'    => 'array',
+        'requirements' => 'array',
         'responsibilities' => 'array',
-        'nice_to_have'    => 'array',
-        'featured'        => 'boolean',
-        'published_at'    => 'datetime',
+        'nice_to_have' => 'array',
+        'featured' => 'boolean',
+        'published_at' => 'datetime',
     ];
 
     public function applications(): HasMany

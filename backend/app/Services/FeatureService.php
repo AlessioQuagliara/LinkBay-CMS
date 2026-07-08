@@ -17,7 +17,7 @@ class FeatureService
 
     public function enforce(Agency $agency, string $feature): void
     {
-        if (!$this->check($agency, $feature)) {
+        if (! $this->check($agency, $feature)) {
             throw new FeatureNotAvailableException($feature);
         }
     }

@@ -2,7 +2,6 @@
 
 namespace App\Filament\Admin\Widgets;
 
-use App\Models\Central\Plan;
 use App\Models\Central\Subscription;
 use App\Models\Central\Tenant;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -32,7 +31,7 @@ class AdminStatsOverviewWidget extends BaseWidget
                 ->color('success')
                 ->icon('heroicon-o-building-office-2'),
 
-            Stat::make('MRR', '€ ' . number_format($mrr, 2, ',', '.'))
+            Stat::make('MRR', '€ '.number_format($mrr, 2, ',', '.'))
                 ->description('Monthly Recurring Revenue')
                 ->color('info')
                 ->icon('heroicon-o-banknotes'),

@@ -25,10 +25,13 @@ class CustomerAuthController extends Controller
             'accepts_marketing' => ['boolean'],
         ]);
 
-        $customer = $this->authService->register($validated);
+        $token = $this->authService->register($validated);
 
         return response()->json([
-            'data' => $customer->only(['id', 'name', 'email', 'phone']),
+            'data' => [
+                'token' => $token->plainTextToken,
+                'token_type' => 'Bearer',
+            ],
             'message' => 'Registration successful. Please verify your email.',
         ], 201);
     }
@@ -40,21 +43,24 @@ class CustomerAuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $customer = $this->authService->login($validated['email'], $validated['password']);
+        $token = $this->authService->login($validated['email'], $validated['password']);
 
-        if (! $customer) {
+        if (! $token) {
             return response()->json(['message' => 'Invalid credentials.'], 401);
         }
 
         return response()->json([
-            'data' => $customer->only(['id', 'name', 'email']),
+            'data' => [
+                'token' => $token->plainTextToken,
+                'token_type' => 'Bearer',
+            ],
             'message' => 'Login successful.',
         ]);
     }
 
-    public function logout(): JsonResponse
+    public function logout(Request $request): JsonResponse
     {
-        $this->authService->logout();
+        $this->authService->logout($request->user('customer'));
 
         return response()->json(['message' => 'Logged out successfully.']);
     }

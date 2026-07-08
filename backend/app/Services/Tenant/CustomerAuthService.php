@@ -9,22 +9,23 @@ use App\Models\Tenant\Customer;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\NewAccessToken;
 
 class CustomerAuthService
 {
     /**
-     * Register a new customer. Fires Registered event (triggers email verification).
+     * Register a new customer and issue an access token (auto-login).
+     * Fires Registered event (triggers email verification).
      *
      * @param  array{name: string, email: string, password: string, phone?: string, accepts_marketing?: bool}  $data
      *
      * @throws ValidationException if email already exists in this tenant
      */
-    public function register(array $data): Customer
+    public function register(array $data): NewAccessToken
     {
         if (Customer::where('email', $data['email'])->exists()) {
             throw ValidationException::withMessages([
@@ -44,13 +45,15 @@ class CustomerAuthService
         event(new Registered($customer));
         event(new CustomerRegistered($customer));
 
-        return $customer;
+        $customer->update(['last_login_at' => now()]);
+
+        return $customer->createToken('storefront');
     }
 
     /**
-     * Attempt login via the customer guard.
+     * Attempt login and issue a Sanctum access token for the storefront.
      */
-    public function login(string $email, string $password): Customer|false
+    public function login(string $email, string $password): NewAccessToken|false
     {
         $customer = Customer::where('email', $email)->where('status', 'active')->first();
 
@@ -58,16 +61,17 @@ class CustomerAuthService
             return false;
         }
 
-        Auth::guard('customer')->login($customer, remember: true);
-
         $customer->update(['last_login_at' => now()]);
 
-        return $customer;
+        return $customer->createToken('storefront');
     }
 
-    public function logout(): void
+    /**
+     * Revoke the access token used to authenticate the current request.
+     */
+    public function logout(Customer $customer): void
     {
-        Auth::guard('customer')->logout();
+        $customer->currentAccessToken()?->delete();
     }
 
     /**

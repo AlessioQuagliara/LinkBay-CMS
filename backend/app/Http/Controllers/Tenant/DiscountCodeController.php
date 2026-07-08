@@ -14,7 +14,7 @@ class DiscountCodeController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $codes = DiscountCode::when($request->active_only, fn($q) => $q->where('is_active', true))
+        $codes = DiscountCode::when($request->active_only, fn ($q) => $q->where('is_active', true))
             ->orderBy('created_at', 'desc')
             ->paginate($request->per_page ?? 20);
 
@@ -60,6 +60,7 @@ class DiscountCodeController extends Controller
     public function destroy(DiscountCode $discountCode): JsonResponse
     {
         $discountCode->delete();
+
         return response()->json(['message' => 'Discount code deleted successfully']);
     }
 }

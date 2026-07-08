@@ -46,3 +46,16 @@ export async function confirmPayment(
   })
   return data
 }
+
+/**
+ * Order lookup scoped by checkout session id (public /api/store route, no
+ * auth required) — used by the checkout success page so guest checkouts can
+ * see their confirmation without an account. Do not use this for the
+ * "my orders" list; that must stay on the authenticated /api/account/orders.
+ */
+export async function getOrderByCheckout(checkoutId: number): Promise<Order> {
+  const { data } = await apiClient.get<{ data: Order }>(
+    `/api/store/checkout/${checkoutId}/order`,
+  )
+  return data.data
+}

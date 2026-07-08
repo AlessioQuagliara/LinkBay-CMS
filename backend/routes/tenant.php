@@ -36,7 +36,10 @@ Route::middleware([
     PreventAccessFromCentralDomains::class,
 ])->prefix('api/v1')->group(function () {
 
-    Route::middleware('auth:sanctum')->group(function () {
+    // 'tenant_api' (not the bare 'sanctum' guard) — see config/auth.php comment:
+    // the default Sanctum guard accepts any tokenable model, which would let a
+    // storefront Customer's own token reach this merchant-admin API.
+    Route::middleware('auth:tenant_api')->group(function () {
 
         // Products
         Route::get('/products', [ProductController::class, 'index']);
@@ -75,8 +78,9 @@ Route::middleware([
     PreventAccessFromCentralDomains::class,
 ])->prefix('api/account')->group(function () {
 
-    // Guest-only routes (redirect if already authenticated)
-    Route::middleware(RedirectIfCustomerAuthenticated::class)->group(function () {
+    // Guest-only routes (redirect if already authenticated). Throttled — these
+    // had no rate limit at all, making login/register brute-forceable.
+    Route::middleware([RedirectIfCustomerAuthenticated::class, 'throttle:10,1'])->group(function () {
         Route::post('/register', [CustomerAuthController::class, 'register']);
         Route::post('/login', [CustomerAuthController::class, 'login']);
         Route::post('/password/forgot', [CustomerAuthController::class, 'forgotPassword']);
@@ -136,6 +140,7 @@ Route::middleware([
     Route::get('/checkout/{checkout}', [CheckoutController::class, 'show']);
     Route::post('/checkout/{checkout}/payment-intent', [CheckoutController::class, 'createPaymentIntent']);
     Route::post('/checkout/{checkout}/confirm', [CheckoutController::class, 'confirm']);
+    Route::get('/checkout/{checkout}/order', [CheckoutController::class, 'order']);
 
     // Shipping
     Route::get('/shipping-methods', [ShippingMethodController::class, 'index']);

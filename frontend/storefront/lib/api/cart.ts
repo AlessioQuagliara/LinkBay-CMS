@@ -3,7 +3,6 @@ import type {
   CartItemResponse,
   CartMeta,
   CartResponse,
-  CartSession,
   DiscountResult,
 } from '@/storefront/lib/types/cart'
 

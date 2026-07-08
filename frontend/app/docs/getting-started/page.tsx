@@ -30,12 +30,6 @@ const Step = ({
   </div>
 );
 
-const CodeBlock = ({ children }: { children: string }) => (
-  <pre className="bg-gray-900 text-green-400 rounded-xl px-5 py-4 overflow-x-auto text-sm font-mono my-3">
-    <code>{children}</code>
-  </pre>
-);
-
 const Callout = ({ children }: { children: React.ReactNode }) => (
   <div className="bg-red-50 border border-red-100 rounded-xl px-5 py-4 text-sm text-gray-700 leading-relaxed">
     {children}

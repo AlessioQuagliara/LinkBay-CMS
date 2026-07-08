@@ -197,6 +197,7 @@ class AgencyRegistrationTest extends CentralTestCase
     {
         $response = $this->post('/agency/register', []);
 
-        $response->assertSessionHasErrors(['agency_name', 'slug', 'email', 'password']);
+        // 'slug' is nullable — it's auto-generated from agency_name when omitted.
+        $response->assertSessionHasErrors(['agency_name', 'email', 'password']);
     }
 }

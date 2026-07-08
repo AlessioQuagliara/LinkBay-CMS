@@ -12,11 +12,15 @@ class CommissionRecord extends Model
 
     public const UPDATED_AT = null;  // append-only — solo created_at
 
-    public const STATUS_PENDING  = 'pending';
-    public const STATUS_SETTLED  = 'settled';
+    public const STATUS_PENDING = 'pending';
+
+    public const STATUS_SETTLED = 'settled';
+
     public const STATUS_REFUNDED = 'refunded';
+
     public const STATUS_DISPUTED = 'disputed';
-    public const STATUS_FAILED   = 'failed';
+
+    public const STATUS_FAILED = 'failed';
 
     protected $fillable = [
         'agency_id',
@@ -36,9 +40,9 @@ class CommissionRecord extends Model
     ];
 
     protected $casts = [
-        'fee_pct'    => 'decimal:4',
+        'fee_pct' => 'decimal:4',
         'settled_at' => 'datetime',
-        'metadata'   => 'array',
+        'metadata' => 'array',
         'created_at' => 'datetime',
     ];
 
@@ -56,22 +60,22 @@ class CommissionRecord extends Model
 
     public function grossFormatted(): string
     {
-        return '€' . number_format($this->gross_amount_cents / 100, 2, ',', '.');
+        return '€'.number_format($this->gross_amount_cents / 100, 2, ',', '.');
     }
 
     public function feeFormatted(): string
     {
-        return '€' . number_format($this->fee_amount_cents / 100, 2, ',', '.');
+        return '€'.number_format($this->fee_amount_cents / 100, 2, ',', '.');
     }
 
     public function netFormatted(): string
     {
-        return '€' . number_format($this->net_to_agency_cents / 100, 2, ',', '.');
+        return '€'.number_format($this->net_to_agency_cents / 100, 2, ',', '.');
     }
 
     public function feePctFormatted(): string
     {
-        return number_format((float) $this->fee_pct * 100, 1, ',', '.') . '%';
+        return number_format((float) $this->fee_pct * 100, 1, ',', '.').'%';
     }
 
     // ── Mutation helpers ──────────────────────────────────────────────────────
@@ -83,9 +87,9 @@ class CommissionRecord extends Model
     public function forceSetStatus(string $status): void
     {
         $this->getConnection()
-             ->table('commission_records')
-             ->where('id', $this->id)
-             ->update(['status' => $status]);
+            ->table('commission_records')
+            ->where('id', $this->id)
+            ->update(['status' => $status]);
 
         $this->status = $status;
     }
@@ -99,18 +103,18 @@ class CommissionRecord extends Model
         $refundFee = (int) round($refundCents * (float) $this->fee_pct);
 
         return static::create([
-            'agency_id'            => $this->agency_id,
-            'tenant_id'            => $this->tenant_id,
+            'agency_id' => $this->agency_id,
+            'tenant_id' => $this->tenant_id,
             'platform_fee_rule_id' => $this->platform_fee_rule_id,
-            'gross_amount_cents'   => -$refundCents,
-            'fee_pct'              => $this->fee_pct,
-            'fee_amount_cents'     => -$refundFee,
-            'net_to_agency_cents'  => -($refundCents - $refundFee),
-            'currency'             => $this->currency,
-            'status'               => self::STATUS_REFUNDED,
-            'metadata'             => [
+            'gross_amount_cents' => -$refundCents,
+            'fee_pct' => $this->fee_pct,
+            'fee_amount_cents' => -$refundFee,
+            'net_to_agency_cents' => -($refundCents - $refundFee),
+            'currency' => $this->currency,
+            'status' => self::STATUS_REFUNDED,
+            'metadata' => [
                 'original_commission_id' => $this->id,
-                'reason'                 => $reason,
+                'reason' => $reason,
             ],
         ]);
     }

@@ -18,15 +18,20 @@ jobs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: filter
         with:
           filters: |
             backend:
               - 'backend/**'
+              - '.github/workflows/ci.yml'
+            # frontend/ is the single storefront + marketing codebase (see
+            # frontend/README.md). _archive/** is intentionally excluded —
+            # it's archived reference code, not part of the build.
             frontend:
               - 'frontend/**'
+              - '.github/workflows/ci.yml'
 
   # ── Backend: Laravel / PHPUnit ─────────────────────────────────────────────
   # Tests use SQLite :memory: (see backend/phpunit.xml) — no Postgres or Redis needed.
@@ -40,7 +45,7 @@ jobs:
         working-directory: backend
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup PHP 8.4
         uses: shivammathur/setup-php@v2
@@ -51,7 +56,7 @@ jobs:
           tools: composer:v2
 
       - name: Cache Composer dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: backend/vendor
           key: composer-${{ hashFiles('backend/composer.lock') }}
@@ -65,8 +70,15 @@ jobs:
           cp .env.example .env
           php artisan key:generate --force
 
+      - name: Check code style (Pint)
+        run: vendor/bin/pint --test
+
+      # Migrations without an explicit $connection (e.g. create_tenants_table) land on
+      # the "default" connection; migrations under database/migrations/central force the
+      # 'central' connection explicitly. --database=central makes both resolve to the
+      # same in-memory SQLite instance — see tests/CentralTestCase for the same pattern.
       - name: Validate migrations (SQLite in-memory sanity check)
-        run: php artisan migrate --force
+        run: php artisan migrate --force --database=central
         env:
           APP_ENV: testing
           DB_CONNECTION: sqlite
@@ -77,8 +89,12 @@ jobs:
           STRIPE_WEBHOOK_SECRET: whsec_placeholder
           TERMS_VERSION: test-v1
 
+      # No --parallel: brianium/paratest is not a project dependency, so
+      # `php artisan test --parallel` fails outright before running a single
+      # test. The suite runs in ~6s sequentially, which doesn't justify
+      # adding a new dev dependency just to parallelize it.
       - name: Run PHPUnit tests
-        run: php artisan test --parallel
+        run: php artisan test
 
   # ── Backend: Vite / Filament assets ────────────────────────────────────────
   backend-assets:
@@ -91,12 +107,32 @@ jobs:
         working-directory: backend
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - name: Setup Node.js 20
-        uses: actions/setup-node@v4
+      # resources/css/filament-agency.css imports Filament's own CSS straight out of
+      # vendor/ (@import '../../vendor/filament/filament/resources/css/index.css'),
+      # so Vite can't build without the Composer dependencies present first.
+      - name: Setup PHP 8.4
+        uses: shivammathur/setup-php@v2
         with:
-          node-version: '20'
+          php-version: '8.4'
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v5
+        with:
+          path: backend/vendor
+          key: composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: backend/package-lock.json
 
@@ -117,12 +153,12 @@ jobs:
         working-directory: frontend
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - name: Setup Node.js 20
-        uses: actions/setup-node@v4
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
@@ -131,13 +167,15 @@ jobs:
 
       - name: Lint
         run: npm run lint
-        continue-on-error: true  # remove once the codebase is lint-clean
 
       - name: Type check
         run: npx tsc --noEmit
-        continue-on-error: true  # remove once all type errors are resolved
 
       - name: Build
         run: npm run build
         env:
-          NEXT_PUBLIC_API_URL: https://app.linkbay-cms.com
+          # Correct var name is NEXT_PUBLIC_API_BASE_URL (this previously said
+          # NEXT_PUBLIC_API_URL, which the app never reads — silently a no-op).
+          # Must contain {slug} and point at STORE_DOMAIN, not a central host —
+          # see frontend/.env.example.
+          NEXT_PUBLIC_API_BASE_URL: https://{slug}.yoursite-linkbay-cms.com

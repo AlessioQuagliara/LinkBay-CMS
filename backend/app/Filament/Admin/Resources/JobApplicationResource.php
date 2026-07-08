@@ -5,6 +5,10 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\JobApplicationResource\Pages;
 use App\Models\Central\JobApplication;
 use App\Models\Central\JobPosition;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -15,10 +19,15 @@ use Filament\Tables\Table;
 class JobApplicationResource extends Resource
 {
     protected static ?string $model = JobApplication::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Careers';
+
     protected static ?string $modelLabel = 'Application';
+
     protected static ?string $pluralModelLabel = 'Applications';
+
     protected static ?int $navigationSort = 2;
 
     public static function getNavigationBadge(): ?string
@@ -70,11 +79,11 @@ class JobApplicationResource extends Resource
                     Forms\Components\Select::make('status')
                         ->label('Status')
                         ->options([
-                            'new'         => 'New',
-                            'reviewing'   => 'Reviewing',
+                            'new' => 'New',
+                            'reviewing' => 'Reviewing',
                             'shortlisted' => 'Shortlisted',
-                            'rejected'    => 'Rejected',
-                            'closed'      => 'Closed',
+                            'rejected' => 'Rejected',
+                            'closed' => 'Closed',
                         ])
                         ->required(),
                     Forms\Components\Textarea::make('motivation')
@@ -116,11 +125,11 @@ class JobApplicationResource extends Resource
                 Tables\Columns\SelectColumn::make('status')
                     ->label('Status')
                     ->options([
-                        'new'         => 'New',
-                        'reviewing'   => 'Reviewing',
+                        'new' => 'New',
+                        'reviewing' => 'Reviewing',
                         'shortlisted' => 'Shortlisted',
-                        'rejected'    => 'Rejected',
-                        'closed'      => 'Closed',
+                        'rejected' => 'Rejected',
+                        'closed' => 'Closed',
                     ])
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -131,11 +140,11 @@ class JobApplicationResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'new'         => 'New',
-                        'reviewing'   => 'Reviewing',
+                        'new' => 'New',
+                        'reviewing' => 'Reviewing',
                         'shortlisted' => 'Shortlisted',
-                        'rejected'    => 'Rejected',
-                        'closed'      => 'Closed',
+                        'rejected' => 'Rejected',
+                        'closed' => 'Closed',
                     ]),
                 Tables\Filters\SelectFilter::make('job_position_id')
                     ->label('Position')
@@ -149,23 +158,22 @@ class JobApplicationResource extends Resource
                         ->pluck('department', 'department')
                         ->toArray()
                     )
-                    ->query(fn ($query, $data) =>
-                        $data['value']
+                    ->query(fn ($query, $data) => $data['value']
                             ? $query->whereHas('position', fn ($q) => $q->where('department', $data['value']))
                             : $query
                     ),
             ])
             ->actions([
-                \Filament\Actions\EditAction::make()->label('Review'),
-                \Filament\Actions\Action::make('download_cv')
+                EditAction::make()->label('Review'),
+                Action::make('download_cv')
                     ->label('CV')
                     ->icon('heroicon-o-document-arrow-down')
                     ->url(fn ($record) => route('admin.careers.cv.download', $record))
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([
-                \Filament\Actions\BulkActionGroup::make([
-                    \Filament\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -174,7 +182,7 @@ class JobApplicationResource extends Resource
     {
         return [
             'index' => Pages\ListJobApplications::route('/'),
-            'edit'  => Pages\ViewJobApplication::route('/{record}/edit'),
+            'edit' => Pages\ViewJobApplication::route('/{record}/edit'),
         ];
     }
 }

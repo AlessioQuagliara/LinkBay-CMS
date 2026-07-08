@@ -46,7 +46,6 @@ function CollectionContent({ collectionSlug }: { collectionSlug: string }) {
             <Pagination
               currentPage={firstPage.meta.current_page}
               lastPage={firstPage.meta.last_page}
-              total={firstPage.meta.total}
             />
           </Suspense>
         </div>

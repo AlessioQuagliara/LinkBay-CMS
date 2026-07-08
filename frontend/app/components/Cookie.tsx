@@ -18,12 +18,15 @@ const CookieConsentBanner: React.FC = () => {
     marketing: false,
   });
 
-  // Controlla lo stato del consenso all'avvio
+  // Controlla lo stato del consenso all'avvio.
+  // localStorage non è disponibile lato server: la lettura deve avvenire in un
+  // effetto post-mount per evitare mismatch di idratazione SSR.
   useEffect(() => {
     const consent = localStorage.getItem('cookieConsent');
     const saved = localStorage.getItem('cookiePreferences');
 
     if (consent === 'pending' || consent === 'custom' || consent === 'denied') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- inizializzazione da localStorage, non disponibile in SSR
       setConsentGiven(consent);
       if (saved) {
         try {
@@ -74,7 +77,7 @@ const CookieConsentBanner: React.FC = () => {
   };
 
   // Modale Preferenze Cookie
-  const PreferencesModal = () => (
+  const preferencesModal = (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Overlay */}
       <div 
@@ -179,7 +182,7 @@ const CookieConsentBanner: React.FC = () => {
   );
 
   // Banner principale
-  const CookieBanner = () => (
+  const cookieBanner = (
     <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t-4 border-[#ff5758] shadow-2xl">
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -222,8 +225,8 @@ const CookieConsentBanner: React.FC = () => {
   );
 
   // Pulsante fisso per riaprire le preferenze
-  const FloatingPreferencesButton = () => (
-    <button 
+  const floatingPreferencesButton = (
+    <button
       onClick={() => setShowPreferences(true)}
       className="fixed bottom-4 left-4 z-30 bg-[#343a4D] text-white p-3 rounded-full shadow-lg hover:bg-[#ff5758] transition-colors group"
       title="Gestisci preferenze cookie"
@@ -248,13 +251,13 @@ const CookieConsentBanner: React.FC = () => {
   return (
     <>
       {/* Banner Cookie — nessun overlay, non blocca la navigazione */}
-      {showBanner && <CookieBanner />}
+      {showBanner && cookieBanner}
 
       {/* Modale Preferenze — ha il proprio overlay */}
-      {showPreferences && <PreferencesModal />}
+      {showPreferences && preferencesModal}
 
       {/* Pulsante fisso per riaprire le preferenze */}
-      {!showBanner && consentGiven !== 'pending' && <FloatingPreferencesButton />}
+      {!showBanner && consentGiven !== 'pending' && floatingPreferencesButton}
     </>
   );
 };

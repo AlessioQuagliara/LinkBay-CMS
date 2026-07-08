@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Central\PlanController;
 use App\Http\Controllers\Central\TenantController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('central/api')->middleware(['api', 'auth:sanctum'])->group(function () {

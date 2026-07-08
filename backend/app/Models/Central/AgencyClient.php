@@ -43,10 +43,10 @@ class AgencyClient extends Model
     public function statusLabel(): string
     {
         return match ($this->status) {
-            'active'      => 'Attivo',
-            'suspended'   => 'Sospeso',
-            'offboarded'  => 'Offboarded',
-            default       => $this->status,
+            'active' => 'Attivo',
+            'suspended' => 'Sospeso',
+            'offboarded' => 'Offboarded',
+            default => $this->status,
         };
     }
 }

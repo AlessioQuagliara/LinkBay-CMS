@@ -27,17 +27,19 @@ class StripeWebhookController extends Controller
     public function handle(Request $request): Response
     {
         // 1. Valida firma Stripe
-        $payload   = $request->getContent();
+        $payload = $request->getContent();
         $sigHeader = $request->header('Stripe-Signature', '');
-        $secret    = config('services.stripe.webhook_secret');
+        $secret = config('services.stripe.webhook_secret');
 
         try {
             $event = Webhook::constructEvent($payload, $sigHeader, $secret);
         } catch (SignatureVerificationException $e) {
             Log::warning('Stripe webhook invalid signature', ['error' => $e->getMessage()]);
+
             return response('Invalid signature', 400);
         } catch (\Throwable $e) {
             Log::error('Stripe webhook parse error', ['error' => $e->getMessage()]);
+
             return response('Webhook error', 400);
         }
 
@@ -45,13 +47,13 @@ class StripeWebhookController extends Controller
         // insertOrIgnore: se stripe_event_id già esiste, non fa nulla e non lancia eccezione
         $inserted = BillingEvent::insertOrIgnore([
             'stripe_event_id' => $event->id,
-            'event_type'      => $event->type,
-            'payload'         => json_encode($event->toArray()),
-            'processed_at'    => null,
-            'created_at'      => now(),
+            'event_type' => $event->type,
+            'payload' => json_encode($event->toArray()),
+            'processed_at' => null,
+            'created_at' => now(),
         ]);
 
-        if (!$inserted) {
+        if (! $inserted) {
             // Evento già registrato — controlla se già processato
             $existing = BillingEvent::where('stripe_event_id', $event->id)->first();
             if ($existing?->isProcessed()) {
@@ -61,6 +63,7 @@ class StripeWebhookController extends Controller
             if ($existing) {
                 ProcessStripeWebhookJob::dispatch($existing->id);
             }
+
             return response('OK', 200);
         }
 

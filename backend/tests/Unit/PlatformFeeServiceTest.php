@@ -8,7 +8,6 @@ use App\Models\Central\Agency;
 use App\Models\Central\Plan;
 use App\Models\Central\PlatformFeeRule;
 use App\Services\PlatformFeeService;
-use Carbon\Carbon;
 use RuntimeException;
 use Tests\CentralTestCase;
 
@@ -19,12 +18,12 @@ class PlatformFeeServiceTest extends CentralTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new PlatformFeeService();
+        $this->service = new PlatformFeeService;
     }
 
     public function test_resolves_plan_specific_rule(): void
     {
-        $plan   = Plan::create(['name' => 'Starter', 'slug' => 'starter', 'price' => 29, 'billing_interval' => 'month', 'is_active' => true, 'sort_order' => 1]);
+        $plan = Plan::create(['name' => 'Starter', 'slug' => 'starter', 'price' => 29, 'billing_interval' => 'month', 'is_active' => true, 'sort_order' => 1]);
         $agency = Agency::create(['name' => 'Ag', 'slug' => 'ag', 'brand_name' => 'Ag', 'plan_id' => $plan->id, 'billing_type' => 'monthly', 'status' => 'active']);
 
         // Regola globale con fee 50% (non deve vincere)
@@ -40,7 +39,7 @@ class PlatformFeeServiceTest extends CentralTestCase
 
     public function test_resolves_global_fallback_when_no_plan_specific_rule(): void
     {
-        $plan   = Plan::create(['name' => 'Pro', 'slug' => 'pro', 'price' => 79, 'billing_interval' => 'month', 'is_active' => true, 'sort_order' => 2]);
+        $plan = Plan::create(['name' => 'Pro', 'slug' => 'pro', 'price' => 79, 'billing_interval' => 'month', 'is_active' => true, 'sort_order' => 2]);
         $agency = Agency::create(['name' => 'AgPro', 'slug' => 'ag-pro', 'brand_name' => 'AgPro', 'plan_id' => $plan->id, 'billing_type' => 'monthly', 'status' => 'active']);
 
         // Solo fallback globale
@@ -53,7 +52,7 @@ class PlatformFeeServiceTest extends CentralTestCase
 
     public function test_resolves_lifetime_billing_type_rule(): void
     {
-        $plan   = Plan::create(['name' => 'LTD', 'slug' => 'lifetime-ltd', 'price' => 0, 'billing_interval' => 'month', 'is_active' => true, 'sort_order' => 4]);
+        $plan = Plan::create(['name' => 'LTD', 'slug' => 'lifetime-ltd', 'price' => 0, 'billing_interval' => 'month', 'is_active' => true, 'sort_order' => 4]);
         $agency = Agency::create(['name' => 'AgLTD', 'slug' => 'ag-ltd', 'brand_name' => 'AgLTD', 'plan_id' => $plan->id, 'billing_type' => 'lifetime', 'status' => 'active']);
 
         // Regola per billing_type = lifetime (deve vincere)
@@ -69,7 +68,7 @@ class PlatformFeeServiceTest extends CentralTestCase
 
     public function test_throws_when_no_rule_exists(): void
     {
-        $plan   = Plan::create(['name' => 'Mystery', 'slug' => 'mystery', 'price' => 0, 'billing_interval' => 'month', 'is_active' => true, 'sort_order' => 9]);
+        $plan = Plan::create(['name' => 'Mystery', 'slug' => 'mystery', 'price' => 0, 'billing_interval' => 'month', 'is_active' => true, 'sort_order' => 9]);
         $agency = Agency::create(['name' => 'AgMystery', 'slug' => 'ag-mystery', 'brand_name' => 'AgMystery', 'plan_id' => $plan->id, 'billing_type' => 'monthly', 'status' => 'active']);
 
         $this->expectException(RuntimeException::class);
@@ -79,7 +78,7 @@ class PlatformFeeServiceTest extends CentralTestCase
 
     public function test_respects_valid_until_expiry(): void
     {
-        $plan   = Plan::create(['name' => 'ExpiredPlan', 'slug' => 'expired', 'price' => 0, 'billing_interval' => 'month', 'is_active' => true, 'sort_order' => 9]);
+        $plan = Plan::create(['name' => 'ExpiredPlan', 'slug' => 'expired', 'price' => 0, 'billing_interval' => 'month', 'is_active' => true, 'sort_order' => 9]);
         $agency = Agency::create(['name' => 'AgExp', 'slug' => 'ag-exp', 'brand_name' => 'AgExp', 'plan_id' => $plan->id, 'billing_type' => 'monthly', 'status' => 'active']);
 
         // Regola scaduta ieri

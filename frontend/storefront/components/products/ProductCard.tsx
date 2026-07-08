@@ -2,7 +2,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { Product } from '@/storefront/lib/types/product'
 import PriceDisplay from './PriceDisplay'
-import StockBadge from './StockBadge'
 
 interface ProductCardProps {
   product: Product

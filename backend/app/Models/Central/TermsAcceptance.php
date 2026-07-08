@@ -50,12 +50,12 @@ class TermsAcceptance extends Model
     public static function record(Agency $agency, int $userId, string $ip, ?string $ua): static
     {
         return static::create([
-            'agency_id'     => $agency->id,
-            'user_id'       => $userId,
+            'agency_id' => $agency->id,
+            'user_id' => $userId,
             'terms_version' => static::currentVersion(),
-            'ip_address'    => $ip,
-            'user_agent'    => $ua,
-            'accepted_at'   => now(),
+            'ip_address' => $ip,
+            'user_agent' => $ua,
+            'accepted_at' => now(),
         ]);
     }
 }

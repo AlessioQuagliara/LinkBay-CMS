@@ -29,16 +29,16 @@ class PlatformFeeService
         $rule = PlatformFeeRule::query()
             ->where(function ($q) use ($agency) {
                 $q->where('plan_id', $agency->plan_id)
-                  ->orWhereNull('plan_id');
+                    ->orWhereNull('plan_id');
             })
             ->where(function ($q) use ($agency) {
                 $q->where('billing_type', $agency->billing_type)
-                  ->orWhereNull('billing_type');
+                    ->orWhereNull('billing_type');
             })
             ->where('valid_from', '<=', $at)
             ->where(function ($q) use ($at) {
                 $q->whereNull('valid_until')
-                  ->orWhere('valid_until', '>', $at);
+                    ->orWhere('valid_until', '>', $at);
             })
             // Più specifico prima: plan_id NOT NULL > NULL; billing_type NOT NULL > NULL
             ->orderByRaw('(plan_id IS NULL) ASC')
@@ -46,10 +46,10 @@ class PlatformFeeService
             ->orderByDesc('valid_from')
             ->first();
 
-        if (!$rule) {
+        if (! $rule) {
             throw new RuntimeException(
                 "No active platform_fee_rule for agency #{$agency->id} "
-                . "(plan_id={$agency->plan_id}, billing_type={$agency->billing_type}) at {$at}"
+                ."(plan_id={$agency->plan_id}, billing_type={$agency->billing_type}) at {$at}"
             );
         }
 

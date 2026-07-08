@@ -4,10 +4,13 @@ namespace App\Filament\Tenant\Resources;
 
 use App\Filament\Tenant\Resources\DiscountCodeResource\Pages;
 use App\Models\Tenant\DiscountCode;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Schemas\Schema;
-
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
@@ -15,9 +18,13 @@ use Illuminate\Support\Str;
 class DiscountCodeResource extends Resource
 {
     protected static ?string $model = DiscountCode::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Marketing';
+
     protected static ?string $modelLabel = 'Codice sconto';
+
     protected static ?string $pluralModelLabel = 'Codici sconto';
 
     public static function form(Schema $schema): Schema
@@ -80,7 +87,7 @@ class DiscountCodeResource extends Resource
                 Tables\Columns\TextColumn::make('type')
                     ->label('Tipo')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => match($state) {
+                    ->formatStateUsing(fn ($state) => match ($state) {
                         'percentage' => 'Percentuale',
                         'fixed' => 'Importo fisso',
                         'free_shipping' => 'Spedizione gratis',
@@ -88,14 +95,14 @@ class DiscountCodeResource extends Resource
                     }),
                 Tables\Columns\TextColumn::make('value')
                     ->label('Valore')
-                    ->formatStateUsing(fn ($state, $record) => match($record->type) {
-                        'percentage' => $state . '%',
-                        'fixed' => '€' . $state,
+                    ->formatStateUsing(fn ($state, $record) => match ($record->type) {
+                        'percentage' => $state.'%',
+                        'fixed' => '€'.$state,
                         default => '—',
                     }),
                 Tables\Columns\TextColumn::make('usage_info')
                     ->label('Utilizzi')
-                    ->state(fn ($record) => $record->used_count . ' / ' . ($record->usage_limit ?? '∞')),
+                    ->state(fn ($record) => $record->used_count.' / '.($record->usage_limit ?? '∞')),
                 Tables\Columns\TextColumn::make('expires_at')
                     ->label('Scadenza')
                     ->date('d/m/Y')
@@ -106,12 +113,12 @@ class DiscountCodeResource extends Resource
                     ->label('Attivo'),
             ])
             ->actions([
-                \Filament\Actions\EditAction::make(),
-                \Filament\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                \Filament\Actions\BulkActionGroup::make([
-                    \Filament\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

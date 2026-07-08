@@ -12,7 +12,9 @@ use App\Models\Tenant\DiscountCode;
 use App\Models\Tenant\Order;
 use App\Models\Tenant\OrderItem;
 use App\Models\Tenant\ShippingMethod;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 use Stripe\StripeClient;
 
@@ -20,7 +22,13 @@ class CheckoutService
 {
     public function initiate(CartSession $cart, array $shippingAddress, int $shippingMethodId): CheckoutSession
     {
-        $shippingMethod = ShippingMethod::findOrFail($shippingMethodId);
+        $shippingMethod = ShippingMethod::where('id', $shippingMethodId)
+            ->where('is_active', true)
+            ->first();
+
+        if (! $shippingMethod) {
+            throw new ModelNotFoundException('Il metodo di spedizione selezionato non è più disponibile.');
+        }
 
         $totals = $this->computeTotals($cart, $shippingMethod, null);
 
@@ -40,31 +48,63 @@ class CheckoutService
 
     public function createPaymentIntent(CheckoutSession $checkout): string
     {
-        $stripe = new StripeClient(config('services.stripe.secret'));
+        $secret = config('services.stripe.secret');
 
-        $intent = $stripe->paymentIntents->create([
-            'amount' => (int) round((float) $checkout->total * 100),
-            'currency' => 'eur',
-            'metadata' => [
-                'checkout_session_id' => $checkout->id,
-            ],
-        ]);
+        if (empty($secret)) {
+            throw new RuntimeException('Il pagamento online non è configurato per questo store.');
+        }
 
-        $checkout->update([
-            'stripe_payment_intent_id' => $intent->id,
-            'stripe_payment_status' => $intent->status,
-        ]);
+        try {
+            $stripe = new StripeClient($secret);
 
-        return $intent->client_secret;
+            $intent = $stripe->paymentIntents->create([
+                'amount' => (int) round((float) $checkout->total * 100),
+                'currency' => 'eur',
+                'metadata' => [
+                    'checkout_session_id' => $checkout->id,
+                ],
+            ]);
+
+            $checkout->update([
+                'stripe_payment_intent_id' => $intent->id,
+                'stripe_payment_status' => $intent->status,
+            ]);
+
+            return $intent->client_secret;
+        } catch (RuntimeException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            Log::error('CheckoutService: createPaymentIntent failed', [
+                'checkout_id' => $checkout->id,
+                'error' => $e->getMessage(),
+            ]);
+            throw new RuntimeException('Impossibile inizializzare il pagamento. Riprova tra qualche istante.', previous: $e);
+        }
     }
 
     public function confirmPayment(string $paymentIntentId): CheckoutSession
     {
-        $stripe = new StripeClient(config('services.stripe.secret'));
+        $checkout = CheckoutSession::where('stripe_payment_intent_id', $paymentIntentId)->first();
 
-        $intent = $stripe->paymentIntents->retrieve($paymentIntentId);
+        if (! $checkout) {
+            throw new ModelNotFoundException('Sessione di pagamento non trovata. Riprova il checkout.');
+        }
 
-        $checkout = CheckoutSession::where('stripe_payment_intent_id', $paymentIntentId)->firstOrFail();
+        // Idempotency: a retried confirm call must not downgrade an already-completed checkout.
+        if ($checkout->status === CheckoutSession::STATUS_COMPLETED) {
+            return $checkout;
+        }
+
+        try {
+            $stripe = new StripeClient(config('services.stripe.secret'));
+            $intent = $stripe->paymentIntents->retrieve($paymentIntentId);
+        } catch (\Throwable $e) {
+            Log::error('CheckoutService: confirmPayment failed to retrieve intent', [
+                'checkout_id' => $checkout->id,
+                'error' => $e->getMessage(),
+            ]);
+            throw new RuntimeException('Impossibile verificare lo stato del pagamento. Riprova tra qualche istante.', previous: $e);
+        }
 
         $checkout->update([
             'stripe_payment_status' => $intent->status,
@@ -73,13 +113,36 @@ class CheckoutService
                 : CheckoutSession::STATUS_PENDING,
         ]);
 
+        if ($intent->status !== 'succeeded') {
+            throw new RuntimeException('Il pagamento non risulta completato (stato: '.$intent->status.').');
+        }
+
         return $checkout->fresh();
+    }
+
+    /**
+     * Looks up the order produced by a completed checkout session, if any.
+     * Public (unauthenticated) storefront routes use this to show the guest
+     * checkout success page without requiring a customer session — see
+     * CheckoutController::order().
+     */
+    public function findOrderFor(CheckoutSession $checkout): ?Order
+    {
+        return Order::where('metadata->checkout_session_id', $checkout->id)->first();
     }
 
     public function convertToOrder(CheckoutSession $checkout): Order
     {
+        // Idempotency: a retried confirm must return the already-created order, not duplicate it.
+        if ($checkout->status === CheckoutSession::STATUS_COMPLETED) {
+            $existing = $this->findOrderFor($checkout);
+            if ($existing) {
+                return $existing;
+            }
+        }
+
         if ($checkout->status !== CheckoutSession::STATUS_PROCESSING) {
-            throw new RuntimeException('Checkout must be in processing state to convert to order.');
+            throw new RuntimeException('Il pagamento non risulta completato: impossibile creare l\'ordine.');
         }
 
         return DB::transaction(function () use ($checkout) {
@@ -98,6 +161,10 @@ class CheckoutService
                 'billing_address' => $checkout->billing_address ?? $checkout->shipping_address,
                 'payment_method' => 'stripe',
                 'payment_status' => 'paid',
+                // Required for TenantStripeWebhookController to find this order later
+                // (payment_intent.succeeded/failed, charge.refunded all look it up by
+                // this column) — without it those webhook handlers silently no-op.
+                'stripe_payment_intent_id' => $checkout->stripe_payment_intent_id,
                 'metadata' => ['checkout_session_id' => $checkout->id],
             ]);
 

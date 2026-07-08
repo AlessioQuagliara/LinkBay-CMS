@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 import { useBrandStore } from '@/storefront/lib/store/brandStore'
 import { useCartStore } from '@/storefront/lib/store/cartStore'
+import { useAuthStore } from '@/storefront/lib/store/authStore'
 import CartDrawer from './CartDrawer'
 
 const queryClient = new QueryClient({
@@ -16,11 +17,20 @@ const queryClient = new QueryClient({
 function StoreInitializer() {
   const fetchBrand = useBrandStore((s) => s.fetchBrand)
   const initCart = useCartStore((s) => s.initCart)
+  const clearAuth = useAuthStore((s) => s.clearAuth)
 
   useEffect(() => {
     void fetchBrand()
     void initCart()
   }, [fetchBrand, initCart])
+
+  // The apiClient response interceptor dispatches this on any 401 (expired
+  // or revoked token) — keep the in-memory auth store in sync so protected
+  // pages redirect immediately instead of only after a reload.
+  useEffect(() => {
+    window.addEventListener('auth:logout', clearAuth)
+    return () => window.removeEventListener('auth:logout', clearAuth)
+  }, [clearAuth])
 
   return null
 }

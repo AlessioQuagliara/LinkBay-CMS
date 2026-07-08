@@ -49,8 +49,19 @@ return [
             'provider' => 'tenant_users',
         ],
         'customer' => [
-            'driver' => 'session',
+            'driver' => 'sanctum',
             'provider' => 'customers',
+        ],
+        // Sanctum's own service provider registers a fallback 'sanctum' guard with
+        // provider => null (accept-any-tokenable-model) if nothing overrides it — see
+        // vendor/laravel/sanctum/src/SanctumServiceProvider.php. Left as-is, that guard
+        // would let a Customer's storefront token (the only tenant-DB model that
+        // actually issues tokens today) also authenticate the merchant-admin API below.
+        // 'tenant_api' pins the provider explicitly so only App\Models\Tenant\User
+        // tokens are accepted there.
+        'tenant_api' => [
+            'driver' => 'sanctum',
+            'provider' => 'tenant_users',
         ],
     ],
 

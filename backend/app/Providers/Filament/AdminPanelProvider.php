@@ -8,7 +8,9 @@ use App\Filament\Admin\Resources\AgencyEntitlementResource;
 use App\Filament\Admin\Resources\AgencyHealthAlertResource;
 use App\Filament\Admin\Resources\AgencyResource;
 use App\Filament\Admin\Resources\AiCreditPackageResource;
+use App\Filament\Admin\Resources\BillingEventResource;
 use App\Filament\Admin\Resources\ContactSubmissionResource;
+use App\Filament\Admin\Resources\FailedJobResource;
 use App\Filament\Admin\Resources\JobApplicationResource;
 use App\Filament\Admin\Resources\JobPositionResource;
 use App\Filament\Admin\Resources\PlanResource;
@@ -60,6 +62,8 @@ class AdminPanelProvider extends PanelProvider
                 PluginCatalogItemResource::class,
                 AgencyEntitlementResource::class,
                 AgencyHealthAlertResource::class,
+                FailedJobResource::class,
+                BillingEventResource::class,
             ])
             ->pages([Dashboard::class, UsageAnalyticsPage::class, AgencyHealthPage::class])
             ->widgets([GlobalStatsWidget::class])

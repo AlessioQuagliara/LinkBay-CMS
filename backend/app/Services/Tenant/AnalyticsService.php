@@ -46,7 +46,7 @@ class AnalyticsService
 
     public function getRevenueTotal(Carbon $from, Carbon $to): float
     {
-        return (float) $this->remember("revenue_total", $from, $to, fn () => DB::table('orders')
+        return (float) $this->remember('revenue_total', $from, $to, fn () => DB::table('orders')
             ->whereBetween('created_at', [$from->startOfDay(), $to->endOfDay()])
             ->whereNotIn('status', ['cancelled', 'refunded'])
             ->sum('total'));
@@ -78,7 +78,7 @@ class AnalyticsService
 
     public function getOrdersCount(Carbon $from, Carbon $to): int
     {
-        return (int) $this->remember("orders_count", $from, $to, fn () => DB::table('orders')
+        return (int) $this->remember('orders_count', $from, $to, fn () => DB::table('orders')
             ->whereBetween('created_at', [$from->startOfDay(), $to->endOfDay()])
             ->count());
     }
@@ -108,7 +108,7 @@ class AnalyticsService
 
     public function getAverageOrderValue(Carbon $from, Carbon $to): float
     {
-        return (float) $this->remember("avg_order_value", $from, $to, function () use ($from, $to) {
+        return (float) $this->remember('avg_order_value', $from, $to, function () use ($from, $to) {
             $result = DB::table('orders')
                 ->whereBetween('created_at', [$from->startOfDay(), $to->endOfDay()])
                 ->whereNotIn('status', ['cancelled', 'refunded'])
@@ -123,14 +123,14 @@ class AnalyticsService
 
     public function getNewCustomersCount(Carbon $from, Carbon $to): int
     {
-        return (int) $this->remember("new_customers", $from, $to, fn () => DB::table('customers')
+        return (int) $this->remember('new_customers', $from, $to, fn () => DB::table('customers')
             ->whereBetween('created_at', [$from->startOfDay(), $to->endOfDay()])
             ->count());
     }
 
     public function getReturningCustomersRate(Carbon $from, Carbon $to): float
     {
-        return (float) $this->remember("returning_rate", $from, $to, function () use ($from, $to) {
+        return (float) $this->remember('returning_rate', $from, $to, function () use ($from, $to) {
             $total = DB::table('orders')
                 ->whereBetween('created_at', [$from->startOfDay(), $to->endOfDay()])
                 ->whereNotNull('customer_id')
@@ -214,7 +214,7 @@ class AnalyticsService
 
     public function getCartAbandonmentRate(Carbon $from, Carbon $to): float
     {
-        return (float) $this->remember("cart_abandonment", $from, $to, function () use ($from, $to) {
+        return (float) $this->remember('cart_abandonment', $from, $to, function () use ($from, $to) {
             $total = DB::table('checkout_sessions')
                 ->whereBetween('created_at', [$from->startOfDay(), $to->endOfDay()])
                 ->count();
@@ -285,7 +285,7 @@ class AnalyticsService
     /**
      * Build a complete date series filling gaps with default values.
      *
-     * @param  \Illuminate\Support\Collection<string, mixed>  $rows
+     * @param  Collection<string, mixed>  $rows
      * @param  callable(object|null): array<string, mixed>  $transform
      * @return Collection<int, array<string, mixed>>
      */

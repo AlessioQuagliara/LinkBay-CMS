@@ -24,7 +24,7 @@ class PlatformFeeRule extends Model
     ];
 
     protected $casts = [
-        'fee_pct'    => 'decimal:4',
+        'fee_pct' => 'decimal:4',
         'valid_from' => 'datetime',
         'valid_until' => 'datetime',
     ];
@@ -36,6 +36,6 @@ class PlatformFeeRule extends Model
 
     public function feePctAsPercent(): string
     {
-        return number_format((float) $this->fee_pct * 100, 1, ',', '.') . '%';
+        return number_format((float) $this->fee_pct * 100, 1, ',', '.').'%';
     }
 }

@@ -28,20 +28,21 @@ class DevSetup extends Command
     {
         if (app()->isProduction()) {
             $this->error('Questo comando non può girare in produzione.');
+
             return self::FAILURE;
         }
 
         $this->info('── Super Admin ─────────────────────────────────────────');
 
-        $adminEmail    = $this->option('admin-email');
+        $adminEmail = $this->option('admin-email');
         $adminPassword = $this->option('admin-password');
 
         $admin = User::firstOrCreate(
             ['email' => $adminEmail],
             [
-                'name'           => 'LinkBayCMS Admin',
-                'email'          => $adminEmail,
-                'password'       => Hash::make($adminPassword),
+                'name' => 'LinkBayCMS Admin',
+                'email' => $adminEmail,
+                'password' => Hash::make($adminPassword),
                 'is_super_admin' => true,
             ]
         );
@@ -55,23 +56,23 @@ class DevSetup extends Command
         }
 
         $this->info("  Password: {$adminPassword}");
-        $this->info("  URL:      " . config('app.url') . '/linkbay-admin/login');
+        $this->info('  URL:      '.config('app.url').'/linkbay-admin/login');
 
         $this->info('');
         $this->info('── Agenzia Test ────────────────────────────────────────');
 
-        $agencySlug    = $this->option('agency-slug');
-        $agencyEmail   = $this->option('agency-email');
+        $agencySlug = $this->option('agency-slug');
+        $agencyEmail = $this->option('agency-email');
         $agencyPassword = $this->option('agency-password');
         $centralDomain = config('app.central_domain', 'linkbay-cms.com');
 
         $agency = Agency::firstOrCreate(
             ['slug' => $agencySlug],
             [
-                'name'         => 'Test Agency',
-                'brand_name'   => 'Test Agency',
-                'slug'         => $agencySlug,
-                'status'       => 'active',
+                'name' => 'Test Agency',
+                'brand_name' => 'Test Agency',
+                'slug' => $agencySlug,
+                'status' => 'active',
                 'billing_type' => 'monthly',
             ]
         );
@@ -85,9 +86,9 @@ class DevSetup extends Command
         $owner = User::firstOrCreate(
             ['email' => $agencyEmail],
             [
-                'name'           => 'Agency Owner',
-                'email'          => $agencyEmail,
-                'password'       => Hash::make($agencyPassword),
+                'name' => 'Agency Owner',
+                'email' => $agencyEmail,
+                'password' => Hash::make($agencyPassword),
                 'is_super_admin' => false,
             ]
         );
@@ -100,7 +101,7 @@ class DevSetup extends Command
         }
 
         // Link owner to agency if not already linked
-        if (!$agency->owner_user_id) {
+        if (! $agency->owner_user_id) {
             $agency->update(['owner_user_id' => $owner->id]);
             $this->info("  Owner collegato all'agenzia");
         } elseif ((int) $agency->owner_user_id !== (int) $owner->id) {
@@ -115,7 +116,7 @@ class DevSetup extends Command
         $this->table(
             ['Ruolo', 'Email', 'Password', 'URL Login'],
             [
-                ['Super Admin', $adminEmail, $adminPassword, config('app.url') . '/linkbay-admin/login'],
+                ['Super Admin', $adminEmail, $adminPassword, config('app.url').'/linkbay-admin/login'],
                 ['Agency Owner', $agencyEmail, $agencyPassword, "http://{$agencySlug}.{$centralDomain}/dashboard/login"],
             ]
         );

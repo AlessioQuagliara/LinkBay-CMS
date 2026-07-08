@@ -4,20 +4,28 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\ContactSubmissionResource\Pages;
 use App\Models\Central\ContactSubmission;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Forms;
 use Filament\Tables;
 use Filament\Tables\Table;
 
 class ContactSubmissionResource extends Resource
 {
     protected static ?string $model = ContactSubmission::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-envelope';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Operations';
+
     protected static ?string $modelLabel = 'Contact Submission';
+
     protected static ?string $pluralModelLabel = 'Contact Submissions';
+
     protected static ?int $navigationSort = 10;
 
     public static function getNavigationBadge(): ?string
@@ -42,8 +50,8 @@ class ContactSubmissionResource extends Resource
                     Forms\Components\Select::make('status')
                         ->label('Status')
                         ->options([
-                            'new'      => 'New',
-                            'read'     => 'Read',
+                            'new' => 'New',
+                            'read' => 'Read',
                             'archived' => 'Archived',
                         ])
                         ->required(),
@@ -84,8 +92,8 @@ class ContactSubmissionResource extends Resource
                 Tables\Columns\SelectColumn::make('status')
                     ->label('Status')
                     ->options([
-                        'new'      => 'New',
-                        'read'     => 'Read',
+                        'new' => 'New',
+                        'read' => 'Read',
                         'archived' => 'Archived',
                     ])
                     ->sortable(),
@@ -97,17 +105,17 @@ class ContactSubmissionResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'new'      => 'New',
-                        'read'     => 'Read',
+                        'new' => 'New',
+                        'read' => 'Read',
                         'archived' => 'Archived',
                     ]),
             ])
             ->actions([
-                \Filament\Actions\EditAction::make()->label('View'),
+                EditAction::make()->label('View'),
             ])
             ->bulkActions([
-                \Filament\Actions\BulkActionGroup::make([
-                    \Filament\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -116,7 +124,7 @@ class ContactSubmissionResource extends Resource
     {
         return [
             'index' => Pages\ListContactSubmissions::route('/'),
-            'edit'  => Pages\ViewContactSubmission::route('/{record}/edit'),
+            'edit' => Pages\ViewContactSubmission::route('/{record}/edit'),
         ];
     }
 }

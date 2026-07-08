@@ -76,7 +76,7 @@ export const useCartStore = create<CartStore>()(
 
         set({ isLoading: true })
         try {
-          const res = await addCartItem(sessionId, productId, quantity, variantId)
+          await addCartItem(sessionId, productId, quantity, variantId)
           // Refresh the full cart
           await get().initCart()
           set({ isOpen: true })

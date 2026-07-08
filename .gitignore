@@ -74,6 +74,13 @@ backend/static/images/*
 *.sqlite3
 *.db
 
+# File/dir SQLite per-tenant creati da stancl/tenancy durante test reali (non
+# :memory:) o dev manuale (es. DevSetup) — restano su disco tra un run e
+# l'altro perché la creazione file non fa parte del rollback transazionale dei
+# test. Non tocca backend/database/{migrations,factories,seeders,schema}.
+backend/database/tenant*
+backend/database/database.sqlite
+
 # ==========================================================
 # Docker
 # ==========================================================

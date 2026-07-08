@@ -10,6 +10,7 @@ use App\Models\Central\AiCreditPackage;
 use App\Services\AiCreditsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Stripe\Checkout\Session;
 use Stripe\Stripe;
 
 class AiCreditsController extends Controller
@@ -40,7 +41,7 @@ class AiCreditsController extends Controller
         Stripe::setApiKey(config('services.stripe.secret'));
 
         $sessionId = $request->query('session_id');
-        $session = \Stripe\Checkout\Session::retrieve($sessionId);
+        $session = Session::retrieve($sessionId);
 
         if ($session->payment_status !== 'paid') {
             return response()->json(['error' => 'Payment not completed'], 402);
@@ -55,7 +56,7 @@ class AiCreditsController extends Controller
 
             // Idempotenza: il webhook checkout.session.completed potrebbe aver già creditato
             $alreadyCredited = AiCreditLedger::where('stripe_payment_intent_id', $paymentIntentId)->exists();
-            if (!$alreadyCredited) {
+            if (! $alreadyCredited) {
                 $this->credits->purchase($agency, $package, $paymentIntentId);
             }
 

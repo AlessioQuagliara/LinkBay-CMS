@@ -78,7 +78,10 @@ return [
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
             'username' => env('LOG_SLACK_USERNAME', env('APP_NAME', 'Laravel')),
             'emoji' => env('LOG_SLACK_EMOJI', ':boom:'),
-            'level' => env('LOG_LEVEL', 'critical'),
+            // Deliberately its own env var, not LOG_LEVEL: local/staging run with
+            // LOG_LEVEL=debug for the file logs, which would otherwise flood Slack
+            // with every debug line once 'slack' is added to LOG_STACK.
+            'level' => env('LOG_SLACK_LEVEL', 'critical'),
             'replace_placeholders' => true,
         ],
 

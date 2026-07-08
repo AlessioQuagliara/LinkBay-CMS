@@ -4,10 +4,13 @@ namespace App\Filament\Tenant\Resources;
 
 use App\Filament\Tenant\Resources\CollectionResource\Pages;
 use App\Models\Tenant\Collection;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Schemas\Schema;
-
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
@@ -15,10 +18,15 @@ use Illuminate\Support\Str;
 class CollectionResource extends Resource
 {
     protected static ?string $model = Collection::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-folder';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Catalogo';
+
     protected static ?string $modelLabel = 'Collezione';
+
     protected static ?string $pluralModelLabel = 'Collezioni';
+
     protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
@@ -29,8 +37,7 @@ class CollectionResource extends Resource
                 ->required()
                 ->maxLength(255)
                 ->live(onBlur: true)
-                ->afterStateUpdated(fn ($state, Set $set) =>
-                    $set('slug', Str::slug($state))
+                ->afterStateUpdated(fn ($state, Set $set) => $set('slug', Str::slug($state))
                 ),
             Forms\Components\TextInput::make('slug')
                 ->label('Slug')
@@ -79,12 +86,12 @@ class CollectionResource extends Resource
                     ->label('Attiva'),
             ])
             ->actions([
-                \Filament\Actions\EditAction::make(),
-                \Filament\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                \Filament\Actions\BulkActionGroup::make([
-                    \Filament\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

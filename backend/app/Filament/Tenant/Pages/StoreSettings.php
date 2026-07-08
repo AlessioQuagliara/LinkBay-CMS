@@ -3,9 +3,7 @@
 namespace App\Filament\Tenant\Pages;
 
 use App\Models\Tenant\Setting;
-use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
-
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 
@@ -14,12 +12,17 @@ class StoreSettings extends Page
     use InteractsWithForms;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Impostazioni';
+
     protected static ?string $navigationLabel = 'Impostazioni negozio';
+
     protected string $view = 'filament.tenant.pages.store-settings';
 
     public array $storeData = [];
+
     public array $seoData = [];
+
     public array $paymentData = [];
 
     public function mount(): void

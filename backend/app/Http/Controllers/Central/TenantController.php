@@ -9,8 +9,6 @@ use App\Models\Central\Tenant;
 use App\Services\TenantProvisioningService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Validation\ValidationException;
 
 class TenantController extends Controller
 {
@@ -21,8 +19,8 @@ class TenantController extends Controller
     public function index(Request $request): JsonResponse
     {
         $tenants = Tenant::with(['plan', 'subscription'])
-            ->when($request->search, fn($q) => $q->where('name', 'like', "%{$request->search}%"))
-            ->when($request->status, fn($q) => $q->where('status', $request->status))
+            ->when($request->search, fn ($q) => $q->where('name', 'like', "%{$request->search}%"))
+            ->when($request->status, fn ($q) => $q->where('status', $request->status))
             ->latest()
             ->paginate($request->per_page ?? 15);
 
@@ -32,6 +30,7 @@ class TenantController extends Controller
     public function show(string $id): JsonResponse
     {
         $tenant = Tenant::with(['plan', 'subscription'])->findOrFail($id);
+
         return response()->json(['data' => $tenant]);
     }
 

@@ -4,19 +4,24 @@ namespace App\Filament\Tenant\Resources;
 
 use App\Filament\Tenant\Resources\ShippingMethodResource\Pages;
 use App\Models\Tenant\ShippingMethod;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Schemas\Schema;
-
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
 class ShippingMethodResource extends Resource
 {
     protected static ?string $model = ShippingMethod::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-truck';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Impostazioni';
+
     protected static ?string $modelLabel = 'Metodo spedizione';
+
     protected static ?string $pluralModelLabel = 'Metodi spedizione';
 
     public static function form(Schema $schema): Schema
@@ -52,8 +57,8 @@ class ShippingMethodResource extends Resource
                 Tables\Columns\ToggleColumn::make('is_active')->label('Attivo'),
             ])
             ->actions([
-                \Filament\Actions\EditAction::make(),
-                \Filament\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ]);
     }
 

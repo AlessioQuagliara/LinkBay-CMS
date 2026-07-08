@@ -15,11 +15,11 @@ class ContactController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'        => ['required', 'string', 'max:150'],
-            'company'     => ['required', 'string', 'max:150'],
-            'email'       => ['required', 'email', 'max:255'],
+            'name' => ['required', 'string', 'max:150'],
+            'company' => ['required', 'string', 'max:150'],
+            'email' => ['required', 'email', 'max:255'],
             'store_count' => ['nullable', 'string', 'max:50'],
-            'message'     => ['required', 'string', 'max:5000'],
+            'message' => ['required', 'string', 'max:5000'],
         ]);
 
         ContactSubmission::create([

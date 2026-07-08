@@ -8,12 +8,15 @@ use App\Events\Tenant\CustomerRegistered;
 use App\Events\Tenant\OrderPlaced;
 use App\Events\Tenant\OrderRefunded;
 use App\Events\Tenant\OrderShipped;
+use App\Listeners\CheckApplicationHealth;
+use App\Listeners\Tenant\CheckLowStock;
 use App\Listeners\Tenant\NotifyAdminOfNewOrder;
 use App\Listeners\Tenant\SendOrderConfirmationEmail;
 use App\Listeners\Tenant\SendOrderRefundedEmail;
 use App\Listeners\Tenant\SendOrderShippedEmail;
 use App\Listeners\Tenant\SendWelcomeEmail;
-use Illuminate\Database\Eloquent\Events\Saved;
+use App\Models\Tenant\OrderItem;
+use Illuminate\Foundation\Events\DiagnosingHealth;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -32,14 +35,16 @@ class EventServiceProvider extends ServiceProvider
         CustomerRegistered::class => [
             SendWelcomeEmail::class,
         ],
+        DiagnosingHealth::class => [
+            CheckApplicationHealth::class,
+        ],
     ];
 
     public function boot(): void
     {
-        // Low-stock check via Eloquent model event (Saved on OrderItem)
-        \App\Models\Tenant\OrderItem::saved(function (\App\Models\Tenant\OrderItem $item) {
-            $event = new Saved($item);
-            app(\App\Listeners\Tenant\CheckLowStock::class)->handle($event);
+        // Low-stock check via Eloquent model event (saved on OrderItem)
+        OrderItem::saved(function (OrderItem $item) {
+            app(CheckLowStock::class)->handle($item);
         });
     }
 }

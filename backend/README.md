@@ -1,58 +1,101 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# backend — LinkBayCMS
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel 13 / Filament 5 multi-tenant backend: piattaforma SaaS B2B per agenzie
+digitali che rivendono e gestiscono negozi (store) per i propri clienti.
+Multi-tenancy fisica via [stancl/tenancy](https://tenancyforlaravel.com/) —
+un database per tenant, non solo scoping a livello di query.
 
-## About Laravel
+## Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.3+, Laravel 13, Filament 5
+- Postgres (central + per-tenant), Redis (cache/queue/session)
+- Sanctum per l'autenticazione a token (customer storefront, API tenant)
+- Stripe (billing agenzia a livello centrale, checkout storefront a livello tenant)
+- PHPUnit su SQLite `:memory:` per i test (vedi `phpunit.xml`) — nessuna
+  dipendenza da Postgres/Redis per lanciare la suite
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Architettura: central DB vs tenant DB
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Central**: `App\Models\Central\*` — Agency, AgencyClient, Tenant (= lo
+  store), Plan, Subscription, BillingEvent, AuditEvent, ecc. Vive nel
+  database Postgres "centrale".
+- **Tenant**: `App\Models\Tenant\*` — Product, Order, Customer, CartSession,
+  CheckoutSession, ShippingMethod, ecc. Ogni store ha il proprio database
+  fisico, inizializzato da `TenantProvisioningService` e risolto a runtime
+  dal dominio della richiesta (`Stancl\Tenancy\Middleware\InitializeTenancyByDomain`).
+- Un tenant viene registrato su **due domini diversi** (vedi
+  `TenantProvisioningService::registerDomain`): il dominio dello store
+  (`{tenant_id}.STORE_DOMAIN`, es. `acme.yoursite-linkbay-cms.com`) serve il
+  pannello Filament `/admin` del tenant e le API storefront
+  (`api/store/*`, `api/v1/*`). Le pagine storefront vere e proprie (Next.js)
+  vivono invece su un subdomain di `CENTRAL_DOMAIN` — vedi `frontend/README.md`.
 
-## Learning Laravel
+## I tre pannelli Filament
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| Panel | Path | Dominio | Provider | Per chi |
+|---|---|---|---|---|
+| Admin (superadmin) | `/linkbay-admin` | `admin.CENTRAL_DOMAIN` (prod) / `ADMIN_DOMAIN` (locale) | `AdminPanelProvider` | Gestione piattaforma: agenzie, piani, tenant, fatturazione |
+| Agency | `/dashboard` | qualsiasi dominio centrale (nessun domain-lock, l'agenzia è risolta dall'utente loggato) | `AgencyPanelProvider` | Agenzie: clienti, store, commissioni, entitlement |
+| Tenant | `/admin` | `{tenant_id}.STORE_DOMAIN` (domain-lock via `InitializeTenancyByDomain`) | `TenantPanelProvider` | Store owner: prodotti, ordini, clienti, spedizioni |
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Come si avvia
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Con Docker (consigliato — vedi `../compose.yaml` e
+`../compose.override.local.yml` per lo sviluppo locale):
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+cp ../.env.example ../.env              # valorizza CENTRAL_DOMAIN, STORE_DOMAIN, Stripe keys
+cp .env.example .env
+docker compose -f ../compose.yaml -f ../compose.override.local.yml up -d
+docker compose exec php php artisan migrate --force
+docker compose exec php php artisan db:seed --class=PlanSeeder
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Guida completa passo-passo (agency → tenant → Stripe test mode):
+[`docs/local-full-flow-testing.md`](../docs/local-full-flow-testing.md).
 
-## Contributing
+Senza Docker (solo backend, `composer run dev` avvia anche queue listener,
+log tailing e Vite):
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --force
+composer run dev
+```
 
-## Code of Conduct
+## Test
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan test --compact                        # tutta la suite
+php artisan test --compact tests/Feature/Tenant    # solo una cartella
+php artisan test --compact --filter=nomeTest       # un test specifico
+vendor/bin/pint --dirty --format agent             # style fix sui file modificati
+```
 
-## Security Vulnerabilities
+Note sull'ambiente di test:
+- `tests/TenantIsolationTestCase.php` prova l'isolamento fisico dei dati fra
+  tenant con due connessioni SQLite in-memory indipendenti, non solo scoping
+  a livello di query — vedi `tests/Feature/Tenant/TenantIsolationTest.php`.
+- `tests/Concerns/InteractsWithTenantRoutes.php` bypassa solo il middleware
+  di risoluzione del tenant da dominio nei test HTTP (che girano su una
+  singola connessione SQLite in-memory senza un vero Host header) — il resto
+  dello stack (route, form request, controller, service, DB) gira per davvero.
+- Se lanci `vendor/bin/phpunit`/`php artisan test` direttamente da CLI locale
+  (fuori da Docker/CI) e ottieni un `Fatal error: Allowed memory size
+  exhausted`, il tuo `php.ini` locale ha probabilmente `memory_limit=128M` —
+  CI non ne risente (i runner GitHub Actions partono con `memory_limit=-1`).
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Documentazione
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- [`docs/demo-runbook.md`](../docs/demo-runbook.md) — flusso demo end-to-end
+  (shipping method → prodotto → checkout → conferma ordine)
+- [`docs/pre-demo-checklist.md`](../docs/pre-demo-checklist.md) — checklist
+  pre-demo/pre-beta
+- [`docs/staging-deploy.md`](../docs/staging-deploy.md) — proposta di deploy
+  su staging (nessun ambiente staging esiste ancora)
+- [`docs/local-full-flow-testing.md`](../docs/local-full-flow-testing.md) —
+  setup locale dettagliato con routing Traefik
+- [`../frontend/README.md`](../frontend/README.md) — storefront Next.js
+  (routing tenant, integrazione API)

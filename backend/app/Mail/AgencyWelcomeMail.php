@@ -25,7 +25,7 @@ class AgencyWelcomeMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Benvenuto su LinkBay CMS — ' . $this->agency->name,
+            subject: 'Benvenuto su LinkBay CMS — '.$this->agency->name,
         );
     }
 
@@ -35,9 +35,9 @@ class AgencyWelcomeMail extends Mailable
             markdown: 'emails.agency.welcome',
             with: [
                 'agencyName' => $this->agency->name,
-                'ownerName'  => $this->owner->name,
-                'loginUrl'   => $this->loginUrl,
-                'isPending'  => $this->agency->status === 'pending',
+                'ownerName' => $this->owner->name,
+                'loginUrl' => $this->loginUrl,
+                'isPending' => $this->agency->status === 'pending',
             ],
         );
     }

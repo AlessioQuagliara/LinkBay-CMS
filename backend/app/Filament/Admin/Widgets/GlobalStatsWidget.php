@@ -4,8 +4,6 @@ namespace App\Filament\Admin\Widgets;
 
 use App\Models\Central\Agency;
 use App\Models\Central\AiCreditLedger;
-use App\Models\Central\Plan;
-use App\Models\Central\Subscription;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -35,7 +33,7 @@ class GlobalStatsWidget extends BaseWidget
                 ->color('success')
                 ->icon('heroicon-o-building-office-2'),
 
-            Stat::make('MRR', '€ ' . number_format($mrr, 2, ',', '.'))
+            Stat::make('MRR', '€ '.number_format($mrr, 2, ',', '.'))
                 ->description('Monthly Recurring Revenue')
                 ->color('info')
                 ->icon('heroicon-o-banknotes'),

@@ -14,6 +14,9 @@ interface AuthStore {
   register: (payload: RegisterPayload) => Promise<void>
   logout: () => Promise<void>
   fetchProfile: () => Promise<void>
+  /** Clears local auth state without calling the API — used when the server
+   * already rejected the token (401) and there is nothing left to revoke. */
+  clearAuth: () => void
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -62,6 +65,10 @@ export const useAuthStore = create<AuthStore>()(
         } catch {
           set({ token: null, customer: null })
         }
+      },
+
+      clearAuth() {
+        set({ token: null, customer: null })
       },
     }),
     {

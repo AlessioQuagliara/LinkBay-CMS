@@ -23,14 +23,14 @@ class CommissionSnapshotTest extends CentralTestCase
 
         // Crea CommissionRecord con piano A (fee 30%)
         $commission = CommissionRecord::create([
-            'agency_id'            => $agency->id,
+            'agency_id' => $agency->id,
             'platform_fee_rule_id' => $ruleA->id,
-            'gross_amount_cents'   => 10000,
-            'fee_pct'              => $ruleA->fee_pct,
-            'fee_amount_cents'     => 3000,
-            'net_to_agency_cents'  => 7000,
-            'currency'             => 'eur',
-            'status'               => CommissionRecord::STATUS_PENDING,
+            'gross_amount_cents' => 10000,
+            'fee_pct' => $ruleA->fee_pct,
+            'fee_amount_cents' => 3000,
+            'net_to_agency_cents' => 7000,
+            'currency' => 'eur',
+            'status' => CommissionRecord::STATUS_PENDING,
         ]);
 
         // Aggiorna piano dell'agency a PlanB
@@ -45,8 +45,8 @@ class CommissionSnapshotTest extends CentralTestCase
 
     public function test_commission_records_are_scoped_to_agency(): void
     {
-        $plan   = Plan::create(['name' => 'P', 'slug' => 'p', 'price' => 10, 'billing_interval' => 'month', 'is_active' => true, 'sort_order' => 1]);
-        $rule   = PlatformFeeRule::create(['plan_id' => null, 'billing_type' => null, 'fee_pct' => 0.2000, 'fee_type' => 'platform_share', 'valid_from' => now()->subDay()]);
+        $plan = Plan::create(['name' => 'P', 'slug' => 'p', 'price' => 10, 'billing_interval' => 'month', 'is_active' => true, 'sort_order' => 1]);
+        $rule = PlatformFeeRule::create(['plan_id' => null, 'billing_type' => null, 'fee_pct' => 0.2000, 'fee_type' => 'platform_share', 'valid_from' => now()->subDay()]);
 
         $agencyA = Agency::create(['name' => 'A', 'slug' => 'a', 'brand_name' => 'A', 'plan_id' => $plan->id, 'billing_type' => 'monthly', 'status' => 'active']);
         $agencyB = Agency::create(['name' => 'B', 'slug' => 'b', 'brand_name' => 'B', 'plan_id' => $plan->id, 'billing_type' => 'monthly', 'status' => 'active']);

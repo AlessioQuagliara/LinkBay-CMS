@@ -19,14 +19,14 @@ class CheckAiCredits
     {
         $agency = $this->resolveAgency($request);
 
-        if ($agency && !$this->credits->hasCredits($agency, $required)) {
+        if ($agency && ! $this->credits->hasCredits($agency, $required)) {
             $balance = $this->credits->getBalance($agency);
 
             return response()->json([
                 'error' => 'insufficient_credits',
                 'balance' => $balance,
                 'required' => $required,
-                'purchase_url' => url('/credits/buy?agency=' . $agency->id),
+                'purchase_url' => url('/credits/buy?agency='.$agency->id),
             ], 402);
         }
 
@@ -37,7 +37,7 @@ class CheckAiCredits
                 'error' => 'insufficient_credits',
                 'balance' => $e->balance,
                 'required' => $e->required,
-                'purchase_url' => url('/credits/buy?agency=' . ($agency?->id ?? '')),
+                'purchase_url' => url('/credits/buy?agency='.($agency?->id ?? '')),
             ], 402);
         }
     }
@@ -48,7 +48,8 @@ class CheckAiCredits
             if (tenancy()->initialized()) {
                 return tenant()->agency;
             }
-        } catch (\Throwable) {}
+        } catch (\Throwable) {
+        }
 
         return $request->user()?->agency ?? null;
     }

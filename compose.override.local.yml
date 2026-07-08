@@ -17,17 +17,26 @@
 #
 # Domini locali supportati (richiedono /etc/hosts o dnsmasq):
 #
-#   --- Agency panel (CENTRAL_DOMAIN) ---
+#   --- Laravel centrale: agency dashboard, superadmin, registrazione (CENTRAL_DOMAIN) ---
 #   127.0.0.1  linkbay-cms.test
 #   127.0.0.1  app.linkbay-cms.test
 #   127.0.0.1  admin.linkbay-cms.test
-#   127.0.0.1  testagency.linkbay-cms.test
+#   127.0.0.1  api.linkbay-cms.test
+#
+#   --- Storefront Next.js del tenant: shop/cart/checkout/account (CENTRAL_DOMAIN,
+#       stesso dominio dei tre host sopra ma QUALSIASI altro subdomain — vedi
+#       frontend-test-wildcard più sotto) ---
+#   Aggiungere una riga per ogni store creato, es:
 #   127.0.0.1  clientalpha.linkbay-cms.test
 #
-#   --- Tenant/store cliente (STORE_DOMAIN) ---
-#   Aggiungere una riga per ogni store creato, es:
-#   127.0.0.1  acme.yoursite-linkbay-cms.test
-#   127.0.0.1  beta-store.yoursite-linkbay-cms.test
+#   --- Backend Laravel del tenant: pannello Filament /admin + api/store/* +
+#       api/v1/* (STORE_DOMAIN — dominio DIVERSO da quello sopra, anche se lo
+#       slug è lo stesso) ---
+#   127.0.0.1  clientalpha.yoursite-linkbay-cms.test
+#
+# Nota: uno store "clientalpha" usa entrambi gli host, per due scopi diversi —
+# non sono intercambiabili (vedi TenantProvisioningService::registerDomain,
+# che registra solo il secondo come dominio tenant lato Laravel).
 #
 # Protocollo: HTTP puro (porta 80). Nessun TLS locale.
 # =============================================================================
@@ -51,7 +60,10 @@ services:
 
   frontend:
     environment:
-      NEXT_PUBLIC_API_BASE_URL: http://app.linkbay-cms.test
+      # {slug} viene sostituito a runtime con il tenant slug risolto dal middleware —
+      # il backend risolve il tenant dal dominio della richiesta (STORE_DOMAIN), un
+      # dominio centrale/condiviso qui viene rifiutato da PreventAccessFromCentralDomains.
+      NEXT_PUBLIC_API_BASE_URL: http://{slug}.yoursite-linkbay-cms.test
     labels:
       # Override: aggiungi i router .test per il frontend locale
       - "traefik.enable=true"
@@ -60,6 +72,15 @@ services:
       - "traefik.http.routers.frontend-test.rule=Host(`linkbay-cms.test`) || Host(`www.linkbay-cms.test`)"
       - "traefik.http.routers.frontend-test.entrypoints=web"
       - "traefik.http.routers.frontend-test.service=frontend-svc"
+      # Storefront tenant di un negozio: {slug}.linkbay-cms.test → Next.js, che fa
+      # da lì il rewrite verso /storefront (middleware.ts + NEXT_PUBLIC_MAIN_DOMAIN,
+      # da impostare a linkbay-cms.test in .env.local — vedi .env.local.example).
+      # Priorità più bassa di test-wildcard qui sotto: per app./admin./api.test
+      # vince sempre nginx/Laravel, per qualsiasi altro subdomain vince questo.
+      - "traefik.http.routers.frontend-test-wildcard.rule=HostRegexp(`[a-z0-9-]+\\.linkbay-cms\\.test`)"
+      - "traefik.http.routers.frontend-test-wildcard.entrypoints=web"
+      - "traefik.http.routers.frontend-test-wildcard.service=frontend-svc"
+      - "traefik.http.routers.frontend-test-wildcard.priority=1"
       # Fallback localhost → Next.js
       - "traefik.http.routers.frontend-local.rule=Host(`localhost`) || Host(`www.localhost`)"
       - "traefik.http.routers.frontend-local.entrypoints=web"
@@ -69,11 +90,17 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.nginx-svc.loadbalancer.server.port=80"
-      # *.linkbay-cms.test → nginx → Laravel (agency panel, app, admin)
-      # Traefik v3 RE2: dots escaped, no named capture groups
-      - "traefik.http.routers.test-wildcard.rule=HostRegexp(`[a-z0-9-]+\\.linkbay-cms\\.test`)"
+      # Solo gli host centrali Laravel (agency panel, app, admin) — NON un
+      # wildcard *.linkbay-cms.test generico: la storefront di un tenant vive
+      # sullo stesso dominio padre (frontend-test-wildcard sopra) e deve
+      # arrivare al container Next.js, non a Laravel (che non ha viste
+      # storefront proprie). Priorità esplicita più alta così questi 3 host
+      # vincono sempre sul wildcard frontend. Vedi config/tenancy.php
+      # central_domains per la lista lato Laravel.
+      - "traefik.http.routers.test-wildcard.rule=Host(`app.linkbay-cms.test`) || Host(`admin.linkbay-cms.test`) || Host(`api.linkbay-cms.test`)"
       - "traefik.http.routers.test-wildcard.entrypoints=web"
       - "traefik.http.routers.test-wildcard.service=nginx-svc"
+      - "traefik.http.routers.test-wildcard.priority=100"
       # *.yoursite-linkbay-cms.test → nginx → Laravel (tenant/store cliente)
       - "traefik.http.routers.test-store-wildcard.rule=HostRegexp(`[a-z0-9-]+\\.yoursite-linkbay-cms\\.test`)"
       - "traefik.http.routers.test-store-wildcard.entrypoints=web"

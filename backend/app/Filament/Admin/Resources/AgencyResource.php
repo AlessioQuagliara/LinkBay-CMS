@@ -5,12 +5,14 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\AgencyResource\Pages;
 use App\Models\Central\Agency;
 use App\Services\AiCreditsService;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,9 +20,13 @@ use Filament\Tables\Table;
 class AgencyResource extends Resource
 {
     protected static ?string $model = Agency::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-library';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Tenancy';
+
     protected static ?string $modelLabel = 'Agenzia';
+
     protected static ?string $pluralModelLabel = 'Agenzie';
 
     public static function form(Schema $schema): Schema
@@ -86,19 +92,19 @@ class AgencyResource extends Resource
                 Tables\Columns\TextColumn::make('name')->label('Nome')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('custom_domain')
                     ->label('Dominio')
-                    ->state(fn ($record) => $record->custom_domain ?? $record->slug . '.linkbay-cms.com')
+                    ->state(fn ($record) => $record->custom_domain ?? $record->slug.'.linkbay-cms.com')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('plan.name')->label('Piano')->badge()->color('info'),
                 Tables\Columns\TextColumn::make('billing_type')
                     ->label('Billing')
                     ->badge()
-                    ->color(fn ($state) => match($state) {
+                    ->color(fn ($state) => match ($state) {
                         'monthly' => 'info',
                         'yearly' => 'success',
                         'lifetime' => 'warning',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn ($state) => match($state) {
+                    ->formatStateUsing(fn ($state) => match ($state) {
                         'monthly' => 'Mensile', 'yearly' => 'Annuale',
                         'lifetime' => 'Lifetime', default => $state,
                     }),
@@ -116,7 +122,7 @@ class AgencyResource extends Resource
                     ->boolean(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn ($state) => match($state) {
+                    ->color(fn ($state) => match ($state) {
                         'active' => 'success', 'suspended' => 'warning',
                         'cancelled' => 'danger', default => 'gray',
                     }),
@@ -131,13 +137,13 @@ class AgencyResource extends Resource
                     ->options(['monthly' => 'Mensile', 'yearly' => 'Annuale', 'lifetime' => 'Lifetime']),
             ])
             ->actions([
-                \Filament\Actions\EditAction::make(),
-                \Filament\Actions\Action::make('impersonate')
+                EditAction::make(),
+                Action::make('impersonate')
                     ->label('Login')
                     ->icon('heroicon-o-arrow-right-on-rectangle')
-                    ->url(fn (Agency $record) => 'http://' . $record->panelDomain() . '/dashboard')
+                    ->url(fn (Agency $record) => 'http://'.$record->panelDomain().'/dashboard')
                     ->openUrlInNewTab(),
-                \Filament\Actions\Action::make('add_bonus_credits')
+                Action::make('add_bonus_credits')
                     ->label('Bonus AI')
                     ->icon('heroicon-o-sparkles')
                     ->color('warning')
@@ -149,16 +155,16 @@ class AgencyResource extends Resource
                         app(AiCreditsService::class)->addBonus($record, (int) $data['credits'], $data['reason']);
                         Notification::make()->title("Bonus {$data['credits']} crediti aggiunto")->success()->send();
                     }),
-                \Filament\Actions\Action::make('suspend')
+                Action::make('suspend')
                     ->label('Sospendi')->icon('heroicon-o-pause-circle')->color('warning')
                     ->requiresConfirmation()
                     ->visible(fn (Agency $r) => $r->status === 'active')
                     ->action(fn (Agency $r) => $r->update(['status' => 'suspended'])),
-                \Filament\Actions\Action::make('reactivate')
+                Action::make('reactivate')
                     ->label('Riattiva')->icon('heroicon-o-play-circle')->color('success')
                     ->visible(fn (Agency $r) => $r->status !== 'active')
                     ->action(fn (Agency $r) => $r->update(['status' => 'active'])),
-                \Filament\Actions\DeleteAction::make(),
+                DeleteAction::make(),
             ])
             ->defaultSort('created_at', 'desc');
     }

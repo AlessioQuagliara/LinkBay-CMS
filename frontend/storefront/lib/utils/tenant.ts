@@ -20,9 +20,13 @@ export function getClientTenantSlug(): string | null {
   return extractTenantSlug(window.location.hostname)
 }
 
-/** Build the tenant API base URL. */
+/**
+ * Build the tenant API base URL by substituting the `{slug}` placeholder in
+ * NEXT_PUBLIC_API_BASE_URL (e.g. `https://{slug}.yoursite-linkbay-cms.com`)
+ * with the resolved tenant slug. Matches the tenant's real domain on the
+ * Laravel backend (see TenantProvisioningService::registerDomain).
+ */
 export function tenantApiUrl(slug: string): string {
-  const base =
-    process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://{slug}.api.linkbay-cms.com'
+  const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? ''
   return base.replace('{slug}', slug)
 }

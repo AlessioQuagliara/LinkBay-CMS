@@ -7,17 +7,11 @@ namespace App\Listeners\Tenant;
 use App\Models\Tenant\OrderItem;
 use App\Models\Tenant\User;
 use App\Notifications\Tenant\LowStockNotification;
-use Illuminate\Database\Eloquent\Events\Saved;
 
 class CheckLowStock
 {
-    public function handle(Saved $event): void
+    public function handle(OrderItem $orderItem): void
     {
-        if (! ($event->model instanceof OrderItem)) {
-            return;
-        }
-
-        $orderItem = $event->model;
         $product = $orderItem->product;
 
         if (! $product) {

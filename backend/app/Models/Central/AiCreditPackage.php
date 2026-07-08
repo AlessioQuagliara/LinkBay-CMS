@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models\Central;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class AiCreditPackage extends Model
 {
@@ -31,7 +31,7 @@ class AiCreditPackage extends Model
 
     public function priceFormatted(): string
     {
-        return '€' . number_format($this->price_cents / 100, 2, ',', '.');
+        return '€'.number_format($this->price_cents / 100, 2, ',', '.');
     }
 
     public function scopeActive($query)

@@ -5,20 +5,28 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\TenantResource\Pages;
 use App\Models\Central\Tenant;
 use App\Services\TenantProvisioningService;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Schemas\Schema;
-
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
 class TenantResource extends Resource
 {
     protected static ?string $model = Tenant::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-office-2';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Tenancy';
+
     protected static ?string $modelLabel = 'Tenant';
+
     protected static ?string $pluralModelLabel = 'Tenant';
 
     public static function form(Schema $schema): Schema
@@ -31,7 +39,7 @@ class TenantResource extends Resource
                 ->label('Domain / ID')
                 ->required()
                 ->unique(Tenant::class, 'id', ignoreRecord: true)
-                ->helperText('Es: cliente1 → cliente1.' . config('app.store_domain', 'yoursite-linkbay-cms.com')),
+                ->helperText('Es: cliente1 → cliente1.'.config('app.store_domain', 'yoursite-linkbay-cms.com')),
             Forms\Components\Select::make('plan_id')
                 ->label('Piano')
                 ->relationship('plan', 'name')
@@ -65,7 +73,7 @@ class TenantResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('id')
                     ->label('Domain')
-                    ->formatStateUsing(fn ($state) => $state . '.' . config('app.store_domain')),
+                    ->formatStateUsing(fn ($state) => $state.'.'.config('app.store_domain')),
                 Tables\Columns\TextColumn::make('plan.name')
                     ->label('Piano')
                     ->badge()
@@ -73,7 +81,7 @@ class TenantResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->label('Stato')
                     ->badge()
-                    ->color(fn ($state) => match($state) {
+                    ->color(fn ($state) => match ($state) {
                         'active' => 'success',
                         'suspended' => 'warning',
                         'cancelled' => 'danger',
@@ -89,8 +97,8 @@ class TenantResource extends Resource
                     ->options(['active' => 'Attivo', 'suspended' => 'Sospeso', 'cancelled' => 'Cancellato']),
             ])
             ->actions([
-                \Filament\Actions\EditAction::make(),
-                \Filament\Actions\Action::make('provision')
+                EditAction::make(),
+                Action::make('provision')
                     ->label('Provisioning')
                     ->icon('heroicon-o-server')
                     ->color('success')
@@ -101,17 +109,17 @@ class TenantResource extends Resource
                         $service->initializeDatabase($record);
                         Notification::make()->title('Tenant provisionato')->success()->send();
                     }),
-                \Filament\Actions\Action::make('suspend')
+                Action::make('suspend')
                     ->label('Sospendi')
                     ->icon('heroicon-o-pause-circle')
                     ->color('warning')
                     ->requiresConfirmation()
                     ->action(fn (Tenant $record) => $record->update(['status' => 'suspended'])),
-                \Filament\Actions\DeleteAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                \Filament\Actions\BulkActionGroup::make([
-                    \Filament\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

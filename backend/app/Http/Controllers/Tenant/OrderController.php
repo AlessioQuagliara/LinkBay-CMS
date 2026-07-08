@@ -14,10 +14,10 @@ class OrderController extends Controller
     public function index(Request $request): JsonResponse
     {
         $orders = Order::with(['customer', 'items', 'shippingMethod'])
-            ->when($request->status, fn($q) => $q->where('status', $request->status))
-            ->when($request->customer_id, fn($q) => $q->where('customer_id', $request->customer_id))
-            ->when($request->from, fn($q) => $q->where('created_at', '>=', $request->from))
-            ->when($request->to, fn($q) => $q->where('created_at', '<=', $request->to))
+            ->when($request->status, fn ($q) => $q->where('status', $request->status))
+            ->when($request->customer_id, fn ($q) => $q->where('customer_id', $request->customer_id))
+            ->when($request->from, fn ($q) => $q->where('created_at', '>=', $request->from))
+            ->when($request->to, fn ($q) => $q->where('created_at', '<=', $request->to))
             ->orderBy('created_at', 'desc')
             ->paginate($request->per_page ?? 20);
 

@@ -4,6 +4,11 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\JobPositionResource\Pages;
 use App\Models\Central\JobPosition;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -16,10 +21,15 @@ use Illuminate\Support\Str;
 class JobPositionResource extends Resource
 {
     protected static ?string $model = JobPosition::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-briefcase';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Careers';
+
     protected static ?string $modelLabel = 'Job Position';
+
     protected static ?string $pluralModelLabel = 'Job Positions';
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
@@ -33,7 +43,9 @@ class JobPositionResource extends Resource
                         ->maxLength(150)
                         ->live(onBlur: true)
                         ->afterStateUpdated(function (string $state, Set $set, string $operation) {
-                            if ($operation !== 'create') return;
+                            if ($operation !== 'create') {
+                                return;
+                            }
                             $set('slug', Str::slug($state));
                         }),
                     Forms\Components\TextInput::make('slug')
@@ -55,18 +67,18 @@ class JobPositionResource extends Resource
                     Forms\Components\Select::make('work_mode')
                         ->label('Work mode')
                         ->options([
-                            'remote'   => 'Remote',
-                            'hybrid'   => 'Hybrid',
-                            'on_site'  => 'On-site',
+                            'remote' => 'Remote',
+                            'hybrid' => 'Hybrid',
+                            'on_site' => 'On-site',
                         ])
                         ->default('remote')
                         ->required(),
                     Forms\Components\Select::make('employment_type')
                         ->label('Employment type')
                         ->options([
-                            'full_time'  => 'Full-time',
-                            'part_time'  => 'Part-time',
-                            'contract'   => 'Contract',
+                            'full_time' => 'Full-time',
+                            'part_time' => 'Part-time',
+                            'contract' => 'Contract',
                             'internship' => 'Internship',
                         ])
                         ->default('full_time')
@@ -78,9 +90,9 @@ class JobPositionResource extends Resource
                     Forms\Components\Select::make('status')
                         ->label('Status')
                         ->options([
-                            'draft'     => 'Draft',
+                            'draft' => 'Draft',
                             'published' => 'Published',
-                            'archived'  => 'Archived',
+                            'archived' => 'Archived',
                         ])
                         ->default('draft')
                         ->required()
@@ -170,26 +182,26 @@ class JobPositionResource extends Resource
                     ->label('Position')
                     ->searchable()
                     ->sortable()
-                    ->description(fn ($record) => $record->department . ' · ' . $record->location),
+                    ->description(fn ($record) => $record->department.' · '.$record->location),
                 Tables\Columns\TextColumn::make('employment_type')
                     ->label('Type')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => match($state) {
-                        'full_time'  => 'Full-time',
-                        'part_time'  => 'Part-time',
-                        'contract'   => 'Contract',
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'full_time' => 'Full-time',
+                        'part_time' => 'Part-time',
+                        'contract' => 'Contract',
                         'internship' => 'Internship',
-                        default      => $state,
+                        default => $state,
                     })
                     ->color('info'),
                 Tables\Columns\TextColumn::make('work_mode')
                     ->label('Mode')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => match($state) {
-                        'remote'  => 'Remote',
-                        'hybrid'  => 'Hybrid',
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'remote' => 'Remote',
+                        'hybrid' => 'Hybrid',
                         'on_site' => 'On-site',
-                        default   => $state,
+                        default => $state,
                     })
                     ->color('gray'),
                 Tables\Columns\IconColumn::make('featured')
@@ -200,11 +212,11 @@ class JobPositionResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn ($state) => match($state) {
+                    ->color(fn ($state) => match ($state) {
                         'published' => 'success',
-                        'draft'     => 'warning',
-                        'archived'  => 'gray',
-                        default     => 'gray',
+                        'draft' => 'warning',
+                        'archived' => 'gray',
+                        default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('applications_count')
                     ->label('Applications')
@@ -220,9 +232,9 @@ class JobPositionResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'draft'     => 'Draft',
+                        'draft' => 'Draft',
                         'published' => 'Published',
-                        'archived'  => 'Archived',
+                        'archived' => 'Archived',
                     ]),
                 Tables\Filters\SelectFilter::make('department')
                     ->options(fn () => JobPosition::query()
@@ -234,8 +246,8 @@ class JobPositionResource extends Resource
                     ->label('Featured only'),
             ])
             ->actions([
-                \Filament\Actions\EditAction::make(),
-                \Filament\Actions\Action::make('toggle_publish')
+                EditAction::make(),
+                Action::make('toggle_publish')
                     ->label(fn ($record) => $record->status === 'published' ? 'Unpublish' : 'Publish')
                     ->icon(fn ($record) => $record->status === 'published'
                         ? 'heroicon-o-eye-slash'
@@ -246,17 +258,17 @@ class JobPositionResource extends Resource
                             $record->update(['status' => 'draft']);
                         } else {
                             $record->update([
-                                'status'       => 'published',
+                                'status' => 'published',
                                 'published_at' => $record->published_at ?? now(),
                             ]);
                         }
                     })
                     ->requiresConfirmation(false),
-                \Filament\Actions\DeleteAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                \Filament\Actions\BulkActionGroup::make([
-                    \Filament\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -264,9 +276,9 @@ class JobPositionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListJobPositions::route('/'),
+            'index' => Pages\ListJobPositions::route('/'),
             'create' => Pages\CreateJobPosition::route('/create'),
-            'edit'   => Pages\EditJobPosition::route('/{record}/edit'),
+            'edit' => Pages\EditJobPosition::route('/{record}/edit'),
         ];
     }
 }

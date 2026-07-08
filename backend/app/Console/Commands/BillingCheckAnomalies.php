@@ -8,20 +8,23 @@ use App\Models\Central\Agency;
 use App\Models\Central\AgencySubscription;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
+use Stripe\Exception\InvalidRequestException;
 use Stripe\Stripe;
 use Stripe\Subscription as StripeSubscription;
 
 class BillingCheckAnomalies extends Command
 {
-    protected $signature   = 'billing:check-anomalies {--fix : Cancel orphaned Stripe subscriptions automatically}';
+    protected $signature = 'billing:check-anomalies {--fix : Cancel orphaned Stripe subscriptions automatically}';
+
     protected $description = 'Detect agencies with inconsistent billing state between local DB and Stripe';
 
     public function handle(): int
     {
         Stripe::setApiKey(config('services.stripe.secret'));
 
-        if (!config('services.stripe.secret')) {
+        if (! config('services.stripe.secret')) {
             $this->error('STRIPE_SECRET not configured.');
+
             return self::FAILURE;
         }
 
@@ -43,7 +46,9 @@ class BillingCheckAnomalies extends Command
             $anomalies++;
         }
 
-        if ($mismatch->isEmpty()) $this->info('  ✓ None found');
+        if ($mismatch->isEmpty()) {
+            $this->info('  ✓ None found');
+        }
 
         // ── 2. Agency sospesa ma subscription attiva su Stripe ───────────────
         $this->line('');
@@ -61,8 +66,8 @@ class BillingCheckAnomalies extends Command
                 if (in_array($stripe->status, ['active', 'trialing'], true)) {
                     $this->warn("  Agency #{$agency->id} ({$agency->slug}): suspended locally but Stripe sub is {$stripe->status}");
                     Log::warning('billing-anomaly: agency suspended but Stripe sub active', [
-                        'agency_id'    => $agency->id,
-                        'stripe_sub'   => $sub->stripe_subscription_id,
+                        'agency_id' => $agency->id,
+                        'stripe_sub' => $sub->stripe_subscription_id,
                         'stripe_status' => $stripe->status,
                     ]);
                     $anomalies++;
@@ -72,7 +77,9 @@ class BillingCheckAnomalies extends Command
             }
         }
 
-        if ($suspended->isEmpty()) $this->info('  ✓ None found');
+        if ($suspended->isEmpty()) {
+            $this->info('  ✓ None found');
+        }
 
         // ── 3. Agency senza subscription locale ma con stripe_customer_id ────
         $this->line('');
@@ -87,7 +94,9 @@ class BillingCheckAnomalies extends Command
             $anomalies++;
         }
 
-        if ($orphan->isEmpty()) $this->info('  ✓ None found');
+        if ($orphan->isEmpty()) {
+            $this->info('  ✓ None found');
+        }
 
         // ── 4. Subscription locale con stripe_subscription_id che non esiste su Stripe ──
         $this->line('');
@@ -104,7 +113,7 @@ class BillingCheckAnomalies extends Command
                         );
                         $anomalies++;
                     }
-                } catch (\Stripe\Exception\InvalidRequestException $e) {
+                } catch (InvalidRequestException $e) {
                     $this->error(
                         "  Sub #{$sub->id} (agency #{$sub->agency_id}): Stripe sub {$sub->stripe_subscription_id} not found — {$e->getMessage()}"
                     );

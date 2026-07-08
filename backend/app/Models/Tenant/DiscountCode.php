@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace App\Models\Tenant;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class DiscountCode extends Model
 {
     use HasFactory;
 
     const TYPE_PERCENTAGE = 'percentage';
+
     const TYPE_FIXED = 'fixed';
+
     const TYPE_FREE_SHIPPING = 'free_shipping';
 
     protected $fillable = [
@@ -44,7 +46,7 @@ class DiscountCode extends Model
 
     public function isValid(): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
         if ($this->expires_at && $this->expires_at->isPast()) {
@@ -53,6 +55,7 @@ class DiscountCode extends Model
         if ($this->usage_limit && $this->used_count >= $this->usage_limit) {
             return false;
         }
+
         return true;
     }
 }

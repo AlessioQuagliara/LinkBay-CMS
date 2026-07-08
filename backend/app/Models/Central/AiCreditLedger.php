@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class AiCreditLedger extends Model
 {
     protected $connection = 'central';
+
     protected $table = 'ai_credit_ledger';
 
     public $timestamps = false;
@@ -16,8 +17,11 @@ class AiCreditLedger extends Model
     const UPDATED_AT = null;
 
     const TYPE_PURCHASE = 'purchase';
+
     const TYPE_CONSUMPTION = 'consumption';
+
     const TYPE_REFUND = 'refund';
+
     const TYPE_BONUS = 'bonus';
 
     protected $fillable = [

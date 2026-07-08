@@ -14,7 +14,7 @@ class CustomerController extends Controller
     public function index(Request $request): JsonResponse
     {
         $customers = Customer::withCount('orders')
-            ->when($request->search, fn($q) => $q
+            ->when($request->search, fn ($q) => $q
                 ->where('name', 'like', "%{$request->search}%")
                 ->orWhere('email', 'like', "%{$request->search}%")
             )
@@ -64,6 +64,7 @@ class CustomerController extends Controller
     public function destroy(Customer $customer): JsonResponse
     {
         $customer->delete();
+
         return response()->json(['message' => 'Customer deleted successfully']);
     }
 }

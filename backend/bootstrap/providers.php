@@ -1,6 +1,7 @@
 <?php
 
 use App\Providers\AppServiceProvider;
+use App\Providers\EventServiceProvider;
 use App\Providers\Filament\AdminPanelProvider;
 use App\Providers\Filament\AgencyPanelProvider;
 use App\Providers\Filament\TenantPanelProvider;
@@ -9,7 +10,7 @@ use App\Providers\TenancyServiceProvider;
 
 return [
     AppServiceProvider::class,
-    \App\Providers\EventServiceProvider::class,
+    EventServiceProvider::class,
     PluginServiceProvider::class,
     TenancyServiceProvider::class,
     AdminPanelProvider::class,

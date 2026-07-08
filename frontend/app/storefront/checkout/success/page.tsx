@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { getOrder } from '@/storefront/lib/api/account'
+import { getOrderByCheckout } from '@/storefront/lib/api/checkout'
 import { useCartStore } from '@/storefront/lib/store/cartStore'
 import { formatPrice } from '@/storefront/lib/utils/currency'
 import { CheckCircle, Package, ArrowRight } from 'lucide-react'
@@ -29,6 +30,7 @@ function StatusBadge({ status }: { status: Order['status'] }) {
 function SuccessContent() {
   const params = useSearchParams()
   const orderId = Number(params.get('order'))
+  const checkoutId = Number(params.get('checkout'))
   const clearCart = useCartStore((s) => s.clearCart)
 
   // Clear cart on mount after successful payment
@@ -36,11 +38,16 @@ function SuccessContent() {
     clearCart()
   }, [clearCart])
 
-  const { data: order, isLoading } = useQuery({
-    queryKey: ['order', orderId],
-    queryFn: () => getOrder(orderId),
-    enabled: orderId > 0,
+  // Order lookup is scoped by checkout session id (works for guest checkouts —
+  // no auth required), falling back to the authenticated account endpoint only
+  // if a checkout id somehow isn't in the URL (e.g. an old/bookmarked link).
+  const { data: order, isLoading, isError } = useQuery({
+    queryKey: ['order', checkoutId || orderId],
+    queryFn: () =>
+      checkoutId > 0 ? getOrderByCheckout(checkoutId) : getOrder(orderId),
+    enabled: checkoutId > 0 || orderId > 0,
     staleTime: Infinity,
+    retry: false,
   })
 
   return (
@@ -65,6 +72,14 @@ function SuccessContent() {
           {[0, 1, 2].map((i) => (
             <div key={i} className="h-4 animate-pulse rounded bg-gray-100" />
           ))}
+        </div>
+      )}
+
+      {isError && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center text-sm text-amber-800">
+          Il pagamento è andato a buon fine, ma non riusciamo a mostrare il
+          dettaglio dell&apos;ordine in questo momento. Controlla la tua email
+          per la conferma, oppure contattaci indicando il riferimento sopra.
         </div>
       )}
 

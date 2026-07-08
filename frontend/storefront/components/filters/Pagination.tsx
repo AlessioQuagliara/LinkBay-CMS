@@ -6,10 +6,9 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 interface PaginationProps {
   currentPage: number
   lastPage: number
-  total: number
 }
 
-export default function Pagination({ currentPage, lastPage, total }: PaginationProps) {
+export default function Pagination({ currentPage, lastPage }: PaginationProps) {
   const router = useRouter()
   const pathname = usePathname()
   const params = useSearchParams()

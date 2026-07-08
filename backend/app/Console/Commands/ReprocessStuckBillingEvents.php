@@ -20,7 +20,7 @@ class ReprocessStuckBillingEvents extends Command
     public function handle(): int
     {
         $minutes = (int) $this->option('minutes');
-        $dryRun  = (bool) $this->option('dry-run');
+        $dryRun = (bool) $this->option('dry-run');
 
         $stuck = BillingEvent::whereNull('processed_at')
             ->where('created_at', '<', now()->subMinutes($minutes))
@@ -29,6 +29,7 @@ class ReprocessStuckBillingEvents extends Command
 
         if ($stuck->isEmpty()) {
             $this->info("Nessun billing_event bloccato (soglia: {$minutes} minuti).");
+
             return self::SUCCESS;
         }
 
@@ -36,9 +37,9 @@ class ReprocessStuckBillingEvents extends Command
 
         foreach ($stuck as $event) {
             $age = $event->created_at->diffForHumans();
-            $this->line("  [{$event->id}] {$event->event_type} — {$age} — errore: " . ($event->error ?? 'nessuno'));
+            $this->line("  [{$event->id}] {$event->event_type} — {$age} — errore: ".($event->error ?? 'nessuno'));
 
-            if (!$dryRun) {
+            if (! $dryRun) {
                 ProcessStripeWebhookJob::dispatch($event->id);
             }
         }
@@ -48,9 +49,9 @@ class ReprocessStuckBillingEvents extends Command
         } else {
             $this->info("{$stuck->count()} job dispatchati.");
             Log::warning('billing:reprocess-stuck-events: dispatched jobs for stuck events', [
-                'count'   => $stuck->count(),
+                'count' => $stuck->count(),
                 'minutes' => $minutes,
-                'ids'     => $stuck->pluck('id')->toArray(),
+                'ids' => $stuck->pluck('id')->toArray(),
             ]);
         }
 

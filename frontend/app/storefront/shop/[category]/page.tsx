@@ -69,7 +69,6 @@ function CategoryContent({ categorySlug }: { categorySlug: string }) {
                 <Pagination
                   currentPage={data.meta.current_page}
                   lastPage={data.meta.last_page}
-                  total={data.meta.total}
                 />
               </Suspense>
             </div>
