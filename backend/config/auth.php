@@ -63,6 +63,17 @@ return [
             'driver' => 'sanctum',
             'provider' => 'tenant_users',
         ],
+        // Same fix, central side: routes/central.php (tenant/plan CRUD) and the
+        // AI-credits checkout route in routes/api.php both used the bare
+        // 'sanctum' guard. Without this, a storefront Customer's token could
+        // reach these platform-admin routes too (Customer is the only other
+        // model with HasApiTokens) — in practice the lookup would likely fail
+        // since these routes never initialize tenant context, but that's an
+        // accident of implementation, not a guarantee. This pins it explicitly.
+        'central_api' => [
+            'driver' => 'sanctum',
+            'provider' => 'central_users',
+        ],
     ],
 
     /*

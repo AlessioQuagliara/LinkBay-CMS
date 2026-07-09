@@ -4,8 +4,14 @@ import axios, { AxiosError } from 'axios'
 import { getClientTenantSlug, tenantApiUrl } from '@/storefront/lib/utils/tenant'
 
 export class ValidationError extends Error {
-  constructor(public readonly errors: Record<string, string[]>) {
-    super('Errore di validazione')
+  constructor(
+    public readonly errors: Record<string, string[]>,
+    /** Raw `message` from the 422 response body — Laravel's abort(422, '...')
+     * controller calls (no per-field `errors`) still carry a real, specific
+     * message here even though `errors` is empty. */
+    public readonly responseMessage?: string,
+  ) {
+    super(responseMessage ?? 'Errore di validazione')
     this.name = 'ValidationError'
   }
 }
@@ -15,6 +21,27 @@ export class MaintenanceError extends Error {
     super('Il servizio è temporaneamente non disponibile')
     this.name = 'MaintenanceError'
   }
+}
+
+/**
+ * Turns a caught API error into a message worth showing a user, instead of
+ * the generic wrapper text on ValidationError.message ("Errore di
+ * validazione") or a one-size-fits-all toast for every failure mode.
+ * `fallback` covers anything that isn't one of the two typed errors above
+ * (network failure, unexpected 500, etc.) — callers should pass a message
+ * specific to what they were trying to do.
+ */
+export function getErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof ValidationError) {
+    const firstFieldMessage = Object.values(error.errors)[0]?.[0]
+    return firstFieldMessage ?? error.responseMessage ?? fallback
+  }
+
+  if (error instanceof MaintenanceError) {
+    return error.message
+  }
+
+  return fallback
 }
 
 export const apiClient = axios.create({
@@ -70,8 +97,8 @@ apiClient.interceptors.response.use(
     }
 
     if (status === 422) {
-      const data = error.response?.data as { errors?: Record<string, string[]> }
-      throw new ValidationError(data?.errors ?? {})
+      const data = error.response?.data as { errors?: Record<string, string[]>; message?: string }
+      throw new ValidationError(data?.errors ?? {}, data?.message)
     }
 
     if (status === 503) {

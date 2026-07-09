@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
+import { getErrorMessage } from '@/storefront/lib/api/client'
 import { useAuthStore } from '@/storefront/lib/store/authStore'
 import { Eye, EyeOff } from 'lucide-react'
 
@@ -62,8 +63,8 @@ function LoginForm() {
       await login({ email, password })
       toast.success('Accesso effettuato!')
       router.push('/account')
-    } catch {
-      toast.error('Email o password non corretti.')
+    } catch (err) {
+      toast.error(getErrorMessage(err, 'Email o password non corretti.'))
     }
   }
 
@@ -134,9 +135,7 @@ function RegisterForm() {
       toast.success('Account creato con successo!')
       router.push('/account')
     } catch (err: unknown) {
-      const msg =
-        err instanceof Error ? err.message : 'Registrazione non riuscita.'
-      toast.error(msg)
+      toast.error(getErrorMessage(err, 'Registrazione non riuscita.'))
     }
   }
 

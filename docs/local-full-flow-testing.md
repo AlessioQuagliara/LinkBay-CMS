@@ -227,6 +227,20 @@ instradato alla storefront Next.js, non a Laravel (vedi diagramma sopra).
 
 - Poi accedi: **http://clientalpha.yoursite-linkbay-cms.test/admin**
 
+**⚠ Verificato dal vivo il 2026-07-08**: `Tenant::create()` scatena in modo
+asincrono la pipeline `CreateDatabase → MigrateDatabase → SeedDatabase`
+(`TenancyServiceProvider::events()`), che in un test reale con
+`docker compose up` è fallita due volte con
+`TenantDatabaseAlreadyExistsException: Database tenant<slug> already exists`
+— pur non esistendo affatto quel database secondo `psql -l` sullo stesso
+server. Non root-causato nel tempo disponibile (nessuna query
+`CREATE DATABASE` corrispondente nei log di Postgres). **Non assumere che la
+creazione tenant funzioni solo perché il comando torna senza errori** — dopo
+lo Step 4, verifica sempre che il pannello `/admin` del tenant carichi
+davvero e che `docker compose logs php | grep -i tenant` non mostri
+eccezioni, oppure controlla `App\Models\Central\FailedJob` da tinker o dal
+pannello Admin (Operations → Failed Jobs).
+
 ---
 
 ## 404 attesi vs 404 anomali

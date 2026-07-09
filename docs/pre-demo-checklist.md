@@ -54,7 +54,14 @@ minutes for someone who already has the stack running.
 ## Golden path (see docs/demo-runbook.md for full detail)
 
 - [ ] Agency registration → login works
-- [ ] Tenant/store creation works, panel reachable
+- [ ] **Tenant/store creation works, panel reachable AND the tenant database
+      is actually queryable** — don't just check the Filament wizard says
+      "created". Live testing (2026-07-08) found the async
+      `CreateDatabase`/`MigrateDatabase`/`SeedDatabase` pipeline can fail
+      inconsistently (see docs/demo-runbook.md § 0 for the exact symptom) —
+      confirmed unresolved, not a false alarm. Check
+      `docker compose logs php | grep -i tenant` and the central Failed Jobs
+      admin page after creating a store, before assuming it's ready.
 - [ ] Shipping method exists for the demo store (checkout silently looks
       broken without one)
 - [ ] At least one active/published product exists and shows on `/shop`
@@ -77,12 +84,10 @@ discover it as a "bug":
       wired up yet — `tests/Feature/StoreFullProvisioningTest.php` documents
       this as a TODO, it's not a commented-out-but-otherwise-ready test.
       Any agency can create a store regardless of plan today.
-- [ ] Checkout isn't safe against true concurrent double-submit (two
-      near-simultaneous confirm calls could create two orders); sequential
-      retries are safe. Low risk in a supervised demo.
-- [ ] `createPaymentIntent` isn't idempotent — repeated "proceed to payment"
-      clicks can leave orphaned PaymentIntents in the Stripe dashboard.
-      Cosmetic, not a demo blocker.
+- [x] ~~Checkout isn't safe against concurrent double-submit~~ — fixed:
+      `convertToOrder()` locks the checkout row inside a transaction;
+      `createPaymentIntent()` reuses an existing intent plus a Stripe
+      idempotency key. See docs/demo-runbook.md for detail.
 
 Cross-tenant data isolation now **does** have a dedicated automated test
 (`tests/Feature/Tenant/TenantIsolationTest.php`) — no longer a gap to disclose,

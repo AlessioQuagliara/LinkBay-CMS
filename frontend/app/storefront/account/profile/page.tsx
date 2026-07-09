@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { useAuthStore } from '@/storefront/lib/store/authStore'
 import { updateProfile, getAddresses, addAddress } from '@/storefront/lib/api/account'
+import { getErrorMessage } from '@/storefront/lib/api/client'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { Plus, MapPin, Star } from 'lucide-react'
 import type { Address } from '@/storefront/lib/types/order'
@@ -37,8 +38,8 @@ function AddAddressForm({ onSuccess }: { onSuccess: () => void }) {
       await addAddress(fields)
       toast.success('Indirizzo aggiunto.')
       onSuccess()
-    } catch {
-      toast.error('Impossibile aggiungere l\'indirizzo.')
+    } catch (err) {
+      toast.error(getErrorMessage(err, 'Impossibile aggiungere l\'indirizzo.'))
     } finally {
       setIsSubmitting(false)
     }
@@ -101,7 +102,7 @@ export default function ProfilePage() {
       await fetchProfile()
       toast.success('Profilo aggiornato.')
     },
-    onError: () => toast.error('Impossibile aggiornare il profilo.'),
+    onError: (err) => toast.error(getErrorMessage(err, 'Impossibile aggiornare il profilo.')),
   })
 
   if (!token) return null

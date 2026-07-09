@@ -136,7 +136,16 @@ services:
     healthcheck:
       # /up runs App\Listeners\CheckApplicationHealth (central DB + Redis) —
       # a non-200 here means the backend is actually broken, not just "nginx is up".
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost/up"]
+      # Must be 127.0.0.1, not localhost: this image's entrypoint normally patches
+      # its config to also listen on IPv6, but can't here since default.conf is
+      # bind-mounted read-only (see docker/nginx/default.conf) — nginx only listens
+      # on IPv4, while "localhost" resolves to [::1] first inside the container.
+      # That mismatch made this healthcheck fail permanently (verified live: nginx
+      # was marked unhealthy from boot, which made Traefik's docker provider drop
+      # nginx-svc's routers entirely — app./admin./api. silently fell through to
+      # the frontend container instead, a much more confusing symptom than this
+      # healthcheck itself).
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1/up"]
       interval: 30s
       timeout: 5s
       retries: 3

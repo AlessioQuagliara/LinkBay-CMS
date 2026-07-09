@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import { getShippingMethods } from '@/storefront/lib/api/shipping'
 import { initiateCheckout, createPaymentIntent, confirmPayment } from '@/storefront/lib/api/checkout'
+import { getErrorMessage } from '@/storefront/lib/api/client'
 import { useCartStore } from '@/storefront/lib/store/cartStore'
 import { formatPrice } from '@/storefront/lib/utils/currency'
 import type { Address, ShippingMethod } from '@/storefront/lib/types/order'
@@ -308,8 +309,8 @@ function PaymentForm({
         toast.success('Ordine confermato!')
         onSuccess(res.data.id)
       }
-    } catch {
-      toast.error('Si è verificato un errore durante il pagamento.')
+    } catch (err) {
+      toast.error(getErrorMessage(err, 'Si è verificato un errore durante il pagamento.'))
     } finally {
       setIsProcessing(false)
     }
@@ -440,8 +441,8 @@ function CheckoutContent() {
       const { client_secret } = await createPaymentIntent(id)
       setClientSecret(client_secret)
       setStep(3)
-    } catch {
-      toast.error('Impossibile avviare il checkout. Riprova.')
+    } catch (err) {
+      toast.error(getErrorMessage(err, 'Impossibile avviare il checkout. Riprova.'))
     } finally {
       setIsInitiating(false)
     }

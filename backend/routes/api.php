@@ -26,7 +26,8 @@ Route::get('/careers/positions', [CareersApiController::class, 'positions'])
 Route::prefix('ai-credits')->group(function () {
     Route::get('/packages', [AiCreditsController::class, 'packages']);
     Route::get('/success', [AiCreditsController::class, 'success'])->name('ai.credits.success');
-    Route::middleware('auth:sanctum')->group(function () {
+    // 'central_api' (not bare 'sanctum') — see config/auth.php comment.
+    Route::middleware('auth:central_api')->group(function () {
         Route::post('/checkout/{package}', [AiCreditsController::class, 'createCheckout']);
     });
 });

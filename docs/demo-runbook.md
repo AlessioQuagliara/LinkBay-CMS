@@ -43,6 +43,24 @@ docker compose -f compose.yaml -f compose.override.local.yml ps   # all healthy?
   there is no separate per-tenant secret yet). Order **creation** does not
   depend on this webhook at all — see step 6.
 
+**⚠ Check this before you rely on "tenant/store provisioned" above.** Live
+testing (2026-07-08, real `docker compose up` against a fresh Postgres) found
+that creating a `Tenant` can leave its physical database in a broken state:
+the `TenantCreated` → `CreateDatabase → MigrateDatabase → SeedDatabase`
+pipeline (`TenancyServiceProvider::events()`) failed twice with
+`TenantDatabaseAlreadyExistsException: Database tenant<slug> already exists`
+— while `psql -l` on the same Postgres server confirmed the database did
+**not** exist. This is inconsistent with itself and wasn't root-caused in the
+time available (Postgres's own log had no matching `CREATE DATABASE`
+statement at all, ruling out the simplest explanations). Before demoing store
+creation live: **provision a test tenant end-to-end first** (agency wizard or
+`TenantController`) and confirm both that its Filament `/admin` panel loads
+*and* that `SELECT 1` works against its tenant database, rather than assuming
+this "just works" because the code reads correctly. If it fails, check
+`docker compose logs php | grep -i tenant` and the central `failed_jobs`
+table (Admin panel → Operations → Failed Jobs) for the same exception before
+re-trying — this is a discovered, unresolved risk, not yet a fix.
+
 ## 1. Add a shipping method (required before checkout will work)
 
 Storefront checkout calls `GET /api/store/shipping-methods` and blocks on an
@@ -72,7 +90,13 @@ setting it — `NEXT_PUBLIC_*` vars are baked in at build time. Without this,
 every `.test` subdomain is treated as the marketing site instead of being
 rewritten to `/storefront`, and `/shop` etc. 404 even though the backend and
 Next.js code are both correct — this was the single biggest "demo looks
-broken but isn't" trap found in this repo, now fixed at the config level.
+broken but isn't" trap found in this repo.
+
+**Verified live 2026-07-08** with a real `docker compose up`: `app./admin./
+api.linkbay-cms.test` correctly reach Laravel, any other subdomain
+(`clientalpha.linkbay-cms.test`) correctly reaches the `frontend` container —
+see `frontend/README.md` for exactly how this was checked and a second,
+unrelated nginx-healthcheck bug that was found and fixed along the way.
 
 - **http://clientalpha.linkbay-cms.test/** → homepage (CMS blocks or featured
   products depending on what's configured)
@@ -150,6 +174,12 @@ Confirm nothing silently failed in either system:
 
 ---
 
+## Known risk — not yet resolved (updated 2026-07-08)
+
+- **Tenant/store provisioning failed in live testing** — see the ⚠ callout in
+  §0 above. Verify a test store provisions cleanly (panel loads, tenant DB
+  reachable) before relying on store creation during a live demo.
+
 ## Known non-blocking gaps (updated 2026-07-08)
 
 - `storefront/` (repo root) has been archived to
@@ -165,11 +195,13 @@ Confirm nothing silently failed in either system:
   isolated per tenant DB. Still sanity-check visually if demoing two tenants
   side by side — the test proves data isolation, not that the UI/routing
   layer can't cross wires.
-- Checkout has no protection against true concurrent double-submission (two
-  near-simultaneous confirm calls for the same checkout could both create an
-  order) — sequential retries are idempotent and safe, races are not. Low
-  risk for a supervised demo, worth hardening before a real beta.
-- `createPaymentIntent()` isn't idempotent — repeatedly clicking "proceed to
-  payment" before the first attempt returns can create orphaned Stripe
-  PaymentIntents. Doesn't break the demo, just leaves noise in the Stripe
-  dashboard.
+- ~~Checkout has no protection against concurrent double-submission~~ —
+  fixed: `convertToOrder()` now locks the checkout row (`lockForUpdate()`)
+  inside a transaction before creating the order, so a second concurrent
+  `confirm()` call for the same checkout blocks until the first commits, then
+  correctly returns the existing order instead of creating a duplicate.
+  `createPaymentIntent()` now also reuses an existing reusable PaymentIntent
+  instead of creating a new one on retry, plus a Stripe-level idempotency key
+  as a second layer. Not exercised by an automated concurrency test (PHPUnit
+  is single-threaded — this can only really be observed under real concurrent
+  load against Postgres), but the fix is real, not just reasoned about.

@@ -6,7 +6,9 @@ use App\Http\Controllers\Central\PlanController;
 use App\Http\Controllers\Central\TenantController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('central/api')->middleware(['api', 'auth:sanctum'])->group(function () {
+// 'central_api' (not bare 'sanctum') — see config/auth.php comment: the
+// default Sanctum guard has no provider restriction.
+Route::prefix('central/api')->middleware(['api', 'auth:central_api'])->group(function () {
 
     // Tenants
     Route::get('/tenants', [TenantController::class, 'index']);

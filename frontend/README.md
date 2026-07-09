@@ -85,18 +85,28 @@ tenant ha il proprio dominio registrato via
 sono protette da `PreventAccessFromCentralDomains`, quindi un dominio
 centrale/condiviso nell'URL API **non funziona** per queste chiamate.
 
-**Rischio noto / da verificare prima della demo pubblica:** in `compose.yaml` e
-`docker/nginx/default.conf`, i subdomain wildcard (`*.linkbay-cms.com`) sono
-instradati da Traefik a `nginx-svc` → `php-fpm` (Laravel), mentre solo l'host
-esatto `linkbay-cms.com`/`www.` è instradato al container `frontend`
-(Next.js). Questo è corretto per le chiamate `api/v1/*` e `api/store/*` (che
-devono arrivare a Laravel per la risoluzione tenant-by-domain), ma va
-verificato end-to-end che la *pagina* storefront su un vero subdomain tenant
-pubblico arrivi effettivamente al container `frontend` e non resti intrappolata
-in Laravel (che non ha viste storefront proprie, solo API + redirect
-`app.frontend_url` per la root `/`). In locale/staging su host fissi
-(`app.linkbay-cms.test`) il problema non si presenta perché non si passa da un
-vero subdomain wildcard.
+**Risolto e verificato dal vivo (2026-07-08):** `compose.yaml` e
+`compose.override.local.yml` ora instradano esplicitamente `app.`/`admin.`/
+`api.CENTRAL_DOMAIN` a `nginx-svc` → Laravel (priorità Traefik alta), mentre
+qualsiasi altro subdomain di `CENTRAL_DOMAIN` — cioè le pagine storefront di
+un tenant — va al container `frontend` (priorità bassa). Confermato con uno
+stack Docker locale realmente avviato: `curl` su `app.linkbay-cms.test/up`
+risponde da Laravel (`X-Powered-By: PHP`), `curl` su
+`clientalpha.linkbay-cms.test/` risponde dal container Next.js
+(`X-Powered-By: Next.js`), verificato anche via l'API di Traefik
+(`/api/http/routers`) per controllare le regole/priorità effettivamente
+risolte.
+
+Durante questa verifica è emerso un secondo bug reale, indipendente dal
+routing dei subdomain ma che lo mascherava: l'healthcheck Docker di `nginx`
+(`wget http://localhost/up`) falliva sempre, perché `localhost` risolve a
+`[::1]` (IPv6) dentro il container ma nginx ascolta solo su IPv4 (il suo
+`default.conf` è montato read-only, quindi lo script d'entrypoint dell'immagine
+non riesce a patchare il listener IPv6 come farebbe normalmente). Con `nginx`
+marcato "unhealthy", il provider Docker di Traefik escludeva del tutto i
+router di `nginx-svc`, e `app./admin./api.` finivano per cadere sul wildcard
+del frontend. Fixato puntando l'healthcheck a `127.0.0.1` invece di
+`localhost` (vedi `compose.yaml`).
 
 ## Integrazione API
 

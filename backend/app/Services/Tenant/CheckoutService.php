@@ -46,6 +46,33 @@ class CheckoutService
         ]);
     }
 
+    /**
+     * Reusable/still-pending PaymentIntent statuses — safe to hand the same
+     * client_secret back out again instead of creating a new intent.
+     */
+    private const REUSABLE_INTENT_STATUSES = [
+        'requires_payment_method',
+        'requires_confirmation',
+        'requires_action',
+        'processing',
+    ];
+
+    /**
+     * Creates (or reuses) the Stripe PaymentIntent for a checkout.
+     *
+     * Idempotency has two layers, because this is called from the "proceed to
+     * payment" step and can be retried by a double-click, a page reload before
+     * the first response arrives, or a network retry:
+     *  1. Application-level: if the checkout already has a PaymentIntent in a
+     *     reusable state, its client_secret is returned unchanged instead of
+     *     creating a new intent (which would previously overwrite
+     *     stripe_payment_intent_id and orphan the first intent in Stripe).
+     *  2. Stripe-level: the create call itself carries a deterministic
+     *     idempotency key derived from the checkout id, so even if two
+     *     requests race past check #1 (TOCTOU — no DB lock here, unlike
+     *     convertToOrder), Stripe's own API deduplicates the create and
+     *     returns the same PaymentIntent for both.
+     */
     public function createPaymentIntent(CheckoutSession $checkout): string
     {
         $secret = config('services.stripe.secret');
@@ -57,12 +84,21 @@ class CheckoutService
         try {
             $stripe = new StripeClient($secret);
 
+            if ($checkout->stripe_payment_intent_id) {
+                $existing = $stripe->paymentIntents->retrieve($checkout->stripe_payment_intent_id);
+                if (in_array($existing->status, self::REUSABLE_INTENT_STATUSES, true)) {
+                    return $existing->client_secret;
+                }
+            }
+
             $intent = $stripe->paymentIntents->create([
                 'amount' => (int) round((float) $checkout->total * 100),
                 'currency' => 'eur',
                 'metadata' => [
                     'checkout_session_id' => $checkout->id,
                 ],
+            ], [
+                'idempotency_key' => 'checkout-'.$checkout->id.'-intent',
             ]);
 
             $checkout->update([
@@ -131,44 +167,59 @@ class CheckoutService
         return Order::where('metadata->checkout_session_id', $checkout->id)->first();
     }
 
+    /**
+     * Creates the Order for a confirmed checkout.
+     *
+     * Concurrency: two near-simultaneous confirm() calls for the same checkout
+     * (double-click, retried request after a slow response) both used to be able
+     * to pass the "not completed yet" check before either committed, creating two
+     * orders for one checkout. Everything now runs inside a transaction that
+     * re-fetches the checkout row with lockForUpdate() first — the second caller
+     * blocks until the first transaction commits, then sees STATUS_COMPLETED and
+     * returns the existing order via findOrderFor() instead of creating another.
+     * (SQLite, used in tests, has no real row-level locking — lockForUpdate() is
+     * a no-op there. The behavior this protects against can only be observed
+     * under a real concurrent load against Postgres.)
+     */
     public function convertToOrder(CheckoutSession $checkout): Order
     {
-        // Idempotency: a retried confirm must return the already-created order, not duplicate it.
-        if ($checkout->status === CheckoutSession::STATUS_COMPLETED) {
-            $existing = $this->findOrderFor($checkout);
-            if ($existing) {
-                return $existing;
-            }
-        }
-
-        if ($checkout->status !== CheckoutSession::STATUS_PROCESSING) {
-            throw new RuntimeException('Il pagamento non risulta completato: impossibile creare l\'ordine.');
-        }
-
         return DB::transaction(function () use ($checkout) {
-            $checkout->loadMissing('cartSession.cartItems.product');
+            $locked = CheckoutSession::whereKey($checkout->id)->lockForUpdate()->firstOrFail();
+
+            if ($locked->status === CheckoutSession::STATUS_COMPLETED) {
+                $existing = $this->findOrderFor($locked);
+                if ($existing) {
+                    return $existing;
+                }
+            }
+
+            if ($locked->status !== CheckoutSession::STATUS_PROCESSING) {
+                throw new RuntimeException('Il pagamento non risulta completato: impossibile creare l\'ordine.');
+            }
+
+            $locked->loadMissing('cartSession.cartItems.product');
 
             $order = Order::create([
-                'customer_id' => $checkout->customer_id,
+                'customer_id' => $locked->customer_id,
                 'status' => Order::STATUS_CONFIRMED,
-                'subtotal' => $checkout->subtotal,
-                'shipping_total' => $checkout->shipping_amount,
-                'discount_total' => $checkout->discount_amount,
-                'total' => $checkout->total,
-                'shipping_method_id' => $checkout->shipping_method_id,
-                'discount_code_id' => $checkout->discount_code_id,
-                'shipping_address' => $checkout->shipping_address,
-                'billing_address' => $checkout->billing_address ?? $checkout->shipping_address,
+                'subtotal' => $locked->subtotal,
+                'shipping_total' => $locked->shipping_amount,
+                'discount_total' => $locked->discount_amount,
+                'total' => $locked->total,
+                'shipping_method_id' => $locked->shipping_method_id,
+                'discount_code_id' => $locked->discount_code_id,
+                'shipping_address' => $locked->shipping_address,
+                'billing_address' => $locked->billing_address ?? $locked->shipping_address,
                 'payment_method' => 'stripe',
                 'payment_status' => 'paid',
                 // Required for TenantStripeWebhookController to find this order later
                 // (payment_intent.succeeded/failed, charge.refunded all look it up by
                 // this column) — without it those webhook handlers silently no-op.
-                'stripe_payment_intent_id' => $checkout->stripe_payment_intent_id,
-                'metadata' => ['checkout_session_id' => $checkout->id],
+                'stripe_payment_intent_id' => $locked->stripe_payment_intent_id,
+                'metadata' => ['checkout_session_id' => $locked->id],
             ]);
 
-            foreach ($checkout->cartSession->cartItems as $cartItem) {
+            foreach ($locked->cartSession->cartItems as $cartItem) {
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $cartItem->product_id,
@@ -180,11 +231,11 @@ class CheckoutService
                 ]);
             }
 
-            if ($checkout->discount_code_id) {
-                DiscountCode::find($checkout->discount_code_id)?->increment('used_count');
+            if ($locked->discount_code_id) {
+                DiscountCode::find($locked->discount_code_id)?->increment('used_count');
             }
 
-            $checkout->update([
+            $locked->update([
                 'status' => CheckoutSession::STATUS_COMPLETED,
                 'completed_at' => now(),
             ]);
