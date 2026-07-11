@@ -1,0 +1,42 @@
+# Applies to the `php` service build context (build.context: . in compose.yaml,
+# docker/php/Dockerfile does `COPY backend/ .`). Keeps secrets out of image
+# layers entirely — backend/.env is bind-mounted in at runtime (./backend:/var/www),
+# never needed inside the image itself, and must never be baked into a layer
+# that could end up in a registry or `docker save` export.
+
+# Secrets — never part of any image layer
+backend/.env
+backend/.env.*
+!backend/.env.example
+.env
+.env.*
+!.env.example
+
+# Reinstalled inside the image by composer/npm — copying host copies wastes
+# build context transfer time and can leak platform-mismatched binaries
+backend/vendor/
+frontend/node_modules/
+frontend/.next/
+node_modules/
+
+# Not needed to build the php image at all
+frontend/
+.git/
+.github/
+docs/
+*.md
+
+# Runtime state — bind-mounted separately (laravel_storage volume), never baked in
+backend/storage/logs/
+backend/storage/framework/cache/
+backend/storage/framework/sessions/
+backend/storage/framework/views/
+
+# Local/dev noise
+.DS_Store
+backend/tests/
+backend/.phpunit.cache
+backend/.phpunit.result.cache
+*.sqlite
+.idea/
+.vscode/

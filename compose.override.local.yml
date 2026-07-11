@@ -43,6 +43,21 @@
 
 services:
 
+  # Insecure dashboard on :8080 — fine here (bound to your own machine, not
+  # the public internet); compose.yaml keeps it off by default since this
+  # exact setting exposed unauthenticated to the internet was a real
+  # production incident once. `command:` fully replaces the base list (Docker
+  # Compose doesn't merge it), so the base's two entries are repeated here.
+  traefik:
+    command:
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "8080:8080"
+
   php:
     environment:
       APP_ENV: local

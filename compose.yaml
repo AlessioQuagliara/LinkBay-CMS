@@ -14,28 +14,24 @@
 services:
 
 # ── Traefik ──────────────────────────────────────────────────────────────────
+# No dashboard, no insecure API, no :8080 here on purpose — this file is meant
+# to be safe to run alone (see header). A production incident once had this
+# dashboard exposed unauthenticated on the public internet; local dev gets it
+# back (convenient, network-isolated to your own machine) via a small
+# override in compose.override.local.yml. Real HTTPS (:443 + ACME) is a
+# separate opt-in overlay: see compose.prod.yaml.
   traefik:
     image: traefik:v3.6.2
     container_name: traefik
     restart: unless-stopped
     command:
-      - "--api.dashboard=true"
-      - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
-      # HTTPS — abilitare in produzione con certificato reale
-      #- "--entrypoints.websecure.address=:443"
-      #- "--certificatesresolvers.le.acme.tlschallenge=true"
-      #- "--certificatesresolvers.le.acme.email=quagliara.alessio@outlook.com"
-      #- "--certificatesresolvers.le.acme.storage=/acme.json"
     ports:
       - "80:80"
-      #- "443:443"
-      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      #- ./traefik/acme.json:/acme.json
     networks:
       - web
 
