@@ -16,8 +16,14 @@ export class StorefrontPages {
   }
 
   async openCartAndGoToCheckout() {
-    await this.page.getByRole('button', { name: /^Carrello/ }).click()
-    await expect(this.page.getByRole('dialog', { name: 'Carrello' })).toBeVisible()
+    // Adding an item already opens the drawer (see AddToCartButton flow), so
+    // the header toggle button can be hidden behind its own backdrop here —
+    // only click it if the drawer isn't already up.
+    const cartDialog = this.page.getByRole('dialog', { name: 'Carrello' })
+    if (!(await cartDialog.isVisible())) {
+      await this.page.getByRole('button', { name: /^Carrello/ }).click()
+    }
+    await expect(cartDialog).toBeVisible()
     await this.page.getByRole('link', { name: 'Vai al checkout' }).click()
     await expect(this.page).toHaveURL(/\/checkout$/)
   }
@@ -26,7 +32,7 @@ export class StorefrontPages {
     await this.page.getByPlaceholder('Mario').fill('Mario')
     await this.page.getByPlaceholder('Rossi').fill('Rossi')
     await this.page.getByPlaceholder('Via Roma 1').fill('Via Test 1')
-    await this.page.getByPlaceholder('Roma').fill('Roma')
+    await this.page.getByPlaceholder('Roma', { exact: true }).fill('Roma')
     await this.page.getByPlaceholder('00100').fill('00100')
     await this.page.getByRole('button', { name: 'Continua con la spedizione' }).click()
   }

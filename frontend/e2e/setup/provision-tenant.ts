@@ -112,7 +112,7 @@ function ensureShippingMethodAndProduct() {
         );
         App\\Models\\Tenant\\Product::updateOrCreate(
             ['slug' => '${E2E_PRODUCT_SLUG}'],
-            ['name' => 'E2E Golden Path Product', 'description' => 'Used only by the Playwright e2e suite.', 'price' => 29.99, 'stock' => 999, 'sku' => 'E2E-GP-001', 'is_active' => true]
+            ['name' => 'E2E Golden Path Product', 'description' => 'Used only by the Playwright e2e suite.', 'price' => 29.99, 'stock' => 999, 'quantity' => 999, 'sku' => 'E2E-GP-001', 'is_active' => true]
         );
         echo 'FIXTURES_OK';
     } finally {

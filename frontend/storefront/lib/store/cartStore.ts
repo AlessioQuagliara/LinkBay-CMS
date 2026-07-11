@@ -62,7 +62,7 @@ export const useCartStore = create<CartStore>()(
         set({ isLoading: true })
         try {
           const res = await createOrFetchCart(sessionId, customerId)
-          set({ items: res.data.cartItems ?? [], meta: res.meta })
+          set({ items: res.data.cart_items ?? [], meta: res.meta })
         } catch {
           // Ignore network errors during init — cart stays empty
         } finally {

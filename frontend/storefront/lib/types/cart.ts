@@ -17,7 +17,7 @@ export interface CartSession {
   session_id: string
   customer_id: number | null
   expires_at: string | null
-  cartItems: CartItem[]
+  cart_items: CartItem[]
   metadata: Record<string, unknown> | null
 }
 

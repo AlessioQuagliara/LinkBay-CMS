@@ -71,5 +71,17 @@ export async function applyDiscount(
 }
 
 export function generateSessionId(): string {
-  return crypto.randomUUID()
+  // crypto.randomUUID() is only defined in secure contexts (HTTPS or
+  // localhost) — plain-HTTP local/dev domains (e.g. *.test) don't qualify,
+  // and calling it there throws, which silently breaks cart init entirely.
+  // The cart session id isn't security-sensitive, so a Math.random fallback
+  // is fine here.
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
 }
