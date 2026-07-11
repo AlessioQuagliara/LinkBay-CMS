@@ -6,7 +6,9 @@ namespace Tests\Feature\Tenant;
 
 use App\Models\Tenant\CartItem;
 use App\Models\Tenant\CartSession;
+use App\Models\Tenant\CheckoutSession;
 use App\Models\Tenant\DiscountCode;
+use App\Models\Tenant\Order;
 use App\Models\Tenant\ShippingMethod;
 use App\Services\Tenant\CheckoutService;
 use Tests\Concerns\InteractsWithTenantRoutes;
@@ -136,5 +138,34 @@ class CheckoutApiTest extends TenantTestCase
 
         $response->assertOk();
         $this->assertEquals(10, $response->json('meta.discount'));
+    }
+
+    /**
+     * Regression test: the controller previously passed the raw Stringable
+     * from $request->string('payment_intent_id') straight into
+     * CheckoutService::confirmPayment(string $paymentIntentId), which has a
+     * strict `string` type hint — PHP doesn't coerce objects to scalar type
+     * hints, so every real confirm request threw a TypeError before it ever
+     * reached application logic (payment succeeded on Stripe's side, but our
+     * own endpoint 500'd). Uses the already-completed idempotent path so it
+     * exercises the full HTTP → FormRequest → controller → service chain
+     * without a live Stripe call.
+     */
+    public function test_confirm_endpoint_accepts_payment_intent_id_for_already_completed_checkout(): void
+    {
+        $checkout = CheckoutSession::factory()->create([
+            'status' => CheckoutSession::STATUS_COMPLETED,
+            'stripe_payment_intent_id' => 'pi_already_done',
+        ]);
+        $order = Order::factory()->paid()->create([
+            'metadata' => ['checkout_session_id' => $checkout->id],
+        ]);
+
+        $response = $this->postJson("/api/store/checkout/{$checkout->id}/confirm", [
+            'payment_intent_id' => 'pi_already_done',
+        ]);
+
+        $response->assertOk();
+        $this->assertEquals($order->id, $response->json('data.id'));
     }
 }

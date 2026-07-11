@@ -74,7 +74,7 @@ class CheckoutController extends Controller
     public function confirm(ConfirmPaymentRequest $request, CheckoutSession $checkout): JsonResponse
     {
         try {
-            $confirmed = $this->checkoutService->confirmPayment($request->string('payment_intent_id'));
+            $confirmed = $this->checkoutService->confirmPayment($request->string('payment_intent_id')->toString());
             $order = $this->checkoutService->convertToOrder($confirmed);
         } catch (ModelNotFoundException $e) {
             abort(404, $e->getMessage());

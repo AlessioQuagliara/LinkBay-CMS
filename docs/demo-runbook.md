@@ -43,23 +43,30 @@ docker compose -f compose.yaml -f compose.override.local.yml ps   # all healthy?
   there is no separate per-tenant secret yet). Order **creation** does not
   depend on this webhook at all — see step 6.
 
-**⚠ Check this before you rely on "tenant/store provisioned" above.** Live
-testing (2026-07-08, real `docker compose up` against a fresh Postgres) found
-that creating a `Tenant` can leave its physical database in a broken state:
-the `TenantCreated` → `CreateDatabase → MigrateDatabase → SeedDatabase`
-pipeline (`TenancyServiceProvider::events()`) failed twice with
-`TenantDatabaseAlreadyExistsException: Database tenant<slug> already exists`
-— while `psql -l` on the same Postgres server confirmed the database did
-**not** exist. This is inconsistent with itself and wasn't root-caused in the
-time available (Postgres's own log had no matching `CREATE DATABASE`
-statement at all, ruling out the simplest explanations). Before demoing store
-creation live: **provision a test tenant end-to-end first** (agency wizard or
-`TenantController`) and confirm both that its Filament `/admin` panel loads
-*and* that `SELECT 1` works against its tenant database, rather than assuming
-this "just works" because the code reads correctly. If it fails, check
-`docker compose logs php | grep -i tenant` and the central `failed_jobs`
-table (Admin panel → Operations → Failed Jobs) for the same exception before
-re-trying — this is a discovered, unresolved risk, not yet a fix.
+**✅ Tenant/store provisioning — fixed and verified live (2026-07-09).** A
+previous version of this doc flagged `TenantDatabaseAlreadyExistsException`
+as an unresolved, intermittent failure. Root cause: `TenantProvisioningService
+::initializeDatabase()` used to call `tenancy()->initialize()` immediately,
+relying on stancl/tenancy's own **async**, queued `TenantCreated ->
+[CreateDatabase, MigrateDatabase, SeedDatabase]` pipeline
+(`TenancyServiceProvider`) to have already created the physical database —
+with no ordering guarantee between the two. `TenantProvisioningService` now
+creates and migrates the tenant database itself, synchronously
+(`ensureDatabaseProvisioned()`), and `TenancyServiceProvider` no longer
+registers the competing pipeline for `TenantCreated`. Two more real,
+Postgres-only bugs surfaced by the same live testing and fixed alongside it:
+a tenant migration referencing a non-existent `tenant_users` table (should be
+`users`), and the `Setting` model missing its non-standard string primary key
+(`key`, not `id`) — both silently tolerated by SQLite (used in automated
+tests) but hard failures on Postgres (used in Docker/production).
+
+Verified live: agency-wizard-style provisioning (async, queued
+`ProvisionTenantDatabaseJob`) and central-API provisioning (`POST
+/central/api/tenants`, synchronous `provision()`) each succeeded 3/3 times in
+a row against a real `docker compose` stack, zero failed jobs, tenant
+database confirmed migrated and seeded (admin user, default collection,
+settings) each time. Regression test:
+`backend/tests/Feature/TenantProvisioningTest.php`.
 
 ## 1. Add a shipping method (required before checkout will work)
 
@@ -156,6 +163,28 @@ drops the connection between Stripe confirming payment and that final
 `/confirm` call completing, no order is created and no webhook will create
 one after the fact either — this is a known gap, see the final report.
 
+**✅ Verified live end-to-end (2026-07-11), not just by reading code** — and
+three real bugs were found and fixed in the process (none of them webhook- or
+Stripe-config-related; Stripe itself always confirmed the payment correctly):
+1. `CheckoutController::confirm()` passed `$request->string('payment_intent_id')`
+   (a `Stringable`) into `CheckoutService::confirmPayment(string $paymentIntentId)`
+   — PHP doesn't coerce objects to a strict scalar type hint, so **every**
+   real confirm request threw a `TypeError` and 500'd, even though Stripe had
+   already confirmed the charge. Fixed with `->toString()` at the call site.
+2. `CartService::getOrCreateCart()` only set `customer_id` when a cart row was
+   first created. The storefront layout creates a cart anonymously on the very
+   first page view (e.g. `/account/login`, before the shopper has registered),
+   so by the time they actually check out, the cart — and the order it
+   produces — stayed permanently unowned even though they were logged in.
+   Fixed to attach the now-known customer the next time the same cart is seen
+   with a valid bearer token (never overwrites an existing owner).
+3. Frontend: `getOrders()` unwrapped the paginated `/api/account/orders`
+   response one level too shallow (`response.data.data` is the paginator
+   object, not the array — the array is `response.data.data.data`), and
+   `useAuthStore`'s `persist` hydration raced the "no token → redirect to
+   login" guard on `/account/*` pages after a full page load. Both fixed;
+   see the session's commit for the four affected account pages.
+
 The platform-level billing pipeline (`ProcessStripeWebhookJob`,
 `BillingEvent`) is a **separate, unrelated system** for agency
 subscriptions/AI credits — it has nothing to do with storefront orders.
@@ -174,13 +203,7 @@ Confirm nothing silently failed in either system:
 
 ---
 
-## Known risk — not yet resolved (updated 2026-07-08)
-
-- **Tenant/store provisioning failed in live testing** — see the ⚠ callout in
-  §0 above. Verify a test store provisions cleanly (panel loads, tenant DB
-  reachable) before relying on store creation during a live demo.
-
-## Known non-blocking gaps (updated 2026-07-08)
+## Known non-blocking gaps (updated 2026-07-09)
 
 - `storefront/` (repo root) has been archived to
   `_archive/storefront-standalone-legacy/` — it's reference-only, not a

@@ -69,11 +69,18 @@ export async function addAddress(
 
 // ── Orders ────────────────────────────────────────────────────────────────
 
+/**
+ * CustomerOrderController::index() wraps a Laravel paginator in {data: ...},
+ * so the array of orders is one level deeper than the usual {data: T} shape
+ * (response.data.data.data, not response.data.data) — see the paginator's
+ * own current_page/last_page/total fields alongside it if pagination UI is
+ * ever added here.
+ */
 export async function getOrders(): Promise<Order[]> {
-  const { data } = await apiClient.get<{ data: Order[] }>(
+  const { data } = await apiClient.get<{ data: { data: Order[] } }>(
     '/api/account/orders',
   )
-  return data.data
+  return data.data.data
 }
 
 export async function getOrder(id: number): Promise<Order> {

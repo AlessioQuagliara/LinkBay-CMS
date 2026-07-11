@@ -24,16 +24,19 @@ class TenancyServiceProvider extends ServiceProvider
         return [
             // Tenant events
             Events\CreatingTenant::class => [],
-            Events\TenantCreated::class => [
-                JobPipeline::make([
-                    Jobs\CreateDatabase::class,
-                    Jobs\MigrateDatabase::class,
-                    Jobs\SeedDatabase::class,
-
-                ])->send(function (Events\TenantCreated $event) {
-                    return $event->tenant;
-                })->shouldBeQueued(true),
-            ],
+            // Deliberately NOT wired to stancl's own CreateDatabase/MigrateDatabase/
+            // SeedDatabase pipeline. That pipeline is queued (async) and used to run
+            // concurrently, unordered, against App\Services\TenantProvisioningService
+            // ::initializeDatabase() (called synchronously by provision(), or from a
+            // second, independently-queued job by the agency wizard) — a real race
+            // that threw TenantDatabaseDoesNotExistException/
+            // TenantDatabaseAlreadyExistsException depending on timing, confirmed in
+            // live testing. Its SeedDatabase step also ran database/seeders/
+            // TenantSeeder.php (unrelated demo-data seeder), duplicating/conflicting
+            // with the app's own seedTenantDefaults(). TenantProvisioningService now
+            // creates + migrates the tenant database itself, synchronously, as the
+            // single source of truth — see its ensureDatabaseProvisioned().
+            Events\TenantCreated::class => [],
             Events\SavingTenant::class => [],
             Events\TenantSaved::class => [],
             Events\UpdatingTenant::class => [],

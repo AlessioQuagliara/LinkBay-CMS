@@ -22,11 +22,11 @@ const STATUS_MAP: Record<Order['status'], { label: string; cls: string }> = {
 
 export default function OrdersPage() {
   const router = useRouter()
-  const { token } = useAuthStore()
+  const { token, hasHydrated } = useAuthStore()
 
   useEffect(() => {
-    if (!token) router.replace('/account/login')
-  }, [token, router])
+    if (hasHydrated && !token) router.replace('/account/login')
+  }, [hasHydrated, token, router])
 
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ['orders'],
@@ -34,7 +34,7 @@ export default function OrdersPage() {
     enabled: !!token,
   })
 
-  if (!token) return null
+  if (!hasHydrated || !token) return null
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">

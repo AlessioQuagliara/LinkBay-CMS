@@ -227,19 +227,28 @@ instradato alla storefront Next.js, non a Laravel (vedi diagramma sopra).
 
 - Poi accedi: **http://clientalpha.yoursite-linkbay-cms.test/admin**
 
-**⚠ Verificato dal vivo il 2026-07-08**: `Tenant::create()` scatena in modo
-asincrono la pipeline `CreateDatabase → MigrateDatabase → SeedDatabase`
-(`TenancyServiceProvider::events()`), che in un test reale con
-`docker compose up` è fallita due volte con
-`TenantDatabaseAlreadyExistsException: Database tenant<slug> already exists`
-— pur non esistendo affatto quel database secondo `psql -l` sullo stesso
-server. Non root-causato nel tempo disponibile (nessuna query
-`CREATE DATABASE` corrispondente nei log di Postgres). **Non assumere che la
-creazione tenant funzioni solo perché il comando torna senza errori** — dopo
-lo Step 4, verifica sempre che il pannello `/admin` del tenant carichi
-davvero e che `docker compose logs php | grep -i tenant` non mostri
-eccezioni, oppure controlla `App\Models\Central\FailedJob` da tinker o dal
-pannello Admin (Operations → Failed Jobs).
+**✅ Fixato e verificato dal vivo il 2026-07-09**: una versione precedente di
+questa nota segnalava `Tenant::create()` come intermittentemente rotto
+(`TenantDatabaseAlreadyExistsException` con il database in realtà assente).
+Root cause: `TenantProvisioningService::initializeDatabase()` chiamava
+`tenancy()->initialize()` subito dopo, assumendo che la pipeline asincrona
+`TenantCreated → CreateDatabase → MigrateDatabase → SeedDatabase`
+(`TenancyServiceProvider`) avesse già creato il database fisico — nessuna
+garanzia d'ordine tra i due. `TenantProvisioningService` ora crea e migra il
+database del tenant da sé, in modo sincrono
+(`ensureDatabaseProvisioned()`); `TenancyServiceProvider` non registra più
+quella pipeline per `TenantCreated`. La stessa sessione di test ha anche
+scoperto e corretto due bug reali specifici di Postgres (tollerati in
+silenzio da SQLite, quindi mai visti nei test automatici): una migration
+tenant che referenziava una tabella inesistente `tenant_users` invece di
+`users`, e il modello `Setting` privo della sua chiave primaria non
+standard (`key`, non `id`).
+
+Verificato dal vivo: creazione tenant sia via wizard agency
+(`ProvisionTenantDatabaseJob`, asincrono) sia via API centrale
+(`POST /central/api/tenants`, sincrono) — 3/3 di fila per entrambi, zero
+job falliti, database del tenant confermato migrato e seedato ogni volta.
+Test di regressione: `backend/tests/Feature/TenantProvisioningTest.php`.
 
 ---
 
@@ -302,5 +311,99 @@ Tutti gli URL locali usano `http://`. Questo è intenzionale:
 - `APP_URL=http://app.linkbay-cms.test` → `url()` e `route()` Laravel generano `http://`
 - `SESSION_DOMAIN=.linkbay-cms.test` → cookie condivisi cross-subdomain
 - `TrustProxies` è attivo (`bootstrap/app.php`) per gestire gli header X-Forwarded-* di Traefik
+
+---
+
+## Playwright golden path
+
+Suite E2E minimale (`frontend/e2e/`) che copre il percorso critico
+storefront → checkout → conferma → ordine in account contro lo stack Docker
+reale — non dipende solo dal runbook manuale per accorgersi di regressioni
+su login/checkout. Due spec, deliberatamente pochi test, non una batteria:
+
+- `checkout-golden-path.spec.ts` — percorso **autenticato**: registrazione →
+  carrello → checkout → pagamento Stripe reale (test mode) → conferma →
+  ordine visibile in `/account/orders`. Registrazione avviene **prima** del
+  checkout, non dopo: un ordine guest ha `customer_id = null` e non esiste
+  logica di "reclamo" per email da nessuna parte nell'app (verificato in
+  `CustomerAuthService` prima di scrivere il test) — collegare un ordine
+  guest a un account dopo la registrazione richiederebbe inventare un
+  comportamento nuovo, fuori scope ("non cambiare la logica di
+  checkout/ordini").
+- `guest-checkout.spec.ts` — percorso **guest**: carrello → checkout →
+  pagamento → conferma, senza account, verificando che la pagina di
+  conferma mostri i dati reali dell'ordine (non lo stato di errore ambra —
+  vedi `checkout/success/page.tsx`). Copre il path pubblico
+  `GET /api/store/checkout/{checkout}/order` separatamente da quello
+  autenticato.
+
+### Prerequisiti (una tantum)
+
+1. **Stack Docker avviato**:
+   ```bash
+   docker compose -f compose.yaml -f compose.override.local.yml up -d
+   ```
+2. **Riga in `/etc/hosts`** per il tenant e2e dedicato — non automatizzabile
+   da questa suite (richiede sudo):
+   ```
+   127.0.0.1 e2e-test.linkbay-cms.test e2e-test.yoursite-linkbay-cms.test
+   ```
+3. **Chiave Stripe test** in `frontend/.env.local` (deve combaciare con
+   `APP_STRIPE_SECRET_KEY` nel root `.env` — stesso account Stripe, modalità
+   test):
+   ```
+   NEXT_PUBLIC_STRIPE_KEY=pk_test_...
+   ```
+   e `NEXT_PUBLIC_MAIN_DOMAIN=linkbay-cms.test` (vedi
+   `frontend/.env.local.example` — senza questa riga il routing dei
+   subdomain è silenziosamente rotto, non solo per Playwright). Dopo aver
+   modificato `.env.local`: `docker compose build frontend && docker compose
+   up -d frontend` (i `NEXT_PUBLIC_*` sono baked al build time).
+4. **Migrations + seed piani** già eseguiti sul central DB (vedi sezione
+   "Comandi di avvio" più sopra).
+
+### Come lanciarlo
+
+```bash
+cd frontend
+npm ci
+npx playwright install --with-deps chromium   # una tantum
+npm run test:e2e            # headless
+npm run test:e2e:ui         # UI mode interattiva, utile per debug
+```
+
+Il `globalSetup` (`frontend/e2e/setup/provision-tenant.ts`) provisiona in
+modo idempotente un tenant fisso `e2e-test` — stessa pipeline verificata dal
+vivo in `docs/demo-runbook.md` § 0 (crea solo se assente), più un metodo di
+spedizione e un prodotto dedicati (`firstOrCreate`/`updateOrCreate`, sempre
+riallineati). Se `/etc/hosts` o lo stack non sono pronti, fallisce subito con
+un messaggio che dice esattamente cosa manca, invece di un timeout di
+navigazione oscuro.
+
+### Interpretare i risultati
+
+- **Verde**: il golden path funziona end-to-end contro il codice reale — non
+  solo build/lint/tsc puliti.
+- **Fallisce al passo Stripe** (`payWithStripeTestCard`): quasi sempre
+  `NEXT_PUBLIC_STRIPE_KEY` mancante/non ricostruita nel container, o
+  `APP_STRIPE_SECRET_KEY` non in modalità test — non un bug del test.
+- **Fallisce al passo "ordine in account"**: qui sì che vale la pena
+  guardare — significa che la sessione autenticata non produce più un
+  ordine collegato al cliente (regressione reale su
+  `CartController::store()`/`CheckoutService`).
+- Su fallimento: `frontend/playwright-report/index.html` (trace, screenshot,
+  video) e `frontend/test-results/`.
+- Riesecuzioni ripetute sono sicure: il tenant/prodotto/spedizione sono
+  fissi e idempotenti, solo l'email cliente è unica per run
+  (`e2e-{timestamp}@example.test`) — nessuna pulizia manuale richiesta tra
+  un run e l'altro.
+
+### CI (opzionale)
+
+`.github/workflows/e2e.yml` — solo `workflow_dispatch` (manuale), non su
+ogni push/PR: la suite guida iframe Stripe reali sulla rete, più lenta e
+potenzialmente più fragile delle suite unit/feature già in `ci.yml`. Richiede
+i secret repo `STRIPE_TEST_SECRET_KEY` e `STRIPE_TEST_PUBLISHABLE_KEY`
+(chiavi test, mai `sk_live_`/`pk_live_`).
 
 Per HTTPS locale in futuro: usare `mkcert linkbay-cms.test "*.linkbay-cms.test"` e abilitare il blocco `websecure` in compose.yaml.

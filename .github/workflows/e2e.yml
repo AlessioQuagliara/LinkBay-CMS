@@ -1,0 +1,117 @@
+name: E2E (Playwright)
+
+# Manual trigger only, not on every push/PR: this suite drives real Stripe
+# test-mode iframes over the network (see frontend/e2e/pages/storefront.page.ts),
+# which is inherently slower and flakier than the unit/feature suites in
+# ci.yml — a good candidate to run on demand or on a schedule once it's
+# proven stable, not as a blocking gate from day one. See
+# docs/local-full-flow-testing.md § "Playwright golden path" for the local
+# equivalent of everything this workflow does.
+on:
+  workflow_dispatch:
+  # Uncomment once STRIPE_TEST_* secrets are configured and the suite has
+  # proven stable enough to run unattended:
+  # schedule:
+  #   - cron: '0 6 * * 1' # weekly, Monday 06:00 UTC
+
+jobs:
+  e2e:
+    name: Playwright golden path
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      # Required — see docs/local-full-flow-testing.md § "Playwright golden
+      # path". Without these, checkout renders no Stripe payment form and
+      # both specs fail at the payment step (not a false negative — that's
+      # the real behavior of a misconfigured checkout).
+      APP_STRIPE_SECRET_KEY: ${{ secrets.STRIPE_TEST_SECRET_KEY }}
+      APP_STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_TEST_PUBLISHABLE_KEY }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Fail fast if Stripe test secrets are missing
+        run: |
+          if [ -z "$APP_STRIPE_SECRET_KEY" ] || [ -z "$APP_STRIPE_PUBLISHABLE_KEY" ]; then
+            echo "::error::STRIPE_TEST_SECRET_KEY / STRIPE_TEST_PUBLISHABLE_KEY repo secrets are not set — see docs/local-full-flow-testing.md."
+            exit 1
+          fi
+
+      - name: Add local domains to /etc/hosts
+        run: |
+          echo "127.0.0.1 linkbay-cms.test app.linkbay-cms.test admin.linkbay-cms.test" | sudo tee -a /etc/hosts
+          echo "127.0.0.1 e2e-test.linkbay-cms.test e2e-test.yoursite-linkbay-cms.test" | sudo tee -a /etc/hosts
+
+      - name: Configure root .env
+        run: |
+          cp .env.example .env
+          sed -i "s/^APP_STRIPE_PUBLISHABLE_KEY=.*/APP_STRIPE_PUBLISHABLE_KEY=${APP_STRIPE_PUBLISHABLE_KEY}/" .env
+          sed -i "s/^APP_STRIPE_SECRET_KEY=.*/APP_STRIPE_SECRET_KEY=${APP_STRIPE_SECRET_KEY}/" .env
+          sed -i "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=ci-e2e-password/" .env
+          grep -q '^POSTGRES_PASSWORD=' .env || echo "POSTGRES_PASSWORD=ci-e2e-password" >> .env
+
+      - name: Configure backend .env
+        run: cp backend/.env.example backend/.env
+
+      - name: Configure frontend .env.local
+        run: |
+          cat > frontend/.env.local <<EOF
+          NEXT_PUBLIC_API_BASE_URL=http://{slug}.yoursite-linkbay-cms.test
+          NEXT_PUBLIC_MAIN_DOMAIN=linkbay-cms.test
+          NEXT_PUBLIC_STRIPE_KEY=${APP_STRIPE_PUBLISHABLE_KEY}
+          EOF
+
+      - name: Build and start the stack
+        run: docker compose -f compose.yaml -f compose.override.local.yml up -d --build
+
+      - name: Wait for the app to become healthy
+        run: |
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://app.linkbay-cms.test/up || true)
+            [ "$code" = "200" ] && exit 0
+            sleep 3
+          done
+          echo "::error::App never became healthy — dumping php logs"
+          docker compose -f compose.yaml -f compose.override.local.yml logs php
+          exit 1
+
+      - name: Run migrations + plan seeder
+        run: |
+          docker compose -f compose.yaml -f compose.override.local.yml exec -T php php artisan migrate --force
+          docker compose -f compose.yaml -f compose.override.local.yml exec -T php php artisan db:seed --class=PlanSeeder --force
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright suite
+        working-directory: frontend
+        run: npx playwright test
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7
+
+      - name: Dump container logs on failure
+        if: failure()
+        run: docker compose -f compose.yaml -f compose.override.local.yml logs --tail=200
+
+      - name: Tear down the stack
+        if: always()
+        run: docker compose -f compose.yaml -f compose.override.local.yml down -v

@@ -13,15 +13,15 @@ const NAV = [
 
 export default function AccountPage() {
   const router = useRouter()
-  const { token, customer, logout } = useAuthStore()
+  const { token, customer, logout, hasHydrated } = useAuthStore()
 
   useEffect(() => {
-    if (!token) {
+    if (hasHydrated && !token) {
       router.replace('/account/login')
     }
-  }, [token, router])
+  }, [hasHydrated, token, router])
 
-  if (!token) return null
+  if (!hasHydrated || !token) return null
 
   async function handleLogout() {
     await logout()

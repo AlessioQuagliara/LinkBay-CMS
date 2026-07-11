@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Agency\Resources\StoreResource\Pages;
 
+use App\Exceptions\AgencyPlanRequiredException;
+use App\Filament\Agency\Pages\PlanSelectionPage;
 use App\Filament\Agency\Resources\StoreResource;
 use App\Jobs\ProvisionTenantDatabaseJob;
 use App\Models\Central\AgencyClient;
 use App\Models\Central\AuditEvent;
 use App\Models\Central\Tenant;
 use App\Services\AuditEventService;
+use App\Services\StoreProvisioningGate;
 use App\Services\TenantProvisioningService;
 use Filament\Forms;
+use Filament\Notifications\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Resources\Pages\CreateRecord\Concerns\HasWizard;
@@ -147,6 +151,25 @@ class CreateStore extends CreateRecord
                 ->title('Errore contesto agenzia')
                 ->body('Impossibile identificare l\'agenzia corrente. Ricarica la pagina e riprova.')
                 ->danger()
+                ->send();
+
+            $this->halt();
+        }
+
+        try {
+            app(StoreProvisioningGate::class)->enforce($agency);
+        } catch (AgencyPlanRequiredException $e) {
+            Notification::make()
+                ->title('Piano attivo richiesto')
+                ->body($e->getMessage().' Passa a un piano per continuare, oppure contatta il supporto.')
+                ->danger()
+                ->actions([
+                    Action::make('upgrade')
+                        ->label('Vai ai piani')
+                        ->url(PlanSelectionPage::getUrl())
+                        ->button(),
+                ])
+                ->persistent()
                 ->send();
 
             $this->halt();

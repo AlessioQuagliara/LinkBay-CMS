@@ -8,6 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
+    // 'key' (string) is the real primary key — see the migration, no 'id'
+    // column exists. Without these three, Eloquent assumes an auto-increment
+    // 'id' and appends "returning id" to inserts, which SQLite tolerates but
+    // Postgres hard-fails on ("column id does not exist") — found via live
+    // tenant-provisioning testing, 2026-07-09.
+    protected $primaryKey = 'key';
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
     protected $fillable = ['key', 'value', 'group'];
 
     public $timestamps = false;

@@ -73,11 +73,12 @@ function AddAddressForm({ onSuccess }: { onSuccess: () => void }) {
 
 export default function ProfilePage() {
   const router = useRouter()
-  const { token, customer, fetchProfile } = useAuthStore()
+  const { token, customer, fetchProfile, hasHydrated } = useAuthStore()
   const [name, setName] = useState('')
   const [showAddForm, setShowAddForm] = useState(false)
 
   useEffect(() => {
+    if (!hasHydrated) return
     if (!token) {
       router.replace('/account/login')
       return
@@ -88,7 +89,7 @@ export default function ProfilePage() {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- sync da store async, non calcolabile al render
       setName(customer.name)
     }
-  }, [token, customer, router])
+  }, [hasHydrated, token, customer, router])
 
   const { data: addresses = [], refetch: refetchAddresses } = useQuery({
     queryKey: ['addresses'],
@@ -105,7 +106,7 @@ export default function ProfilePage() {
     onError: (err) => toast.error(getErrorMessage(err, 'Impossibile aggiornare il profilo.')),
   })
 
-  if (!token) return null
+  if (!hasHydrated || !token) return null
 
   return (
     <div className="mx-auto max-w-lg px-4 py-12 sm:px-6">

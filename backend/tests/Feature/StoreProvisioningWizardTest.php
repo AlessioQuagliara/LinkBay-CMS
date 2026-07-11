@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Exceptions\AgencyPlanRequiredException;
 use App\Jobs\ProvisionTenantDatabaseJob;
 use App\Models\Central\Agency;
 use App\Models\Central\AgencyClient;
 use App\Models\Central\AgencyMember;
 use App\Models\Central\Plan;
 use App\Models\Central\User;
+use App\Services\StoreProvisioningGate;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Queue;
 use Tests\CentralTestCase;
@@ -159,5 +161,39 @@ class StoreProvisioningWizardTest extends CentralTestCase
         $this->assertEquals($agency->id, $output['agency_id']);
         $this->assertEquals('active', $output['status']);
         $this->assertEquals('My Store', $output['name']);
+    }
+
+    // ── Plan gate (CreateStore::mutateFormDataBeforeCreate) ────────────────────
+
+    public function test_wizard_allows_form_mutation_for_agency_with_active_plan(): void
+    {
+        // makeAgency() assigns a plan_id directly (no AgencySubscription row),
+        // which Agency::hasActivePlan() treats as active — same as an
+        // admin-granted plan. This is the same agency every other test in this
+        // file already relies on, so the gate must not regress them.
+        $agency = $this->makeAgency();
+
+        // Apply the same logic as CreateStore::mutateFormDataBeforeCreate().
+        app(StoreProvisioningGate::class)->enforce($agency);
+
+        $this->addToAssertionCount(1); // enforce() did not throw
+    }
+
+    public function test_wizard_blocks_form_mutation_for_agency_without_active_plan(): void
+    {
+        $agency = Agency::create([
+            'name' => 'No Plan Agency',
+            'slug' => 'no-plan-agency',
+            'brand_name' => 'No Plan Agency',
+            'status' => 'active',
+            'billing_type' => 'monthly',
+        ]);
+        app()->instance('current_agency', $agency);
+
+        // Apply the same logic as CreateStore::mutateFormDataBeforeCreate():
+        // the gate must throw before agency_id/status are ever stamped onto
+        // the form data, i.e. before Tenant::create() could be reached.
+        $this->expectException(AgencyPlanRequiredException::class);
+        app(StoreProvisioningGate::class)->enforce($agency);
     }
 }

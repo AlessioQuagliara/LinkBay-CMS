@@ -9,6 +9,12 @@ interface AuthStore {
   token: string | null
   customer: Customer | null
   isLoading: boolean
+  /** False until the persisted token has been read back from localStorage —
+   * on a full page load/navigation, the store's first render is always the
+   * default (unhydrated) state, so guards like "no token -> redirect to
+   * login" must wait for this before deciding, or they fire one tick too
+   * early and boot an already-logged-in visitor back to the login page. */
+  hasHydrated: boolean
 
   login: (payload: LoginPayload) => Promise<void>
   register: (payload: RegisterPayload) => Promise<void>
@@ -17,6 +23,7 @@ interface AuthStore {
   /** Clears local auth state without calling the API — used when the server
    * already rejected the token (401) and there is nothing left to revoke. */
   clearAuth: () => void
+  setHasHydrated: (value: boolean) => void
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -25,6 +32,7 @@ export const useAuthStore = create<AuthStore>()(
       token: null,
       customer: null,
       isLoading: false,
+      hasHydrated: false,
 
       async login(payload) {
         set({ isLoading: true })
@@ -70,10 +78,17 @@ export const useAuthStore = create<AuthStore>()(
       clearAuth() {
         set({ token: null, customer: null })
       },
+
+      setHasHydrated(value) {
+        set({ hasHydrated: value })
+      },
     }),
     {
       name: 'auth-store',
       partialize: (state) => ({ token: state.token }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true)
+      },
     },
   ),
 )

@@ -102,6 +102,27 @@ class Agency extends Model
         return in_array($this->stripe_status, ['active', 'trialing'], true);
     }
 
+    /**
+     * Authoritative "can this agency create a new store" check.
+     *
+     * A plan must be assigned, and — if a billing subscription row exists for
+     * it — that subscription must be in good standing (active/trialing;
+     * lifetime subscriptions are created with status=active and never expire).
+     * No subscription row at all (e.g. a plan granted manually by an admin,
+     * bypassing Stripe) is treated as active, since plan_id is the explicit
+     * signal of intent in that case.
+     */
+    public function hasActivePlan(): bool
+    {
+        if ($this->plan_id === null) {
+            return false;
+        }
+
+        $subscription = $this->subscription;
+
+        return $subscription === null || $subscription->isActive();
+    }
+
     public function paymentMethodLabel(): string
     {
         if (! $this->payment_method_last4) {

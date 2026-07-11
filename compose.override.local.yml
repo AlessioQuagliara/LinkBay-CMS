@@ -64,6 +64,18 @@ services:
       # il backend risolve il tenant dal dominio della richiesta (STORE_DOMAIN), un
       # dominio centrale/condiviso qui viene rifiutato da PreventAccessFromCentralDomains.
       NEXT_PUBLIC_API_BASE_URL: http://{slug}.yoursite-linkbay-cms.test
+    extra_hosts:
+      # I Server Component di Next.js (fetchProduct, fetchHomePage, ecc.) fanno
+      # fetch da DENTRO il container. Sul Mac i domini *.test sono risolti a
+      # 127.0.0.1 da un resolver wildcard: fuori da Docker è corretto (Traefik
+      # ascolta lì), ma dentro al container 127.0.0.1 è il loopback del
+      # container stesso → ECONNREFUSED, pagina prodotto in 500 (visto coi
+      # test Playwright del golden path). host-gateway punta invece all'host
+      # Docker reale, dove Traefik è in ascolto — stesso risultato di un vero
+      # fetch da browser. Aggiungere una riga per ogni store usato negli e2e/
+      # test manuali SSR (stesso principio dei domini in /etc/hosts sopra).
+      - "e2e-test.linkbay-cms.test:host-gateway"
+      - "e2e-test.yoursite-linkbay-cms.test:host-gateway"
     labels:
       # Override: aggiungi i router .test per il frontend locale
       - "traefik.enable=true"

@@ -26,7 +26,14 @@ return new class extends Migration
             $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();
 
-            $table->foreign('created_by')->references('id')->on('tenant_users')->nullOnDelete();
+            // References the tenant's own 'users' table (App\Models\Tenant\User) —
+            // there is no 'tenant_users' table; that string only appears elsewhere
+            // as an auth guard/provider *name* (config/auth.php), not a table.
+            // This FK previously pointed at a non-existent table, which is silently
+            // tolerated by SQLite (used in tests) but hard-fails on Postgres (used
+            // in Docker/production) with "relation tenant_users does not exist" —
+            // found via live provisioning testing, 2026-07-09.
+            $table->foreign('created_by')->references('id')->on('users')->nullOnDelete();
             $table->index(['tenant_id', 'collection']);
         });
     }

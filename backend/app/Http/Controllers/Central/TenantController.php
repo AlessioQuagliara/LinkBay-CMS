@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Central;
 
+use App\Exceptions\AgencyPlanRequiredException;
 use App\Http\Controllers\Controller;
+use App\Models\Central\Agency;
 use App\Models\Central\Tenant;
+use App\Services\StoreProvisioningGate;
 use App\Services\TenantProvisioningService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,7 +16,8 @@ use Illuminate\Http\Request;
 class TenantController extends Controller
 {
     public function __construct(
-        private readonly TenantProvisioningService $provisioningService
+        private readonly TenantProvisioningService $provisioningService,
+        private readonly StoreProvisioningGate $provisioningGate,
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -40,9 +44,24 @@ class TenantController extends Controller
             'name' => 'required|string|max:255',
             'domain' => 'required|string|max:255|unique:tenants,id',
             'plan_id' => 'nullable|exists:plans,id',
+            'agency_id' => 'nullable|exists:agencies,id',
             'admin_email' => 'required|email',
             'admin_password' => 'required|string|min:8',
         ]);
+
+        if (! empty($validated['agency_id'])) {
+            $agency = Agency::findOrFail($validated['agency_id']);
+
+            try {
+                $this->provisioningGate->enforce($agency);
+            } catch (AgencyPlanRequiredException $e) {
+                return response()->json([
+                    'error' => 'active_plan_required',
+                    'message' => $e->getMessage(),
+                    'upgrade_url' => url('/pricing'),
+                ], 403);
+            }
+        }
 
         $tenant = $this->provisioningService->provision($validated);
 

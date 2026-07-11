@@ -6,6 +6,7 @@ namespace Tests\Feature\Tenant;
 
 use App\Models\Tenant\CartItem;
 use App\Models\Tenant\CartSession;
+use App\Models\Tenant\Customer;
 use App\Models\Tenant\DiscountCode;
 use App\Models\Tenant\Product;
 use Tests\Concerns\InteractsWithTenantRoutes;
@@ -21,12 +22,59 @@ class CartApiTest extends TenantTestCase
         $this->bypassTenantDomainResolution();
     }
 
+    private function authHeaders(string $token): array
+    {
+        return ['Authorization' => "Bearer {$token}"];
+    }
+
     public function test_store_creates_a_new_cart_session(): void
     {
         $response = $this->postJson('/api/store/cart', ['session_id' => 'sess-1']);
 
         $response->assertCreated();
         $this->assertDatabaseHas('cart_sessions', ['session_id' => 'sess-1']);
+    }
+
+    /**
+     * Regression test: the storefront layout initializes the cart on every
+     * page (including /account/login, before a shopper has authenticated),
+     * so a cart is routinely created anonymously first. Once that same
+     * browser session registers/logs in, the next /api/store/cart call for
+     * the same session_id carries a bearer token and must attach the
+     * customer — otherwise the order this cart produces never shows up in
+     * that customer's own order history.
+     */
+    public function test_store_attaches_customer_to_a_previously_anonymous_cart(): void
+    {
+        $this->postJson('/api/store/cart', ['session_id' => 'sess-claim']);
+        $this->assertDatabaseHas('cart_sessions', ['session_id' => 'sess-claim', 'customer_id' => null]);
+
+        $customer = Customer::factory()->create(['password' => bcrypt('password123')]);
+        $token = $this->postJson('/api/account/login', [
+            'email' => $customer->email,
+            'password' => 'password123',
+        ])->json('data.token');
+
+        $response = $this->postJson('/api/store/cart', ['session_id' => 'sess-claim'], $this->authHeaders($token));
+
+        $response->assertCreated();
+        $this->assertDatabaseHas('cart_sessions', ['session_id' => 'sess-claim', 'customer_id' => $customer->id]);
+    }
+
+    public function test_store_never_reassigns_a_cart_already_owned_by_another_customer(): void
+    {
+        $owner = Customer::factory()->create();
+        $cart = CartSession::factory()->create(['session_id' => 'sess-owned', 'customer_id' => $owner->id]);
+
+        $other = Customer::factory()->create(['password' => bcrypt('password123')]);
+        $token = $this->postJson('/api/account/login', [
+            'email' => $other->email,
+            'password' => 'password123',
+        ])->json('data.token');
+
+        $this->postJson('/api/store/cart', ['session_id' => 'sess-owned'], $this->authHeaders($token));
+
+        $this->assertSame($owner->id, $cart->fresh()->customer_id);
     }
 
     public function test_add_item_creates_cart_item_with_product_price(): void

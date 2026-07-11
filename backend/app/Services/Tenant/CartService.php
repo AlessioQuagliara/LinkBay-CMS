@@ -14,13 +14,25 @@ class CartService
 {
     public function getOrCreateCart(string $sessionId, ?int $customerId = null): CartSession
     {
-        return CartSession::firstOrCreate(
+        $cart = CartSession::firstOrCreate(
             ['session_id' => $sessionId],
             [
                 'customer_id' => $customerId,
                 'expires_at' => now()->addDays(30),
             ]
         );
+
+        // A cart is commonly created anonymously (e.g. the layout initializes
+        // it on the very first page load, before login) and only later seen
+        // with a resolved customer once the shopper registers/logs in in the
+        // same browser session. Attach the now-known identity so the order it
+        // produces is tied to that customer and shows up in their account —
+        // never overwrite an identity the cart already has.
+        if ($customerId !== null && $cart->customer_id === null) {
+            $cart->update(['customer_id' => $customerId]);
+        }
+
+        return $cart;
     }
 
     public function addItem(CartSession $cart, int $productId, int $quantity, ?int $variantId = null): CartItem

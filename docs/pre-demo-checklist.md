@@ -54,14 +54,12 @@ minutes for someone who already has the stack running.
 ## Golden path (see docs/demo-runbook.md for full detail)
 
 - [ ] Agency registration → login works
-- [ ] **Tenant/store creation works, panel reachable AND the tenant database
-      is actually queryable** — don't just check the Filament wizard says
-      "created". Live testing (2026-07-08) found the async
-      `CreateDatabase`/`MigrateDatabase`/`SeedDatabase` pipeline can fail
-      inconsistently (see docs/demo-runbook.md § 0 for the exact symptom) —
-      confirmed unresolved, not a false alarm. Check
-      `docker compose logs php | grep -i tenant` and the central Failed Jobs
-      admin page after creating a store, before assuming it's ready.
+- [x] ~~Tenant/store creation works, panel reachable AND the tenant database
+      is actually queryable~~ — fixed and verified live 2026-07-09 (agency
+      wizard + central API, 3/3 each, zero failed jobs). See
+      docs/demo-runbook.md § 0 for the root cause and fix. Still worth a spot
+      check before a real demo — verify a store's Filament `/admin` loads and
+      the central Failed Jobs admin page is empty after creating it.
 - [ ] Shipping method exists for the demo store (checkout silently looks
       broken without one)
 - [ ] At least one active/published product exists and shows on `/shop`

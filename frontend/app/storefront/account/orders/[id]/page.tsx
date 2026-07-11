@@ -27,11 +27,11 @@ export default function OrderDetailPage({
 }) {
   const { id } = use(params)
   const router = useRouter()
-  const { token } = useAuthStore()
+  const { token, hasHydrated } = useAuthStore()
 
   useEffect(() => {
-    if (!token) router.replace('/account/login')
-  }, [token, router])
+    if (hasHydrated && !token) router.replace('/account/login')
+  }, [hasHydrated, token, router])
 
   const { data: order, isLoading } = useQuery({
     queryKey: ['order', id],
@@ -39,7 +39,7 @@ export default function OrderDetailPage({
     enabled: !!token && !!id,
   })
 
-  if (!token) return null
+  if (!hasHydrated || !token) return null
 
   const { label, cls } = order
     ? (STATUS_MAP[order.status] ?? { label: order.status, cls: 'bg-gray-100 text-gray-600' })
