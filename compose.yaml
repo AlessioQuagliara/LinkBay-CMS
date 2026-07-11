@@ -84,8 +84,15 @@ services:
       dockerfile: docker/php/Dockerfile
     container_name: saas_php
     restart: unless-stopped
+    # Only backend/.env feeds the container's process env directly — root .env
+    # is still used by Compose itself for ${VAR} substitution below (that's
+    # automatic for any .env next to this file, independent of env_file:), but
+    # injecting it here too caused duplicate/conflicting APP_KEY and APP_URL
+    # values inside the php container in production (APP_URL came out as
+    # "http:https://app.linkbay-cms.com"). Anything the app actually needs from
+    # root .env (Stripe keys, CENTRAL_DOMAIN, ...) is already explicitly
+    # re-mapped below with the right name, so backend/.env alone is sufficient.
     env_file:
-      - .env
       - ./backend/.env
     environment:
       APP_ENV: ${APP_ENV:-production}
