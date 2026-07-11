@@ -73,6 +73,26 @@ jobs:
       - name: Check code style (Pint)
         run: vendor/bin/pint --test
 
+      # AgencyPanelProvider registers a Vite theme (resources/css/filament-agency.css).
+      # Filament resolves that manifest synchronously the moment it actually renders
+      # any page for that panel — tests that reach a real panel render (not just an
+      # early 404 from EnsureValidAgencyDomain) throw ViteManifestNotFoundException
+      # without a built public/build/manifest.json. backend-assets (below) builds the
+      # same assets but is a fully independent parallel job with no artifact sharing,
+      # so this job needs its own build rather than depending on that one.
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build Vite assets
+        run: npm run build
+
       # Migrations without an explicit $connection (e.g. create_tenants_table) land on
       # the "default" connection; migrations under database/migrations/central force the
       # 'central' connection explicitly. --database=central makes both resolve to the
