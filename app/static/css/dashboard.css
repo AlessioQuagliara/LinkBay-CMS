@@ -1,0 +1,137 @@
+/*
+  LinkBay Admin — CSS dell'area protetta (dashboard + form auth).
+  Usa i token in tokens.css. Ispirato a Shopify Polaris nello stile
+  (superfici neutre, gerarchia chiara), nessun asset copiato.
+  Prefisso classi: "lb-".
+*/
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--lb-bg);
+  color: var(--lb-ink-900);
+  font-family: var(--lb-font);
+  font-size: var(--lb-fs-base);
+  line-height: var(--lb-lh-base);
+}
+a { color: var(--lb-accent-600); text-decoration: none; }
+a:hover { text-decoration: underline; }
+table { border-collapse: collapse; width: 100%; }
+:focus-visible { outline: 2px solid var(--lb-accent-600); outline-offset: 2px; }
+
+/* ---------- Flash messages ---------- */
+.lb-flash-region { max-width: 1180px; margin: var(--lb-space-4) auto 0; padding: 0 var(--lb-space-6); display: flex; flex-direction: column; gap: var(--lb-space-2); }
+.lb-banner {
+  padding: var(--lb-space-3) var(--lb-space-4);
+  border-radius: var(--lb-radius-md);
+  border: 1px solid var(--lb-border);
+  font-size: var(--lb-fs-sm);
+}
+.lb-banner--success { background: var(--lb-success-100); border-color: var(--lb-success-100); color: var(--lb-success-700); }
+.lb-banner--error, .lb-banner--critical { background: var(--lb-critical-100); border-color: var(--lb-critical-100); color: var(--lb-critical-700); }
+.lb-banner--info { background: var(--lb-accent-100); border-color: var(--lb-accent-100); color: var(--lb-accent-700); }
+
+/* ---------- Shell: sidebar + topbar ---------- */
+.lb-shell { display: flex; min-height: 100vh; }
+.lb-sidebar {
+  width: 220px; flex: 0 0 220px;
+  background: var(--lb-surface);
+  border-right: 1px solid var(--lb-border);
+  display: flex; flex-direction: column;
+}
+.lb-sidebar__brand {
+  display: flex; align-items: center; gap: var(--lb-space-3);
+  padding: var(--lb-space-4);
+  border-bottom: 1px solid var(--lb-border);
+  color: var(--lb-ink-900); font-weight: var(--lb-fw-semibold);
+}
+.lb-sidebar__brand:hover { text-decoration: none; }
+.lb-sidebar__logo { height: 24px; width: auto; display: block; }
+.lb-sidebar__nav { padding: var(--lb-space-3); display: flex; flex-direction: column; gap: 2px; }
+.lb-nav-item {
+  padding: var(--lb-space-2) var(--lb-space-3);
+  border-radius: var(--lb-radius-md);
+  color: var(--lb-ink-700); font-size: var(--lb-fs-sm); font-weight: var(--lb-fw-medium);
+}
+.lb-nav-item:hover { background: var(--lb-surface-secondary); text-decoration: none; color: var(--lb-ink-900); }
+.lb-nav-item.is-active { background: var(--lb-ink-900); color: #fff; }
+.lb-sidebar__footer { margin-top: auto; padding: var(--lb-space-4); border-top: 1px solid var(--lb-border); font-size: var(--lb-fs-caption); color: var(--lb-ink-500); }
+
+.lb-main { flex: 1 1 auto; min-width: 0; }
+.lb-topbar {
+  height: 56px; background: var(--lb-surface); border-bottom: 1px solid var(--lb-border);
+  display: flex; align-items: center; justify-content: flex-end; gap: var(--lb-space-3);
+  padding: 0 var(--lb-space-6);
+}
+.lb-topbar__user { font-size: var(--lb-fs-sm); color: var(--lb-ink-500); }
+.lb-content { padding: var(--lb-space-6); max-width: 1000px; }
+
+/* ---------- Page header ---------- */
+.lb-page-header { margin-bottom: var(--lb-space-5); }
+.lb-page-header__title { font-size: var(--lb-fs-xl); font-weight: var(--lb-fw-semibold); margin: 0; }
+.lb-page-header__subtitle { margin: 4px 0 0; font-size: var(--lb-fs-sm); color: var(--lb-ink-500); }
+
+/* ---------- Card ---------- */
+.lb-card {
+  background: var(--lb-surface);
+  border: 1px solid var(--lb-border);
+  border-radius: var(--lb-radius-lg);
+  box-shadow: var(--lb-shadow-sm);
+}
+.lb-card__body { padding: var(--lb-space-5); }
+.lb-card + .lb-card { margin-top: var(--lb-space-5); }
+
+/* ---------- Stat ---------- */
+.lb-stat { display: flex; flex-direction: column; gap: 4px; }
+.lb-stat__label { font-size: var(--lb-fs-sm); color: var(--lb-ink-500); }
+.lb-stat__value { font-size: var(--lb-fs-xxl); font-weight: var(--lb-fw-semibold); }
+
+/* ---------- Table ---------- */
+.lb-table { font-size: var(--lb-fs-sm); }
+.lb-table thead th {
+  text-align: left; font-size: 12px; font-weight: var(--lb-fw-semibold);
+  color: var(--lb-ink-500); text-transform: uppercase; letter-spacing: .03em;
+  padding: 10px var(--lb-space-5); border-bottom: 1px solid var(--lb-border);
+  background: var(--lb-surface-secondary);
+}
+.lb-table td { padding: var(--lb-space-3) var(--lb-space-5); border-bottom: 1px solid var(--lb-border); }
+.lb-table tbody tr:last-child td { border-bottom: none; }
+.lb-table tbody tr:hover { background: var(--lb-surface-secondary); }
+
+/* ---------- Empty state ---------- */
+.lb-empty { padding: var(--lb-space-10) var(--lb-space-6); text-align: center; }
+.lb-empty__title { font-size: var(--lb-fs-md); font-weight: var(--lb-fw-semibold); margin: 0 0 4px; }
+.lb-empty__desc { font-size: var(--lb-fs-sm); color: var(--lb-ink-500); margin: 0 0 var(--lb-space-4); }
+
+/* ---------- Buttons ---------- */
+.lb-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; padding: 0 16px;
+  border-radius: var(--lb-radius-md);
+  font-size: var(--lb-fs-sm); font-weight: var(--lb-fw-medium);
+  border: 1px solid transparent; cursor: pointer;
+}
+.lb-btn:hover { text-decoration: none; }
+.lb-btn--primary { background: var(--lb-ink-900); border-color: var(--lb-ink-900); color: #fff; }
+.lb-btn--primary:hover { background: #2a2c31; }
+.lb-btn--secondary { background: var(--lb-surface); border-color: var(--lb-border-strong); color: var(--lb-ink-900); }
+.lb-btn--secondary:hover { background: var(--lb-surface-secondary); }
+.lb-btn--block { width: 100%; }
+
+/* ---------- Forms ---------- */
+.lb-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: var(--lb-space-4); }
+.lb-field label { font-size: var(--lb-fs-sm); font-weight: var(--lb-fw-medium); }
+.lb-input {
+  border: 1px solid var(--lb-border-strong); border-radius: var(--lb-radius-md);
+  padding: 9px 10px; font-size: var(--lb-fs-sm); font-family: inherit; width: 100%;
+}
+.lb-input:focus { border-color: var(--lb-ink-900); }
+.lb-field__error { font-size: 12.5px; color: var(--lb-critical-600); font-weight: var(--lb-fw-medium); }
+
+/* ---------- Auth pages (login/register) ---------- */
+.lb-auth-shell { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: var(--lb-space-6); }
+.lb-auth-card { width: 100%; max-width: 380px; background: var(--lb-surface); border: 1px solid var(--lb-border); border-radius: var(--lb-radius-lg); box-shadow: var(--lb-shadow-sm); padding: var(--lb-space-8); }
+.lb-auth-brand { display: flex; justify-content: center; margin-bottom: var(--lb-space-6); }
+.lb-auth-brand img { height: 28px; width: auto; }
+.lb-auth-card h1 { font-size: var(--lb-fs-lg); text-align: center; margin: 0 0 var(--lb-space-6); }
+.lb-auth-alt { text-align: center; font-size: var(--lb-fs-sm); color: var(--lb-ink-500); margin-top: var(--lb-space-4); }

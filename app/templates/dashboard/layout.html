@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="lb-shell">
+  <aside class="lb-sidebar">
+    <a class="lb-sidebar__brand" href="{{ url_for('dashboard.overview') }}">
+      <img class="lb-sidebar__logo" src="{{ url_for('static', filename='shared/logo.png') }}" alt="LinkBayCMS">
+    </a>
+    <nav class="lb-sidebar__nav">
+      <a class="lb-nav-item {{ 'is-active' if request.endpoint == 'dashboard.overview' }}" href="{{ url_for('dashboard.overview') }}">Overview</a>
+      {% if current_user.is_admin %}
+        <a class="lb-nav-item" href="{{ url_for('admin.index') }}">Flask-Admin</a>
+      {% endif %}
+    </nav>
+    <div class="lb-sidebar__footer">
+      {{ current_user.name }}<br>
+      <a href="{{ url_for('auth.logout') }}">Logout</a>
+    </div>
+  </aside>
+
+  <div class="lb-main">
+    <header class="lb-topbar">
+      <span class="lb-topbar__user">{{ current_user.email }}</span>
+    </header>
+    <main class="lb-content">
+      {% block dashboard_content %}{% endblock %}
+    </main>
+  </div>
+</div>
+{% endblock %}

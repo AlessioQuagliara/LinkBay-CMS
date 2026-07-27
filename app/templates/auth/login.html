@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block content %}
+<div class="lb-auth-shell">
+  <div class="lb-auth-card">
+    <a class="lb-auth-brand" href="{{ url_for('main.index') }}">
+      <img src="{{ url_for('static', filename='shared/logo.png') }}" alt="LinkBayCMS">
+    </a>
+    <h1>Sign In</h1>
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+
+      <div class="lb-field">
+        {{ form.email.label }}
+        {{ form.email(class_="lb-input", placeholder="your@company.com") }}
+        {% for error in form.email.errors %}<span class="lb-field__error">{{ error }}</span>{% endfor %}
+      </div>
+
+      <div class="lb-field">
+        {{ form.password.label }}
+        {{ form.password(class_="lb-input", placeholder="••••••••") }}
+        {% for error in form.password.errors %}<span class="lb-field__error">{{ error }}</span>{% endfor %}
+      </div>
+
+      {{ form.submit(class_="lb-btn lb-btn--primary lb-btn--block") }}
+    </form>
+    <p class="lb-auth-alt">Don't have an account? <a href="{{ url_for('auth.register') }}">Sign up</a></p>
+  </div>
+</div>
+{% endblock %}

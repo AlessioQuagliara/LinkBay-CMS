@@ -1,123 +1,253 @@
-# LinkBay CMS®
+# LinkBay Admin
 
-**Il monitor delle pagine che perdono traffico organico.**
+Base tecnica pulita per un SaaS: Flask, Postgres, login, e una struttura pronta a crescere per blueprint. Questo README è pensato per te tra una settimana, quando non ricorderai più i dettagli: leggilo dall'inizio, non serve altro.
 
-Sono Alessio Quagliara, founder di LinkBayCMS. Questo repository è il prodotto che sto costruendo, in autonomia, da founder tecnico. Questo documento è la fotografia più onesta che posso dare di cosa sto costruendo, perché, e per chi.
-
-> Nota di percorso: questo README descrive un cambio di rotta rispetto alle versioni precedenti del progetto (che era un CMS multi-tenant per agenzie). Il piano che segue è quello attuale, descritto per intero in [BUSINESS_PLAN.md](BUSINESS_PLAN.md).
-
-## In una frase
-
-LinkBay CMS ti dice **quali pagine del tuo sito stanno perdendo traffico su Google, e quali conviene sistemare per prime.**
-
-Non sostituisce il CMS del cliente. Ci lavora sopra.
-
-## Il problema, con un esempio vero
-
-Un sito di contenuti ha 3.000 pagine pubblicate. Il traffico totale sembra stabile: 200.000 visite al mese, più o meno come l'anno scorso. Tutto ok, apparentemente.
-
-In realtà sotto sta succedendo questo: 40 pagine nuove hanno portato +30.000 visite, 180 pagine vecchie ne hanno perse -28.000. Il totale si compensa, quindi **nessuno se ne accorge**, mentre l'azienda brucia pagine che aveva già pagato per scrivere.
-
-Caso singolo, più concreto: la guida "migliori scarpe da running" faceva 4.000 visite al mese. Oggi ne fa 900. Scesa piano, mese dopo mese, per 8 mesi. Nessun allarme, perché in Search Console quel calo è una riga su tremila.
-
-Il risultato tipico: **te ne accorgi un anno dopo, quando recuperare costa dieci volte di più.**
-
-## Cosa fa
-
-Tre cose, in ordine:
-
-1. **Ti dice cosa sta scendendo davvero.** Non il rumore giornaliero: la tendenza su mesi, isolando le pagine in vera discesa secondo regole precise (sotto).
-2. **Ti dice quanto pesa**, in **click persi al mese** — una moneta reale, presa da Search Console.
-3. **Ti dice cosa fare prima**: non un grafico, ma 5-10 pagine in ordine di priorità, ognuna con il motivo scritto in italiano semplice.
-
-Esempio di output:
-
-> **Priorità 1 — /guide/migliori-scarpe-running**
-> Ha perso 3.100 click/mese negli ultimi 8 mesi. Era in posizione media 3,1, ora è 11,4. Il resto del sito nello stesso periodo è sceso solo del 4%: questa pagina sta scendendo per conto suo. Le impressioni sono rimaste alte: la domanda c'è ancora, il problema è il posizionamento.
-> **Priorità alta:** valeva molto, sta perdendo molto, ed è a poca distanza dalla prima pagina.
-
-## Cosa vuol dire "vera discesa"
-
-Una pagina entra in lista solo se rispetta **tutte** queste condizioni:
-
-| Regola | Valore di partenza | A cosa serve |
-|---|---|---|
-| Soglia minima di rilevanza | almeno 50 click nel mese migliore degli ultimi 16 | non allarmarsi per pagine irrilevanti |
-| Perdita minima percentuale | almeno -30% | sotto è oscillazione normale |
-| Perdita minima assoluta | almeno -20 click/mese | evita di confrontare cali di scala diversa |
-| Finestra temporale | ultimi 3 mesi vs 3 mesi precedenti | un mese è rumore, sei mesi arrivano tardi |
-| Persistenza | calo in almeno 2 mesi consecutivi | un mese storto capita a tutti |
-
-Più due filtri anti-falsi-allarme:
-
-- **Stagionalità**: confronto anche con lo stesso trimestre dell'anno prima.
-- **Colpa del sito o della pagina**: confronto con l'andamento medio dell'intero sito nello stesso periodo. Interessano solo le pagine che scendono **più del sito attorno a loro** — questo filtro elimina il 90% del rumore ed è la risposta alla prima domanda che farà ogni SEO in demo.
-
-Le soglie sono **valori di partenza**, da tarare sui primi utenti reali e regolabili per cliente.
-
-## Come si decide la priorità
-
-Ogni pagina prende un punteggio su quattro domande: quanto valeva prima, quanto sta perdendo, quanto è facile da recuperare (posizione persa piccola vs grande), e se la domanda c'è ancora (impressioni stabili = si aggiusta; impressioni crollate = non c'è nulla da salvare). Ogni punteggio è accompagnato dalla spiegazione in italiano: nessun numero senza motivazione.
-
-## Il valore in euro
-
-La moneta di default è una sola: **click persi al mese**, dato reale e verificabile da Search Console. Gli euro arrivano solo se il cliente indica il valore di una visita o collega Analytics, e sempre etichettati come stima dichiarata. Se non c'è dato, non si inventa nulla — il giorno che un euro è sbagliato, il cliente non crede più nemmeno ai click.
-
-## Cosa NON facciamo
-
-- ❌ Non è un CMS e non modifica il sito del cliente
-- ❌ Non è un page builder, non scrive contenuti, non è keyword research
-- ❌ Non è l'ennesima dashboard che rimette in bella copia Search Console
-- ❌ Non facciamo audit tecnici completi (ci sono già Screaming Frog, Ahrefs)
-
-Una cosa sola: individuare le pagine che perdono traffico organico e metterle in fila per priorità.
-
-## Per chi è
-
-Cliente ideale, stretto e non largo: **publisher e siti editoriali** (non aziende con un blog, non e-commerce), tra **500 e 20.000 pagine indicizzate**, almeno **20.000 click organici/mese** da Search Console, dove il traffico organico è la fonte principale di ricavi, e dove **esiste già qualcuno che può mettere mano ai contenuti** (SEO interno, content manager, agenzia). Senza quest'ultimo punto, la lista resta lì inutilizzata e il cliente disdice al secondo mese.
-
-Le agenzie SEO (multi-sito, white label) arrivano dal mese sei, non subito.
-
-## Perché scelgono noi
-
-| Cosa usano oggi | Perché non basta |
-|---|---|
-| Google Search Console | Archivio, non assistente: non avvisa, non toglie stagionalità, non distingue il calo tuo da quello generale, non prioritizza |
-| Ahrefs / Semrush | Attrezzi da analisi completi ma costosi (100-500 €/mese), usati al 10% |
-| Screaming Frog | Fotografia tecnica del momento, non ha memoria storica |
-| Un Excel fatto a mano | Funziona finché c'è chi lo aggiorna, poi muore |
-
-**Search Console ti dà i dati, noi ti diamo le cinque cose da fare lunedì mattina.** La differenza non è l'allarme, è l'ordine: cosa viene prima, cosa dopo, e perché.
-
-## Modello: Free e Pro
-
-| | Free | Pro |
-|---|---|---|
-| Siti | 1 | più siti |
-| URL monitorate | 100 | tutte |
-| Pagine in calo mostrate | prime 5 | tutte |
-| Aggiornamento | manuale | automatico settimanale |
-| Storico | 3 mesi | dal primo giorno |
-| Email del lunedì / priorità completa / note / verifica recupero / team | ❌ | ✅ |
-
-Free deve far vedere il problema e fermarsi lì; Pro serve a gestirlo nel tempo. **Gratis per accorgersi del problema, a pagamento per gestirlo davvero.** Dettagli su fasi di lancio (beta chiusa → free → Pro) e ordini di grandezza economici in [BUSINESS_PLAN.md](BUSINESS_PLAN.md#10-come-si-guadagna).
-
-## Stato del progetto
-
-Siamo al giorno zero del piano descritto nel business plan: **nessuna riga di prodotto ancora scritta per questo nuovo corso.** I primi 30 giorni sono un'unica schermata — Search Console → storico → regole → lista ordinata — e nient'altro. Ogni funzione successiva (email del lunedì, verifica del recupero, multi-sito, mappa dei link interni) è deliberatamente rimandata finché non è chiaro che quella prima lista, da sola, fa muovere le persone.
-
-Il traguardo dei primi 30 giorni non è "il prodotto è pronto": è che **sette persone su dieci**, guardando la lista prodotta su un sito vero, dicano che le farebbe muovere lunedì mattina. Dettagli operativi in [BUSINESS_PLAN.md, sezione 15](BUSINESS_PLAN.md#15-i-prossimi-30-giorni-concretamente).
-
-## Il vantaggio che cresce da solo
-
-Search Console conserva 16 mesi di dati e poi li butta. Noi li salviamo dal primo giorno e non li buttiamo più. Dopo due anni un cliente ha dentro LinkBay CMS una storia del proprio sito che non esiste da nessun'altra parte. Non è un vantaggio tecnologico: si costruisce stando lì, e cresce ogni mese da solo.
-
-## I numeri da guardare
-
-Durante la beta, uno solo: **quante pagine della lista vengono davvero sistemate.** Non registrazioni, non accessi — se nessuno tocca una pagina, il prodotto non serve, e va saputo al mese due. Dopo il lancio: conversione free→Pro, apertura dell'email del lunedì, pagine segnate come "fatte", quante pagine sistemate risalgono davvero (obiettivo: più di 1 su 2), tasso di disdetta mensile (sotto il 4% = salute).
+> Nota: le versioni precedenti di questo README descrivevano un prodotto diverso (un monitor SEO). Quella visione di business resta in [BUSINESS_PLAN.md](BUSINESS_PLAN.md) se vuoi recuperarla; questo file descrive lo stato **tecnico attuale** del codice.
 
 ---
 
-*Il piano completo, con le ipotesi di pricing, il canale di acquisizione clienti e la roadmap dettagliata, è in [BUSINESS_PLAN.md](BUSINESS_PLAN.md).*
+## Cosa è stato impostato
 
-*LinkBay CMS è un marchio registrato (deposito n. 302025000116815, UIBM) di Alessio Quagliara.*
+- **Flask application factory** (`app/__init__.py`) invece di un unico `app.py` monolitico.
+- **Auth completa**: registrazione, login, logout, con Flask-Login + Flask-WTF (CSRF incluso).
+- **Un solo modello**: `User`. Chi si registra dalla landing è un cliente che usa il software — tutto lo storico dell'app va agganciato a lui (`user_id`), non esiste un concetto separato di "tenant/agenzia".
+- **Dashboard protetta** minimale, ispirata nello stile a Shopify Polaris (non copiata: solo la stessa filosofia — superfici neutre, gerarchia chiara).
+- **Flask-Admin** con vista su `User`, riservato al team (`User.is_admin`) — mai ai clienti normali.
+- **Landing page** (quella che avevi già, in Tailwind/daisyUI) integrata con Jinja2 e collegata alle pagine di login/registrazione vere.
+- **Postgres via Docker**, configurazione da variabili d'ambiente.
+- **Struttura a blueprint**, pronta per aggiungerne altri senza toccare quello che c'è.
+
+Tutto il resto (RBAC vero, billing, marketplace, Celery, API REST...) **non c'è ancora, di proposito**. Vedi l'ultima sezione per l'ordine in cui aggiungerlo.
+
+---
+
+## Struttura delle cartelle
+
+```
+config.py              # Configurazione letta da variabili d'ambiente
+run.py                 # Entry point: crea l'app e la avvia
+
+app/
+  __init__.py           # Application factory: create_app()
+  extensions.py          # Istanze condivise: db, login_manager, csrf, admin
+
+  models/
+    user.py               # User (login, password hash, is_admin)
+
+  auth/
+    forms.py               # LoginForm, RegisterForm (Flask-WTF)
+    routes.py               # /auth/register, /auth/login, /auth/logout
+
+  main/
+    routes.py               # "/" -> landing page
+
+  dashboard/
+    routes.py               # "/dashboard/" (protetta da login)
+
+  admin/
+    views.py                # Viste Flask-Admin (UserAdminView)
+    __init__.py              # init_admin(): le registra su /admin
+
+  templates/
+    base.html                # Guscio HTML condiviso da auth + dashboard (flash messages)
+    auth/                     # login.html, register.html
+    dashboard/                 # layout.html (sidebar+topbar), overview.html
+    admin/base.html            # Tema custom sobrio per Flask-Admin
+    landing/                   # index.html + partials/ (la landing che avevi già)
+
+  static/
+    css/                      # tokens.css + dashboard.css (dashboard/auth), landing.css/daisyui.css (landing)
+    js/                        # landing.js
+    img/landing/                # immagini della landing page
+    shared/                     # logo.png + favicon.png, usati in landing/dashboard/auth/admin
+```
+
+**Perché un blueprint `dashboard` in più rispetto a quanto avevi abbozzato tu**: la dashboard protetta ha un layout e delle regole di accesso diverse dalla landing pubblica, quindi ha senso tenerla separata da `main`. Se preferisci accorpare, è una modifica piccola (sposta le rotte, aggiorna gli `url_for`).
+
+---
+
+## Come avviare in locale
+
+### 1. Ambiente Python
+
+```bash
+python3 -m venv venv
+source venv/bin/activate          # su Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 2. File `.env`
+
+```bash
+cp .env.example .env
+```
+
+Il valore di default in `.env.example` punta già al Postgres che avvii con Docker al passo successivo, quindi in locale di solito non devi cambiare nulla.
+
+### 3. Postgres con Docker
+
+```bash
+docker compose up -d db
+```
+
+Questo avvia **solo** il database (consigliato per lo sviluppo quotidiano: modifichi il codice e riavvii `python run.py` all'istante, senza rebuild di immagini). Se invece vuoi tutto containerizzato:
+
+```bash
+docker compose up --build
+```
+
+(in questo caso Flask gira anche lui in un container, raggiungibile comunque su `http://localhost:3000`)
+
+### 4. Avviare l'app
+
+```bash
+python run.py
+```
+
+La tabella `users` viene creata automaticamente all'avvio se non esiste già (`db.create_all()` dentro `create_app()`, vedi `_ensure_tables` in `app/__init__.py`) — non serve un passo manuale a parte. Se preferisci crearla esplicitamente (es. in uno script, senza avviare il server):
+
+```bash
+export FLASK_APP=run.py     # su Windows (PowerShell): $env:FLASK_APP = "run.py"
+flask init-db
+```
+
+Va rilanciato solo se cambi database o lo svuoti da zero — non è una vera migration (vedi sezione dedicata più sotto).
+
+Apri `http://localhost:3000`.
+
+---
+
+## Come registrare un utente ed entrare nella dashboard
+
+1. Vai su `http://localhost:3000/auth/register` (oppure clicca "Sign up" nella landing).
+2. Compila nome, email, password (minimo 8 caratteri). Al submit vieni loggato automaticamente e finisci su `/dashboard/`.
+3. Per uscire: link "Logout" nella sidebar della dashboard, oppure `http://localhost:3000/auth/logout`.
+
+Questo è il flusso dei tuoi **clienti**. `/admin/` (Flask-Admin) è un'altra cosa, per il team — vedi sotto.
+
+---
+
+## Come funziona Flask-Login in questo progetto
+
+- `login_manager` (in `app/extensions.py`) è collegato all'app in `create_app()`.
+- `User` eredita da `UserMixin` (`app/models/user.py`): questo gli dà gratis `is_authenticated`, `get_id()`, ecc.
+- La funzione `load_user(user_id)` (dentro `app/__init__.py`, `_register_extensions`) dice a Flask-Login come recuperare uno `User` dal suo id, ad ogni richiesta.
+- `login_user(user)` (in `app/auth/routes.py`) crea la sessione dopo login/registrazione riusciti.
+- `@login_required` (import da `flask_login`) protegge una rotta: se non sei loggato, vieni rimandato a `login_manager.login_view` (`"auth.login"`), configurato in `_register_extensions`.
+- Le password non sono mai salvate in chiaro: `User.set_password()` / `User.check_password()` usano `werkzeug.security` (hash + salt).
+
+## Come funziona l'accesso a Flask-Admin (team vs clienti)
+
+`/admin/` **non** è raggiungibile da un cliente normale, nemmeno se è loggato. `AdminAuthMixin` (in `app/extensions.py`) richiede `current_user.is_authenticated and current_user.is_admin` — e `is_admin` è `False` di default per chiunque si registri dalla landing. Il link "Flask-Admin" nella sidebar della dashboard compare solo se `current_user.is_admin` è vero; se un cliente prova comunque ad aprire `/admin/` a mano, viene rimandato al login (o, se è già loggato, alla propria dashboard — non vede mai nulla del pannello).
+
+Per darti accesso la prima volta (o a un collega):
+
+```bash
+export FLASK_APP=run.py
+flask make-admin tuaemail@esempio.it
+```
+
+L'utente deve essersi già registrato normalmente da `/auth/register`; il comando alza solo il flag `is_admin` sul suo record.
+
+Questo **non è RBAC**: è un solo booleano, "fa parte del team" sì/no. Va bene finché il team è piccolo e fidato — vedi roadmap per quando introdurre ruoli veri.
+
+---
+
+## Dove mettere le cose nuove
+
+| Voglio... | Vai in... |
+|---|---|
+| Un nuovo template | `app/templates/<area>/nome.html` (crea la cartella se serve) |
+| Una nuova rotta in un blueprint esistente | `app/<blueprint>/routes.py` |
+| Un nuovo modello | `app/models/nome.py` + aggiungilo a `app/models/__init__.py` |
+| Un nuovo form | `app/<blueprint>/forms.py` (se non esiste, crealo sul modello di `app/auth/forms.py`) |
+| Nuovo CSS/JS per la dashboard | `app/static/css/dashboard.css` (riusa le classi `lb-*` e i token in `tokens.css`) |
+| Immagini della landing | `app/static/img/landing/` (`hero.jpg`, `feature-*.jpg`, `logo/*.svg`) |
+| Logo o favicon | `app/static/shared/logo.png` e `favicon.png` — sostituisci i file, i template li usano già ovunque (landing, dashboard, auth, Flask-Admin) senza altre modifiche |
+
+---
+
+## Come aggiungere un nuovo blueprint
+
+Esempio: vuoi un'area "Billing".
+
+1. Crea la cartella `app/billing/` con `__init__.py` (vuoto) e `routes.py`:
+
+   ```python
+   from flask import Blueprint, render_template
+   from flask_login import login_required
+
+   billing_bp = Blueprint("billing", __name__, url_prefix="/billing")
+
+   @billing_bp.route("/")
+   @login_required
+   def overview():
+       return render_template("billing/overview.html")
+   ```
+
+2. Crea `app/templates/billing/overview.html` (estendi `dashboard/layout.html` se vuoi la stessa sidebar/topbar, oppure `base.html` se ti serve un layout diverso).
+
+3. Registralo in `app/__init__.py`, dentro `_register_blueprints`:
+
+   ```python
+   from app.billing.routes import billing_bp
+   app.register_blueprint(billing_bp)
+   ```
+
+4. Se ti serve un modello nuovo, seguilo lo stesso schema di `app/models/user.py` (mettilo in relazione a `User` con una `user_id`, non inventare un'altra entità "cliente" parallela). La tabella viene creata da sola al prossimo avvio (o subito con `flask init-db`).
+
+Nient'altro va toccato: niente file di configurazione centrale da aggiornare oltre a questo.
+
+---
+
+## Database: perché `create_all()` e non le migration
+
+Per restare semplici, la creazione delle tabelle usa `db.create_all()` — eseguito automaticamente ad ogni avvio dell'app (`_ensure_tables` in `app/__init__.py`), oppure a mano con `flask init-db` — non Flask-Migrate/Alembic. Va benissimo finché:
+
+- sei l'unico sviluppatore,
+- non hai ancora dati reali da preservare tra una modifica di schema e l'altra.
+
+**Il giorno in cui cambi un modello esistente** (aggiungi/rimuovi una colonna) su un database che ha già dati che ti servono, `create_all()` non basta più: crea tabelle mancanti ma non altera quelle esistenti. A quel punto introduci Flask-Migrate — è un passo naturale, non un rifacimento (vedi roadmap sotto).
+
+---
+
+## Come continuare da solo senza AI
+
+Questa è la parte più importante del documento. Leggila per intero prima di scrivere altro codice.
+
+### Principi da rispettare
+
+1. **`User` è il cliente. Punto.** Chi si registra dalla landing è l'unica entità "account" del sistema. Ogni nuova funzionalità che riguarda un cliente (ordini, progetti, preferenze, storico) si collega a lui con una `user_id` — non inventare un'entità intermedia "tenant/agenzia/workspace" a meno che il prodotto non cambi davvero forma (es. un cliente che deve gestire più sotto-account: a quel punto è una decisione di prodotto consapevole, non un default architetturale).
+2. **Un blueprint, una responsabilità.** Se una nuova funzionalità non c'entra chiaramente con auth/main/dashboard/admin, è un nuovo blueprint — non infilarla in uno esistente "tanto è piccola".
+3. **I modelli restano in `app/models/`, sempre.** Non definire classi `db.Model` altrove, nemmeno "temporaneamente".
+4. **Ogni form con input utente passa da Flask-WTF.** Non scrivere validazione manuale di `request.form` a mano: è la fonte più comune di bug e buchi di sicurezza in Flask.
+5. **Prima di aggiungere una libreria, chiediti se serve davvero ora.** Questo progetto è deliberatamente senza Celery, Redis, code, API REST separate, RBAC granulare, repository pattern. Se pensi di averne bisogno, probabilmente non è ancora il momento (vedi lista sotto).
+6. **Il design system della dashboard vive in `tokens.css` + `dashboard.css`.** Nuovi componenti vanno aggiunti lì, con lo stesso prefisso `lb-` e le stesse variabili — non introdurre un secondo sistema di classi.
+7. **La landing e la dashboard restano due mondi separati** (Tailwind/daisyUI da una parte, `lb-*` dall'altra). Non provare a farle condividere un `base.html`: sono stati scelti deliberatamente disaccoppiati.
+8. **Ogni nuova pagina/vista che espone dati va pensata da subito "chi può vederla?"** — è il tipo di errore più facile da introdurre senza accorgersene (vedi il caso `is_admin` sopra: prima che esistesse, qualunque cliente loggato poteva aprire `/admin/` e vedere tutti gli altri utenti).
+
+### Cosa NON aggiungere subito
+
+Anche se ti verrà voglia, in quest'ordine di tentazione:
+- RBAC granulare (ruoli, permessi per risorsa) — il flag `is_admin` basta finché il team è piccolo e fidato.
+- API REST separata — se ti serve solo la dashboard server-rendered, non aggiungere un layer JSON parallelo "per sicurezza".
+- Celery/task in background — introducilo solo quando hai un'operazione che *deve* girare fuori dalla request (invio email massivo, elaborazioni lunghe). Non prima.
+- Un'entità "tenant/workspace" separata da `User` — solo se e quando un cliente deve davvero gestire più account/utenti sotto di sé.
+- Un frontend JS separato (React/Vue) — finché Jinja2 + un po' di JS vanilla bastano, cambiare stack è puro costo.
+
+### Roadmap pratica, in ordine
+
+1. ~~Immagini vere nella landing~~, ~~logo/favicon ovunque~~, ~~registrazione minimale~~ — fatto.
+2. **Ripulisci il testo placeholder della landing** (sezioni Features/Pricing/FAQ sono ancora quelle del template originale).
+3. **Storico/dati del cliente**, agganciati a `User` via `user_id`, man mano che il prodotto lo richiede — segui il pattern della sezione "Come aggiungere un nuovo blueprint".
+4. **Ruoli più fini di `is_admin`**, solo quando "team sì/no" non basta più (es. serve distinguere supporto da founder). Valuta prima un secondo campo semplice prima di una libreria RBAC.
+5. **Billing**, come nuovo blueprint (`app/billing/`), quando hai davvero un piano da far pagare — non prima.
+6. **Migration vere (Flask-Migrate)**, nel momento in cui hai dati reali da non perdere tra una modifica di schema e l'altra.
+7. **Marketplace/funzionalità premium**, solo dopo che billing e ruoli esistono — dipendono da entrambi.
+
+### Suggerimenti per non incasinare l'architettura
+
+- Se un file supera le ~150-200 righe e fai fatica a scorrerlo, è probabile che stia facendo più di una cosa: dividilo (es. `routes.py` troppo lungo → estrai `services.py` con la logica, tieni le view sottili).
+- Non importare `db` o modelli specifici dentro `app/extensions.py`: quel file deve restare senza dipendenze verso il resto dell'app, altrimenti rischi import circolari.
+- Quando aggiungi un campo a `User`, aggiorna anche `form_columns`/`column_list` in `app/admin/views.py`, altrimenti resta invisibile lì.
+- Tieni questo README aggiornato **tu**, quando cambi qualcosa di strutturale — è il documento che ti eviterà di dover rileggere tutto il codice tra sei mesi.

@@ -1,0 +1,15 @@
+<meta charset="utf-8" />
+<title>LinkBayCMS</title>
+<meta content="LinkBayCMS" name="description" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='shared/favicon.png') }}" />
+
+{# Tailwind + daisyUI via CDN, senza build step (niente Node/npm nel progetto).
+   I sorgenti "veri" restano in app/static/css/landing.css e daisyui.css:
+   servono per quando un giorno vorrai un build reale con tema personalizzato
+   (vedi README, sezione "Come continuare da solo senza AI"). #}
+<link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/card3d@2.6.5/dist/card3d.min.js"></script>
+<script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>

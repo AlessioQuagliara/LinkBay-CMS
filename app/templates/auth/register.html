@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Sign Up{% endblock %}
+{% block content %}
+<div class="lb-auth-shell">
+  <div class="lb-auth-card">
+    <a class="lb-auth-brand" href="{{ url_for('main.index') }}">
+      <img src="{{ url_for('static', filename='shared/logo.png') }}" alt="LinkBayCMS">
+    </a>
+    <h1>Create account</h1>
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+
+      <div class="lb-field">
+        {{ form.name.label }}
+        {{ form.name(class_="lb-input", placeholder="Mario Rossi") }}
+        {% for error in form.name.errors %}<span class="lb-field__error">{{ error }}</span>{% endfor %}
+      </div>
+
+      <div class="lb-field">
+        {{ form.email.label }}
+        {{ form.email(class_="lb-input", placeholder="your@company.com") }}
+        {% for error in form.email.errors %}<span class="lb-field__error">{{ error }}</span>{% endfor %}
+      </div>
+
+      <div class="lb-field">
+        {{ form.password.label }}
+        {{ form.password(class_="lb-input", placeholder="Minumum 8 char") }}
+        {% for error in form.password.errors %}<span class="lb-field__error">{{ error }}</span>{% endfor %}
+      </div>
+
+      <div class="lb-field">
+        {{ form.confirm_password.label }}
+        {{ form.confirm_password(class_="lb-input", placeholder="Repeat password") }}
+        {% for error in form.confirm_password.errors %}<span class="lb-field__error">{{ error }}</span>{% endfor %}
+      </div>
+
+      {{ form.submit(class_="lb-btn lb-btn--primary lb-btn--block") }}
+    </form>
+    <p class="lb-auth-alt">Already have an account? <a href="{{ url_for('auth.login') }}">Sign In</a></p>
+  </div>
+</div>
+{% endblock %}

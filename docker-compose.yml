@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: linkbay
+      POSTGRES_PASSWORD: linkbay
+      POSTGRES_DB: linkbay_cms
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # Opzionale: l'app dentro Docker. Per lo sviluppo quotidiano è più comodo
+  # avviare solo `db` qui e lanciare `python run.py` in locale (vedi README).
+  web:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://linkbay:linkbay@db:5432/linkbay_cms
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+
+volumes:
+  pgdata:
