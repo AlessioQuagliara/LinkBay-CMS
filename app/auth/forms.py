@@ -6,9 +6,9 @@ from wtforms.validators import DataRequired, Email, EqualTo, Length
 class RegisterForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired(), Length(max=120)])
     email = StringField("Email", validators=[DataRequired(), Email(), Length(max=255)])
-    password = PasswordField("Password", validators=[DataRequired(), Length(min=8, message="Minimum 8 char.")])
+    password = PasswordField("Password", validators=[DataRequired(), Length(min=8, message="Minimum 8 characters.")])
     confirm_password = PasswordField(
-        "Conferma password",
+        "Confirm password",
         validators=[DataRequired(), EqualTo("password", message="Passwords do not match.")],
     )
     submit = SubmitField("Create account")

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="it" class="group/html">
+<html lang="en" class="group/html">
     <head>
         {% include "landing/partials/head.html" %}
     </head>
@@ -12,22 +12,23 @@
                 <div class="grid gap-8 lg:grid-cols-2 lg:gap-16">
                     <div class="max-lg:order-2">
                         <h1 class="text-4xl font-bold tracking-tight lg:text-6xl lg:leading-none">
-                            Transform your business with our
-                            <span class="text-error">Innovative SaaS</span>
-                            solutions.
+                            Find out which pages are
+                            <span class="text-error">losing organic traffic</span>
+                            — before it costs you 10x more to fix.
                         </h1>
                         <p class="text-base-content/80 mt-8 sm:text-lg">
-                            Take your business to the next level with our advanced SaaS solutions.
-                            Enjoy seamless integration, flexible pricing, and dedicated support.
+                            LinkBayCMS reads your Google Search Console data, filters out the noise, and
+                            hands you a short, ranked list of declining pages — each with a plain-English
+                            reason. Built for publishers and editorial sites that live off organic search.
                         </p>
                         <div class="mt-8 inline-flex gap-3 sm:mt-16">
                             <a href="{{ url_for('auth.register') }}">
                                 <button class="btn btn-error text-white">
                                     <span class="iconify lucide--rocket size-4"></span>
-                                    Inizia ora
+                                    Get started free
                                 </button>
                             </a>
-                            <a href="#features"><button class="btn btn-ghost">Scopri di più</button></a>
+                            <a href="#features"><button class="btn btn-ghost">See how it works</button></a>
                         </div>
                     </div>
 
@@ -36,12 +37,12 @@
                         data-card3d
                         data-card3d-perspective="1000"
                         data-card3d-full-page-listening>
-                        <img alt="SaaS" class="rounded-lg" src="{{ url_for('static', filename='img/landing/hero.jpg') }}" />
+                        <img alt="LinkBayCMS prioritized list of declining pages" class="rounded-lg" src="{{ url_for('static', filename='img/landing/hero.jpg') }}" />
                     </div>
                 </div>
 
                 <h2 class="text-base-content/60 mt-12 text-center text-2xl font-medium lg:mt-32">
-                    Our Partners
+                    You don't need to replace anything you already use
                 </h2>
 
                 <div
@@ -75,9 +76,10 @@
 
             <div class="container">
                 <div class="flex flex-col items-center">
-                    <h2 class="text-3xl font-semibold sm:text-4xl">Magical Things</h2>
-                    <p class="text-base-content/80 mt-4 sm:text-lg">
-                        Unlock Your Business's Full Potential with Our SaaS Platform
+                    <h2 class="text-3xl font-semibold sm:text-4xl">Three signals. One prioritized list.</h2>
+                    <p class="text-base-content/80 mt-4 max-w-2xl text-center sm:text-lg">
+                        No dashboard to interpret, no 3,000-row spreadsheet. Just the pages that need
+                        attention, in order — and why.
                     </p>
                 </div>
 
@@ -85,73 +87,74 @@
                     <div class="grid gap-8 lg:grid-cols-2 lg:gap-16">
                         <div class="rounded-box overflow-hidden">
                             <img
-                                alt="saas img"
+                                alt="LinkBayCMS detecting a real traffic decline"
                                 class="object-cover"
                                 src="{{ url_for('static', filename='img/landing/feature-1.jpg') }}" />
                         </div>
 
                         <div class="lg:mt-8">
-                            <div class="badge badge-soft badge-primary">Dashboard</div>
+                            <div class="badge badge-soft badge-primary">Detection</div>
                             <h3 class="mt-3 text-xl font-medium sm:text-2xl">
-                                Streamlined Management
+                                We isolate real decline, not daily noise
                             </h3>
                             <p class="text-base-content/80 mt-1">
-                                Take full control with our advanced SaaS dashboard—real-time
-                                analytics, user-friendly design, and effortless customization.
+                                Traffic wobbles every day — that's not a signal, it's weather. LinkBayCMS
+                                looks at the trend over months and only flags a page when the drop is real.
                             </p>
                             <ul class="mt-4 list-inside list-disc">
-                                <li>Real-Time Analytics</li>
-                                <li>Customizable Layouts</li>
-                                <li>User-Friendly Navigation</li>
-                                <li>Comprehensive Performance Reports</li>
+                                <li>Filters out normal month-to-month swings</li>
+                                <li>Compares each page to your site's own trend, not the whole internet's</li>
+                                <li>Checks the same quarter last year to rule out seasonality</li>
+                                <li>Only flags drops that hold for 2+ consecutive months</li>
                             </ul>
                         </div>
                     </div>
 
                     <div class="grid gap-8 lg:grid-cols-2 lg:gap-16">
                         <div>
-                            <div class="badge badge-soft badge-secondary">Control</div>
-                            <h3 class="mt-3 text-xl font-medium sm:text-2xl">Entity Management</h3>
+                            <div class="badge badge-soft badge-secondary">Prioritization</div>
+                            <h3 class="mt-3 text-xl font-medium sm:text-2xl">Know what's worth fixing first</h3>
                             <p class="text-base-content/80 mt-1">
-                                Streamline operations with our SaaS platform manage users, projects,
-                                and resources in one place, with real-time insights and optimized
-                                workflows.
+                                A page that dropped from 4,000 to 900 visits is not the same emergency as
+                                one that dropped from 50 to 20. Every page gets ranked by how much it's
+                                worth and how likely it is to recover.
                             </p>
 
                             <ul class="mt-4 list-inside list-disc">
-                                <li>Intuitive Management Tools</li>
-                                <li>Efficient Resource Allocation</li>
-                                <li>Simplified Task Assignment</li>
-                                <li>Comprehensive Oversight</li>
+                                <li>Ranked by clicks lost per month, not vanity metrics</li>
+                                <li>Flags pages that are close to recovering (small ranking drop)</li>
+                                <li>Tells you when demand itself has disappeared — no point fixing that</li>
+                                <li>Every score ships with a plain-English reason, never a bare number</li>
                             </ul>
                         </div>
 
                         <div class="order-first lg:order-last">
                             <div class="rounded-box overflow-hidden">
-                                <img alt="saas img" src="{{ url_for('static', filename='img/landing/feature-2.jpg') }}" />
+                                <img alt="LinkBayCMS ranking declining pages by priority" src="{{ url_for('static', filename='img/landing/feature-2.jpg') }}" />
                             </div>
                         </div>
                     </div>
 
                     <div class="grid gap-8 lg:grid-cols-2 lg:gap-16">
                         <div class="overflow-hidden rounded-lg">
-                            <img alt="saas img" src="{{ url_for('static', filename='img/landing/feature-3.jpg') }}" />
+                            <img alt="LinkBayCMS reporting clicks lost per month" src="{{ url_for('static', filename='img/landing/feature-3.jpg') }}" />
                         </div>
 
                         <div class="lg:mt-8">
-                            <div class="badge badge-soft badge-error">Integrations</div>
+                            <div class="badge badge-soft badge-error">Clarity</div>
                             <h3 class="mt-3 text-xl font-medium sm:text-2xl">
-                                Effortless Integrations
+                                Real numbers, never invented ones
                             </h3>
                             <p class="text-base-content/80 mt-1">
-                                Integrate tools seamlessly with our SaaS platform to streamline
-                                processes and drive growth.
+                                Clicks lost per month is real, verifiable data straight from Search
+                                Console. A revenue estimate only ever appears if you give us the input —
+                                and it's always labeled as an estimate.
                             </p>
                             <ul class="mt-4 list-inside list-disc">
-                                <li>Real-time collaboration with Slack</li>
-                                <li>Engage customers via Email</li>
-                                <li>Manage orders from Amazon</li>
-                                <li>Leverage AI with OpenAI</li>
+                                <li>Clicks lost per month, pulled directly from Search Console</li>
+                                <li>Optional revenue estimate, only if you provide the value per visit</li>
+                                <li>Every number is labeled with exactly where it came from</li>
+                                <li>No made-up dollar figures, ever</li>
                             </ul>
                         </div>
                     </div>
@@ -162,24 +165,26 @@
         <section class="py-8 lg:py-20" id="integrations">
             <div class="container">
                 <div class="text-center">
-                    <h2 class="text-3xl font-semibold sm:text-4xl">Quick Integrations</h2>
+                    <h2 class="text-3xl font-semibold sm:text-4xl">Works with the data you already have</h2>
                     <p class="text-base-content/80 mt-4 sm:text-lg">
-                        Integrate tools seamlessly for unified efficiency with our SaaS platform
+                        No tracking code, no site access, nothing to install on your CMS.
                     </p>
                 </div>
                 <div class="bg-base-200 rounded-box mt-12 p-8 lg:p-16">
                     <div class="grid items-center gap-12 lg:grid-cols-5">
                         <div class="lg:col-span-3">
                             <h3 class="text-2xl font-medium sm:text-3xl">
-                                Seamless expert SaaS integrations, just a snap away.
+                                Connect Google Search Console once. Get a ranked list from then on.
                             </h3>
                             <p class="text-base-content/80 mt-4 sm:text-lg">
-                                Boost efficiency with our SaaS platform's seamless integration.
-                                Connect tools effortlessly to create a unified digital workspace.
+                                LinkBayCMS reads directly from the Search Console data you already
+                                collect — read-only, nothing is changed on your site. It doesn't replace
+                                your CMS, your analytics, or your workflow; it just tells you where to
+                                look first.
                             </p>
 
                             <div class="mt-8 flex justify-center lg:justify-start">
-                                <button class="btn btn-error text-white">Quick Connect</button>
+                                <a href="{{ url_for('auth.register') }}"><button class="btn btn-error text-white">Connect Search Console</button></a>
                             </div>
                         </div>
 
@@ -245,15 +250,14 @@
                                     class="bg-base-200 flex items-center justify-center rounded-full p-3">
                                     <img alt="slack" class="size-6" src="{{ url_for('static', filename='img/landing/logo/slack.svg') }}" />
                                 </div>
-                                <h3 class="text-lg font-medium">Slack</h3>
+                                <h3 class="text-lg font-medium">Monday morning email</h3>
                                 <button class="btn btn-circle ms-auto" aria-label="Details">
                                     <span class="iconify lucide--arrow-right size-4"></span>
                                 </button>
                             </div>
                             <p class="mt-2 line-clamp-2 overflow-ellipsis">
-                                Improve project efficiency using GitHub. Facilitate smooth
-                                discussions, effortless updates, and enhanced real-time
-                                collaboration.
+                                A short email with your top declining pages, sent automatically every
+                                Monday — on the Pro plan.
                             </p>
                         </div>
                     </div>
@@ -267,13 +271,14 @@
                                         class="size-6"
                                         src="{{ url_for('static', filename='img/landing/logo/g-drive.svg') }}" />
                                 </div>
-                                <h3 class="text-lg font-medium">Google Drive</h3>
+                                <h3 class="text-lg font-medium">Full history, not just 16 months</h3>
                                 <button class="btn btn-circle ms-auto" aria-label="Details">
                                     <span class="iconify lucide--arrow-right size-4"></span>
                                 </button>
                             </div>
                             <p class="mt-2 line-clamp-2 overflow-ellipsis">
-                                Streamline file management and boost collaboration with Google Drive
+                                Search Console deletes data after 16 months. We keep your site's
+                                history from the day you connect, and never throw it away.
                             </p>
                         </div>
                     </div>
@@ -288,14 +293,14 @@
                                         class="size-6"
                                         src="{{ url_for('static', filename='img/landing/logo/bitbucket-mini.svg') }}" />
                                 </div>
-                                <h3 class="text-lg font-medium">Bitbucket</h3>
+                                <h3 class="text-lg font-medium">Mark as done, track recovery</h3>
                                 <button class="btn btn-circle ms-auto" aria-label="Details">
                                     <span class="iconify lucide--arrow-right size-4"></span>
                                 </button>
                             </div>
                             <p class="mt-2 line-clamp-2 overflow-ellipsis">
-                                Boost productivity with Bitbucket. Streamline file management,
-                                collaboration, and development
+                                Flag a page as fixed and we check back at 30 and 60 days to confirm
+                                whether it actually recovered.
                             </p>
                         </div>
                     </div>
@@ -304,35 +309,16 @@
         </section>
 
         <section class="py-8 lg:py-20" id="pricing">
-            <div class="group container">
+            <div class="container">
                 <div class="text-center">
-                    <h2 class="text-3xl font-semibold sm:text-4xl">Pricing Plans</h2>
+                    <h2 class="text-3xl font-semibold sm:text-4xl">Free to spot the problem. Pro to actually fix it.</h2>
                     <p class="text-base-content/80 mt-2 sm:text-lg">
-                        Flexible pricing. No hidden fees. Scale with your needs.
+                        Start free, no credit card required. We're still shaping Pro pricing with our
+                        first customers — talk to us if you want in early.
                     </p>
                 </div>
 
-                <div class="mt-8 flex justify-center">
-                    <div role="tablist" class="tabs tabs-box relative w-fit">
-                        <input
-                            type="radio"
-                            name="pricing-tab"
-                            role="tab"
-                            value="monthly"
-                            class="tab px-8"
-                            aria-label="Monthly" />
-                        <input
-                            type="radio"
-                            name="pricing-tab"
-                            role="tab"
-                            class="tab px-8"
-                            value="yearly"
-                            aria-label="Yearly"
-                            checked="checked" />
-                        <span class="badge badge-neutral absolute -end-10 -top-2">-40%</span>
-                    </div>
-                </div>
-                <div class="mt-8 grid gap-8 lg:grid-cols-3">
+                <div class="mt-8 grid gap-8 lg:grid-cols-2 lg:max-w-3xl lg:mx-auto">
                     <div class="card border-base-300 border p-3">
                         <div class="bg-base-200 p-6">
                             <h3 class="text-xl font-semibold">Free</h3>
@@ -341,111 +327,53 @@
                                 <span class="ml-1 text-xl font-medium">/month</span>
                             </p>
                             <p class="mt-4">
-                                Experience essential features at no cost, setting the foundation for
-                                your business growth.
+                                Enough to see the problem for yourself, no strings attached.
                             </p>
                         </div>
                         <div class="p-6">
                             <ul class="list-inside list-disc space-y-3" role="list">
-                                <li>
-                                    <span class="ms-3">For Personal Use</span>
-                                </li>
-                                <li>
-                                    <span class="ms-3">20 products</span>
-                                </li>
-                                <li>
-                                    <span class="ms-3">Limited Integrations</span>
-                                </li>
+                                <li><span class="ms-3">1 site</span></li>
+                                <li><span class="ms-3">Up to 100 URLs monitored</span></li>
+                                <li><span class="ms-3">Your top 5 declining pages</span></li>
+                                <li><span class="ms-3">Manual refresh</span></li>
+                                <li><span class="ms-3">Last 3 months of history</span></li>
                             </ul>
                         </div>
-                        <button class="btn btn-outline border-base-300 btn-block mt-auto">
-                            Start for Free
-                        </button>
+                        <a href="{{ url_for('auth.register') }}">
+                            <button class="btn btn-outline border-base-300 btn-block mt-auto">
+                                Start for free
+                            </button>
+                        </a>
                     </div>
                     <div class="card border-base-300 border p-3">
                         <div class="bg-primary/10 rounded-box p-6">
                             <div class="flex justify-between">
-                                <h3 class="text-error text-xl font-semibold">Premium</h3>
-                                <div class="badge badge-primary badge-sm">Most Popular</div>
+                                <h3 class="text-error text-xl font-semibold">Pro</h3>
+                                <div class="badge badge-primary badge-sm">For serious traffic</div>
                             </div>
-
-                            <p class="mt-4 flex items-baseline">
-                                <span
-                                    class="text-error text-5xl font-semibold tracking-tight group-has-[[value=yearly]:checked]:hidden">
-                                    $99
-                                </span>
-                                <span
-                                    class="text-error text-5xl font-semibold tracking-tight group-has-[[value=monthly]:checked]:hidden">
-                                    $59
-                                </span>
-                                <span class="ml-1 text-xl font-medium">/month</span>
-                            </p>
-                            <p class="mt-6">
-                                Unlock advanced features and elevate your SaaS experience with our
-                                premium plan.
+                            <p class="mt-4 text-xl font-medium">Let's talk</p>
+                            <p class="mt-2">
+                                Pricing is still being shaped with our first customers — get in touch
+                                and we'll figure it out together.
                             </p>
                         </div>
                         <div class="p-6">
                             <ul class="list-inside list-disc space-y-3" role="list">
-                                <li>
-                                    <span class="ms-3">Up to 10 Team Members</span>
-                                </li>
-                                <li>
-                                    <span class="ms-3">Unlocked all Apps</span>
-                                </li>
-                                <li>
-                                    <span class="ms-3">Use all Integrations</span>
-                                </li>
-                                <li>
-                                    <span class="ms-3">99.9% Support Response Time</span>
-                                </li>
+                                <li><span class="ms-3">Unlimited sites</span></li>
+                                <li><span class="ms-3">All URLs monitored</span></li>
+                                <li><span class="ms-3">Full prioritized list, not just the top 5</span></li>
+                                <li><span class="ms-3">Automatic weekly refresh</span></li>
+                                <li><span class="ms-3">Full history from day one</span></li>
+                                <li><span class="ms-3">Monday morning email</span></li>
+                                <li><span class="ms-3">Mark as done + 30/60-day recovery check</span></li>
+                                <li><span class="ms-3">Team access</span></li>
                             </ul>
                         </div>
-                        <button class="btn btn-error text-white btn-block mt-auto">
-                            Upgrade to Premium
-                        </button>
-                    </div>
-                    <div class="card border-base-300 border p-3">
-                        <div class="bg-secondary/10 rounded-box p-6">
-                            <h3 class="text-secondary text-xl font-medium">Ultimate</h3>
-                            <p class="mt-4 flex items-baseline">
-                                <span
-                                    class="text-secondary text-5xl font-semibold tracking-tight group-has-[[value=yearly]:checked]:hidden">
-                                    $199
-                                </span>
-                                <span
-                                    class="text-secondary text-5xl font-semibold tracking-tight group-has-[[value=monthly]:checked]:hidden">
-                                    $159
-                                </span>
-                                <span class="ml-1 text-xl font-semibold">/month</span>
-                            </p>
-                            <p class="mt-6 line-clamp-2 overflow-ellipsis">
-                                Unleash business potential with our ultimate plan. Maximize
-                                features, scalability, and success.
-                            </p>
-                        </div>
-                        <div class="p-6">
-                            <ul class="list-inside list-disc space-y-3" role="list">
-                                <li>
-                                    <span class="ms-3">Unlimited Members</span>
-                                </li>
-                                <li>
-                                    <span class="ms-3">Unlocked all Apps</span>
-                                </li>
-                                <li>
-                                    <span class="ms-3">Use all Integrations</span>
-                                </li>
-                                <li>
-                                    <span class="ms-3">24*7 Quick Support</span>
-                                </li>
-                                <li>
-                                    <span class="ms-3">Marketing automations</span>
-                                </li>
-                            </ul>
-                        </div>
-                        <button class="btn btn-secondary btn-block mt-auto">
-                            Get Ultimate Power
-                        </button>
+                        <a href="{{ url_for('auth.register') }}">
+                            <button class="btn btn-error text-white btn-block mt-auto">
+                                Get started
+                            </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -456,7 +384,7 @@
                 <div class="text-center">
                     <h2 class="text-3xl font-semibold sm:text-4xl">FAQs</h2>
                     <p class="text-base-content/80 mt-2 sm:text-lg">
-                        Improve your SaaS experience. Find solutions, tips, and resources
+                        The questions every SEO asks in the first two minutes of a demo.
                     </p>
                 </div>
 
@@ -469,68 +397,75 @@
                                 type="radio"
                                 aria-label="open/close" />
                             <div class="collapse-title text-xl font-medium">
-                                How does SaaS benefit my business?
+                                How is this different from Google Search Console?
                             </div>
                             <div class="collapse-content">
                                 <p class="text-base">
-                                    SaaS offers several advantages, including cost-effectiveness,
-                                    scalability, automatic updates, and accessibility. It allows
-                                    businesses to focus on core operations while the software
-                                    provider handles maintenance and updates.
+                                    Search Console gives you the data — thousands of rows and no
+                                    particular order. LinkBayCMS gives you the five things to fix
+                                    Monday morning, ranked by how much they're worth and how likely
+                                    they are to recover. It's not another archive; it's a shortlist.
                                 </p>
                             </div>
                         </div>
                         <div class="collapse-arrow border-base-content/10 collapse border">
                             <input name="faq" type="radio" aria-label="open/close" />
                             <div class="collapse-title text-xl font-medium">
-                                What features are included in your SaaS platform?
+                                How do you know a page is really declining, and not just noisy?
                             </div>
                             <div class="collapse-content">
                                 <p class="text-base">
-                                    Our SaaS platform offers a range of features, including
-                                    collaborative tools, real-time analytics, integrations with
-                                    popular applications, user-friendly interfaces, and customizable
-                                    solutions tailored to your business needs.
+                                    A page only makes the list if it clears a minimum relevance
+                                    threshold, has dropped at least 30% and at least 20 clicks/month,
+                                    held that drop for two consecutive months, and is falling faster
+                                    than the rest of your site in the same period. That last check
+                                    alone removes most of the false alarms — it's the difference
+                                    between "your page is broken" and "Google shipped an update and
+                                    your whole site moved."
                                 </p>
                             </div>
                         </div>
                         <div class="collapse-arrow border-base-content/10 collapse border">
                             <input name="faq" type="radio" aria-label="open/close" />
                             <div class="collapse-title text-xl font-medium">
-                                How can I upgrade my plan?
+                                Do I need to install anything on my site?
                             </div>
                             <div class="collapse-content">
                                 <p class="text-base">
-                                    Upgrading your plan is easy. Log in to your account, go to the
-                                    billing section, and choose the plan that suits your business
-                                    requirements. The upgrade will take effect immediately.
+                                    No. LinkBayCMS is not a CMS and doesn't touch your site — it reads
+                                    your existing Google Search Console data with read-only access.
+                                    Nothing to embed, no plugin, no code changes.
                                 </p>
                             </div>
                         </div>
                         <div class="collapse-arrow border-base-content/10 collapse border">
                             <input name="faq" type="radio" aria-label="open/close" />
                             <div class="collapse-title text-xl font-medium">
-                                Is there a trial period for your SaaS platform?
+                                Is this built for e-commerce or SaaS marketing sites too?
                             </div>
                             <div class="collapse-content">
                                 <p class="text-base">
-                                    Yes, we offer a free trial period for you to explore and
-                                    experience our platform's features. No credit card is required
-                                    during the trial period.
+                                    Not really — it's built specifically for publishers and editorial
+                                    sites with 500 to 20,000 indexed pages and at least 20,000 organic
+                                    clicks a month, where organic search is the main source of
+                                    revenue. Below that volume, declines are hard to tell apart from
+                                    noise, and our output gets less reliable. We'd rather tell you
+                                    that upfront than sign you up and have you churn in month two.
                                 </p>
                             </div>
                         </div>
                         <div class="collapse-arrow border-base-content/10 collapse border">
                             <input name="faq" type="radio" aria-label="open/close" />
                             <div class="collapse-title text-xl font-medium">
-                                How is data security handled on your platform?
+                                Is my Search Console data safe?
                             </div>
                             <div class="collapse-content">
                                 <p class="text-base">
-                                    We prioritize data security. Our platform employs encryption,
-                                    access controls, and regular security audits to safeguard your
-                                    data. We comply with industry standards to ensure your
-                                    information is secure.
+                                    We connect via Google's standard read-only access — we can see
+                                    your performance data, we can't change anything on your property.
+                                    We never invent numbers: click figures come straight from Search
+                                    Console, and any revenue estimate is only shown if you provide it,
+                                    always labeled as an estimate.
                                 </p>
                             </div>
                         </div>

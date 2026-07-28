@@ -1,7 +1,14 @@
 <meta charset="utf-8" />
-<title>LinkBayCMS</title>
-<meta content="LinkBayCMS" name="description" />
+<title>LinkBayCMS — Find Which Pages Are Losing Organic Traffic</title>
+<meta name="description" content="LinkBayCMS reads your Google Search Console data and gives you a short, prioritized list of pages losing organic traffic — with a plain-English reason for each. Built for publishers and editorial sites." />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="canonical" href="{{ request.url_root }}" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="LinkBayCMS — Find Which Pages Are Losing Organic Traffic" />
+<meta property="og:description" content="A short, prioritized list of the content pages losing organic traffic on your site — and what to fix first. Built on your own Google Search Console data." />
+<meta property="og:image" content="{{ url_for('static', filename='img/landing/hero.jpg', _external=True) }}" />
+<meta name="twitter:card" content="summary_large_image" />
 
 <link rel="icon" type="image/png" href="{{ url_for('static', filename='shared/favicon.png') }}" />
 
@@ -13,3 +20,35 @@
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <script src="https://cdn.jsdelivr.net/npm/card3d@2.6.5/dist/card3d.min.js"></script>
 <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;1000&display=swap" rel="stylesheet" />
+
+{# Il CDN Tailwind non legge app/static/css/landing.css (è un sorgente da build,
+   non CSS che il browser può eseguire): senza questo blocco la classe
+   "container" non esiste in Tailwind v4 (non è più inclusa di default), ed è
+   per questo che immagini/testo restavano incollati al bordo. Un blocco
+   <style type="text/tailwindcss"> con @utility non viene processato in modo
+   affidabile dal build via CDN (verificato) — questo è CSS puro, funziona
+   sempre, indipendentemente dal runtime Tailwind. #}
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; overflow-x: hidden; }
+  .container {
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  @media (min-width: 768px) {
+    .container { padding-left: 2rem; padding-right: 2rem; }
+  }
+  @media (min-width: 1024px) {
+    .container { padding-left: 3rem; padding-right: 3rem; }
+  }
+  @media (min-width: 1280px) {
+    .container { padding-left: 4rem; padding-right: 4rem; }
+  }
+  @media (min-width: 1536px) {
+    .container { padding-left: 6rem; padding-right: 6rem; }
+  }
+</style>

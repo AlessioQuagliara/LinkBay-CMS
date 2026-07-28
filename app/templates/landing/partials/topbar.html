@@ -1,7 +1,8 @@
 <div class="bg-base-200 border-base-300 border-b px-1 py-1.5 text-center text-[11px] sm:text-sm">
     <span>
-        <span class="text-error font-medium">Update:</span>
-        TailwindCSS 4 & DaisyUI 5 revamp your control!
+        <span class="text-error font-medium">Beta:</span>
+        We're running free traffic-decline audits for the first 20 publishers —
+        <a class="link-hover link font-medium" href="{{ url_for('auth.register') }}">get yours</a>.
     </span>
 </div>
 
@@ -29,7 +30,7 @@
                 <ul class="menu menu-horizontal gap-2 px-1">
                     <li class="font-medium"><a href="#home">Home</a></li>
                     <li class="font-medium"><a href="#features">Features</a></li>
-                    <li class="font-medium"><a href="#integrations">Integrations</a></li>
+                    <li class="font-medium"><a href="#integrations">How it works</a></li>
                     <li class="font-medium"><a href="#pricing">Pricing</a></li>
                     <li class="font-medium"><a href="#faq">FAQ</a></li>
                 </ul>
@@ -37,7 +38,7 @@
 
             <div class="space-x-2">
                 {% if current_user.is_authenticated %}
-                    <a class="btn btn-ghost btn-sm" href="{{ url_for('auth.logout') }}">Exit</a>
+                    <a class="btn btn-ghost btn-sm" href="{{ url_for('auth.logout') }}">Log out</a>
                     <a class="btn btn-error text-white btn-sm" href="{{ url_for('dashboard.overview') }}">Dashboard</a>
                 {% else %}
                     <a class="btn btn-ghost btn-sm" href="{{ url_for('auth.register') }}">Sign Up</a>
@@ -58,7 +59,7 @@
                     <ul class="menu w-full gap-2 p-0 pt-4">
                         <li class="font-medium"><a href="#home">Home</a></li>
                         <li class="font-medium"><a href="#features">Features</a></li>
-                        <li class="font-medium"><a href="#integrations">Integrations</a></li>
+                        <li class="font-medium"><a href="#integrations">How it works</a></li>
                         <li class="font-medium"><a href="#pricing">Pricing</a></li>
                         <li class="font-medium"><a href="#faq">FAQ</a></li>
                     </ul>
