@@ -1,4 +1,4 @@
-# LinkBay Admin
+# LinkBayCMS
 
 Base tecnica pulita per un SaaS: Flask, Postgres, login, e una struttura pronta a crescere per blueprint. Questo README è pensato per te tra una settimana, quando non ricorderai più i dettagli: leggilo dall'inizio, non serve altro.
 
@@ -10,9 +10,11 @@ Base tecnica pulita per un SaaS: Flask, Postgres, login, e una struttura pronta 
 
 - **Flask application factory** (`app/__init__.py`) invece di un unico `app.py` monolitico.
 - **Auth completa**: registrazione, login, logout, con Flask-Login + Flask-WTF (CSRF incluso).
-- **Un solo modello**: `User`. Chi si registra dalla landing è un cliente che usa il software — tutto lo storico dell'app va agganciato a lui (`user_id`), non esiste un concetto separato di "tenant/agenzia".
+- **Due modelli**: `User` e `GscConnection` (le credenziali OAuth di Search Console di un utente, 1:1 con `User`). Chi si registra dalla landing è un cliente che usa il software — tutto lo storico dell'app va agganciato a lui (`user_id`), non esiste un concetto separato di "tenant/agenzia".
+- **Collegamento a Google Search Console** (`app/gsc/`): OAuth2, per utente. Access/refresh token cifrati (Fernet) prima di finire in DB. Vedi la sezione dedicata più sotto.
 - **Dashboard protetta** minimale, ispirata nello stile a Shopify Polaris (non copiata: solo la stessa filosofia — superfici neutre, gerarchia chiara).
-- **Flask-Admin** con vista su `User`, riservato al team (`User.is_admin`) — mai ai clienti normali.
+- **Un solo stack CSS per tutto ciò che vede il cliente**: Tailwind + daisyUI via CDN (nessun build step), usato sia dalla landing sia da dashboard/auth — stessa identità visiva dalla homepage al primo login. Fa eccezione solo Flask-Admin (vedi sotto).
+- **Flask-Admin** con vista su `User`, riservato al team (`User.is_admin`) — mai ai clienti normali. Resta su un tema Bootstrap4 custom, separato dal resto: non lo vede mai un cliente, e i suoi template interni sono troppo legati a Bootstrap per un reskin sicuro.
 - **Landing page** (quella che avevi già, in Tailwind/daisyUI) integrata con Jinja2 e collegata alle pagine di login/registrazione vere.
 - **Postgres via Docker**, configurazione da variabili d'ambiente.
 - **Struttura a blueprint**, pronta per aggiungerne altri senza toccare quello che c'è.
@@ -33,6 +35,7 @@ app/
 
   models/
     user.py               # User (login, password hash, is_admin)
+    gsc_connection.py      # GscConnection (token OAuth cifrati, 1:1 con User)
 
   auth/
     forms.py               # LoginForm, RegisterForm (Flask-WTF)
@@ -42,7 +45,12 @@ app/
     routes.py               # "/" -> landing page
 
   dashboard/
-    routes.py               # "/dashboard/" (protetta da login)
+    routes.py               # "/dashboard/", "/dashboard/connect" (protette da login)
+
+  gsc/
+    gsc.py                  # Blueprint OAuth: /gsc/authorize, /callback, /sites, /analytics/<site>, /disconnect
+    crypto.py                # encrypt()/decrypt() (Fernet) per i token
+    repository.py            # save/load/delete credenziali <-> GscConnection
 
   admin/
     views.py                # Viste Flask-Admin (UserAdminView)
@@ -51,12 +59,12 @@ app/
   templates/
     base.html                # Guscio HTML condiviso da auth + dashboard (flash messages)
     auth/                     # login.html, register.html
-    dashboard/                 # layout.html (sidebar+topbar), overview.html
+    dashboard/                 # layout.html (sidebar+topbar), overview.html, connect.html
     admin/base.html            # Tema custom sobrio per Flask-Admin
     landing/                   # index.html + partials/ (la landing che avevi già)
 
   static/
-    css/                      # tokens.css + dashboard.css (dashboard/auth), landing.css/daisyui.css (landing)
+    css/                      # landing.css/daisyui.css: sorgenti Tailwind "veri", non caricati (vedi sotto)
     js/                        # landing.js
     img/landing/                # immagini della landing page
     shared/                     # logo.png + favicon.png, usati in landing/dashboard/auth/admin
@@ -144,12 +152,59 @@ Per darti accesso la prima volta (o a un collega):
 
 ```bash
 export FLASK_APP=run.py
-flask make-admin tuaemail@esempio.it
+python -m flask make-admin tuaemail@esempio.it
 ```
 
 L'utente deve essersi già registrato normalmente da `/auth/register`; il comando alza solo il flag `is_admin` sul suo record.
 
 Questo **non è RBAC**: è un solo booleano, "fa parte del team" sì/no. Va bene finché il team è piccolo e fidato — vedi roadmap per quando introdurre ruoli veri.
+
+**Se `flask make-admin ...` dà `ModuleNotFoundError: No module named 'flask_admin'`** (o comandi "non trovati") anche con il venv attivo: il comando `flask` che stai eseguendo non è quello del progetto — capita quando un altro `flask` globale è prima nel `PATH`. Usa questa forma, che forza l'uso dell'interprete Python correntemente attivo:
+
+```bash
+python -m flask make-admin tuaemail@esempio.it
+```
+
+Se anche questa fallisce, verifica con `which python` che stia puntando dentro `venv/bin/python` e non a un Python di sistema.
+
+**Nota sulla vista Users di Flask-Admin**: non ha un pulsante "Create" (`can_create = False` in `app/admin/views.py`). Non è un'omissione: `User.password_hash` è `NOT NULL` e questo form non raccoglie una password, quindi un insert da qui fallirebbe sempre. Nuovi utenti si creano solo da `/auth/register` — qui puoi solo modificare anagrafica ed `is_admin` di chi si è già registrato.
+
+---
+
+## Uno stack CSS solo, per tutto ciò che vede il cliente
+
+Landing, dashboard e pagine di login/registrazione usano tutte **Tailwind + daisyUI via CDN** (`app/templates/base.html` per dashboard/auth, `app/templates/landing/partials/head.html` per la landing — due file separati perché hanno `<head>` diversi, ma caricano esattamente lo stesso CDN). Niente più CSS scritto a mano per la dashboard: si costruisce con le stesse classi che vedi già nella landing (`btn btn-error text-white`, `card`, `input`, `fieldset`, `alert`, `menu`...).
+
+**Perché via CDN e non con un build reale**: `app/static/css/landing.css` e `daisyui.css` sono i sorgenti "veri" (con tema custom, font, ecc.) ma richiedono Tailwind CLI/Node per essere compilati, cosa che questo progetto non ha. Restano nel repo come riferimento per quando vorrai un build vero; nel frattempo il CDN dà lo stesso linguaggio visivo senza installare Node.
+
+**Icone**: usa `<span class="iconify" data-icon="lucide:nome"></span>`. La forma `class="iconify lucide--nome"` (che trovi ancora in qualche vecchio esempio online) **non funziona** con la versione della libreria caricata qui (`code.iconify.design/3/...`) — quella libreria legge l'attributo `data-icon`, non un secondo class-name. Nomi icone su [icon-sets.iconify.design](https://icon-sets.iconify.design/lucide/).
+
+**Flask-Admin resta fuori da questo**: ha il suo tema Bootstrap4 custom in `app/templates/admin/base.html`, autonomo. Non è pigrizia — i template interni di Flask-Admin (liste, form, paginazione) generano markup Bootstrap4 al loro interno, e un reskin vero richiederebbe sovrascrivere molti più file con il rischio di rompere widget JS che si aspettano quelle classi. Dato che `/admin/` lo vede solo il team (mai un cliente), non vale il rischio.
+
+---
+
+## Google Search Console: come funziona il collegamento
+
+Ogni `User` può collegare **un** account Google Search Console (relazione 1:1 con `GscConnection`). Il flusso:
+
+1. L'utente loggato va su `/dashboard/connect` (voce "Connector" in sidebar) e clicca "Connect Search Console".
+2. `GET /gsc/authorize` costruisce l'URL di consenso Google e ci reindirizza (usa `current_user`, non serve altro).
+3. Google rimanda l'utente a `GET /gsc/callback`: qui si scambia il `code` con i token, e si salvano cifrati in `GscConnection` (`app/gsc/repository.py`).
+4. Da `/dashboard/connect` si può disconnettere (`POST /gsc/disconnect`, cancella la riga) o vedere i siti verificati (`GET /gsc/sites`, JSON grezzo — non c'è ancora una UI per scegliere/monitorare un sito, vedi roadmap).
+
+**Setup richiesto** (una tantum, in [Google Cloud Console](https://console.cloud.google.com/)):
+1. Crea un progetto, abilita l'API "Google Search Console".
+2. Crea credenziali OAuth2 di tipo "Web application".
+3. Aggiungi come redirect URI autorizzato `{APP_BASE_URL}/gsc/callback` (in locale: `http://localhost:3000/gsc/callback`).
+4. Metti `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET` in `.env` (vedi `.env.example`).
+5. Genera una chiave per `TOKEN_ENCRYPTION_KEY`:
+   ```bash
+   python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+   ```
+
+**Perché i token sono cifrati e non in chiaro**: sono credenziali a lunga durata (il `refresh_token` non scade) che danno accesso in lettura ai dati di Search Console di un cliente — un dump del DB non deve bastare per usarle. `app/gsc/crypto.py` cifra/decifra con Fernet (simmetrica); se `TOKEN_ENCRYPTION_KEY` cambia, i token già salvati non sono più decifrabili (va bene: l'utente si ricollega, non è un dato che serve preservare per sempre).
+
+**In locale su `http://` (non https)**: Google normalmente rifiuta redirect URI non HTTPS. `app/gsc/gsc.py` imposta `OAUTHLIB_INSECURE_TRANSPORT=1` automaticamente quando `APP_BASE_URL` inizia per `http://` — non serve farlo a mano, ma non farlo mai in produzione (lì `APP_BASE_URL` deve essere `https://...`).
 
 ---
 
@@ -161,7 +216,8 @@ Questo **non è RBAC**: è un solo booleano, "fa parte del team" sì/no. Va bene
 | Una nuova rotta in un blueprint esistente | `app/<blueprint>/routes.py` |
 | Un nuovo modello | `app/models/nome.py` + aggiungilo a `app/models/__init__.py` |
 | Un nuovo form | `app/<blueprint>/forms.py` (se non esiste, crealo sul modello di `app/auth/forms.py`) |
-| Nuovo CSS/JS per la dashboard | `app/static/css/dashboard.css` (riusa le classi `lb-*` e i token in `tokens.css`) |
+| Nuovo componente in dashboard/auth | Classi utility Tailwind + componenti daisyUI (`btn`, `card`, `input`, `alert`, `menu`...) direttamente nel template, stessa sintassi della landing — niente CSS custom da scrivere |
+| Un'icona | `<span class="iconify" data-icon="lucide:nome-icona"></span>` — **non** `class="iconify lucide--nome"`, quella forma non viene renderizzata dalla versione della libreria caricata (vedi nota sotto) |
 | Immagini della landing | `app/static/img/landing/` (`hero.jpg`, `feature-*.jpg`, `logo/*.svg`) |
 | Logo o favicon | `app/static/shared/logo.png` e `favicon.png` — sostituisci i file, i template li usano già ovunque (landing, dashboard, auth, Flask-Admin) senza altre modifiche |
 
@@ -222,8 +278,8 @@ Questa è la parte più importante del documento. Leggila per intero prima di sc
 3. **I modelli restano in `app/models/`, sempre.** Non definire classi `db.Model` altrove, nemmeno "temporaneamente".
 4. **Ogni form con input utente passa da Flask-WTF.** Non scrivere validazione manuale di `request.form` a mano: è la fonte più comune di bug e buchi di sicurezza in Flask.
 5. **Prima di aggiungere una libreria, chiediti se serve davvero ora.** Questo progetto è deliberatamente senza Celery, Redis, code, API REST separate, RBAC granulare, repository pattern. Se pensi di averne bisogno, probabilmente non è ancora il momento (vedi lista sotto).
-6. **Il design system della dashboard vive in `tokens.css` + `dashboard.css`.** Nuovi componenti vanno aggiunti lì, con lo stesso prefisso `lb-` e le stesse variabili — non introdurre un secondo sistema di classi.
-7. **La landing e la dashboard restano due mondi separati** (Tailwind/daisyUI da una parte, `lb-*` dall'altra). Non provare a farle condividere un `base.html`: sono stati scelti deliberatamente disaccoppiati.
+6. **Un solo linguaggio visivo per tutto ciò che vede il cliente: Tailwind + daisyUI.** Landing, dashboard e auth condividono lo stesso CDN e lo stesso vocabolario di classi (`btn`, `card`, `input`, `alert`...). Non scrivere CSS custom per un nuovo componente prima di aver controllato se daisyUI lo offre già — è quasi sempre così.
+7. **Flask-Admin resta l'unica eccezione, di proposito.** Ha un tema Bootstrap4 separato perché lo vede solo il team, mai un cliente, e i suoi template interni sono troppo legati a Bootstrap per un reskin sicuro. Non provare a fargli condividere `base.html` con dashboard/auth.
 8. **Ogni nuova pagina/vista che espone dati va pensata da subito "chi può vederla?"** — è il tipo di errore più facile da introdurre senza accorgersene (vedi il caso `is_admin` sopra: prima che esistesse, qualunque cliente loggato poteva aprire `/admin/` e vedere tutti gli altri utenti).
 
 ### Cosa NON aggiungere subito
@@ -237,13 +293,14 @@ Anche se ti verrà voglia, in quest'ordine di tentazione:
 
 ### Roadmap pratica, in ordine
 
-1. ~~Immagini vere nella landing~~, ~~logo/favicon ovunque~~, ~~registrazione minimale~~ — fatto.
-2. **Ripulisci il testo placeholder della landing** (sezioni Features/Pricing/FAQ sono ancora quelle del template originale).
-3. **Storico/dati del cliente**, agganciati a `User` via `user_id`, man mano che il prodotto lo richiede — segui il pattern della sezione "Come aggiungere un nuovo blueprint".
-4. **Ruoli più fini di `is_admin`**, solo quando "team sì/no" non basta più (es. serve distinguere supporto da founder). Valuta prima un secondo campo semplice prima di una libreria RBAC.
-5. **Billing**, come nuovo blueprint (`app/billing/`), quando hai davvero un piano da far pagare — non prima.
-6. **Migration vere (Flask-Migrate)**, nel momento in cui hai dati reali da non perdere tra una modifica di schema e l'altra.
-7. **Marketplace/funzionalità premium**, solo dopo che billing e ruoli esistono — dipendono da entrambi.
+1. ~~Immagini vere nella landing~~, ~~logo/favicon ovunque~~, ~~registrazione minimale~~, ~~collegamento OAuth a Search Console~~ — fatto.
+2. **UI per scegliere il sito da monitorare.** `GET /gsc/sites` oggi ritorna JSON grezzo dei siti verificati; serve una pagina che li mostri e lasci scegliere quale monitorare (probabilmente un nuovo campo/tabella "sito attivo" collegato a `GscConnection`).
+3. **Storico + regole di decadenza (sezione 4 del business plan).** Il cuore del prodotto: salvare lo storico di `searchanalytics().query()` nel tempo e applicare le regole (soglia minima, -30%, persistenza, filtro stagionalità, filtro "sito vs pagina") per produrre la lista prioritizzata. Oggi `/gsc/analytics/<site>` fa solo la query grezza degli ultimi 90 giorni, senza salvare né analizzare nulla.
+4. **Ripulisci il testo placeholder della landing** (sezioni Features/Pricing/FAQ sono ancora quelle del template originale).
+5. **Ruoli più fini di `is_admin`**, solo quando "team sì/no" non basta più (es. serve distinguere supporto da founder). Valuta prima un secondo campo semplice prima di una libreria RBAC.
+6. **Billing**, come nuovo blueprint (`app/billing/`), quando hai davvero un piano da far pagare — non prima.
+7. **Migration vere (Flask-Migrate)**, nel momento in cui hai dati reali da non perdere tra una modifica di schema e l'altra.
+8. **Marketplace/funzionalità premium**, solo dopo che billing e ruoli esistono — dipendono da entrambi.
 
 ### Suggerimenti per non incasinare l'architettura
 

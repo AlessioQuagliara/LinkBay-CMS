@@ -8,3 +8,8 @@ __pycache__/
 node_modules/
 .DS_Store
 instance/
+
+# Credenziali OAuth scaricate da Google Cloud Console — non serve più al
+# codice (app/gsc/gsc.py legge GOOGLE_CLIENT_ID/SECRET da .env), ma se la
+# tieni in locale non deve mai finire in un commit.
+client_secret*.json

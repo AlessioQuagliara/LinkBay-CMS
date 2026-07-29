@@ -1,30 +1,42 @@
 {% extends "base.html" %}
 {% block title %}Sign in{% endblock %}
 {% block content %}
-<div class="lb-auth-shell">
-  <div class="lb-auth-card">
-    <a class="lb-auth-brand" href="{{ url_for('main.index') }}">
-      <img src="{{ url_for('static', filename='shared/logo.png') }}" alt="LinkBayCMS">
-    </a>
-    <h1>Sign In</h1>
-    <form method="post" novalidate>
-      {{ form.hidden_tag() }}
+<div class="min-h-screen flex items-center justify-center p-6">
+  <div class="card w-full max-w-sm bg-base-100 border border-base-300 shadow-sm">
+    <div class="card-body">
+      <a class="flex justify-center mb-4" href="{{ url_for('main.index') }}">
+        <img class="h-7 w-auto" src="{{ url_for('static', filename='shared/logo.png') }}" alt="LinkBayCMS">
+      </a>
+      <h1 class="text-xl font-medium text-center mb-4">Sign in</h1>
 
-      <div class="lb-field">
-        {{ form.email.label }}
-        {{ form.email(class_="lb-input", placeholder="your@company.com") }}
-        {% for error in form.email.errors %}<span class="lb-field__error">{{ error }}</span>{% endfor %}
-      </div>
+      <form method="post" novalidate>
+        {{ form.hidden_tag() }}
 
-      <div class="lb-field">
-        {{ form.password.label }}
-        {{ form.password(class_="lb-input", placeholder="••••••••") }}
-        {% for error in form.password.errors %}<span class="lb-field__error">{{ error }}</span>{% endfor %}
-      </div>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">{{ form.email.label.text }}</legend>
+          <label class="input w-full focus-within:outline-0">
+            <span class="iconify text-base-content/60 size-5" data-icon="lucide:mail"></span>
+            {{ form.email(class_="grow focus:outline-0", placeholder="your@company.com") }}
+          </label>
+          {% for error in form.email.errors %}<p class="text-error text-sm mt-1">{{ error }}</p>{% endfor %}
+        </fieldset>
 
-      {{ form.submit(class_="lb-btn lb-btn--primary lb-btn--block") }}
-    </form>
-    <p class="lb-auth-alt">Don't have an account? <a href="{{ url_for('auth.register') }}">Sign up</a></p>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">{{ form.password.label.text }}</legend>
+          <label class="input w-full focus-within:outline-0">
+            <span class="iconify text-base-content/60 size-5" data-icon="lucide:key-round"></span>
+            {{ form.password(class_="grow focus:outline-0", placeholder="••••••••") }}
+          </label>
+          {% for error in form.password.errors %}<p class="text-error text-sm mt-1">{{ error }}</p>{% endfor %}
+        </fieldset>
+
+        {{ form.submit(class_="btn btn-error text-white btn-block mt-4") }}
+      </form>
+
+      <p class="text-center text-sm text-base-content/60 mt-4">
+        Don't have an account? <a class="link" href="{{ url_for('auth.register') }}">Sign up</a>
+      </p>
+    </div>
   </div>
 </div>
 {% endblock %}

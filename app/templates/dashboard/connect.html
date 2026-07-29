@@ -1,0 +1,50 @@
+{% extends "dashboard/layout.html" %}
+{% block title %}Connect Search Console{% endblock %}
+{% block dashboard_content %}
+<div class="mb-6">
+  <h1 class="text-2xl font-semibold">Connect Google Search Console</h1>
+  <p class="text-base-content/60 mt-1">
+    Read-only access. We can see your performance data — we can't change anything on your site.
+  </p>
+</div>
+
+{% if connection %}
+  <div class="card bg-base-100 border border-base-300">
+    <div class="card-body">
+      <div class="flex items-center gap-3">
+        <span class="iconify text-success size-6" data-icon="lucide:circle-check-big"></span>
+        <div>
+          <p class="font-medium">Connected</p>
+          <p class="text-sm text-base-content/60">Connected on {{ connection.created_at.strftime('%d %b %Y') }}</p>
+        </div>
+      </div>
+
+      <div class="card-actions justify-end mt-6">
+        <a class="btn btn-ghost btn-sm" href="{{ url_for('gsc.sites') }}">
+          <span class="iconify size-4" data-icon="lucide:list"></span>
+          View sites
+        </a>
+        <form method="post" action="{{ url_for('gsc.disconnect') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-outline btn-error btn-sm" type="submit">Disconnect</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% else %}
+  <div class="card bg-base-100 border border-base-300">
+    <div class="card-body items-center text-center py-12">
+      <span class="iconify text-base-content/30 size-10" data-icon="lucide:cable"></span>
+      <p class="font-medium mt-3">No account connected yet</p>
+      <p class="text-sm text-base-content/60 max-w-sm mt-1">
+        Connect your Google Search Console account to start tracking which pages are losing
+        organic traffic.
+      </p>
+      <a class="btn btn-error text-white mt-5" href="{{ url_for('gsc.authorize') }}">
+        <span class="iconify size-4" data-icon="lucide:link"></span>
+        Connect Search Console
+      </a>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

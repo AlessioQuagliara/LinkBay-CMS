@@ -1,8 +1,22 @@
 {% extends "dashboard/layout.html" %}
 {% block title %}Overview{% endblock %}
 {% block dashboard_content %}
-<div class="lb-page-header">
-  <h1 class="lb-page-header__title">Overview</h1>
-  <p class="lb-page-header__subtitle">Welcome, {{ current_user.name }}.</p>
+<div class="mb-6">
+  <h1 class="text-2xl font-semibold">Overview</h1>
+  <p class="text-base-content/60 mt-1">Welcome, {{ current_user.name }}.</p>
+</div>
+
+
+<div class="card w-96 bg-base-100 card-md shadow-sm">
+  <div class="card-body">
+    <h2 class="card-title">Connect Google</h2>
+    <p>To use the service, you will need to connect the Google account that owns the websites.</p>
+    <div class="justify-end card-actions">
+        <a class="btn btn-error text-white" href="{{ url_for('dashboard.connect') }}">
+          <span class="iconify size-4" data-icon="lucide:unplug"></span>
+          Connect
+        </a>
+    </div>
+  </div>
 </div>
 {% endblock %}

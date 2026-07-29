@@ -41,11 +41,13 @@ def _register_extensions(app):
 def _register_blueprints(app):
     from app.auth.routes import auth_bp
     from app.dashboard.routes import dashboard_bp
+    from app.gsc.gsc import gsc_bp
     from app.main.routes import main_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
+    app.register_blueprint(gsc_bp)
 
 
 def _register_cli(app):

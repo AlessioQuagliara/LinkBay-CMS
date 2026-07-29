@@ -19,8 +19,12 @@ class User(db.Model, UserMixin):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     # Non è RBAC: un solo flag per distinguere il team (accesso a Flask-Admin)
-    # dai clienti normali. Si imposta con `flask make-admin <email>`.
+    # dai clienti normali. Si imposta con `python3 -m flask make-admin <email>`.
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
+
+    gsc_connection = db.relationship(
+        "GscConnection", back_populates="user", uselist=False, cascade="all, delete-orphan"
+    )
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

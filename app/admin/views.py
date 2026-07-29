@@ -8,7 +8,11 @@ class SecureModelView(AdminAuthMixin, ModelView):
 
 
 class UserAdminView(SecureModelView):
-    # La password non è nel form: gli utenti si creano da /auth/register.
+    # Niente "Create" qui: User.password_hash è NOT NULL e questo form non
+    # raccoglie una password, quindi un insert fallirebbe sempre con un
+    # integrity error. Gli utenti si creano solo da /auth/register; qui si
+    # gestiscono solo anagrafica e il flag is_admin.
+    can_create = False
     column_list = ("id", "name", "email", "is_admin", "created_at")
     form_columns = ("name", "email", "is_admin")
     column_searchable_list = ("name", "email")
