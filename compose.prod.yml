@@ -1,0 +1,69 @@
+services:
+  traefik:
+    image: traefik:v3.7
+    restart: unless-stopped
+    environment:
+      CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --certificatesresolvers.le.acme.dnschallenge=true
+      - --certificatesresolvers.le.acme.dnschallenge.provider=cloudflare
+      - --certificatesresolvers.le.acme.email=quagliara.alessio@gmail.com
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-certs:/letsencrypt
+
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: linkbay
+      POSTGRES_PASSWORD: linkbay
+      POSTGRES_DB: linkbay_cms
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  web:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://linkbay:linkbay@db:5432/linkbay_cms
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.linkbay.loadbalancer.server.port=3000"
+      # www.linkbay-cms.com -> app
+      - "traefik.http.routers.linkbay.rule=Host(`www.linkbay-cms.com`)"
+      - "traefik.http.routers.linkbay.entrypoints=websecure"
+      - "traefik.http.routers.linkbay.tls.certresolver=le"
+      - "traefik.http.routers.linkbay.service=linkbay"
+      # linkbay-cms.com -> redirect 301 su www.linkbay-cms.com
+      - "traefik.http.routers.linkbay-apex.rule=Host(`linkbay-cms.com`)"
+      - "traefik.http.routers.linkbay-apex.entrypoints=websecure"
+      - "traefik.http.routers.linkbay-apex.tls.certresolver=le"
+      - "traefik.http.routers.linkbay-apex.tls.domains[0].main=linkbay-cms.com"
+      - "traefik.http.routers.linkbay-apex.tls.domains[0].sans=*.linkbay-cms.com"
+      - "traefik.http.routers.linkbay-apex.service=linkbay"
+      - "traefik.http.routers.linkbay-apex.middlewares=redirect-to-www"
+      - "traefik.http.middlewares.redirect-to-www.redirectregex.regex=^https://linkbay-cms\\.com/(.*)"
+      - "traefik.http.middlewares.redirect-to-www.redirectregex.replacement=https://www.linkbay-cms.com/$${1}"
+      - "traefik.http.middlewares.redirect-to-www.redirectregex.permanent=true"
+
+volumes:
+  pgdata:
+  traefik-certs:
