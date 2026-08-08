@@ -14,6 +14,8 @@ import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 
+from app.gsc.history import get_site_series, sync_site_daily
+from app.gsc.insights import build_insights
 from app.gsc.repository import (
     credentials_to_dict,
     delete_gsc_credentials,
@@ -68,6 +70,18 @@ def _credentials_from_dict(creds: dict) -> google.oauth2.credentials.Credentials
 
 def _build_service(credentials):
     return googleapiclient.discovery.build(API_SERVICE_NAME, API_VERSION, credentials=credentials)
+
+
+def get_user_gsc_service(user_id):
+    """(service, credentials) per l'utente, o (None, None) se non collegato.
+    Riutilizzabile fuori dalle route (es. AI Analyzer). Dopo l'uso il chiamante
+    deve ripersistere le credenziali con save_gsc_credentials, perché la
+    libreria può averle aggiornate con un refresh trasparente."""
+    creds = load_gsc_credentials(user_id)
+    if not creds:
+        return None, None
+    credentials = _credentials_from_dict(creds)
+    return _build_service(credentials), credentials
 
 
 @gsc_bp.route("/authorize")
@@ -160,6 +174,68 @@ def sites():
     save_gsc_credentials(current_user.id, credentials_to_dict(credentials))
 
     return jsonify(verified_sites)
+
+
+@gsc_bp.route("/api/sites")
+@login_required
+def api_sites():
+    """Elenco JSON dei siti verificati, per popolare il selettore in dashboard."""
+    creds = load_gsc_credentials(current_user.id)
+    if not creds:
+        return jsonify({"error": "not_connected"}), 401
+
+    credentials = _credentials_from_dict(creds)
+    service = _build_service(credentials)
+
+    site_list = service.sites().list().execute()
+    sites = [
+        {"siteUrl": s["siteUrl"], "permissionLevel": s["permissionLevel"]}
+        for s in site_list.get("siteEntry", [])
+        if s["permissionLevel"] != "siteUnverifiedUser"
+    ]
+
+    save_gsc_credentials(current_user.id, credentials_to_dict(credentials))
+    return jsonify({"sites": sites})
+
+
+ALLOWED_PERIODS = {7, 28, 90}
+
+
+@gsc_bp.route("/api/insights")
+@login_required
+def api_insights():
+    """Dati aggregati (totali sito + delta, pagine con rating, query, serie
+    storica) per la vista Insights. Querystring: ?site=<siteUrl>&days=7|28|90."""
+    site_url = request.args.get("site")
+    if not site_url:
+        return jsonify({"error": "missing_site"}), 400
+
+    try:
+        days = int(request.args.get("days", 28))
+    except (TypeError, ValueError):
+        days = 28
+    if days not in ALLOWED_PERIODS:
+        days = 28
+
+    creds = load_gsc_credentials(current_user.id)
+    if not creds:
+        return jsonify({"error": "not_connected"}), 401
+
+    credentials = _credentials_from_dict(creds)
+    service = _build_service(credentials)
+
+    try:
+        # Prima allinea lo storico su DB (backfill/refresh), poi calcola i
+        # numeri del periodo live e rileggi la serie dal DB per il grafico.
+        sync_site_daily(service, current_user.id, site_url, days)
+        data = build_insights(service, site_url, days=days)
+        data["series"] = get_site_series(current_user.id, site_url, days)
+    except Exception:
+        current_app.logger.exception("GSC insights failed for %s", site_url)
+        return jsonify({"error": "query_failed"}), 502
+
+    save_gsc_credentials(current_user.id, credentials_to_dict(credentials))
+    return jsonify(data)
 
 
 @gsc_bp.route("/analytics/<path:site_url>")

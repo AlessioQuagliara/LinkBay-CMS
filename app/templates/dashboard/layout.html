@@ -15,6 +15,13 @@
       </li>
 
       <li>
+        <a class="{{ 'menu-active' if request.endpoint == 'dashboard.insights' }}" href="{{ url_for('dashboard.insights') }}">
+          <span class="iconify size-4" data-icon="lucide:trending-down"></span>
+          Insights
+        </a>
+      </li>
+
+      <li>
         <a class="{{ 'menu-active' if request.endpoint == 'dashboard.connect' }}" href="{{ url_for('dashboard.connect') }}">
           <span class="iconify size-4" data-icon="lucide:cable"></span>
           Connector
@@ -35,7 +42,7 @@
     <header class="h-14 shrink-0 bg-base-100 border-b border-base-300 flex items-center justify-end px-6">
       <span class="text-sm text-base-content/60">{{ current_user.email }}</span>
     </header>
-    <main class="p-6 max-w-4xl w-full">
+    <main class="p-6 max-w-6xl w-full">
       {% block dashboard_content %}{% endblock %}
     </main>
   </div>

@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /gsc/
+Disallow: /auth/login
+Disallow: /auth/logout
+
+Sitemap: {{ sitemap_url }}

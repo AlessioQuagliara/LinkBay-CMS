@@ -1,21 +1,133 @@
 <meta charset="utf-8" />
-<title>LinkBayCMS — Find Which Pages Are Losing Organic Traffic</title>
-<meta name="description" content="LinkBayCMS reads your Google Search Console data and gives you a short, prioritized list of pages losing organic traffic — with a plain-English reason for each. Built for publishers and editorial sites." />
+<title>LinkBayCMS — Find Pages Losing Organic Traffic | SEO Monitoring</title>
+<meta name="description" content="LinkBayCMS is an SEO monitoring tool that reads your Google Search Console data and hands you a short, prioritized list of pages losing organic traffic — each with a plain-English reason. Built for publishers and editorial sites. Free to start." />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link rel="canonical" href="{{ request.url_root }}" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+<meta name="keywords" content="SEO monitoring, organic traffic drop, traffic decline detection, Google Search Console tool, content decay, page traffic loss, SEO alerts, publisher SEO, editorial SEO" />
+<meta name="author" content="LinkBayCMS" />
+<meta name="theme-color" content="#e11d48" />
+<link rel="canonical" href="{{ site_url }}/" />
 
+{# Open Graph #}
 <meta property="og:type" content="website" />
-<meta property="og:title" content="LinkBayCMS — Find Which Pages Are Losing Organic Traffic" />
-<meta property="og:description" content="A short, prioritized list of the content pages losing organic traffic on your site — and what to fix first. Built on your own Google Search Console data." />
+<meta property="og:site_name" content="LinkBayCMS" />
+<meta property="og:url" content="{{ site_url }}/" />
+<meta property="og:title" content="LinkBayCMS — Find Pages Losing Organic Traffic" />
+<meta property="og:description" content="An SEO monitoring tool that turns your Google Search Console data into a short, prioritized list of the content pages losing organic traffic — and what to fix first. Built for publishers and editorial sites." />
 <meta property="og:image" content="{{ url_for('static', filename='img/landing/hero.jpg', _external=True) }}" />
+<meta property="og:image:alt" content="LinkBayCMS prioritized list of declining pages" />
+<meta property="og:locale" content="en_US" />
+
+{# Twitter #}
 <meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="LinkBayCMS — Find Pages Losing Organic Traffic" />
+<meta name="twitter:description" content="An SEO monitoring tool that turns your Google Search Console data into a short, prioritized list of pages losing organic traffic — and what to fix first." />
+<meta name="twitter:image" content="{{ url_for('static', filename='img/landing/hero.jpg', _external=True) }}" />
 
 <link rel="icon" type="image/png" href="{{ url_for('static', filename='shared/favicon.png') }}" />
+
+{# Structured data: dice ai crawler (Google, Bing, LLM) cos'è LinkBayCMS e in
+   quale categoria collocarlo, così può comparire tra chi offre strumenti di
+   monitoraggio SEO / traffico organico. Il contenuto qui deve corrispondere a
+   quello visibile in pagina (in particolare le FAQ). #}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "LinkBayCMS",
+      "url": "{{ site_url }}/",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "description": "SEO monitoring tool that reads Google Search Console data and returns a short, prioritized list of the pages losing organic traffic, each with a plain-English reason. Built for publishers and editorial sites.",
+      "featureList": [
+        "Detects real organic traffic decline instead of daily noise",
+        "Ranks declining pages by clicks lost per month",
+        "Plain-English reason for every flagged page",
+        "Connects read-only to Google Search Console",
+        "Keeps full history beyond Search Console's 16-month window",
+        "Weekly email digest of top declining pages"
+      ],
+      "keywords": "SEO monitoring, organic traffic drop, content decay, Google Search Console, traffic decline detection",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "description": "Free plan: 1 site, up to 100 URLs, top 5 declining pages."
+      },
+      "publisher": { "@id": "{{ site_url }}/#organization" }
+    },
+    {
+      "@type": "Organization",
+      "@id": "{{ site_url }}/#organization",
+      "name": "LinkBayCMS",
+      "url": "{{ site_url }}/",
+      "logo": "{{ url_for('static', filename='shared/logo.png', _external=True) }}"
+    },
+    {
+      "@type": "WebSite",
+      "@id": "{{ site_url }}/#website",
+      "name": "LinkBayCMS",
+      "url": "{{ site_url }}/",
+      "publisher": { "@id": "{{ site_url }}/#organization" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How is this different from Google Search Console?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Search Console gives you the data — thousands of rows and no particular order. LinkBayCMS gives you the five things to fix Monday morning, ranked by how much they're worth and how likely they are to recover. It's not another archive; it's a shortlist."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do you know a page is really declining, and not just noisy?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A page only makes the list if it clears a minimum relevance threshold, has dropped at least 30% and at least 20 clicks/month, held that drop for two consecutive months, and is falling faster than the rest of your site in the same period."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I need to install anything on my site?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. LinkBayCMS is not a CMS and doesn't touch your site — it reads your existing Google Search Console data with read-only access. Nothing to embed, no plugin, no code changes."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this built for e-commerce or SaaS marketing sites too?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It's built specifically for publishers and editorial sites with 500 to 20,000 indexed pages and at least 20,000 organic clicks a month, where organic search is the main source of revenue."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is my Search Console data safe?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We connect via Google's standard read-only access — we can see your performance data, we can't change anything on your property. Click figures come straight from Search Console, and any revenue estimate is only shown if you provide it, always labeled as an estimate."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
 
 {# Tailwind + daisyUI via CDN, senza build step (niente Node/npm nel progetto).
    I sorgenti "veri" restano in app/static/css/landing.css e daisyui.css:
    servono per quando un giorno vorrai un build reale con tema personalizzato
    (vedi README, sezione "Come continuare da solo senza AI"). #}
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" />
 <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <script src="https://cdn.jsdelivr.net/npm/card3d@2.6.5/dist/card3d.min.js"></script>

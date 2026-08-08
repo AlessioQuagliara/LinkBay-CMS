@@ -1,0 +1,186 @@
+{% extends "dashboard/layout.html" %}
+{% block title %}Insights{% endblock %}
+{% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
+{% block dashboard_content %}
+
+{# Safelist: queste classi colore vengono iniettate dinamicamente via JS; le
+   elenchiamo qui (nascoste) così il runtime Tailwind del CDN le genera al
+   caricamento anche se non compaiono altrove nel markup statico. #}
+<div class="hidden text-success text-warning text-error text-primary border-success border-warning border-error border-primary bg-success bg-warning bg-error"></div>
+
+<div class="mb-4 flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-semibold">Insights</h1>
+    <p class="text-base-content/60 mt-1">
+      Organic performance from Google Search Console — pages losing traffic first.
+    </p>
+  </div>
+
+  {# Selettore sito: popolato via JS da /gsc/api/sites #}
+  <label class="form-control w-full max-w-xs">
+    <select id="site-select" class="select select-bordered" disabled
+            data-sites-url="{{ url_for('gsc.api_sites') }}"
+            data-insights-url="{{ url_for('gsc.api_insights') }}"
+            data-ai-status-url="{{ url_for('ai.status') }}"
+            data-ai-toggle-url="{{ url_for('ai.toggle') }}"
+            data-ai-analyze-url="{{ url_for('ai.analyze') }}">
+      <option>Loading sites…</option>
+    </select>
+  </label>
+</div>
+
+{% if not connection %}
+  <div class="card bg-base-100 border border-base-300">
+    <div class="card-body items-center text-center py-12">
+      <span class="iconify text-base-content/30 size-10" data-icon="lucide:cable"></span>
+      <p class="font-medium mt-3">No Search Console account connected</p>
+      <p class="text-sm text-base-content/60 max-w-sm mt-1">
+        Connect your Google Search Console account to see which pages are losing organic traffic.
+      </p>
+      <a class="btn btn-error text-white mt-5" href="{{ url_for('gsc.authorize') }}">
+        <span class="iconify size-4" data-icon="lucide:link"></span>
+        Connect Search Console
+      </a>
+    </div>
+  </div>
+{% else %}
+
+  {# Toolbar: filtro periodo + AI analyzer #}
+  <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
+    <div class="join" id="period-filter" role="group" aria-label="Time range">
+      <button class="join-item btn btn-sm" data-days="7">7 days</button>
+      <button class="join-item btn btn-sm btn-active" data-days="28">28 days</button>
+      <button class="join-item btn btn-sm" data-days="90">90 days</button>
+    </div>
+
+    <fieldset class="fieldset bg-base-100 border-base-300 rounded-box border px-4 py-2">
+      <legend class="fieldset-legend">AI analyzer</legend>
+      <div class="flex items-center gap-3">
+        <label class="label cursor-pointer gap-2">
+          <input type="checkbox" id="ai-toggle" class="toggle toggle-primary" />
+          <span>Weekly AI suggestions</span>
+        </label>
+        <button id="ai-run" class="btn btn-sm btn-primary" disabled>
+          <span class="iconify size-4" data-icon="lucide:sparkles"></span>
+          Run now
+        </button>
+      </div>
+      <p id="ai-status-text" class="text-xs text-base-content/50 mt-1">Runs weekly when enabled.</p>
+    </fieldset>
+  </div>
+
+  {# Stato: caricamento (skeleton) #}
+  <div id="state-loading" class="hidden">
+    <div class="flex flex-col gap-4">
+      <div class="skeleton h-32 w-full"></div>
+      <div class="skeleton h-4 w-28"></div>
+      <div class="skeleton h-4 w-full"></div>
+      <div class="skeleton h-4 w-full"></div>
+    </div>
+  </div>
+
+  <div id="state-error" class="alert alert-error alert-soft hidden">
+    <span id="state-error-msg">Something went wrong loading your data.</span>
+  </div>
+
+  <div id="state-empty" class="card bg-base-100 border border-base-300 hidden">
+    <div class="card-body items-center text-center py-12">
+      <span class="iconify text-base-content/30 size-10" data-icon="lucide:search-x"></span>
+      <p class="font-medium mt-3">No verified sites found</p>
+      <p class="text-sm text-base-content/60 max-w-sm mt-1">
+        The connected Google account doesn't own any verified Search Console properties.
+      </p>
+    </div>
+  </div>
+
+  {# Stato: dati (tabs) #}
+  <div id="state-data" class="hidden">
+    <p class="text-base-content/50 text-sm mb-3" id="range-label"></p>
+
+    <div class="tabs tabs-lift" role="tablist">
+      <label class="tab">
+        <input type="radio" name="insights_tabs" checked="checked" />
+        <span class="iconify size-4 me-2" data-icon="lucide:layout-dashboard"></span>
+        Overview
+      </label>
+      <div class="tab-content bg-base-100 border-base-300 p-6">
+        <h3 class="text-sm font-medium text-base-content/70 mb-3">Clicks over time</h3>
+        <div id="chart" class="w-full"></div>
+        <div class="stats stats-vertical sm:stats-horizontal shadow w-full mt-6" id="overview-stats"></div>
+      </div>
+
+      <label class="tab">
+        <input type="radio" name="insights_tabs" />
+        <span class="iconify size-4 me-2" data-icon="lucide:file-text"></span>
+        Pages
+      </label>
+      <div class="tab-content bg-base-100 border-base-300 p-6">
+        <div class="overflow-x-auto">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Page</th>
+                <th class="text-right">Clicks</th>
+                <th class="text-right">Impr.</th>
+                <th class="text-right">CTR</th>
+                <th class="text-right">Pos.</th>
+                <th class="text-right">Δ clicks</th>
+                <th class="text-center">Health</th>
+                <th class="text-center">AI</th>
+              </tr>
+            </thead>
+            <tbody id="pages-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <label class="tab">
+        <input type="radio" name="insights_tabs" />
+        <span class="iconify size-4 me-2" data-icon="lucide:search"></span>
+        Queries
+      </label>
+      <div class="tab-content bg-base-100 border-base-300 p-6">
+        <div class="overflow-x-auto">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Query</th>
+                <th class="text-right">Clicks</th>
+                <th class="text-right">Impr.</th>
+                <th class="text-right">CTR</th>
+                <th class="text-right">Pos.</th>
+              </tr>
+            </thead>
+            <tbody id="queries-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Modal suggerimenti AI per pagina #}
+  <dialog id="ai-modal" class="modal">
+    <div class="modal-box max-w-lg">
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+      </form>
+      <div class="flex items-center gap-4">
+        <div id="ai-modal-radial" class="radial-progress text-primary border-primary border-4"
+             style="--value:0;--size:4rem;--thickness:4px;" role="progressbar">0</div>
+        <div class="min-w-0">
+          <h3 class="font-semibold">AI suggestions</h3>
+          <a id="ai-modal-url" href="#" target="_blank" rel="noopener"
+             class="link link-hover text-sm text-base-content/60 truncate block"></a>
+        </div>
+      </div>
+      <p class="text-xs text-base-content/50 mt-3" id="ai-modal-hint">Click a card to cycle through suggestions.</p>
+      <div class="mt-3 flex justify-center">
+        <div id="ai-modal-stack" class="stack w-full max-w-sm"></div>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
+
+  <script src="{{ url_for('static', filename='js/insights.js') }}"></script>
+{% endif %}
+{% endblock %}

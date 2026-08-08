@@ -1,4 +1,5 @@
 from flask import Flask
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from config import Config
 
@@ -6,6 +7,15 @@ from config import Config
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+
+    # Dietro Traefik l'app riceve richieste in HTTP dall'host interno
+    # (web:3000), ma è servita pubblicamente su https://www.linkbay-cms.com.
+    # Senza questo, request.scheme/host — e quindi url_for(_external=True) e il
+    # redirect URI OAuth di Google Search Console — risulterebbero sbagliati
+    # (http:// e host interno), ed è il motivo per cui il collegamento GSC
+    # funzionava solo in locale. ProxyFix fa fidare Flask degli header
+    # X-Forwarded-* impostati dal primo (e unico) proxy davanti all'app.
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 
     _register_extensions(app)
     _register_blueprints(app)
@@ -39,6 +49,7 @@ def _register_extensions(app):
 
 
 def _register_blueprints(app):
+    from app.ai.routes import ai_bp
     from app.auth.routes import auth_bp
     from app.dashboard.routes import dashboard_bp
     from app.gsc.gsc import gsc_bp
@@ -48,6 +59,7 @@ def _register_blueprints(app):
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(gsc_bp)
+    app.register_blueprint(ai_bp)
 
 
 def _register_cli(app):

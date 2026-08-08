@@ -10,6 +10,12 @@ def overview():
     return render_template("dashboard/overview.html")
 
 
+@dashboard_bp.route("/insights")
+@login_required
+def insights():
+    return render_template("dashboard/insights.html", connection=current_user.gsc_connection)
+
+
 @dashboard_bp.route("/connect")
 @login_required
 def connect():
