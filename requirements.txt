@@ -40,6 +40,7 @@ pyparsing==3.3.2
 python-dotenv==1.2.2
 requests==2.34.2
 requests-oauthlib==2.0.0
+resend==2.35.0
 SQLAlchemy==2.0.51
 typing_extensions==4.16.0
 uritemplate==4.2.0

@@ -1,0 +1,99 @@
+{% extends "landing/legal_base.html" %}
+
+{% block content %}
+<p>
+    This Cookie Policy explains how LinkBayCMS uses cookies and similar technologies, and how you
+    can control them. For how we handle personal data more broadly, see our
+    <a href="{{ url_for('main.privacy_policy') }}">Privacy Policy</a>.
+</p>
+
+<div class="not-prose my-6">
+    <button class="btn btn-error btn-sm text-white" data-cookie-action="prefs">
+        <span class="iconify size-4" data-icon="lucide:sliders-horizontal"></span>
+        Manage cookie preferences
+    </button>
+</div>
+
+<h2>1. What cookies are</h2>
+<p>
+    Cookies are small text files stored on your device when you visit a website. They let the
+    site remember your actions and preferences (such as your consent choices) and help us
+    understand how the Service is used. We also use equivalent technologies such as local storage.
+</p>
+
+<h2>2. Categories we use</h2>
+
+<h3>Strictly necessary</h3>
+<p>
+    Required for the site to function — for example, to keep you signed in, to protect against
+    cross-site request forgery, and to remember your cookie choices. These are always on and
+    cannot be switched off.
+</p>
+
+<h3>Analytics (optional)</h3>
+<p>
+    Help us understand, in aggregate, how visitors use the Service so we can improve it. These run
+    only if you allow them.
+</p>
+
+<h3>Marketing (optional)</h3>
+<p>
+    Used to measure campaigns and show relevant content off-site. These run only if you allow them.
+</p>
+
+<h2>3. Cookies and storage we set</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Purpose</th>
+            <th>Duration</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>session</td>
+            <td>Necessary</td>
+            <td>Keeps you signed in and secures your session.</td>
+            <td>Session</td>
+        </tr>
+        <tr>
+            <td>csrf / session token</td>
+            <td>Necessary</td>
+            <td>Protects forms against cross-site request forgery.</td>
+            <td>Session</td>
+        </tr>
+        <tr>
+            <td>lb_consent</td>
+            <td>Necessary</td>
+            <td>Stores your cookie preferences so we don't ask again.</td>
+            <td>180 days</td>
+        </tr>
+    </tbody>
+</table>
+<p class="text-base-content/70 text-sm">
+    Analytics and marketing cookies are listed here only if and when they are enabled. No optional
+    cookie is set before you give consent.
+</p>
+
+<h2>4. Managing your choices</h2>
+<p>
+    When you first visit, a banner lets you accept all, reject non-essential cookies, or choose per
+    category. You can change your choice at any time using the
+    <strong>Manage cookie preferences</strong> button above. You can also delete cookies through
+    your browser settings; note that blocking necessary cookies may break parts of the Service.
+</p>
+
+<h2>5. Changes to this Policy</h2>
+<p>
+    We may update this Cookie Policy as the Service evolves. We will update the "Last updated" date
+    above, and material changes to the categories will prompt the consent banner again.
+</p>
+
+<h2>6. Contact</h2>
+<p>
+    Questions about cookies? Contact us at
+    <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.
+</p>
+{% endblock %}

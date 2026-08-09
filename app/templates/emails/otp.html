@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <body style="margin:0;padding:0;background:#f4f4f5;font-family:'Helvetica Neue',Arial,sans-serif;color:#18181b;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:460px;background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;overflow:hidden;">
+            <tr>
+              <td style="padding:28px 32px 8px;">
+                <p style="margin:0;font-size:15px;color:#52525b;">Hi {{ name }},</p>
+                <h1 style="margin:12px 0 4px;font-size:20px;font-weight:600;color:#18181b;">
+                  {% if purpose == "register" %}Confirm your email{% else %}Your sign-in code{% endif %}
+                </h1>
+                <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#52525b;">
+                  Enter this code to
+                  {% if purpose == "register" %}finish creating your LinkBayCMS account{% else %}sign in to LinkBayCMS{% endif %}.
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="padding:0 32px 8px;">
+                <div style="display:inline-block;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:16px 24px;">
+                  <span style="font-family:'SF Mono',Menlo,Consolas,monospace;font-size:32px;font-weight:700;letter-spacing:10px;color:#e11d48;">{{ code }}</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 32px 28px;">
+                <p style="margin:0;font-size:13px;line-height:1.6;color:#71717a;">
+                  This code expires in {{ minutes }} minutes. If you didn't request it, you can safely
+                  ignore this email — no one can access your account without it.
+                </p>
+              </td>
+            </tr>
+          </table>
+          <p style="margin:20px 0 0;font-size:12px;color:#a1a1aa;">© LinkBayCMS</p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

@@ -1,11 +1,9 @@
-<meta charset="utf-8" />
+{% include "landing/partials/head-assets.html" %}
 <title>LinkBayCMS — Find Pages Losing Organic Traffic | SEO Monitoring</title>
 <meta name="description" content="LinkBayCMS is an SEO monitoring tool that reads your Google Search Console data and hands you a short, prioritized list of pages losing organic traffic — each with a plain-English reason. Built for publishers and editorial sites. Free to start." />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 <meta name="keywords" content="SEO monitoring, organic traffic drop, traffic decline detection, Google Search Console tool, content decay, page traffic loss, SEO alerts, publisher SEO, editorial SEO" />
 <meta name="author" content="LinkBayCMS" />
-<meta name="theme-color" content="#e11d48" />
 <link rel="canonical" href="{{ site_url }}/" />
 
 {# Open Graph #}
@@ -23,8 +21,6 @@
 <meta name="twitter:title" content="LinkBayCMS — Find Pages Losing Organic Traffic" />
 <meta name="twitter:description" content="An SEO monitoring tool that turns your Google Search Console data into a short, prioritized list of pages losing organic traffic — and what to fix first." />
 <meta name="twitter:image" content="{{ url_for('static', filename='img/landing/hero.png', _external=True) }}" />
-
-<link rel="icon" type="image/png" href="{{ url_for('static', filename='shared/favicon.png') }}" />
 
 {# Structured data: dice ai crawler (Google, Bing, LLM) cos'è LinkBayCMS e in
    quale categoria collocarlo, così può comparire tra chi offre strumenti di
@@ -54,7 +50,7 @@
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD",
-        "description": "Free plan: 1 site, up to 100 URLs, top 5 declining pages."
+        "description": "Free plan: 3 sites, up to 100 URLs, top 5 declining pages."
       },
       "publisher": { "@id": "{{ site_url }}/#organization" }
     },
@@ -120,47 +116,3 @@
   ]
 }
 </script>
-
-{# Tailwind + daisyUI via CDN, senza build step (niente Node/npm nel progetto).
-   I sorgenti "veri" restano in app/static/css/landing.css e daisyui.css:
-   servono per quando un giorno vorrai un build reale con tema personalizzato
-   (vedi README, sezione "Come continuare da solo senza AI"). #}
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="preconnect" href="https://cdn.jsdelivr.net" />
-<link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
-<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-<script src="https://cdn.jsdelivr.net/npm/card3d@2.6.5/dist/card3d.min.js"></script>
-<script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
-
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;1000&display=swap" rel="stylesheet" />
-
-{# Il CDN Tailwind non legge app/static/css/landing.css (è un sorgente da build,
-   non CSS che il browser può eseguire): senza questo blocco la classe
-   "container" non esiste in Tailwind v4 (non è più inclusa di default), ed è
-   per questo che immagini/testo restavano incollati al bordo. Un blocco
-   <style type="text/tailwindcss"> con @utility non viene processato in modo
-   affidabile dal build via CDN (verificato) — questo è CSS puro, funziona
-   sempre, indipendentemente dal runtime Tailwind. #}
-<style>
-  html { scroll-behavior: smooth; }
-  body { font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; overflow-x: hidden; }
-  .container {
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-  @media (min-width: 768px) {
-    .container { padding-left: 2rem; padding-right: 2rem; }
-  }
-  @media (min-width: 1024px) {
-    .container { padding-left: 3rem; padding-right: 3rem; }
-  }
-  @media (min-width: 1280px) {
-    .container { padding-left: 4rem; padding-right: 4rem; }
-  }
-  @media (min-width: 1536px) {
-    .container { padding-left: 6rem; padding-right: 6rem; }
-  }
-</style>

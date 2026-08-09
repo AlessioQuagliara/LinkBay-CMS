@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Verify your email{% endblock %}
+{% block head %}
+<style>
+  /* OTP a 6 caselle = 6 input reali da 1 carattere (pattern robusto: niente
+     caret fantasma, auto-avanzamento, backspace e incolla). Il valore completo
+     viene ricomposto nel campo hidden `code` inviato al server. */
+  .otp { display: grid; grid-template-columns: repeat(6, 1fr); gap: .5rem; width: 100%; }
+  .otp input {
+    aspect-ratio: 3 / 4; width: 100%; min-width: 0; text-align: center;
+    font-size: 1.375rem; font-weight: 600; font-variant-numeric: tabular-nums;
+    border: 1px solid var(--color-base-300, #d4d4d8); border-radius: .5rem;
+    background: var(--color-base-100, #fff); color: var(--color-base-content, #18181b);
+    outline: none; transition: border-color .15s, box-shadow .15s;
+  }
+  .otp input:focus {
+    border-color: var(--color-error, #e11d48);
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--color-error, #e11d48) 25%, transparent);
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="min-h-screen flex items-center justify-center p-6">
+  <div class="card w-full max-w-sm bg-base-100 border border-base-300 shadow-sm">
+    <div class="card-body">
+      <a class="flex justify-center mb-4" href="{{ url_for('main.index') }}">
+        <img class="h-7 w-auto" src="{{ url_for('static', filename='shared/logo.png') }}" alt="LinkBayCMS">
+      </a>
+      <h1 class="text-xl font-medium text-center">
+        {% if purpose == "register" %}Confirm your email{% else %}Enter your code{% endif %}
+      </h1>
+      <p class="text-center text-sm text-base-content/60 mt-1 mb-6">
+        We sent a 6-digit code to<br>
+        <span class="font-medium text-base-content">{{ email }}</span>
+      </p>
+
+      <form method="post" action="{{ url_for('auth.verify') }}" id="otp-form" novalidate>
+        {{ form.hidden_tag() }}
+        {# Valore completo ricomposto dal JS dalle 6 caselle. #}
+        <input type="hidden" name="code" id="otp-code">
+
+        <div class="otp" data-otp aria-label="6-digit verification code">
+          <input inputmode="numeric" autocomplete="one-time-code" maxlength="1" pattern="[0-9]" aria-label="Digit 1" autofocus>
+          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Digit 2">
+          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Digit 3">
+          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Digit 4">
+          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Digit 5">
+          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Digit 6">
+        </div>
+        {% for error in form.code.errors %}
+          <p class="text-error text-sm mt-3 text-center">{{ error }}</p>
+        {% endfor %}
+
+        {{ form.submit(class_="btn btn-error text-white btn-block mt-6") }}
+      </form>
+
+      <form method="post" action="{{ url_for('auth.resend') }}" class="mt-4 text-center">
+        {{ form.csrf_token }}
+        <span class="text-sm text-base-content/60">Didn't get the email?</span>
+        <button id="resend-btn" type="submit"
+                class="link text-sm ms-1"
+                {% if cooldown_left and cooldown_left > 0 %}disabled data-cooldown="{{ cooldown_left }}"{% endif %}>
+          <span id="resend-label">Resend code</span>
+        </button>
+      </form>
+
+      <p class="text-center text-sm text-base-content/50 mt-4">
+        <a class="link" href="{{ url_for('auth.cancel_verify') }}">Use a different account</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const wrap = document.querySelector("[data-otp]");
+    if (wrap) {
+      const boxes = [...wrap.querySelectorAll("input")];
+      const hidden = document.getElementById("otp-code");
+      const form = document.getElementById("otp-form");
+      const sync = () => { hidden.value = boxes.map(b => b.value).join(""); };
+      const maybeSubmit = () => {
+        if (boxes.every(b => b.value)) {
+          sync();
+          if (form.requestSubmit) form.requestSubmit(); else form.submit();
+        }
+      };
+      boxes.forEach((box, i) => {
+        box.addEventListener("input", () => {
+          box.value = box.value.replace(/\D/g, "").slice(0, 1);
+          if (box.value && i < boxes.length - 1) boxes[i + 1].focus();
+          sync();
+          maybeSubmit();
+        });
+        box.addEventListener("keydown", (e) => {
+          if (e.key === "Backspace" && !box.value && i > 0) boxes[i - 1].focus();
+          if (e.key === "ArrowLeft" && i > 0) { e.preventDefault(); boxes[i - 1].focus(); }
+          if (e.key === "ArrowRight" && i < boxes.length - 1) { e.preventDefault(); boxes[i + 1].focus(); }
+        });
+        box.addEventListener("focus", () => box.select());
+        box.addEventListener("paste", (e) => {
+          e.preventDefault();
+          const digits = (e.clipboardData.getData("text") || "").replace(/\D/g, "").slice(0, boxes.length);
+          if (!digits) return;
+          digits.split("").forEach((d, k) => { if (boxes[k]) boxes[k].value = d; });
+          boxes[Math.min(digits.length, boxes.length - 1)].focus();
+          sync();
+          maybeSubmit();
+        });
+      });
+      sync();
+    }
+
+    // Countdown del pulsante "Resend" quando è ancora in cooldown.
+    const btn = document.getElementById("resend-btn");
+    const label = document.getElementById("resend-label");
+    if (btn && btn.dataset.cooldown) {
+      let left = parseInt(btn.dataset.cooldown, 10);
+      const tick = () => {
+        if (left <= 0) { btn.disabled = false; label.textContent = "Resend code"; return; }
+        label.textContent = "Resend in " + left + "s";
+        left -= 1;
+        setTimeout(tick, 1000);
+      };
+      tick();
+    }
+  })();
+</script>
+{% endblock %}

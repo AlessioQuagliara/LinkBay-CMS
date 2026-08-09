@@ -18,6 +18,11 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
+    # Diventa True dopo che l'utente ha inserito il codice OTP ricevuto via
+    # email in fase di registrazione. Il login richiede comunque un OTP ogni
+    # volta (2FA email), a prescindere da questo flag.
+    email_verified = db.Column(db.Boolean, nullable=False, default=False)
+
     # Non è RBAC: un solo flag per distinguere il team (accesso a Flask-Admin)
     # dai clienti normali. Si imposta con `python3 -m flask make-admin <email>`.
     is_admin = db.Column(db.Boolean, nullable=False, default=False)

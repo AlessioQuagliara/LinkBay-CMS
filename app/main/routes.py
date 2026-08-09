@@ -4,6 +4,12 @@ from flask import Blueprint, Response, current_app, render_template, url_for
 
 main_bp = Blueprint("main", __name__)
 
+# Dati comuni alle pagine legali. Cambiando qui l'email o l'operatore si
+# aggiornano di colpo Terms, Privacy e Cookie policy.
+LEGAL_OPERATOR = "LinkBayCMS (Alessio Quagliara)"
+LEGAL_CONTACT_EMAIL = "privacy@linkbay-cms.com"
+LEGAL_LAST_UPDATED = "August 9, 2026"
+
 
 @main_bp.app_context_processor
 def inject_site_url():
@@ -21,6 +27,49 @@ def _public_base():
 @main_bp.route("/")
 def index():
     return render_template("landing/index.html")
+
+
+def _legal_ctx(page_title, page_description):
+    return {
+        "page_title": page_title,
+        "page_description": page_description,
+        "operator": LEGAL_OPERATOR,
+        "contact_email": LEGAL_CONTACT_EMAIL,
+        "last_updated": LEGAL_LAST_UPDATED,
+    }
+
+
+@main_bp.route("/terms-of-service")
+def terms_of_service():
+    return render_template(
+        "landing/terms.html",
+        **_legal_ctx(
+            "Terms of Service",
+            "The terms that govern your use of LinkBayCMS.",
+        ),
+    )
+
+
+@main_bp.route("/privacy-policy")
+def privacy_policy():
+    return render_template(
+        "landing/privacy.html",
+        **_legal_ctx(
+            "Privacy Policy",
+            "How LinkBayCMS collects, uses, and protects your personal data.",
+        ),
+    )
+
+
+@main_bp.route("/cookie-policy")
+def cookie_policy():
+    return render_template(
+        "landing/cookie.html",
+        **_legal_ctx(
+            "Cookie Policy",
+            "How LinkBayCMS uses cookies and how to manage your preferences.",
+        ),
+    )
 
 
 # Pagine pubbliche e indicizzabili incluse nella sitemap. (endpoint, priority,

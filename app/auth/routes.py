@@ -1,11 +1,41 @@
-from flask import Blueprint, flash, redirect, render_template, url_for
+from flask import Blueprint, flash, redirect, render_template, session, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
-from app.auth.forms import LoginForm, RegisterForm
+from app.auth import otp as otp_service
+from app.auth.forms import LoginForm, OtpForm, RegisterForm
 from app.extensions import db
 from app.models import User
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
+
+# Chiavi con cui teniamo in sessione lo stato "credenziali ok, manca l'OTP".
+# La sessione Flask è un cookie firmato: l'utente non può manometterlo, e qui
+# non c'è ancora un login effettivo (login_user avviene solo dopo l'OTP).
+_PENDING_USER = "otp_pending_user_id"
+_PENDING_PURPOSE = "otp_pending_purpose"
+_PENDING_EMAIL = "otp_pending_email"
+
+
+def _start_otp_flow(user, purpose):
+    """Salva lo stato pendente in sessione, emette e invia il codice, poi
+    manda l'utente alla pagina di verifica."""
+    session[_PENDING_USER] = user.id
+    session[_PENDING_PURPOSE] = purpose
+    session[_PENDING_EMAIL] = user.email
+
+    sent, code = otp_service.issue_code(user, purpose)
+    _flash_code_status(sent, code)
+    return redirect(url_for("auth.verify"))
+
+
+def _flash_code_status(sent, code):
+    if sent:
+        flash("We've emailed you a 6-digit verification code.", "success")
+    elif otp_service.dev_fallback_enabled():
+        # Solo in sviluppo senza Resend: mostriamo il codice per poter testare.
+        flash(f"Dev mode (email not configured): your code is {code}.", "info")
+    else:
+        flash("We couldn't send the email right now. Please try again.", "error")
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
@@ -22,11 +52,9 @@ def register():
             user = User(name=form.name.data.strip(), email=email)
             user.set_password(form.password.data)
             db.session.add(user)
-
             db.session.commit()
-            login_user(user)
-            flash("Account created. Welcome!", "success")
-            return redirect(url_for("dashboard.overview"))
+            # Niente login immediato: prima l'utente conferma l'email con l'OTP.
+            return _start_otp_flow(user, otp_service.PURPOSE_REGISTER)
 
     return render_template("auth/register.html", form=form)
 
@@ -41,12 +69,84 @@ def login():
         email = form.email.data.lower().strip()
         user = User.query.filter_by(email=email).first()
         if user and user.check_password(form.password.data):
-            login_user(user)
-            flash(f"Welcome, {user.name}.", "success")
-            return redirect(url_for("dashboard.overview"))
+            # Password corretta: secondo fattore via email prima di entrare.
+            return _start_otp_flow(user, otp_service.PURPOSE_LOGIN)
         flash("Incorrect email or password.", "error")
 
     return render_template("auth/login.html", form=form)
+
+
+@auth_bp.route("/verify", methods=["GET", "POST"])
+def verify():
+    if current_user.is_authenticated:
+        return redirect(url_for("dashboard.overview"))
+
+    user_id = session.get(_PENDING_USER)
+    purpose = session.get(_PENDING_PURPOSE)
+    if not user_id or not purpose:
+        flash("Start by signing in.", "info")
+        return redirect(url_for("auth.login"))
+
+    form = OtpForm()
+    if form.validate_on_submit():
+        ok, error = otp_service.verify_code(user_id, purpose, form.code.data)
+        if ok:
+            user = db.session.get(User, user_id)
+            if user is None:
+                _clear_pending()
+                flash("Something went wrong. Please sign in again.", "error")
+                return redirect(url_for("auth.login"))
+            if not user.email_verified:
+                user.email_verified = True
+                db.session.commit()
+            login_user(user)
+            _clear_pending()
+            flash(f"Welcome, {user.name}.", "success")
+            return redirect(url_for("dashboard.overview"))
+        flash(error, "error")
+
+    _, cooldown_left = otp_service.can_resend(user_id, purpose)
+    return render_template(
+        "auth/verify.html",
+        form=form,
+        email=session.get(_PENDING_EMAIL),
+        purpose=purpose,
+        cooldown_left=cooldown_left,
+    )
+
+
+@auth_bp.route("/verify/resend", methods=["POST"])
+def resend():
+    user_id = session.get(_PENDING_USER)
+    purpose = session.get(_PENDING_PURPOSE)
+    if not user_id or not purpose:
+        return redirect(url_for("auth.login"))
+
+    allowed, remaining = otp_service.can_resend(user_id, purpose)
+    if not allowed:
+        flash(f"Please wait {remaining}s before requesting a new code.", "error")
+        return redirect(url_for("auth.verify"))
+
+    user = db.session.get(User, user_id)
+    if user is None:
+        _clear_pending()
+        return redirect(url_for("auth.login"))
+
+    sent, code = otp_service.issue_code(user, purpose)
+    _flash_code_status(sent, code)
+    return redirect(url_for("auth.verify"))
+
+
+@auth_bp.route("/verify/cancel")
+def cancel_verify():
+    _clear_pending()
+    return redirect(url_for("auth.login"))
+
+
+def _clear_pending():
+    session.pop(_PENDING_USER, None)
+    session.pop(_PENDING_PURPOSE, None)
+    session.pop(_PENDING_EMAIL, None)
 
 
 @auth_bp.route("/logout")

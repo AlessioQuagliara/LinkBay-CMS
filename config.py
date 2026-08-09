@@ -48,3 +48,16 @@ class Config:
     DEEPSEEK_API = os.environ.get("DEEPSEEK_API")
     DEEPSEEK_BASE_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
     DEEPSEEK_MODEL = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
+
+    # Resend — invio email transazionali (es. codici OTP). RESEND_API è la
+    # API key (re_...). RESEND_FROM è il mittente: deve usare un dominio
+    # verificato su Resend (qui linkbay-cms.com è già verificato).
+    RESEND_API = os.environ.get("RESEND_API")
+    RESEND_FROM = os.environ.get("RESEND_FROM", "LinkBayCMS <no-reply@linkbay-cms.com>")
+
+    # OTP via email al login/registrazione. Codice numerico a 6 cifre, valido
+    # OTP_TTL_SECONDS, max OTP_MAX_ATTEMPTS tentativi, e un nuovo invio non è
+    # richiedibile prima di OTP_RESEND_COOLDOWN secondi.
+    OTP_TTL_SECONDS = int(os.environ.get("OTP_TTL_SECONDS", "600"))
+    OTP_MAX_ATTEMPTS = int(os.environ.get("OTP_MAX_ATTEMPTS", "5"))
+    OTP_RESEND_COOLDOWN = int(os.environ.get("OTP_RESEND_COOLDOWN", "60"))

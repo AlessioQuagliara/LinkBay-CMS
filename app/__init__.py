@@ -105,3 +105,31 @@ def _ensure_tables(app):
 
     with app.app_context():
         db.create_all()
+        _ensure_columns(db)
+
+
+def _ensure_columns(db):
+    """Micro-migrazione idempotente: `db.create_all()` crea le tabelle mancanti
+    ma NON aggiunge colonne nuove a tabelle già esistenti. Senza un tool di
+    migration, aggiungiamo qui a mano le colonne introdotte dopo il primo
+    deploy, solo se mancano. Aggiungere una riga per ogni nuova colonna."""
+    from sqlalchemy import inspect, text
+
+    inspector = inspect(db.engine)
+    dialect = db.engine.dialect.name
+
+    def has_column(table, column):
+        try:
+            return column in {c["name"] for c in inspector.get_columns(table)}
+        except Exception:  # noqa: BLE001 — tabella non ancora esistente, ecc.
+            return False
+
+    # users.email_verified (introdotta con l'OTP email al login/registrazione).
+    if has_column("users", "id") and not has_column("users", "email_verified"):
+        default = "false" if dialect == "postgresql" else "0"
+        with db.engine.begin() as conn:
+            conn.execute(
+                text(
+                    f"ALTER TABLE users ADD COLUMN email_verified BOOLEAN NOT NULL DEFAULT {default}"
+                )
+            )

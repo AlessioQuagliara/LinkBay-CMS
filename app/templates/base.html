@@ -21,13 +21,32 @@
 <body class="min-h-screen bg-base-200 text-base-content">
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-      <div class="max-w-3xl mx-auto px-4 sm:px-6 pt-4 flex flex-col gap-2">
+      {# Toast fisso (fuori dal flusso: non sposta il layout della pagina) con
+         auto-dismiss. Vedi lo script in fondo al body. #}
+      <div class="toast toast-top toast-end z-50" id="flash-toast">
         {% for category, message in messages %}
-          <div role="alert" class="alert {{ 'alert-success' if category == 'success' else 'alert-error' if category in ('error', 'critical') else 'alert-info' }} alert-soft">
+          <div role="alert"
+               class="alert {{ 'alert-success' if category == 'success' else 'alert-error' if category in ('error', 'critical') else 'alert-info' }} alert-soft shadow-lg max-w-xs sm:max-w-sm whitespace-normal"
+               data-flash>
             <span>{{ message }}</span>
+            <button type="button" class="btn btn-ghost btn-xs btn-circle" aria-label="Dismiss" data-flash-close>✕</button>
           </div>
         {% endfor %}
       </div>
+      <script>
+        (function () {
+          document.querySelectorAll("[data-flash]").forEach((el, i) => {
+            const remove = () => {
+              el.style.transition = "opacity .3s, transform .3s";
+              el.style.opacity = "0";
+              el.style.transform = "translateX(0.5rem)";
+              setTimeout(() => el.remove(), 300);
+            };
+            el.querySelector("[data-flash-close]")?.addEventListener("click", remove);
+            setTimeout(remove, 4000 + i * 400); // scaglionato se più messaggi
+          });
+        })();
+      </script>
     {% endif %}
   {% endwith %}
 

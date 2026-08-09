@@ -335,7 +335,7 @@
                         </div>
                         <div class="p-6">
                             <ul class="list-inside list-disc space-y-3" role="list">
-                                <li><span class="ms-3">1 site</span></li>
+                                <li><span class="ms-3">3 sites</span></li>
                                 <li><span class="ms-3">Up to 100 URLs monitored</span></li>
                                 <li><span class="ms-3">Your top 5 declining pages</span></li>
                                 <li><span class="ms-3">Manual refresh</span></li>
@@ -480,6 +480,8 @@
         {% include "landing/partials/footer.html" %}
 
         {% include "landing/partials/theme-toggle.html" %}
+
+        {% include "landing/partials/cookie-consent.html" %}
 
         <script src="{{ url_for('static', filename='js/landing.js') }}"></script>
     </body>

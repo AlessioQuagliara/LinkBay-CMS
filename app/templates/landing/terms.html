@@ -1,0 +1,115 @@
+{% extends "landing/legal_base.html" %}
+
+{% block content %}
+<p>
+    These Terms of Service ("Terms") govern your access to and use of LinkBayCMS (the
+    "Service"), an SEO monitoring tool operated by {{ operator }} ("we", "us"). By creating
+    an account or using the Service, you agree to these Terms. If you do not agree, do not
+    use the Service.
+</p>
+
+<h2>1. The Service</h2>
+<p>
+    LinkBayCMS connects to your Google Search Console property with read-only access, reads
+    your performance data, stores a history of it, and produces a prioritized list of pages
+    that appear to be losing organic traffic, together with plain-language explanations and
+    optional AI-generated suggestions. LinkBayCMS is an analytics and monitoring tool: it does
+    not modify your website, your content, or your Search Console data.
+</p>
+
+<h2>2. Eligibility and accounts</h2>
+<ul>
+    <li>You must be at least 18 years old and able to enter into a binding contract.</li>
+    <li>You are responsible for the accuracy of the information you provide and for keeping your
+        account credentials confidential.</li>
+    <li>You are responsible for all activity that occurs under your account.</li>
+    <li>You must only connect Google properties that you own or are authorized to access.</li>
+</ul>
+
+<h2>3. Google Search Console access</h2>
+<p>
+    To use the core features you authorize LinkBayCMS to access your Google Search Console data
+    through Google's OAuth flow, with read-only scope. You can revoke this access at any time
+    from your Google Account security settings or by disconnecting the property in the Service.
+    Our use of information received from Google APIs adheres to the
+    <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">Google API Services User Data Policy</a>,
+    including its Limited Use requirements.
+</p>
+
+<h2>4. Acceptable use</h2>
+<p>You agree not to:</p>
+<ul>
+    <li>Access data or properties you are not authorized to access;</li>
+    <li>Reverse engineer, scrape, overload, or disrupt the Service or its infrastructure;</li>
+    <li>Resell or redistribute the Service without our written permission;</li>
+    <li>Use the Service to violate any applicable law or third-party rights.</li>
+</ul>
+
+<h2>5. Plans, beta and pricing</h2>
+<p>
+    The Service is currently offered on a free plan and, for selected customers, an early
+    "Pro" arrangement. The Service is provided in beta and features may change, be added, or be
+    removed. If paid plans are introduced, pricing and billing terms will be presented to you
+    before any charge, and these Terms will be updated accordingly.
+</p>
+
+<h2>6. AI-generated suggestions</h2>
+<p>
+    Some features generate suggestions using automated and AI-based analysis. These outputs are
+    provided for guidance only, may be inaccurate or incomplete, and are not professional advice.
+    You are responsible for reviewing any suggestion before acting on it. Traffic figures are
+    read directly from Google Search Console; any revenue estimate is only shown when you supply
+    the input value and is always labeled as an estimate.
+</p>
+
+<h2>7. Intellectual property</h2>
+<p>
+    The Service, including its software, design, and branding, is owned by {{ operator }} and
+    protected by applicable law. We grant you a limited, non-exclusive, non-transferable right to
+    use the Service for its intended purpose. Your data remains yours; see the
+    <a href="{{ url_for('main.privacy_policy') }}">Privacy Policy</a> for how we process it.
+</p>
+
+<h2>8. Disclaimers</h2>
+<p>
+    The Service is provided "as is" and "as available", without warranties of any kind, whether
+    express or implied, including fitness for a particular purpose. We do not warrant that the
+    Service will be uninterrupted, error-free, or that its analysis will be accurate for every
+    site. Search results and organic traffic depend on factors outside our control.
+</p>
+
+<h2>9. Limitation of liability</h2>
+<p>
+    To the maximum extent permitted by law, {{ operator }} will not be liable for any indirect,
+    incidental, special, or consequential damages, or for loss of traffic, revenue, data, or
+    profits, arising out of or related to your use of the Service. Nothing in these Terms limits
+    liability that cannot be limited under applicable law.
+</p>
+
+<h2>10. Termination</h2>
+<p>
+    You may stop using the Service and delete your account at any time. We may suspend or
+    terminate access if you breach these Terms or to protect the Service. On termination, your
+    right to use the Service ends; provisions that by their nature should survive will survive.
+</p>
+
+<h2>11. Changes to these Terms</h2>
+<p>
+    We may update these Terms from time to time. When we make material changes, we will update
+    the "Last updated" date above and, where appropriate, notify you. Continued use of the
+    Service after changes take effect constitutes acceptance of the revised Terms.
+</p>
+
+<h2>12. Governing law</h2>
+<p>
+    These Terms are governed by the laws of Italy, without regard to conflict-of-law rules, and
+    the courts competent for the operator's place of business shall have jurisdiction, unless
+    mandatory consumer-protection law provides otherwise.
+</p>
+
+<h2>13. Contact</h2>
+<p>
+    Questions about these Terms? Contact us at
+    <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.
+</p>
+{% endblock %}
