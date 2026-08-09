@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ code }} — {{ name }}{% endblock %}
+{% block content %}
+<div class="min-h-screen flex items-center justify-center px-4">
+  <div class="text-center max-w-md">
+    <p class="text-error text-7xl font-bold tracking-tight sm:text-8xl">{{ code }}</p>
+    <h1 class="text-2xl font-semibold mt-4">{{ name }}</h1>
+    <p class="text-base-content/60 mt-2">{{ message }}</p>
+    <div class="mt-8 flex justify-center gap-3">
+      <a href="{{ url_for('main.index') }}" class="btn btn-error text-white">
+        <span class="iconify size-4" data-icon="lucide:house"></span>
+        Back home
+      </a>
+      <button onclick="history.back()" class="btn btn-ghost">Go back</button>
+    </div>
+  </div>
+</div>
+{% endblock %}

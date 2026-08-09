@@ -218,7 +218,7 @@ Ogni `User` può collegare **un** account Google Search Console (relazione 1:1 c
 | Un nuovo form | `app/<blueprint>/forms.py` (se non esiste, crealo sul modello di `app/auth/forms.py`) |
 | Nuovo componente in dashboard/auth | Classi utility Tailwind + componenti daisyUI (`btn`, `card`, `input`, `alert`, `menu`...) direttamente nel template, stessa sintassi della landing — niente CSS custom da scrivere |
 | Un'icona | `<span class="iconify" data-icon="lucide:nome-icona"></span>` — **non** `class="iconify lucide--nome"`, quella forma non viene renderizzata dalla versione della libreria caricata (vedi nota sotto) |
-| Immagini della landing | `app/static/img/landing/` (`hero.jpg`, `feature-*.jpg`, `logo/*.svg`) |
+| Immagini della landing | `app/static/img/landing/` (`hero.png`, `feature-*.png`, `logo/*.svg`) |
 | Logo o favicon | `app/static/shared/logo.png` e `favicon.png` — sostituisci i file, i template li usano già ovunque (landing, dashboard, auth, Flask-Admin) senza altre modifiche |
 
 ---

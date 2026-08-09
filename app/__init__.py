@@ -20,9 +20,16 @@ def create_app(config_class=Config):
     _register_extensions(app)
     _register_blueprints(app)
     _register_cli(app)
+    _register_error_handlers(app)
     _ensure_tables(app)
 
     return app
+
+
+def _register_error_handlers(app):
+    from app.errors import register_error_handlers
+
+    register_error_handlers(app)
 
 
 def _register_extensions(app):
