@@ -15,6 +15,12 @@ services:
       - --certificatesresolvers.le.acme.dnschallenge.provider=cloudflare
       - --certificatesresolvers.le.acme.email=quagliara.alessio@gmail.com
       - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      # Resolver aggiuntivo via HTTP-challenge, per domini non gestiti su
+      # Cloudflare (es. fightclub.yoursite-linkbay-cms.com, DNS GoDaddy).
+      - --certificatesresolvers.le-http.acme.httpchallenge=true
+      - --certificatesresolvers.le-http.acme.httpchallenge.entrypoint=web
+      - --certificatesresolvers.le-http.acme.email=quagliara.alessio@gmail.com
+      - --certificatesresolvers.le-http.acme.storage=/letsencrypt/acme-http.json
     ports:
       - "80:80"
       - "443:443"
