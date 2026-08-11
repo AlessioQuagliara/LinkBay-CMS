@@ -20,13 +20,11 @@ errorlog = "-"
 
 def on_starting(server):
     """Eseguito nel master, prima del fork dei worker: crea le tabelle mancanti
-    una volta sola, così nessun worker tocca lo schema (niente race)."""
-    from app import _ensure_tables, create_app
-    from app.extensions import db
+    una volta sola, così nessun worker tocca lo schema (niente race).
 
-    app = create_app()
-    _ensure_tables(app)
-    # App usa e getta: chiudiamo il pool del master così i worker (che
-    # reimportano run:app dopo il fork) partono con connessioni proprie.
-    with app.app_context():
-        db.engine.dispose()
+    Usa init_db_schema (app minimale, solo DB) e NON create_app: quest'ultimo
+    registra le view Flask-Admin sul singleton globale e, girando anche nei
+    worker, darebbe "name 'user' is already registered"."""
+    from app import init_db_schema
+
+    init_db_schema()

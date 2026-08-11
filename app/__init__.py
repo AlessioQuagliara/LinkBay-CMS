@@ -160,6 +160,33 @@ def _ensure_tables(app):
         _ensure_columns(db)
 
 
+def init_db_schema():
+    """Crea le tabelle mancanti usando un'app minimale usa-e-getta (solo il DB).
+
+    Serve all'hook on_starting di gunicorn (una volta sola nel master, prima del
+    fork). NON usa create_app() di proposito: quello registra le view di
+    Flask-Admin sul singleton globale `admin`, operazione non idempotente — se
+    create_app girasse due volte nello stesso processo (master + poi il worker
+    forkato) esploderebbe con "name 'user' is already registered". Qui inizia
+    solo `db`, senza admin né blueprint."""
+    from flask import Flask
+
+    from config import Config
+
+    import app.models  # noqa: F401 — importa i modelli per popolare db.metadata
+    from app.extensions import db
+
+    ddl_app = Flask("db_init")
+    ddl_app.config.from_object(Config)
+    db.init_app(ddl_app)
+    with ddl_app.app_context():
+        db.create_all()
+        _ensure_columns(db)
+        # App usa e getta: chiudiamo il pool così i worker (che reimportano
+        # run:app dopo il fork) partono con connessioni proprie.
+        db.engine.dispose()
+
+
 def _ensure_columns(db):
     """Micro-migrazione idempotente: `db.create_all()` crea le tabelle mancanti
     ma NON aggiunge colonne nuove a tabelle già esistenti. Senza un tool di
