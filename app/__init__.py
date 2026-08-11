@@ -57,6 +57,7 @@ def _register_extensions(app):
 
 def _register_blueprints(app):
     from app.ai.routes import ai_bp
+    from app.alerts.routes import alerts_bp
     from app.auth.routes import auth_bp
     from app.dashboard.routes import dashboard_bp
     from app.gsc.gsc import gsc_bp
@@ -67,6 +68,7 @@ def _register_blueprints(app):
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(gsc_bp)
     app.register_blueprint(ai_bp)
+    app.register_blueprint(alerts_bp)
 
 
 def _register_cli(app):
@@ -93,6 +95,52 @@ def _register_cli(app):
         user.is_admin = True
         db.session.commit()
         print(f"{user.email} ora può accedere a /admin/.")
+
+    @app.cli.command("sync-page-history")
+    @click.argument("email")
+    def sync_page_history_cmd(email):
+        """Sincronizza lo storico mensile per pagina del sito monitorato di
+        un utente (per test manuale)."""
+        from app.gsc.gsc import get_user_gsc_service
+        from app.gsc.page_history import sync_page_monthly
+        from app.gsc.repository import get_monitored_site
+        from app.models import User
+
+        user = User.query.filter_by(email=email.lower().strip()).first()
+        if not user:
+            print(f"Nessun utente con email {email}.")
+            return
+
+        site_url = get_monitored_site(user.id)
+        if not site_url:
+            print(f"{user.email} non ha ancora scelto un sito monitorato.")
+            return
+
+        service, _ = get_user_gsc_service(user.id)
+        if service is None:
+            print(f"{user.email} non è connesso a Google Search Console.")
+            return
+
+        try:
+            written = sync_page_monthly(service, user.id, site_url)
+        except Exception as exc:  # noqa: BLE001 — mostra l'errore GSC senza traceback
+            print(f"Errore durante il sync GSC per {site_url}: {exc}")
+            return
+
+        print(f"{written} righe scritte/aggiornate in gsc_page_monthly per {site_url}.")
+
+    @app.cli.command("run-decay-rules")
+    def run_decay_rules_cmd():
+        """Job settimanale: sincronizza lo storico e applica le regole di
+        decadenza per ogni sito monitorato. Da schedulare con un cron di
+        sistema (es. lunedì alle 4:00), non con un servizio separato."""
+        from app.rules.service import run_weekly
+
+        result = run_weekly()
+        print(f"Processati {result['processed']} siti, "
+              f"{len(result['errors'])} errori.")
+        for err in result["errors"]:
+            print(f"  - {err}")
 
 
 def _ensure_tables(app):
@@ -131,5 +179,14 @@ def _ensure_columns(db):
             conn.execute(
                 text(
                     f"ALTER TABLE users ADD COLUMN email_verified BOOLEAN NOT NULL DEFAULT {default}"
+                )
+            )
+
+    # gsc_connections.monitored_site_url (sito scelto per il monitoraggio).
+    if has_column("gsc_connections", "id") and not has_column("gsc_connections", "monitored_site_url"):
+        with db.engine.begin() as conn:
+            conn.execute(
+                text(
+                    "ALTER TABLE gsc_connections ADD COLUMN monitored_site_url VARCHAR(500)"
                 )
             )

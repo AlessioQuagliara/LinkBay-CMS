@@ -19,8 +19,10 @@ from app.gsc.insights import build_insights
 from app.gsc.repository import (
     credentials_to_dict,
     delete_gsc_credentials,
+    get_monitored_site,
     load_gsc_credentials,
     save_gsc_credentials,
+    save_monitored_site,
 )
 
 gsc_bp = Blueprint("gsc", __name__, url_prefix="/gsc")
@@ -195,7 +197,21 @@ def api_sites():
     ]
 
     save_gsc_credentials(current_user.id, credentials_to_dict(credentials))
-    return jsonify({"sites": sites})
+    return jsonify({
+        "sites": sites,
+        "monitored_site_url": get_monitored_site(current_user.id),
+    })
+
+
+@gsc_bp.route("/api/monitored-site", methods=["POST"])
+@login_required
+def api_monitored_site():
+    """Persiste il sito scelto dall'utente per il monitoraggio."""
+    site = request.form.get("site")
+    if not site:
+        return jsonify({"error": "missing_site"}), 400
+    save_monitored_site(current_user.id, site)
+    return jsonify({"monitored_site_url": site})
 
 
 ALLOWED_PERIODS = {7, 28, 90}

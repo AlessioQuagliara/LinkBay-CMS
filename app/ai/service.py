@@ -9,7 +9,7 @@ from datetime import date, datetime, timedelta, timezone
 
 from app.ai.deepseek import chat_json
 from app.extensions import db
-from app.models import AiAnalyzerConfig, AiPageAnalysis
+from app.models import AiAnalyzerConfig, AiPageAnalysis, PageAlert
 
 MAX_PAGES = 25          # pagine inviate al prompt (limite costo/token)
 MAX_SUGGESTIONS = 5
@@ -28,6 +28,21 @@ SYSTEM_PROMPT = (
     "suggestions per page, each under 160 characters, specific to that page's "
     "numbers (e.g. title/meta CTR fixes, content refresh, internal linking, "
     "intent mismatch, cannibalization). Only include pages present in the input."
+)
+
+# Aggiunta al system prompt per il contesto "decay": qui le pagine arrivano già
+# filtrate dal rule engine (page_alerts), con la perdita reale su base mensile e
+# una motivazione pronta. Diciamo al modello di FIDARSI di quei numeri invece di
+# ricalcolare la severità dal solo delta 28gg, e di legare i consigli al motivo.
+DECAY_PROMPT_ADDENDUM = (
+    " These pages were already flagged as genuinely declining by a rule engine. "
+    "Use best_month_clicks, click_loss_pct and reason_text as the primary context "
+    "for severity and advice — do NOT recompute how bad the drop is from scratch. "
+    "Let the score reflect that loss, and make each suggestion refer explicitly to "
+    "the reason: when impressions hold but position worsened (position_before -> "
+    "position_after), it's lost ranking not lost demand, so focus on title/meta and "
+    "on-page relevance; when impressions dropped too (site_relative_drop_pct, "
+    "yoy_confirmed), demand itself fell, so advise whether a refresh is still worth it."
 )
 
 
@@ -78,21 +93,39 @@ def _compact_pages(pages):
     ]
 
 
-def analyze_site(user_id, site_url, pages):
-    """Esegue l'analisi AI e salva i risultati. Ritorna la mappa url->risultato.
-    Solleva DeepSeekError se la chiamata fallisce o non è configurata."""
-    compact = _compact_pages(pages)
-    known_urls = {p["url"] for p in compact}
+def _compact_alerts(alerts):
+    """Payload arricchito per il contesto "decay": oltre alle metriche base,
+    porta i numeri già calcolati dal rule engine (perdita reale su base mensile,
+    posizione prima/dopo, trend impression, YoY) e la motivazione testuale, così
+    il modello non deve indovinare il contesto del calo."""
+    subset = alerts[:MAX_PAGES]
+    return [
+        {
+            "url": a.url,
+            "best_month_clicks": a.best_month_clicks,
+            "click_loss_pct": (
+                None if a.click_loss_pct is None else round(a.click_loss_pct, 1)
+            ),
+            "position_before": (
+                None if a.position_before is None else round(a.position_before, 1)
+            ),
+            "position_after": (
+                None if a.position_after is None else round(a.position_after, 1)
+            ),
+            "site_relative_drop_pct": (
+                None if a.site_relative_drop_pct is None else round(a.site_relative_drop_pct, 1)
+            ),
+            "yoy_confirmed": bool(a.yoy_confirmed),
+            "reason_text": a.reason_text,
+        }
+        for a in subset
+    ]
 
-    user_prompt = (
-        f"Website: {site_url}\n"
-        f"Pages (last 28 days vs previous 28 days):\n"
-        f"{compact}\n\n"
-        "Return the JSON described in the system prompt."
-    )
 
-    result = chat_json(SYSTEM_PROMPT, user_prompt)
-
+def _store_analysis(user_id, site_url, result, known_urls):
+    """Salva la risposta DeepSeek in AiPageAnalysis e aggiorna last_run_at.
+    Condiviso da analyze_site e analyze_declining: stesso schema, stesso
+    cooldown settimanale (un solo last_run_at per sito)."""
     week = _week_start(date.today())
     stored = {}
     for item in result.get("pages", []):
@@ -129,6 +162,55 @@ def analyze_site(user_id, site_url, pages):
     db.session.commit()
 
     return stored
+
+
+def analyze_site(user_id, site_url, pages):
+    """Esegue l'analisi AI e salva i risultati. Ritorna la mappa url->risultato.
+    Solleva DeepSeekError se la chiamata fallisce o non è configurata."""
+    compact = _compact_pages(pages)
+    known_urls = {p["url"] for p in compact}
+
+    user_prompt = (
+        f"Website: {site_url}\n"
+        f"Pages (last 28 days vs previous 28 days):\n"
+        f"{compact}\n\n"
+        "Return the JSON described in the system prompt."
+    )
+
+    result = chat_json(SYSTEM_PROMPT, user_prompt)
+    return _store_analysis(user_id, site_url, result, known_urls)
+
+
+def analyze_declining(user_id, site_url):
+    """Analisi AI mirata alle pagine già segnalate in calo (page_alerts).
+
+    Legge gli alert "attivi" (new/acknowledged) del sito, ordinati per priorità,
+    e passa al modello il contesto arricchito del rule engine invece del solo
+    delta 28gg. Salva in AiPageAnalysis e rispetta lo stesso cooldown settimanale
+    di analyze_site (nessun secondo cooldown parallelo).
+    Solleva DeepSeekError se la chiamata fallisce o non è configurata."""
+    alerts = (
+        PageAlert.query.filter(
+            PageAlert.user_id == user_id,
+            PageAlert.site_url == site_url,
+            PageAlert.status.in_(("new", "acknowledged")),
+        )
+        .order_by(PageAlert.priority_score.desc())
+        .limit(MAX_PAGES)
+        .all()
+    )
+    compact = _compact_alerts(alerts)
+    known_urls = {a["url"] for a in compact}
+
+    user_prompt = (
+        f"Website: {site_url}\n"
+        "Pages already flagged as declining (monthly figures from a rule engine):\n"
+        f"{compact}\n\n"
+        "Return the JSON described in the system prompt."
+    )
+
+    result = chat_json(SYSTEM_PROMPT + DECAY_PROMPT_ADDENDUM, user_prompt)
+    return _store_analysis(user_id, site_url, result, known_urls)
 
 
 def get_status(user_id, site_url):

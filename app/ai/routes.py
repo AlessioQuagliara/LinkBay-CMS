@@ -6,6 +6,7 @@ from flask_login import current_user, login_required
 from app.ai.deepseek import DeepSeekError
 from app.ai.service import (
     _cooldown_remaining,
+    analyze_declining,
     analyze_site,
     get_or_create_config,
     get_status,
@@ -14,6 +15,7 @@ from app.ai.service import (
 from app.gsc.gsc import get_user_gsc_service
 from app.gsc.insights import build_insights
 from app.gsc.repository import credentials_to_dict, save_gsc_credentials
+from app.models import PageAlert
 
 ai_bp = Blueprint("ai", __name__, url_prefix="/ai")
 
@@ -53,13 +55,32 @@ def analyze():
     if remaining > 0:
         return jsonify({"error": "cooldown", "days_left": remaining}), 429
 
-    service, credentials = get_user_gsc_service(current_user.id)
-    if service is None:
-        return jsonify({"error": "not_connected"}), 401
+    # Se il rule engine ha già prodotto alert attivi per questo sito, analizziamo
+    # quelli con il contesto arricchito (perdita reale su base mensile, motivo del
+    # calo). Altrimenti — sito nuovo, prima settimana, storico insufficiente —
+    # ricadiamo sul flusso classico su tutte le pagine da build_insights, così la
+    # UI di /dashboard/insights continua a funzionare invariata.
+    has_alerts = (
+        PageAlert.query.filter(
+            PageAlert.user_id == current_user.id,
+            PageAlert.site_url == site,
+            PageAlert.status.in_(("new", "acknowledged")),
+        ).first()
+        is not None
+    )
 
     try:
-        data = build_insights(service, site, days=28)
-        analyze_site(current_user.id, site, data["pages"])
+        if has_alerts:
+            # Il contesto arriva da page_alerts (DB): niente chiamata a GSC.
+            analyze_declining(current_user.id, site)
+        else:
+            service, credentials = get_user_gsc_service(current_user.id)
+            if service is None:
+                return jsonify({"error": "not_connected"}), 401
+            data = build_insights(service, site, days=28)
+            analyze_site(current_user.id, site, data["pages"])
+            # Refresh trasparente del token dopo l'uso del service.
+            save_gsc_credentials(current_user.id, credentials_to_dict(credentials))
     except DeepSeekError as e:
         current_app.logger.warning("DeepSeek analyze failed: %s", e)
         return jsonify({"error": "ai_failed", "message": str(e)}), 502
@@ -67,5 +88,4 @@ def analyze():
         current_app.logger.exception("AI analyze failed for %s", site)
         return jsonify({"error": "query_failed"}), 502
 
-    save_gsc_credentials(current_user.id, credentials_to_dict(credentials))
     return jsonify(get_status(current_user.id, site))

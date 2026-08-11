@@ -24,6 +24,10 @@ class GscConnection(db.Model):
     scopes = db.Column(db.String(500), nullable=False)
     expiry = db.Column(db.DateTime, nullable=True)
 
+    # Sito Search Console scelto dall'utente per il monitoraggio (un solo sito
+    # alla volta). NULL = nessun sito ancora selezionato.
+    monitored_site_url = db.Column(db.String(500), nullable=True)
+
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(
         db.DateTime,

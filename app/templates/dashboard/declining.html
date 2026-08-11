@@ -1,0 +1,85 @@
+{% extends "dashboard/layout.html" %}
+{% block title %}Declining Pages{% endblock %}
+{% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
+{% block dashboard_content %}
+
+{# Safelist: classi colore iniettate via JS (badge priorità), elencate qui
+   nascoste così il runtime Tailwind del CDN le genera comunque. #}
+<div class="hidden badge-error badge-warning badge-neutral text-error text-warning text-primary"></div>
+
+<div class="mb-4 flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-semibold">Declining Pages</h1>
+    <p class="text-base-content/60 mt-1">
+      Le pagine che stanno perdendo traffico organico per conto proprio, in ordine di priorità.
+    </p>
+  </div>
+
+  {# Stesso selettore sito di Insights: popolato via JS da /gsc/api/sites #}
+  <label class="form-control w-full max-w-xs">
+    <select id="site-select" class="select select-bordered" disabled
+            data-sites-url="{{ url_for('gsc.api_sites') }}"
+            data-monitored-url="{{ url_for('gsc.api_monitored_site') }}"
+            data-list-url="{{ url_for('alerts.api_list') }}"
+            data-trend-url="{{ url_for('alerts.api_trend') }}"
+            data-query-losses-url="{{ url_for('alerts.api_query_losses') }}"
+            data-status-url="{{ url_for('alerts.api_status') }}">
+      <option>Loading sites…</option>
+    </select>
+  </label>
+</div>
+
+{% if not connection %}
+  <div class="card bg-base-100 border border-base-300">
+    <div class="card-body items-center text-center py-12">
+      <span class="iconify text-base-content/30 size-10" data-icon="lucide:cable"></span>
+      <p class="font-medium mt-3">No Search Console account connected</p>
+      <p class="text-sm text-base-content/60 max-w-sm mt-1">
+        Connect your Google Search Console account to see which pages are losing organic traffic.
+      </p>
+      <a class="btn btn-error text-white mt-5" href="{{ url_for('gsc.authorize') }}">
+        <span class="iconify size-4" data-icon="lucide:link"></span>
+        Connect Search Console
+      </a>
+    </div>
+  </div>
+{% else %}
+
+  {# Filtro per stato #}
+  <div class="join mb-5" id="status-filter" role="group" aria-label="Filtra per stato">
+    <button class="join-item btn btn-sm btn-active" data-status="new">Nuove</button>
+    <button class="join-item btn btn-sm" data-status="acknowledged">Riconosciute</button>
+    <button class="join-item btn btn-sm" data-status="done">Fatte</button>
+    <button class="join-item btn btn-sm" data-status="all">Tutte</button>
+  </div>
+
+  {# Stato: caricamento (skeleton) #}
+  <div id="state-loading" class="hidden">
+    <div class="flex flex-col gap-4">
+      <div class="skeleton h-28 w-full"></div>
+      <div class="skeleton h-28 w-full"></div>
+      <div class="skeleton h-28 w-full"></div>
+    </div>
+  </div>
+
+  <div id="state-error" class="alert alert-error alert-soft hidden">
+    <span id="state-error-msg">Something went wrong loading your data.</span>
+  </div>
+
+  {# Stato vuoto: messaggio positivo, non un errore #}
+  <div id="state-empty" class="card bg-base-100 border border-base-300 hidden">
+    <div class="card-body items-center text-center py-12">
+      <span class="iconify text-success/60 size-10" data-icon="lucide:circle-check"></span>
+      <p class="font-medium mt-3">Nessuna pagina in vera discesa nell'ultimo periodo</p>
+      <p class="text-sm text-base-content/60 max-w-sm mt-1">
+        Nulla da segnalare — nessuna pagina sta perdendo traffico per conto proprio.
+      </p>
+    </div>
+  </div>
+
+  {# Stato: dati (una card per alert, iniettate via JS) #}
+  <div id="state-data" class="hidden"></div>
+
+  <script src="{{ url_for('static', filename='js/declining.js') }}"></script>
+{% endif %}
+{% endblock %}

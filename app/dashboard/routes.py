@@ -16,6 +16,12 @@ def insights():
     return render_template("dashboard/insights.html", connection=current_user.gsc_connection)
 
 
+@dashboard_bp.route("/declining")
+@login_required
+def declining():
+    return render_template("dashboard/declining.html", connection=current_user.gsc_connection)
+
+
 @dashboard_bp.route("/connect")
 @login_required
 def connect():

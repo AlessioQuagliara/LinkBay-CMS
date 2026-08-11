@@ -10,7 +10,7 @@ from datetime import date, timedelta
 DEFAULT_DAYS = 28
 
 
-def _query(service, site_url, start, end, dimensions, row_limit=1000):
+def _query(service, site_url, start, end, dimensions, row_limit=1000, dimension_filter_groups=None):
     body = {
         "startDate": start.isoformat(),
         "endDate": end.isoformat(),
@@ -18,6 +18,8 @@ def _query(service, site_url, start, end, dimensions, row_limit=1000):
     }
     if dimensions:
         body["dimensions"] = dimensions
+    if dimension_filter_groups:
+        body["dimensionFilterGroups"] = dimension_filter_groups
     return service.searchanalytics().query(siteUrl=site_url, body=body).execute().get("rows", [])
 
 
@@ -111,3 +113,54 @@ def build_insights(service, site_url, days=DEFAULT_DAYS):
     ]
 
     return {"overview": overview, "pages": pages[:100], "queries": queries}
+
+
+def page_query_losses(service, site_url, page_url, days=90):
+    """Query che hanno perso più click per una singola pagina, confrontando
+    gli ultimi `days` giorni con i `days` precedenti. Filtrata a una sola
+    pagina via dimensionFilterGroups, quindi economica anche su siti
+    grandi: si chiama solo per le pagine già segnalate come in calo."""
+    today = date.today()
+    # Stessa finestra "chiusa a ieri" di build_insights: SC ha ~2-3 giorni di
+    # ritardo, evitiamo di confrontare periodi con dati incompleti.
+    end = today - timedelta(days=1)
+    start = end - timedelta(days=days - 1)
+    prev_end = start - timedelta(days=1)
+    prev_start = prev_end - timedelta(days=days - 1)
+
+    # Filtro a una sola pagina: la query per-query resta economica anche su
+    # siti grandi perché l'API restringe subito il dataset a questa URL.
+    page_filter = [{"filters": [{"dimension": "page", "operator": "equals", "expression": page_url}]}]
+
+    cur = {
+        r["keys"][0]: r
+        for r in _query(service, site_url, start, end, ["query"], dimension_filter_groups=page_filter)
+    }
+    prev = {
+        r["keys"][0]: r
+        for r in _query(service, site_url, prev_start, prev_end, ["query"], dimension_filter_groups=page_filter)
+    }
+
+    queries = []
+    for q in set(cur) | set(prev):
+        c = cur.get(q, {})
+        p = prev.get(q, {})
+        clicks = c.get("clicks", 0)
+        clicks_prev = p.get("clicks", 0)
+        position = c.get("position", 0.0)
+        position_prev = p.get("position", 0.0)
+        queries.append({
+            "query": q,
+            "clicks": clicks,
+            "clicks_prev": clicks_prev,
+            "clicks_delta_pct": _pct_delta(clicks, clicks_prev),
+            "position": position,
+            "position_prev": position_prev,
+            # position: più alta = peggiorata, quindi after - before è positivo
+            # quando la pagina è scesa nei risultati.
+            "position_delta": (position - position_prev) if (c and p) else None,
+        })
+
+    # Le query che hanno perso più click in valore assoluto per prime.
+    queries.sort(key=lambda x: x["clicks_prev"] - x["clicks"], reverse=True)
+    return queries[:20]

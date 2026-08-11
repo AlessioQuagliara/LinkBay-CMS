@@ -302,6 +302,20 @@ Anche se ti verrà voglia, in quest'ordine di tentazione:
 7. **Migration vere (Flask-Migrate)**, nel momento in cui hai dati reali da non perdere tra una modifica di schema e l'altra.
 8. **Marketplace/funzionalità premium**, solo dopo che billing e ruoli esistono — dipendono da entrambi.
 
+### Job settimanale delle regole di decadenza
+
+Il cuore del prodotto (punto 3 sopra) gira come comando CLI `flask run-decay-rules`: sincronizza lo storico mensile per pagina e applica le regole (`app/rules/`) per ogni sito monitorato, scrivendo la lista prioritizzata in `page_alerts`. **Non serve APScheduler né Celery**: si schedula con il cron di sistema. Esempio di crontab (lunedì alle 4:00), con l'app che gira in Docker come in produzione:
+
+```cron
+0 4 * * 1 cd /var/www/linkbay-cms && docker compose -f compose.prod.yml exec -T web flask run-decay-rules >> /var/log/linkbay-decay.log 2>&1
+```
+
+Oppure, con un virtualenv locale invece di Docker:
+
+```cron
+0 4 * * 1 cd /path/app && /path/venv/bin/python -m flask run-decay-rules >> /var/log/linkbay-decay.log 2>&1
+```
+
 ### Suggerimenti per non incasinare l'architettura
 
 - Se un file supera le ~150-200 righe e fai fatica a scorrerlo, è probabile che stia facendo più di una cosa: dividilo (es. `routes.py` troppo lungo → estrai `services.py` con la logica, tieni le view sottili).

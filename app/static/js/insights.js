@@ -8,6 +8,7 @@
   if (!select) return; // account non collegato: la pagina mostra il connettore
 
   const SITES_URL = select.dataset.sitesUrl;
+  const MONITORED_URL = select.dataset.monitoredUrl;
   const INSIGHTS_URL = select.dataset.insightsUrl;
   const AI_STATUS_URL = select.dataset.aiStatusUrl;
   const AI_TOGGLE_URL = select.dataset.aiToggleUrl;
@@ -406,7 +407,7 @@
     try {
       const res = await fetch(SITES_URL, { headers: { Accept: "application/json" } });
       if (!res.ok) throw new Error("HTTP " + res.status);
-      const { sites } = await res.json();
+      const { sites, monitored_site_url } = await res.json();
       if (!sites || !sites.length) {
         select.innerHTML = "<option>No sites</option>";
         show("empty");
@@ -414,8 +415,22 @@
       }
       select.innerHTML = sites.map((s) => `<option value="${esc(s.siteUrl)}">${esc(s.siteUrl)}</option>`).join("");
       select.disabled = false;
-      select.addEventListener("change", () => loadSite(select.value));
-      loadSite(sites[0].siteUrl);
+
+      // Preseleziona il sito monitorato salvato, se è ancora tra quelli
+      // verificati; altrimenti resta il primo (comportamento di default).
+      const preselect =
+        monitored_site_url && sites.some((s) => s.siteUrl === monitored_site_url)
+          ? monitored_site_url
+          : sites[0].siteUrl;
+      select.value = preselect;
+
+      // Ogni cambio sito: persisti la scelta (fire-and-forget, non blocca il
+      // caricamento dati) e ricarica gli insight.
+      select.addEventListener("change", () => {
+        postForm(MONITORED_URL, { site: select.value }).catch(() => {});
+        loadSite(select.value);
+      });
+      loadSite(preselect);
     } catch (e) {
       showError("Couldn't load your Search Console sites. Please reconnect and try again.");
     }

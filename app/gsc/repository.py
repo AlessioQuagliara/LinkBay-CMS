@@ -56,6 +56,24 @@ def load_gsc_credentials(user_id: int) -> dict | None:
     }
 
 
+def save_monitored_site(user_id: int, site_url: str) -> None:
+    """Imposta il sito monitorato per l'utente. Se la connessione non esiste
+    non fa nulla (dal flusso UI non può succedere: il sito si sceglie solo
+    dopo essersi connessi, ma resta defensive)."""
+    connection = GscConnection.query.filter_by(user_id=user_id).first()
+    if connection is None:
+        return
+    connection.monitored_site_url = site_url
+    db.session.commit()
+
+
+def get_monitored_site(user_id: int) -> str | None:
+    connection = GscConnection.query.filter_by(user_id=user_id).first()
+    if connection is None:
+        return None
+    return connection.monitored_site_url
+
+
 def delete_gsc_credentials(user_id: int) -> bool:
     connection = GscConnection.query.filter_by(user_id=user_id).first()
     if connection is None:

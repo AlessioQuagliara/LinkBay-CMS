@@ -20,6 +20,7 @@
   <label class="form-control w-full max-w-xs">
     <select id="site-select" class="select select-bordered" disabled
             data-sites-url="{{ url_for('gsc.api_sites') }}"
+            data-monitored-url="{{ url_for('gsc.api_monitored_site') }}"
             data-insights-url="{{ url_for('gsc.api_insights') }}"
             data-ai-status-url="{{ url_for('ai.status') }}"
             data-ai-toggle-url="{{ url_for('ai.toggle') }}"
