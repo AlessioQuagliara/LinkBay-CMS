@@ -12,6 +12,6 @@ EXPOSE 3000
 
 # Server WSGI di produzione (niente dev server / debugger interattivo).
 # run:app è l'istanza Flask creata da create_app() in run.py.
-# --timeout 120: l'analisi AI fa una chiamata sincrona a DeepSeek che può
-# superare i 30s di default.
-CMD ["gunicorn", "--bind", "0.0.0.0:3000", "--workers", "3", "--timeout", "120", "--access-logfile", "-", "--error-logfile", "-", "run:app"]
+# I flag (bind/workers/timeout/log) e l'hook on_starting che crea le tabelle
+# una volta sola nel master stanno in gunicorn.conf.py.
+CMD ["gunicorn", "-c", "gunicorn.conf.py", "run:app"]

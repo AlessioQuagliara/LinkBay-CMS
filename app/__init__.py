@@ -21,7 +21,11 @@ def create_app(config_class=Config):
     _register_blueprints(app)
     _register_cli(app)
     _register_error_handlers(app)
-    _ensure_tables(app)
+    # NB: la creazione delle tabelle NON avviene più qui. Con gunicorn ogni
+    # worker importa run:app e chiamerebbe create_all() in parallelo → race su
+    # pg_type (UniqueViolation). Ora è fatta una volta sola: nel master via
+    # l'hook on_starting di gunicorn.conf.py in prod, e nel blocco __main__ di
+    # run.py per il dev server. Vedi gunicorn.conf.py per il perché.
 
     return app
 
