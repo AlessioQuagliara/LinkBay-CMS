@@ -11,7 +11,7 @@
   <div>
     <h1 class="text-2xl font-semibold">Declining Pages</h1>
     <p class="text-base-content/60 mt-1">
-      Le pagine che stanno perdendo traffico organico per conto proprio, in ordine di priorità.
+      Pages that are losing organic traffic on their own, ordered by priority.
     </p>
   </div>
 
@@ -46,11 +46,11 @@
 {% else %}
 
   {# Filtro per stato #}
-  <div class="join mb-5" id="status-filter" role="group" aria-label="Filtra per stato">
-    <button class="join-item btn btn-sm btn-active" data-status="new">Nuove</button>
-    <button class="join-item btn btn-sm" data-status="acknowledged">Riconosciute</button>
-    <button class="join-item btn btn-sm" data-status="done">Fatte</button>
-    <button class="join-item btn btn-sm" data-status="all">Tutte</button>
+  <div class="join mb-5" id="status-filter" role="group" aria-label="Filter by status">
+    <button class="join-item btn btn-sm btn-active" data-status="new">New</button>
+    <button class="join-item btn btn-sm" data-status="acknowledged">Acknowledged</button>
+    <button class="join-item btn btn-sm" data-status="done">Done</button>
+    <button class="join-item btn btn-sm" data-status="all">All</button>
   </div>
 
   {# Stato: caricamento (skeleton) #}
@@ -70,9 +70,9 @@
   <div id="state-empty" class="card bg-base-100 border border-base-300 hidden">
     <div class="card-body items-center text-center py-12">
       <span class="iconify text-success/60 size-10" data-icon="lucide:circle-check"></span>
-      <p class="font-medium mt-3">Nessuna pagina in vera discesa nell'ultimo periodo</p>
+      <p class="font-medium mt-3">No pages in true decline in the last period</p>
       <p class="text-sm text-base-content/60 max-w-sm mt-1">
-        Nulla da segnalare — nessuna pagina sta perdendo traffico per conto proprio.
+        Nothing to report — no page is losing traffic on its own.
       </p>
     </div>
   </div>

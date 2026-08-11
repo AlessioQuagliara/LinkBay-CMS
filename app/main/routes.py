@@ -7,7 +7,7 @@ main_bp = Blueprint("main", __name__)
 # Dati comuni alle pagine legali. Cambiando qui l'email o l'operatore si
 # aggiornano di colpo Terms, Privacy e Cookie policy.
 LEGAL_OPERATOR = "LinkBayCMS (Alessio Quagliara)"
-LEGAL_CONTACT_EMAIL = "privacy@linkbay-cms.com"
+LEGAL_CONTACT_EMAIL = "quagliara.alessio@gmail.com"
 LEGAL_LAST_UPDATED = "August 9, 2026"
 
 
