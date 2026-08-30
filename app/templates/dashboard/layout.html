@@ -1,57 +1,107 @@
 {% extends "base.html" %}
+{% block html_attrs %} data-theme="linkbay"{% endblock %}
 {% block content %}
-<div class="flex min-h-screen">
-  <aside class="w-60 shrink-0 bg-base-100 border-r border-base-300 flex flex-col">
-    <a class="flex items-center px-5 py-4 border-b border-base-300" href="{{ url_for('dashboard.overview') }}">
-      <img class="h-6 w-auto" src="{{ url_for('static', filename='shared/logo.png') }}" alt="LinkBayCMS">
-    </a>
-    <ul class="menu p-3 gap-1 flex-1">
+<div class="drawer lg:drawer-open bg-base-200">
+  <input id="dashboard-drawer" type="checkbox" class="drawer-toggle" aria-label="Toggle sidebar">
 
-      <li>
-        <a class="{{ 'menu-active' if request.endpoint == 'dashboard.overview' }}" href="{{ url_for('dashboard.overview') }}">
-          <span class="iconify size-4" data-icon="lucide:panels-top-left"></span> 
-          Overview
-        </a>
-      </li>
-
-      <li>
-        <a class="{{ 'menu-active' if request.endpoint == 'dashboard.insights' }}" href="{{ url_for('dashboard.insights') }}">
-          <span class="iconify size-4" data-icon="lucide:trending-down"></span>
-          Insights
-        </a>
-      </li>
-
-      <li>
-        <a class="{{ 'menu-active' if request.endpoint == 'dashboard.declining' }}" href="{{ url_for('dashboard.declining') }}">
-          <span class="iconify size-4" data-icon="lucide:trending-down"></span>
-          Declining Pages
-        </a>
-      </li>
-
-      <li>
-        <a class="{{ 'menu-active' if request.endpoint == 'dashboard.connect' }}" href="{{ url_for('dashboard.connect') }}">
-          <span class="iconify size-4" data-icon="lucide:cable"></span>
-          Connector
-        </a>
-      </li>
-
-      {% if current_user.is_admin %}
-        <li><a href="{{ url_for('admin.index') }}">Flask-Admin</a></li>
-      {% endif %}
-    </ul>
-    <div class="px-5 py-4 border-t border-base-300 text-sm text-base-content/70">
-      {{ current_user.name }}<br>
-      <a class="link link-hover" href="{{ url_for('auth.logout') }}">Logout</a>
-    </div>
-  </aside>
-
-  <div class="flex-1 min-w-0 flex flex-col">
-    <header class="h-14 shrink-0 bg-base-100 border-b border-base-300 flex items-center justify-end px-6">
-      <span class="text-sm text-base-content/60">{{ current_user.email }}</span>
+  <div class="drawer-content flex min-h-screen min-w-0 flex-col">
+    {# Header mobile: hamburger + logo. Nascosto da lg in su (la sidebar è sempre visibile). #}
+    <header class="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-3 border-b border-base-300 bg-base-100 px-4 lg:hidden">
+      <label for="dashboard-drawer" class="btn btn-square btn-ghost btn-sm" aria-label="Open sidebar">
+        <span class="iconify size-5" data-icon="lucide:menu"></span>
+      </label>
+      <a class="flex items-center" href="{{ url_for('dashboard.overview') }}">
+        <img class="h-5 w-auto" src="{{ url_for('static', filename='shared/logo.png') }}" alt="LinkBayCMS">
+      </a>
+      <span class="grow"></span>
+      <span class="truncate text-sm text-base-content/60 max-w-[45%]">{{ current_user.email }}</span>
     </header>
-    <main class="p-6 max-w-6xl w-full">
-      {% block dashboard_content %}{% endblock %}
+
+    <main class="min-w-0 flex-1 lg:m-3 lg:ms-0 lg:rounded-3xl lg:border lg:border-base-300 lg:bg-base-100 lg:shadow-xs">
+      <div class="mx-auto w-full max-w-6xl p-4 sm:p-6 lg:p-10">
+        {% block dashboard_content %}{% endblock %}
+      </div>
     </main>
+  </div>
+
+  <div class="drawer-side z-30">
+    <label for="dashboard-drawer" class="drawer-overlay"></label>
+    <aside class="flex min-h-screen w-64 flex-col gap-1 bg-base-200 pt-3 lg:pt-6">
+      <a class="mx-4 mb-4 flex items-center px-1" href="{{ url_for('dashboard.overview') }}">
+        <img class="h-6 w-auto" src="{{ url_for('static', filename='shared/logo.png') }}" alt="LinkBayCMS">
+      </a>
+
+      <ul class="menu w-full flex-1 gap-1 px-3">
+        <li>
+          <a class="{{ 'menu-active' if request.endpoint == 'dashboard.overview' }}" href="{{ url_for('dashboard.overview') }}">
+            <span class="iconify size-4" data-icon="lucide:panels-top-left"></span>
+            Overview
+          </a>
+        </li>
+        <li>
+          <a class="{{ 'menu-active' if request.endpoint == 'dashboard.insights' }}" href="{{ url_for('dashboard.insights') }}">
+            <span class="iconify size-4" data-icon="lucide:chart-line"></span>
+            Insights
+          </a>
+        </li>
+        <li>
+          <a class="{{ 'menu-active' if request.endpoint == 'dashboard.declining' }}" href="{{ url_for('dashboard.declining') }}">
+            <span class="iconify size-4" data-icon="lucide:trending-down"></span>
+            Declining Pages
+          </a>
+        </li>
+        <li>
+          <a class="{{ 'menu-active' if request.endpoint == 'dashboard.connect' }}" href="{{ url_for('dashboard.connect') }}">
+            <span class="iconify size-4" data-icon="lucide:cable"></span>
+            Connector
+          </a>
+        </li>
+        {% if current_user.is_admin %}
+          <li>
+            <a href="{{ url_for('admin.index') }}">
+              <span class="iconify size-4" data-icon="lucide:shield"></span>
+              Flask-Admin
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+
+      {# Account: avatar con iniziale + popover con logout/legal. #}
+      <div class="sticky bottom-0 mt-auto border-t border-base-content/10 bg-base-200 p-3">
+        <div class="dropdown dropdown-top dropdown-end w-full">
+          <button type="button" tabindex="0" class="btn btn-ghost h-auto w-full justify-start gap-3 px-2 py-2" aria-label="Open account menu">
+            <span class="bg-primary text-primary-content flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
+              {{ (current_user.name or current_user.email)[0] | upper }}
+            </span>
+            <span class="grid min-w-0 grow text-left">
+              <span class="truncate text-sm font-semibold">{{ current_user.name }}</span>
+              <span class="truncate text-xs text-base-content/60">{{ current_user.email }}</span>
+            </span>
+            <span class="iconify size-4 text-base-content/50 shrink-0" data-icon="lucide:chevron-up"></span>
+          </button>
+          <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-30 mb-2 w-56 border border-base-300 p-2 shadow-lg">
+            <li>
+              <a href="{{ url_for('main.privacy_policy') }}" target="_blank" rel="noopener">
+                <span class="iconify size-4" data-icon="lucide:shield-check"></span>
+                Privacy Policy
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('main.terms_of_service') }}" target="_blank" rel="noopener">
+                <span class="iconify size-4" data-icon="lucide:file-text"></span>
+                Terms
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('auth.logout') }}">
+                <span class="iconify size-4" data-icon="lucide:log-out"></span>
+                Logout
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </aside>
   </div>
 </div>
 {% endblock %}

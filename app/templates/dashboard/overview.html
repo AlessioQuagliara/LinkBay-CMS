@@ -20,14 +20,14 @@
 
 {% if not connection %}
   {# Nessun account collegato: unico caso in cui mostriamo il connettore. #}
-  <div class="card bg-base-100 border border-base-300 max-w-md">
+  <div class="card card-border bg-base-100 max-w-md shadow-xs">
     <div class="card-body">
       <h2 class="card-title">Connect Google</h2>
       <p class="text-base-content/70">
         To use the service, connect the Google account that owns the websites you want to monitor.
       </p>
       <div class="justify-end card-actions mt-2">
-        <a class="btn btn-error text-white" href="{{ url_for('dashboard.connect') }}">
+        <a class="btn btn-primary" href="{{ url_for('dashboard.connect') }}">
           <span class="iconify size-4" data-icon="lucide:unplug"></span>
           Connect
         </a>
@@ -53,7 +53,7 @@
 
   {# Stato: caricamento (skeleton) #}
   <div id="state-loading">
-    <div class="stats shadow w-full mb-6">
+    <div class="stats stats-vertical sm:stats-horizontal border border-base-300 shadow-xs w-full mb-6">
       <div class="stat gap-2">
         <div class="skeleton h-4 w-20"></div>
         <div class="skeleton h-8 w-28"></div>
@@ -89,7 +89,7 @@
     <span id="state-error-msg">Something went wrong loading your data.</span>
   </div>
 
-  <div id="state-empty" class="card bg-base-100 border border-base-300 hidden">
+  <div id="state-empty" class="card card-border bg-base-100 shadow-xs hidden">
     <div class="card-body items-center text-center py-12">
       <span class="iconify text-base-content/30 size-10" data-icon="lucide:search-x"></span>
       <p class="font-medium mt-3">No verified sites found</p>
@@ -104,7 +104,7 @@
     <p class="text-base-content/50 text-sm mb-3" id="range-label"></p>
 
     {# KPI rapidi del sito #}
-    <div class="stats stats-vertical sm:stats-horizontal shadow w-full mb-6" id="overview-stats"></div>
+    <div class="stats stats-vertical sm:stats-horizontal border border-base-300 shadow-xs w-full mb-6" id="overview-stats"></div>
 
     <div class="grid gap-6 lg:grid-cols-2">
       {# Pagine monitorate (free = 3), quelle che perdono più traffico prima #}

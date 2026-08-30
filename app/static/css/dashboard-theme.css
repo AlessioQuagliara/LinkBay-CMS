@@ -1,0 +1,44 @@
+/* Tema daisyUI per la dashboard, scoped via [data-theme="linkbay"] su <html>
+   (impostato solo da dashboard/layout.html, la landing resta invariata).
+   Palette: bianco/nero + brand #FF5758. Vedi app/templates/dashboard/. */
+[data-theme="linkbay"] {
+  color-scheme: light;
+
+  --color-base-100: #ffffff;
+  --color-base-200: #f6f6f7;
+  --color-base-300: #e7e7ea;
+  --color-base-content: #16181d;
+
+  --color-primary: #ff5758;
+  --color-primary-content: #ffffff;
+
+  --color-secondary: #16181d;
+  --color-secondary-content: #ffffff;
+
+  --color-accent: #ff5758;
+  --color-accent-content: #ffffff;
+
+  --color-neutral: #16181d;
+  --color-neutral-content: #ffffff;
+
+  --color-info: #3abff8;
+  --color-info-content: #00293a;
+
+  --color-success: #16a34a;
+  --color-success-content: #ffffff;
+
+  --color-warning: #f5a524;
+  --color-warning-content: #3a2100;
+
+  --color-error: #ff5758;
+  --color-error-content: #ffffff;
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.75rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}

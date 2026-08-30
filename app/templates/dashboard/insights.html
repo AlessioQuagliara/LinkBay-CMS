@@ -31,17 +31,20 @@
 </div>
 
 {% if not connection %}
-  <div class="card bg-base-100 border border-base-300">
+  <div class="card card-border bg-base-100 shadow-xs">
     <div class="card-body items-center text-center py-12">
       <span class="iconify text-base-content/30 size-10" data-icon="lucide:cable"></span>
       <p class="font-medium mt-3">No Search Console account connected</p>
       <p class="text-sm text-base-content/60 max-w-sm mt-1">
         Connect your Google Search Console account to see which pages are losing organic traffic.
       </p>
-      <a class="btn btn-error text-white mt-5" href="{{ url_for('gsc.authorize') }}">
+      <a class="btn btn-primary mt-5" href="{{ url_for('gsc.authorize') }}">
         <span class="iconify size-4" data-icon="lucide:link"></span>
         Connect Search Console
       </a>
+      <p class="text-xs text-base-content/50 mt-4">
+        Read-only access. See our <a class="link link-hover" href="{{ url_for('main.privacy_policy') }}" target="_blank" rel="noopener">Privacy Policy</a>.
+      </p>
     </div>
   </div>
 {% else %}
@@ -84,7 +87,7 @@
     <span id="state-error-msg">Something went wrong loading your data.</span>
   </div>
 
-  <div id="state-empty" class="card bg-base-100 border border-base-300 hidden">
+  <div id="state-empty" class="card card-border bg-base-100 shadow-xs hidden">
     <div class="card-body items-center text-center py-12">
       <span class="iconify text-base-content/30 size-10" data-icon="lucide:search-x"></span>
       <p class="font-medium mt-3">No verified sites found</p>
@@ -107,7 +110,7 @@
       <div class="tab-content bg-base-100 border-base-300 p-6">
         <h3 class="text-sm font-medium text-base-content/70 mb-3">Clicks over time</h3>
         <div id="chart" class="w-full"></div>
-        <div class="stats stats-vertical sm:stats-horizontal shadow w-full mt-6" id="overview-stats"></div>
+        <div class="stats stats-vertical sm:stats-horizontal border border-base-300 shadow-xs w-full mt-6" id="overview-stats"></div>
       </div>
 
       <label class="tab">

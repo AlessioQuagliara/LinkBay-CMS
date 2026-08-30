@@ -170,7 +170,7 @@
     const label = shortUrl(a.url);
 
     return `
-      <div class="card bg-base-100 border border-base-300" data-id="${a.id}" data-status="${a.status}">
+      <div class="card card-border bg-base-100 shadow-xs" data-id="${a.id}" data-status="${a.status}">
         <div class="card-body gap-3">
           <div class="flex flex-wrap items-start justify-between gap-3">
             <div class="min-w-0">
