@@ -1,0 +1,19 @@
+# Job ricorrenti dell'app, eseguiti dal servizio "cron" (vedi compose.prod.yml)
+# tramite supercronic. Formato cron standard a 5 campi, orari UTC.
+#
+# Storico giornaliero: tiene GscSiteDaily aggiornato anche per utenti che non
+# aprono la dashboard per settimane (oggi quel sync è lazy, solo su visita a
+# Insights).
+0 3 * * *   flask sync-full-history
+
+# Rule engine: sincronizza lo storico mensile per pagina e rigenera gli alert
+# di declino per ogni sito monitorato.
+0 4 * * 1   flask run-decay-rules
+
+# Digest email del lunedì: 30 minuti dopo run-decay-rules, così riflette alert
+# freschi. Solo utenti con abbonamento attivo (vedi app/emails/digest.py).
+30 4 * * 1  flask send-weekly-digest
+
+# Recovery check: pagine marcate "done" da 30 o 60 giorni, verifica se il
+# traffico è tornato (vedi app/rules/recovery.py).
+0 5 * * *   flask check-page-recovery

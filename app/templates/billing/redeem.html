@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Redeem AppSumo code") }}{% endblock %}
+{% block html_attrs %} data-theme="linkbay"{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-base-200 flex flex-col">
+  <header class="flex items-center justify-between px-6 py-4">
+    <a href="{{ url_for('main.index') }}">
+      <img class="h-6 w-auto" src="{{ url_for('static', filename='shared/logo.png') }}" alt="LinkBayCMS">
+    </a>
+    <a class="link link-hover text-sm text-base-content/60" href="{{ url_for('auth.logout') }}">{{ _("Logout") }}</a>
+  </header>
+
+  <main class="flex-1 flex items-center justify-center px-4 pb-16">
+    <div class="card card-border bg-base-100 shadow-xs w-full max-w-md">
+      <div class="card-body items-center text-center gap-4">
+        <span class="iconify text-primary size-8" data-icon="lucide:ticket"></span>
+        <h1 class="text-xl font-semibold">{{ _("Redeem your AppSumo code") }}</h1>
+        <p class="text-base-content/60">
+          {{ _("Enter the code you received from AppSumo to activate your lifetime account.") }}
+        </p>
+
+        <form method="post" class="w-full mt-2 flex flex-col gap-3">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input
+            type="text"
+            name="code"
+            required
+            autocomplete="off"
+            autocapitalize="characters"
+            placeholder="{{ _('AppSumo code') }}"
+            class="input input-bordered w-full text-center tracking-widest uppercase"
+          >
+          <button class="btn btn-primary w-full" type="submit">
+            {{ _("Redeem code") }}
+          </button>
+        </form>
+
+        <a class="link link-hover text-sm text-base-content/60" href="{{ url_for('billing.upgrade') }}">
+          {{ _("Don't have a code? See the Pro plan") }}
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}

@@ -4,6 +4,8 @@ Un blueprint per una responsabilità (README): qui vivono solo le API che
 alimentano /dashboard/declining. Ogni query è sempre filtrata per
 current_user.id — un utente non può vedere né toccare gli alert di un altro.
 """
+from datetime import datetime, timezone
+
 from flask import Blueprint, current_app, jsonify, request
 from flask_login import current_user, login_required
 
@@ -136,6 +138,14 @@ def api_status():
     alert = PageAlert.query.filter_by(id=alert_id, user_id=current_user.id).first()
     if alert is None:
         return jsonify({"error": "not_found"}), 404
+
+    if status == "done" and alert.status != "done":
+        # Riparte il conto alla rovescia del recovery-check a 30/60gg (vedi
+        # app/rules/recovery.py) — un "done" ripetuto non eredita i checkpoint
+        # di un giro precedente.
+        alert.done_at = datetime.now(timezone.utc)
+        alert.checked_30d_at = None
+        alert.checked_60d_at = None
 
     alert.status = status
     db.session.commit()

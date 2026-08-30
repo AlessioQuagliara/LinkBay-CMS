@@ -1,0 +1,94 @@
+{% extends "dashboard/layout.html" %}
+{% block title %}{{ _("Settings") }}{% endblock %}
+{% block dashboard_content %}
+
+<div class="mb-6">
+  <h1 class="text-2xl font-semibold">{{ _("Settings") }}</h1>
+  <p class="text-base-content/60 mt-1">{{ _("Manage your account details and preferences.") }}</p>
+</div>
+
+<div class="grid gap-6 max-w-xl">
+  <div class="card card-border bg-base-100 shadow-xs">
+    <div class="card-body">
+      <h2 class="card-title">{{ _("Profile") }}</h2>
+      <form method="post" class="mt-2 flex flex-col gap-4">
+        {{ profile_form.hidden_tag() }}
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">{{ profile_form.name.label.text }}</legend>
+          <label class="input w-full focus-within:outline-0">
+            <span class="iconify text-base-content/60 size-4" data-icon="lucide:user"></span>
+            {{ profile_form.name(class_="grow focus:outline-0") }}
+          </label>
+          {% for error in profile_form.name.errors %}<p class="text-error text-sm mt-1">{{ error }}</p>{% endfor %}
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">{{ profile_form.locale.label.text }}</legend>
+          {{ profile_form.locale(class_="select select-bordered w-full") }}
+        </fieldset>
+
+        <div class="text-sm text-base-content/60">
+          {{ _("Email") }}: <span class="text-base-content">{{ current_user.email }}</span>
+        </div>
+
+        {{ profile_form.submit(class_="btn btn-primary self-start") }}
+      </form>
+    </div>
+  </div>
+
+  <div class="card card-border bg-base-100 shadow-xs">
+    <div class="card-body">
+      <h2 class="card-title">{{ _("Notifications") }}</h2>
+      <form method="post" class="mt-2 flex flex-col gap-4">
+        {{ notifications_form.hidden_tag() }}
+
+        <label class="label cursor-pointer justify-start gap-3">
+          {{ notifications_form.weekly_digest_enabled(class_="toggle toggle-primary") }}
+          <span class="label-text">{{ notifications_form.weekly_digest_enabled.label.text }}</span>
+        </label>
+
+        {{ notifications_form.submit(class_="btn btn-primary self-start") }}
+      </form>
+    </div>
+  </div>
+
+  <div class="card card-border bg-base-100 shadow-xs">
+    <div class="card-body">
+      <h2 class="card-title">{{ _("Change password") }}</h2>
+      <form method="post" class="mt-2 flex flex-col gap-4">
+        {{ password_form.hidden_tag() }}
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">{{ password_form.current_password.label.text }}</legend>
+          <label class="input w-full focus-within:outline-0">
+            <span class="iconify text-base-content/60 size-4" data-icon="lucide:lock"></span>
+            {{ password_form.current_password(class_="grow focus:outline-0") }}
+          </label>
+          {% for error in password_form.current_password.errors %}<p class="text-error text-sm mt-1">{{ error }}</p>{% endfor %}
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">{{ password_form.new_password.label.text }}</legend>
+          <label class="input w-full focus-within:outline-0">
+            <span class="iconify text-base-content/60 size-4" data-icon="lucide:key-round"></span>
+            {{ password_form.new_password(class_="grow focus:outline-0") }}
+          </label>
+          {% for error in password_form.new_password.errors %}<p class="text-error text-sm mt-1">{{ error }}</p>{% endfor %}
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">{{ password_form.confirm_password.label.text }}</legend>
+          <label class="input w-full focus-within:outline-0">
+            <span class="iconify text-base-content/60 size-4" data-icon="lucide:key-round"></span>
+            {{ password_form.confirm_password(class_="grow focus:outline-0") }}
+          </label>
+          {% for error in password_form.confirm_password.errors %}<p class="text-error text-sm mt-1">{{ error }}</p>{% endfor %}
+        </fieldset>
+
+        {{ password_form.submit(class_="btn btn-outline self-start") }}
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

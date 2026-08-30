@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Upgrade") }}{% endblock %}
+{% block html_attrs %} data-theme="linkbay"{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-base-200 flex flex-col">
+  <header class="flex items-center justify-between px-6 py-4">
+    <a href="{{ url_for('main.index') }}">
+      <img class="h-6 w-auto" src="{{ url_for('static', filename='shared/logo.png') }}" alt="LinkBayCMS">
+    </a>
+    <a class="link link-hover text-sm text-base-content/60" href="{{ url_for('auth.logout') }}">{{ _("Logout") }}</a>
+  </header>
+
+  <main class="flex-1 flex items-center justify-center px-4 pb-16">
+    <div class="card card-border bg-base-100 shadow-xs w-full max-w-md">
+      <div class="card-body items-center text-center gap-4">
+        {% if current_user.subscription_status == "lifetime" %}
+          <span class="iconify text-success size-8" data-icon="lucide:infinity"></span>
+          <h1 class="text-xl font-semibold">{{ _("Your account is lifetime") }}</h1>
+          <p class="text-base-content/60">{{ _("Activated with an AppSumo code — nothing to manage.") }}</p>
+          <a class="link link-hover text-sm" href="{{ url_for('dashboard.overview') }}">{{ _("Back to dashboard") }}</a>
+        {% elif current_user.subscription_status == "active" %}
+          <span class="iconify text-success size-8" data-icon="lucide:circle-check-big"></span>
+          <h1 class="text-xl font-semibold">{{ _("Your Pro subscription is active") }}</h1>
+          <p class="text-base-content/60">{{ _("You can manage or cancel it anytime.") }}</p>
+          <a class="btn btn-primary mt-2" href="{{ url_for('billing.portal') }}">
+            <span class="iconify size-4" data-icon="lucide:settings"></span>
+            {{ _("Manage subscription") }}
+          </a>
+          <a class="link link-hover text-sm" href="{{ url_for('dashboard.overview') }}">{{ _("Back to dashboard") }}</a>
+        {% else %}
+          {% if current_user.subscription_status == "trialing" and current_user.trial_days_left > 0 %}
+            <span class="badge badge-soft badge-primary gap-1">
+              <span class="iconify size-3.5" data-icon="lucide:sparkles"></span>
+              {{ ngettext("%(num)s day left in your trial", "%(num)s days left in your trial", current_user.trial_days_left) }}
+            </span>
+          {% else %}
+            <span class="badge badge-soft badge-error gap-1">
+              <span class="iconify size-3.5" data-icon="lucide:lock"></span>
+              {{ _("Trial ended") }}
+            </span>
+          {% endif %}
+
+          <h1 class="text-2xl font-semibold">{{ _("Upgrade to Pro") }}</h1>
+          <p class="text-base-content/60">
+            {{ _("Keep monitoring declining pages and getting AI suggestions, without interruption.") }}
+          </p>
+          <p class="text-3xl font-bold mt-2">{{ price_label }}</p>
+
+          <ul class="text-sm text-base-content/70 text-left w-full mt-2 space-y-2">
+            <li class="flex items-center gap-2">
+              <span class="iconify text-success size-4 shrink-0" data-icon="lucide:check"></span>
+              {{ _("Unlimited Insights and Declining Pages") }}
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="iconify text-success size-4 shrink-0" data-icon="lucide:check"></span>
+              {{ _("AI suggestions on declining pages") }}
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="iconify text-success size-4 shrink-0" data-icon="lucide:check"></span>
+              {{ _("Full history from the day you connect your site") }}
+            </li>
+          </ul>
+
+          <form method="post" action="{{ url_for('billing.checkout') }}" class="w-full mt-2">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-primary w-full" type="submit">
+              <span class="iconify size-4" data-icon="lucide:credit-card"></span>
+              {{ _("Upgrade to Pro — %(price)s", price=price_label) }}
+            </button>
+          </form>
+
+          <a class="link link-hover text-sm text-base-content/60" href="{{ url_for('billing.redeem') }}">
+            {{ _("Have an AppSumo code?") }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}

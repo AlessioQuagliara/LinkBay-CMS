@@ -1,4 +1,5 @@
 from app.models.ai_analysis import AiAnalyzerConfig, AiPageAnalysis
+from app.models.appsumo_code import AppSumoCode
 from app.models.email_otp import EmailOtp
 from app.models.gsc_connection import GscConnection
 from app.models.gsc_daily import GscSiteDaily
@@ -15,4 +16,5 @@ __all__ = [
     "AiAnalyzerConfig",
     "AiPageAnalysis",
     "EmailOtp",
+    "AppSumoCode",
 ]

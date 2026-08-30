@@ -9,6 +9,7 @@ import os
 from datetime import date, timedelta
 
 from flask import Blueprint, current_app, flash, jsonify, redirect, request, session, url_for
+from flask_babel import gettext as _
 from flask_login import current_user, login_required
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
@@ -16,6 +17,7 @@ import googleapiclient.discovery
 
 from app.gsc.history import get_site_series, sync_site_daily
 from app.gsc.insights import build_insights
+from app.gsc.page_history import sync_page_monthly
 from app.gsc.repository import (
     credentials_to_dict,
     delete_gsc_credentials,
@@ -90,7 +92,7 @@ def get_user_gsc_service(user_id):
 @login_required
 def authorize():
     if not current_app.config.get("GOOGLE_CLIENT_ID") or not current_app.config.get("GOOGLE_CLIENT_SECRET"):
-        flash("Google Search Console is not configured on this server yet (missing GOOGLE_CLIENT_ID/SECRET).", "error")
+        flash(_("Google Search Console is not configured on this server yet (missing GOOGLE_CLIENT_ID/SECRET)."), "error")
         return redirect(url_for("dashboard.connect"))
 
     flow = google_auth_oauthlib.flow.Flow.from_client_config(
@@ -120,11 +122,11 @@ def callback():
     code_verifier = session.pop("gsc_code_verifier", None)
 
     if state is None or state != request.args.get("state"):
-        flash("Could not verify the connection request. Please try connecting again.", "error")
+        flash(_("Could not verify the connection request. Please try connecting again."), "error")
         return redirect(url_for("dashboard.connect"))
 
     if code_verifier is None:
-        flash("The connection request expired. Please try connecting again.", "error")
+        flash(_("The connection request expired. Please try connecting again."), "error")
         return redirect(url_for("dashboard.connect"))
 
     try:
@@ -138,12 +140,12 @@ def callback():
         flow.fetch_token(authorization_response=request.url)
     except Exception:
         current_app.logger.exception("GSC OAuth callback failed")
-        flash("Google didn't confirm the connection. Please try again.", "error")
+        flash(_("Google didn't confirm the connection. Please try again."), "error")
         return redirect(url_for("dashboard.connect"))
 
     save_gsc_credentials(current_user.id, credentials_to_dict(flow.credentials))
 
-    flash("Google Search Console connected.", "success")
+    flash(_("Google Search Console connected."), "success")
     return redirect(url_for("dashboard.connect"))
 
 
@@ -151,7 +153,7 @@ def callback():
 @login_required
 def disconnect():
     delete_gsc_credentials(current_user.id)
-    flash("Google Search Console disconnected.", "success")
+    flash(_("Google Search Console disconnected."), "success")
     return redirect(url_for("dashboard.connect"))
 
 
@@ -206,11 +208,30 @@ def api_sites():
 @gsc_bp.route("/api/monitored-site", methods=["POST"])
 @login_required
 def api_monitored_site():
-    """Persiste il sito scelto dall'utente per il monitoraggio."""
+    """Persiste il sito scelto dall'utente per il monitoraggio e avvia subito
+    il backfill dello storico (giornaliero + mensile per pagina), invece di
+    aspettare la prima visita a Insights o il cron settimanale. È il momento
+    giusto per farlo: prima di scegliere il sito non sappiamo ancora quale
+    storico backfillare."""
     site = request.form.get("site")
     if not site:
         return jsonify({"error": "missing_site"}), 400
     save_monitored_site(current_user.id, site)
+
+    try:
+        creds = load_gsc_credentials(current_user.id)
+        if creds:
+            credentials = _credentials_from_dict(creds)
+            service = _build_service(credentials)
+            sync_site_daily(service, current_user.id, site, days=28)
+            sync_page_monthly(service, current_user.id, site)
+            save_gsc_credentials(current_user.id, credentials_to_dict(credentials))
+    except Exception:
+        # Non bloccare la selezione del sito se il backfill fallisce: il cron
+        # notturno/settimanale (flask sync-full-history / run-decay-rules)
+        # recupera comunque lo storico più avanti.
+        current_app.logger.exception("Backfill iniziale fallito per %s (user %s)", site, current_user.id)
+
     return jsonify({"monitored_site_url": site})
 
 

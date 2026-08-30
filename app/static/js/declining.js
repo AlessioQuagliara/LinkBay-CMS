@@ -9,6 +9,8 @@
   const select = document.getElementById("site-select");
   if (!select) return; // account non collegato: la pagina mostra il connettore
 
+  const t = (window.I18N && window.I18N.t) || ((k) => k);
+
   const SITES_URL = select.dataset.sitesUrl;
   const MONITORED_URL = select.dataset.monitoredUrl;
   const LIST_URL = select.dataset.listUrl;
@@ -61,19 +63,18 @@
     return d.toLocaleDateString(undefined, { month: "short", year: "2-digit" });
   }
 
-  const STATUS_LABELS = {
-    new: "Nuova",
-    acknowledged: "Riconosciuta",
-    done: "Fatta",
-    recovered: "Recuperata",
-  };
+  function statusLabel(status) {
+    return t(
+      "status" + status.charAt(0).toUpperCase() + status.slice(1)
+    );
+  }
 
   // Priorità -> colore badge (alto=error, medio=warning, basso=neutral),
   // stessa soglia dello scoring lato server (66 / 33).
   function priority(score) {
-    if (score >= 66) return { cls: "badge-error", label: "alta" };
-    if (score >= 33) return { cls: "badge-warning", label: "media" };
-    return { cls: "badge-neutral", label: "bassa" };
+    if (score >= 66) return { cls: "badge-error", label: t("priorityHigh") };
+    if (score >= 33) return { cls: "badge-warning", label: t("priorityMedium") };
+    return { cls: "badge-neutral", label: t("priorityLow") };
   }
 
   async function postForm(url, params) {
@@ -88,7 +89,7 @@
   function renderSparkline(host, series) {
     if (!series || series.length < 2) {
       host.innerHTML =
-        '<p class="text-base-content/50 text-xs py-3">Storico insufficiente per il trend.</p>';
+        `<p class="text-base-content/50 text-xs py-3">${t("notEnoughHistoryTrend")}</p>`;
       return;
     }
 
@@ -109,11 +110,11 @@
 
     const labels =
       `<text class="text-base-content/50" x="${x(0).toFixed(1)}" y="${H - 4}" font-size="9" fill="currentColor">${esc(shortMonth(series[0].month))}</text>` +
-      `<text class="text-base-content/50" x="${x(n - 1).toFixed(1)}" y="${H - 4}" text-anchor="end" font-size="9" fill="currentColor">${esc(shortMonth(series[n - 1].month))} · ${fmtInt(series[n - 1].clicks)} click</text>`;
+      `<text class="text-base-content/50" x="${x(n - 1).toFixed(1)}" y="${H - 4}" text-anchor="end" font-size="9" fill="currentColor">${esc(shortMonth(series[n - 1].month))} · ${fmtInt(series[n - 1].clicks)} ${t("statClicks")}</text>`;
 
     host.innerHTML =
       `<div class="text-primary mt-2">` +
-      `<svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="none" role="img" aria-label="Trend click 6 mesi">` +
+      `<svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="none" role="img" aria-label="Trend">` +
       `<path d="${areaPath}" fill="currentColor" fill-opacity="0.12" stroke="none"/>` +
       `<path d="${linePath}" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>` +
       labels +
@@ -124,7 +125,7 @@
   function renderQueryLosses(host, queries) {
     if (!queries || !queries.length) {
       host.innerHTML =
-        '<p class="text-base-content/50 text-xs py-2">Nessuna query in calo per questa pagina.</p>';
+        `<p class="text-base-content/50 text-xs py-2">${t("noDecliningQueries")}</p>`;
       return;
     }
     const rows = queries
@@ -142,7 +143,7 @@
     host.innerHTML =
       `<div class="overflow-x-auto"><table class="table table-sm">` +
       `<thead><tr>` +
-      `<th>Query</th><th class="text-right">Click persi</th><th class="text-right">Posizione</th>` +
+      `<th>${t("colQuery")}</th><th class="text-right">${t("colClicksLost")}</th><th class="text-right">${t("colPosition")}</th>` +
       `</tr></thead><tbody>${rows}</tbody></table></div>`;
   }
 
@@ -158,9 +159,9 @@
 
   function statusSelectHtml(a) {
     const opts = ["new", "acknowledged", "done", "recovered"]
-      .map((s) => `<option value="${s}"${s === a.status ? " selected" : ""}>${STATUS_LABELS[s]}</option>`)
+      .map((s) => `<option value="${s}"${s === a.status ? " selected" : ""}>${statusLabel(s)}</option>`)
       .join("");
-    return `<select class="select select-sm select-bordered status-select" data-id="${a.id}" aria-label="Cambia stato">${opts}</select>`;
+    return `<select class="select select-sm select-bordered status-select" data-id="${a.id}" aria-label="${t("changeStatus")}">${opts}</select>`;
   }
 
   function cardHtml(a) {
@@ -175,8 +176,8 @@
           <div class="flex flex-wrap items-start justify-between gap-3">
             <div class="min-w-0">
               <div class="flex items-center gap-2">
-                <span class="badge ${p.cls} badge-sm">Priorità ${p.label}</span>
-                <span class="text-xs text-base-content/50">score ${fmtInt(a.priority_score)}</span>
+                <span class="badge ${p.cls} badge-sm">${t("priorityBadge", { label: p.label })}</span>
+                <span class="text-xs text-base-content/50">${t("scoreLabel", { score: fmtInt(a.priority_score) })}</span>
               </div>
               <a href="${esc(a.url)}" target="_blank" rel="noopener"
                  class="link link-hover font-medium truncate block max-w-md mt-1"
@@ -187,12 +188,12 @@
 
           <div class="flex flex-wrap gap-x-8 gap-y-1 text-sm">
             <div>
-              <span class="text-base-content/50">Click persi/mese</span>
+              <span class="text-base-content/50">${t("clicksLostPerMonth")}</span>
               <span class="font-semibold text-error ms-1">−${fmtInt(lossAbs)}</span>
               <span class="text-base-content/50">(−${lossPct}%)</span>
             </div>
             <div>
-              <span class="text-base-content/50">Posizione</span>
+              <span class="text-base-content/50">${t("colPosition")}</span>
               <span class="font-semibold ms-1">${fmtPos(a.position_before)} → ${fmtPos(a.position_after)}</span>
             </div>
           </div>
@@ -201,12 +202,12 @@
 
           <div class="collapse collapse-arrow border border-base-300 rounded-box">
             <input type="checkbox" class="trend-toggle" data-page="${esc(a.url)}" />
-            <div class="collapse-title text-sm font-medium py-2 min-h-0">Vedi trend 6 mesi</div>
+            <div class="collapse-title text-sm font-medium py-2 min-h-0">${t("seeTrend")}</div>
             <div class="collapse-content">
-              <div class="trend-host"><p class="text-base-content/50 text-xs py-3">Caricamento…</p></div>
+              <div class="trend-host"><p class="text-base-content/50 text-xs py-3">${t("loading")}</p></div>
               <div class="mt-3">
-                <p class="text-sm font-medium mb-1">Query che hanno perso posizioni</p>
-                <div class="qloss-host"><p class="text-base-content/50 text-xs py-2">Caricamento…</p></div>
+                <p class="text-sm font-medium mb-1">${t("queriesThatLostRankings")}</p>
+                <div class="qloss-host"><p class="text-base-content/50 text-xs py-2">${t("loading")}</p></div>
               </div>
             </div>
           </div>
@@ -249,7 +250,7 @@
           }
         } catch (e) {
           sel.value = prev; // rollback visivo
-          showError("Non è stato possibile aggiornare lo stato. Riprova.");
+          showError(t("updateStatusError"));
         } finally {
           sel.disabled = false;
         }
@@ -273,7 +274,7 @@
           const { series } = await res.json();
           renderSparkline(trendHost, series);
         } catch (e) {
-          trendHost.innerHTML = '<p class="text-error text-xs py-3">Trend non disponibile.</p>';
+          trendHost.innerHTML = `<p class="text-error text-xs py-3">${t("trendNotAvailable")}</p>`;
         }
 
         const qlossHost = collapse.querySelector(".qloss-host");
@@ -285,7 +286,7 @@
           const { queries } = await res.json();
           renderQueryLosses(qlossHost, queries);
         } catch (e) {
-          qlossHost.innerHTML = '<p class="text-error text-xs py-2">Query non disponibili.</p>';
+          qlossHost.innerHTML = `<p class="text-error text-xs py-2">${t("queriesNotAvailable")}</p>`;
         }
       });
     });
@@ -302,7 +303,7 @@
       const { alerts } = await res.json();
       renderList(alerts);
     } catch (e) {
-      showError("Non è stato possibile caricare la lista. Riprova.");
+      showError(t("loadListError"));
     }
   }
 
@@ -346,7 +347,7 @@
       });
       loadAlerts(preselect);
     } catch (e) {
-      showError("Couldn't load your Search Console sites. Please reconnect and try again.");
+      showError(t("loadSitesReconnectError"));
     }
   }
 

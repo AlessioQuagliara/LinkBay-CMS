@@ -7,6 +7,8 @@
   const select = document.getElementById("site-select");
   if (!select) return; // account non collegato: la pagina mostra il connettore
 
+  const t = (window.I18N && window.I18N.t) || ((k) => k);
+
   const SITES_URL = select.dataset.sitesUrl;
   const MONITORED_URL = select.dataset.monitoredUrl;
   const INSIGHTS_URL = select.dataset.insightsUrl;
@@ -63,7 +65,7 @@
 
   function deltaBadge(deltaPct, lowerIsBetter) {
     if (deltaPct === null || deltaPct === undefined) {
-      return '<span class="text-base-content/40">— no prior data</span>';
+      return `<span class="text-base-content/40">— ${t("noPriorData")}</span>`;
     }
     const good = lowerIsBetter ? deltaPct < 0 : deltaPct > 0;
     const flat = Math.abs(deltaPct) < 0.05;
@@ -93,7 +95,7 @@
     const host = document.getElementById("chart");
     if (!series || series.length < 2) {
       host.innerHTML =
-        '<p class="text-base-content/50 text-sm py-8 text-center">Not enough history yet — data will build up day by day.</p>';
+        `<p class="text-base-content/50 text-sm py-8 text-center">${t("notEnoughHistory")}</p>`;
       return;
     }
 
@@ -179,7 +181,11 @@
   function renderOverview(o) {
     const label = document.getElementById("range-label");
     if (label) {
-      label.textContent = `Last ${o.range.days} days (${o.range.start} → ${o.range.end}) vs previous ${o.range.days} days`;
+      label.textContent = t("overviewRangeLabel", {
+        days: o.range.days,
+        start: o.range.start,
+        end: o.range.end,
+      });
     }
     const stat = (title, value, deltaHtml) => `
       <div class="stat">
@@ -188,10 +194,10 @@
         <div class="stat-desc">${deltaHtml}</div>
       </div>`;
     document.getElementById("overview-stats").innerHTML =
-      stat("Clicks", fmtInt(o.clicks.value), deltaBadge(o.clicks.delta_pct, false)) +
-      stat("Impressions", fmtInt(o.impressions.value), deltaBadge(o.impressions.delta_pct, false)) +
-      stat("CTR", fmtPct(o.ctr.value), deltaBadge(o.ctr.delta_pct, false)) +
-      stat("Avg. position", fmtPos(o.position.value), deltaBadge(o.position.delta_pct, true));
+      stat(t("statClicks"), fmtInt(o.clicks.value), deltaBadge(o.clicks.delta_pct, false)) +
+      stat(t("statImpressions"), fmtInt(o.impressions.value), deltaBadge(o.impressions.delta_pct, false)) +
+      stat(t("statCtr"), fmtPct(o.ctr.value), deltaBadge(o.ctr.delta_pct, false)) +
+      stat(t("statAvgPosition"), fmtPos(o.position.value), deltaBadge(o.position.delta_pct, true));
   }
 
   function aiCell(url) {
@@ -208,7 +214,7 @@
     const body = document.getElementById("pages-body");
     if (!pages.length) {
       body.innerHTML =
-        '<tr><td colspan="8" class="text-center text-base-content/50 py-6">No page data in this period.</td></tr>';
+        `<tr><td colspan="8" class="text-center text-base-content/50 py-6">${t("noPageDataPeriod")}</td></tr>`;
       return;
     }
     body.innerHTML = pages
@@ -238,7 +244,7 @@
     const body = document.getElementById("queries-body");
     if (!queries.length) {
       body.innerHTML =
-        '<tr><td colspan="5" class="text-center text-base-content/50 py-6">No query data in this period.</td></tr>';
+        `<tr><td colspan="5" class="text-center text-base-content/50 py-6">${t("noQueryDataPeriod")}</td></tr>`;
       return;
     }
     body.innerHTML = queries
@@ -306,13 +312,13 @@
     const cooling = (st.cooldown_days_left || 0) > 0;
     aiRun.disabled = !st.enabled || cooling;
     if (!st.enabled) {
-      aiStatusText.textContent = "Enable to get weekly AI suggestions per page.";
+      aiStatusText.textContent = t("aiEnableHint");
     } else if (cooling) {
-      aiStatusText.textContent = `Runs weekly. Next run available in ${st.cooldown_days_left} day(s).`;
+      aiStatusText.textContent = t("aiCooldownHint", { days: st.cooldown_days_left });
     } else if (st.last_run_at) {
-      aiStatusText.textContent = "Weekly. You can run a fresh analysis now.";
+      aiStatusText.textContent = t("aiReadyHint");
     } else {
-      aiStatusText.textContent = "Enabled — run your first analysis now.";
+      aiStatusText.textContent = t("aiFirstRunHint");
     }
   }
 
@@ -332,7 +338,7 @@
       const st = await res.json();
       applyAiStatus(st);
     } catch (e) {
-      aiStatusText.textContent = "Couldn't update the AI setting. Try again.";
+      aiStatusText.textContent = t("aiToggleError");
       aiToggle.checked = !aiToggle.checked;
     }
   });
@@ -340,25 +346,25 @@
   aiRun.addEventListener("click", async () => {
     const site = select.value;
     aiRun.disabled = true;
-    aiStatusText.textContent = "Analyzing your pages with AI…";
+    aiStatusText.textContent = t("aiRunning");
     try {
       const res = await postForm(AI_ANALYZE_URL, { site });
       const data = await res.json();
       if (res.ok) {
         applyAiStatus(data);
         renderPages(lastPages); // ridisegna con gli score aggiornati
-        aiStatusText.textContent = "Analysis complete — open the AI column for suggestions.";
+        aiStatusText.textContent = t("aiRunComplete");
       } else if (res.status === 429) {
-        aiStatusText.textContent = `Already run recently. Next run in ${data.days_left} day(s).`;
+        aiStatusText.textContent = t("aiCooldownError", { days: data.days_left });
       } else if (data.error === "ai_failed") {
-        aiStatusText.textContent = "AI provider error (check DEEPSEEK_API on the server).";
+        aiStatusText.textContent = t("aiProviderError");
       } else if (data.error === "disabled") {
-        aiStatusText.textContent = "Enable the AI analyzer first.";
+        aiStatusText.textContent = t("aiDisabledError");
       } else {
-        aiStatusText.textContent = "Analysis failed. Try again later.";
+        aiStatusText.textContent = t("aiFailedError");
       }
     } catch (e) {
-      aiStatusText.textContent = "Analysis failed. Try again later.";
+      aiStatusText.textContent = t("aiFailedError");
     } finally {
       updateRunButton({ enabled: aiToggle.checked, cooldown_days_left: 0, last_run_at: true });
     }
@@ -389,7 +395,7 @@
       renderQueries(data.queries);
       show("data");
     } catch (e) {
-      showError("Couldn't load data for this site. Please try again.");
+      showError(t("loadSiteDataError"));
     }
   }
 
@@ -432,7 +438,7 @@
       });
       loadSite(preselect);
     } catch (e) {
-      showError("Couldn't load your Search Console sites. Please reconnect and try again.");
+      showError(t("loadSitesReconnectError"));
     }
   }
 

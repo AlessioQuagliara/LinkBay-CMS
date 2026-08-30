@@ -1,0 +1,916 @@
+# Italian translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-08-30 18:19+0200\n"
+"PO-Revision-Date: 2026-08-30 15:01+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: it <LL@li.org>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: app/__init__.py:51
+msgid "Please sign in to continue."
+msgstr "Effettua l'accesso per continuare."
+
+#: app/errors.py:17
+msgid "The request couldn't be understood. Check the address and try again."
+msgstr "La richiesta non è stata compresa. Controlla l'indirizzo e riprova."
+
+#: app/errors.py:18
+msgid "You need to sign in to view this page."
+msgstr "Devi accedere per vedere questa pagina."
+
+#: app/errors.py:19
+msgid "You don't have access to this page."
+msgstr "Non hai accesso a questa pagina."
+
+#: app/errors.py:20
+msgid "The page you're looking for doesn't exist or has moved."
+msgstr "La pagina che cerchi non esiste o è stata spostata."
+
+#: app/errors.py:21
+msgid "That action isn't allowed on this page."
+msgstr "Questa azione non è consentita su questa pagina."
+
+#: app/errors.py:22
+msgid "Too many requests. Please slow down and try again shortly."
+msgstr "Troppe richieste. Rallenta e riprova tra poco."
+
+#: app/errors.py:23
+msgid ""
+"Something went wrong on our side. We've been notified — please try again."
+msgstr ""
+"Qualcosa è andato storto da parte nostra. Siamo stati avvisati — riprova."
+
+#: app/errors.py:24
+msgid "An upstream service didn't respond. Please try again in a moment."
+msgstr "Un servizio a monte non ha risposto. Riprova tra un momento."
+
+#: app/errors.py:25
+msgid "The service is temporarily unavailable. Please try again shortly."
+msgstr "Il servizio è temporaneamente non disponibile. Riprova tra poco."
+
+#: app/auth/forms.py:8 app/settings/forms.py:8
+msgid "Name"
+msgstr "Nome"
+
+#: app/auth/forms.py:9 app/auth/forms.py:21
+#: app/templates/settings/index.html:32
+msgid "Email"
+msgstr "Email"
+
+#: app/auth/forms.py:11 app/auth/forms.py:22
+msgid "Password"
+msgstr "Password"
+
+#: app/auth/forms.py:11 app/settings/forms.py:21
+msgid "Minimum 8 characters."
+msgstr "Minimo 8 caratteri."
+
+#: app/auth/forms.py:14
+msgid "Confirm password"
+msgstr "Conferma password"
+
+#: app/auth/forms.py:15 app/settings/forms.py:25
+msgid "Passwords do not match."
+msgstr "Le password non coincidono."
+
+#: app/auth/forms.py:17 app/templates/auth/register.html:10
+msgid "Create account"
+msgstr "Crea account"
+
+#: app/auth/forms.py:23 app/templates/auth/login.html:2
+#: app/templates/auth/login.html:10 app/templates/auth/register.html:55
+msgid "Sign in"
+msgstr "Accedi"
+
+#: app/auth/forms.py:28
+msgid "Code"
+msgstr "Codice"
+
+#: app/auth/forms.py:31
+msgid "Enter the 6-digit code."
+msgstr "Inserisci il codice a 6 cifre."
+
+#: app/auth/forms.py:34
+msgid "Verify"
+msgstr "Verifica"
+
+#: app/auth/otp.py:100
+msgid "No active code. Request a new one."
+msgstr "Nessun codice attivo. Richiedine uno nuovo."
+
+#: app/auth/otp.py:102
+msgid "This code has expired. Request a new one."
+msgstr "Questo codice è scaduto. Richiedine uno nuovo."
+
+#: app/auth/otp.py:106 app/auth/otp.py:113
+msgid "Too many attempts. Request a new code."
+msgstr "Troppi tentativi. Richiedi un nuovo codice."
+
+#: app/auth/otp.py:114
+#, python-format
+msgid "Incorrect code. %(left)s attempt(s) left."
+msgstr "Codice errato. %(left)s tentativo/i rimasti."
+
+#: app/auth/routes.py:38
+msgid "We've emailed you a 6-digit verification code."
+msgstr "Ti abbiamo inviato via email un codice di verifica a 6 cifre."
+
+#: app/auth/routes.py:41
+#, python-format
+msgid "Dev mode (email not configured): your code is %(code)s."
+msgstr "Modalità sviluppo (email non configurata): il tuo codice è %(code)s."
+
+#: app/auth/routes.py:43
+msgid "We couldn't send the email right now. Please try again."
+msgstr "Non è stato possibile inviare l'email in questo momento. Riprova."
+
+#: app/auth/routes.py:55
+msgid "There is already an account with this email address."
+msgstr "Esiste già un account con questo indirizzo email."
+
+#: app/auth/routes.py:80
+msgid "Incorrect email or password."
+msgstr "Email o password errati."
+
+#: app/auth/routes.py:93
+msgid "Start by signing in."
+msgstr "Inizia effettuando l'accesso."
+
+#: app/auth/routes.py:103
+msgid "Something went wrong. Please sign in again."
+msgstr "Qualcosa è andato storto. Accedi di nuovo."
+
+#: app/auth/routes.py:110 app/templates/dashboard/overview.html:13
+#, python-format
+msgid "Welcome, %(name)s."
+msgstr "Benvenuto, %(name)s."
+
+#: app/auth/routes.py:133
+#, python-format
+msgid "Please wait %(seconds)ss before requesting a new code."
+msgstr "Attendi %(seconds)ss prima di richiedere un nuovo codice."
+
+#: app/auth/routes.py:162
+msgid "You've been logged out."
+msgstr "Sei stato disconnesso."
+
+#: app/billing/routes.py:23
+msgid "€79/month"
+msgstr "€79/mese"
+
+#: app/billing/routes.py:45
+msgid "We couldn't start checkout. Please try again shortly."
+msgstr "Non è stato possibile avviare il pagamento. Riprova tra poco."
+
+#: app/billing/routes.py:65
+msgid "We couldn't open subscription management. Please try again shortly."
+msgstr ""
+"Non è stato possibile aprire la gestione abbonamento. Riprova tra poco."
+
+#: app/billing/routes.py:77
+msgid "Invalid code."
+msgstr "Codice non valido."
+
+#: app/billing/routes.py:79
+msgid "This code has already been used."
+msgstr "Questo codice è già stato utilizzato."
+
+#: app/billing/routes.py:85
+msgid "Code redeemed: your account is now lifetime."
+msgstr "Codice riscattato: il tuo account è ora a vita."
+
+#: app/emails/digest.py:51 app/templates/emails/weekly_digest.html:12
+msgid "Your top declining pages this week"
+msgstr "Le tue top declining pages di questa settimana"
+
+#: app/gsc/gsc.py:95
+msgid ""
+"Google Search Console is not configured on this server yet (missing "
+"GOOGLE_CLIENT_ID/SECRET)."
+msgstr ""
+"Google Search Console non è ancora configurato su questo server (manca "
+"GOOGLE_CLIENT_ID/SECRET)."
+
+#: app/gsc/gsc.py:125
+msgid "Could not verify the connection request. Please try connecting again."
+msgstr ""
+"Non è stato possibile verificare la richiesta di connessione. Riprova a "
+"connetterti."
+
+#: app/gsc/gsc.py:129
+msgid "The connection request expired. Please try connecting again."
+msgstr "La richiesta di connessione è scaduta. Riprova a connetterti."
+
+#: app/gsc/gsc.py:143
+msgid "Google didn't confirm the connection. Please try again."
+msgstr "Google non ha confermato la connessione. Riprova."
+
+#: app/gsc/gsc.py:148
+msgid "Google Search Console connected."
+msgstr "Google Search Console collegato."
+
+#: app/gsc/gsc.py:156
+msgid "Google Search Console disconnected."
+msgstr "Google Search Console disconnesso."
+
+#: app/settings/forms.py:9
+msgid "Language"
+msgstr "Lingua"
+
+#: app/settings/forms.py:10 app/settings/forms.py:15
+msgid "Save changes"
+msgstr "Salva modifiche"
+
+#: app/settings/forms.py:14
+msgid "Weekly email with my top declining pages"
+msgstr "Email settimanale con le mie top declining pages"
+
+#: app/settings/forms.py:19
+msgid "Current password"
+msgstr "Password attuale"
+
+#: app/settings/forms.py:21
+msgid "New password"
+msgstr "Nuova password"
+
+#: app/settings/forms.py:24
+msgid "Confirm new password"
+msgstr "Conferma nuova password"
+
+#: app/settings/forms.py:27 app/templates/settings/index.html:58
+msgid "Change password"
+msgstr "Cambia password"
+
+#: app/settings/routes.py:26 app/settings/routes.py:32
+msgid "Settings saved."
+msgstr "Impostazioni salvate."
+
+#: app/settings/routes.py:37
+msgid "Current password is incorrect."
+msgstr "La password attuale non è corretta."
+
+#: app/settings/routes.py:41
+msgid "Password changed."
+msgstr "Password cambiata."
+
+#: app/templates/auth/login.html:37
+msgid "Don't have an account?"
+msgstr "Non hai un account?"
+
+#: app/templates/auth/login.html:37 app/templates/auth/register.html:2
+msgid "Sign up"
+msgstr "Registrati"
+
+#: app/templates/auth/register.html:37
+msgid "Minimum 8 characters"
+msgstr "Minimo 8 caratteri"
+
+#: app/templates/auth/register.html:46
+msgid "Repeat password"
+msgstr "Ripeti password"
+
+#: app/templates/auth/register.html:55
+msgid "Already have an account?"
+msgstr "Hai già un account?"
+
+#: app/templates/auth/verify.html:2
+msgid "Verify your email"
+msgstr "Verifica la tua email"
+
+#: app/templates/auth/verify.html:30
+msgid "Confirm your email"
+msgstr "Conferma la tua email"
+
+#: app/templates/auth/verify.html:30
+msgid "Enter your code"
+msgstr "Inserisci il tuo codice"
+
+#: app/templates/auth/verify.html:33
+msgid "We sent a 6-digit code to"
+msgstr "Abbiamo inviato un codice a 6 cifre a"
+
+#: app/templates/auth/verify.html:42
+msgid "6-digit verification code"
+msgstr "Codice di verifica a 6 cifre"
+
+#: app/templates/auth/verify.html:43 app/templates/auth/verify.html:44
+#: app/templates/auth/verify.html:45 app/templates/auth/verify.html:46
+#: app/templates/auth/verify.html:47 app/templates/auth/verify.html:48
+#, python-format
+msgid "Digit %(n)s"
+msgstr "Cifra %(n)s"
+
+#: app/templates/auth/verify.html:55
+#, python-format
+msgid "Press %(kbd)s to refocus the code field."
+msgstr "Premi %(kbd)s per rimettere il focus sul campo del codice."
+
+#: app/templates/auth/verify.html:63
+msgid "Didn't get the email?"
+msgstr "Non hai ricevuto l'email?"
+
+#: app/templates/auth/verify.html:66 app/templates/auth/verify.html:69
+msgid "Resend code"
+msgstr "Invia di nuovo"
+
+#: app/templates/auth/verify.html:67
+#, python-brace-format
+msgid "Resend in {s}s"
+msgstr "Reinvia tra {s}s"
+
+#: app/templates/auth/verify.html:74
+msgid "Use a different account"
+msgstr "Usa un altro account"
+
+#: app/templates/billing/redeem.html:2
+msgid "Redeem AppSumo code"
+msgstr "Riscatta codice AppSumo"
+
+#: app/templates/billing/redeem.html:10 app/templates/billing/upgrade.html:10
+#: app/templates/dashboard/layout.html:134
+msgid "Logout"
+msgstr "Esci"
+
+#: app/templates/billing/redeem.html:17
+msgid "Redeem your AppSumo code"
+msgstr "Riscatta il tuo codice AppSumo"
+
+#: app/templates/billing/redeem.html:19
+msgid ""
+"Enter the code you received from AppSumo to activate your lifetime account."
+msgstr ""
+"Inserisci il codice ricevuto da AppSumo per attivare il tuo account a vita."
+
+#: app/templates/billing/redeem.html:30
+msgid "AppSumo code"
+msgstr "Codice AppSumo"
+
+#: app/templates/billing/redeem.html:34
+msgid "Redeem code"
+msgstr "Riscatta codice"
+
+#: app/templates/billing/redeem.html:39
+msgid "Don't have a code? See the Pro plan"
+msgstr "Non hai un codice? Vedi il piano Pro"
+
+#: app/templates/billing/subscription.html:2
+#: app/templates/billing/subscription.html:6
+#: app/templates/dashboard/layout.html:74
+#: app/templates/dashboard/layout.html:116
+msgid "Subscription"
+msgstr "Abbonamento"
+
+#: app/templates/billing/subscription.html:7
+msgid "Your plan and billing status."
+msgstr "Il tuo piano e lo stato di fatturazione."
+
+#: app/templates/billing/subscription.html:16
+msgid "Lifetime"
+msgstr "A vita"
+
+#: app/templates/billing/subscription.html:17
+#: app/templates/billing/upgrade.html:19
+msgid "Activated with an AppSumo code — nothing to manage."
+msgstr "Attivato con un codice AppSumo — nessun abbonamento da gestire."
+
+#: app/templates/billing/subscription.html:24
+msgid "Pro — active"
+msgstr "Pro — attivo"
+
+#: app/templates/billing/subscription.html:31
+#: app/templates/billing/upgrade.html:27
+msgid "Manage subscription"
+msgstr "Gestisci abbonamento"
+
+#: app/templates/billing/subscription.html:41
+msgid "Free trial — 1 day left"
+msgstr "Prova gratuita — 1 giorno rimasto"
+
+#: app/templates/billing/subscription.html:43
+#, python-format
+msgid "Free trial — %(days)s days left"
+msgstr "Prova gratuita — %(days)s giorni rimasti"
+
+#: app/templates/billing/subscription.html:47
+msgid "Free trial ended"
+msgstr "Prova gratuita terminata"
+
+#: app/templates/billing/subscription.html:49
+msgid "No credit card on file."
+msgstr "Nessuna carta di credito registrata."
+
+#: app/templates/billing/subscription.html:54
+#: app/templates/billing/upgrade.html:68
+#, python-format
+msgid "Upgrade to Pro — %(price)s"
+msgstr "Passa a Pro — %(price)s"
+
+#: app/templates/billing/subscription.html:61
+msgid "No active subscription"
+msgstr "Nessun abbonamento attivo"
+
+#: app/templates/billing/subscription.html:62
+msgid "Your subscription was canceled."
+msgstr "Il tuo abbonamento è stato annullato."
+
+#: app/templates/billing/subscription.html:67
+#, python-format
+msgid "Resubscribe — %(price)s"
+msgstr "Riattiva l'abbonamento — %(price)s"
+
+#: app/templates/billing/subscription.html:75
+#: app/templates/billing/upgrade.html:73
+msgid "Have an AppSumo code?"
+msgstr "Hai un codice AppSumo?"
+
+#: app/templates/billing/subscription.html:76
+msgid "Redeem it here"
+msgstr "Riscattalo qui"
+
+#: app/templates/billing/success.html:2
+msgid "Subscription activated"
+msgstr "Abbonamento attivato"
+
+#: app/templates/billing/success.html:9
+msgid "Payment received"
+msgstr "Pagamento ricevuto"
+
+#: app/templates/billing/success.html:11
+msgid ""
+"We're activating your Pro subscription — this usually takes a few seconds."
+msgstr ""
+"Stiamo attivando il tuo abbonamento Pro — di solito richiede pochi secondi."
+
+#: app/templates/billing/success.html:14
+msgid "Go to dashboard"
+msgstr "Vai alla dashboard"
+
+#: app/templates/billing/upgrade.html:2
+msgid "Upgrade"
+msgstr "Upgrade"
+
+#: app/templates/billing/upgrade.html:18
+msgid "Your account is lifetime"
+msgstr "Il tuo account è a vita"
+
+#: app/templates/billing/upgrade.html:20 app/templates/billing/upgrade.html:29
+msgid "Back to dashboard"
+msgstr "Torna alla dashboard"
+
+#: app/templates/billing/upgrade.html:23
+msgid "Your Pro subscription is active"
+msgstr "Il tuo abbonamento Pro è attivo"
+
+#: app/templates/billing/upgrade.html:24
+msgid "You can manage or cancel it anytime."
+msgstr "Puoi gestirlo o annullarlo in qualsiasi momento."
+
+#: app/templates/billing/upgrade.html:34
+#, python-format
+msgid "%(num)s day left in your trial"
+msgid_plural "%(num)s days left in your trial"
+msgstr[0] "%(num)s giorno rimasto nel trial"
+msgstr[1] "%(num)s giorni rimasti nel trial"
+
+#: app/templates/billing/upgrade.html:39
+msgid "Trial ended"
+msgstr "Prova terminata"
+
+#: app/templates/billing/upgrade.html:43
+#: app/templates/dashboard/layout.html:28
+msgid "Upgrade to Pro"
+msgstr "Passa a Pro"
+
+#: app/templates/billing/upgrade.html:45
+msgid ""
+"Keep monitoring declining pages and getting AI suggestions, without "
+"interruption."
+msgstr ""
+"Continua a monitorare le pagine in calo e a ricevere suggerimenti AI, senza "
+"interruzioni."
+
+#: app/templates/billing/upgrade.html:52
+msgid "Unlimited Insights and Declining Pages"
+msgstr "Insights e Declining Pages senza limiti"
+
+#: app/templates/billing/upgrade.html:56
+msgid "AI suggestions on declining pages"
+msgstr "Suggerimenti AI sulle pagine in calo"
+
+#: app/templates/billing/upgrade.html:60
+msgid "Full history from the day you connect your site"
+msgstr "Storico completo da quando colleghi il sito"
+
+#: app/templates/dashboard/connect.html:2
+#: app/templates/dashboard/connect.html:44
+#: app/templates/dashboard/declining.html:42
+#: app/templates/dashboard/insights.html:43
+msgid "Connect Search Console"
+msgstr "Collega Search Console"
+
+#: app/templates/dashboard/connect.html:5
+msgid "Connect Google Search Console"
+msgstr "Collega Google Search Console"
+
+#: app/templates/dashboard/connect.html:7
+msgid ""
+"Read-only access. We can see your performance data — we can't change "
+"anything on your site."
+msgstr ""
+"Accesso in sola lettura. Possiamo vedere i tuoi dati di rendimento — non "
+"possiamo modificare nulla sul tuo sito."
+
+#: app/templates/dashboard/connect.html:17
+msgid "Connected"
+msgstr "Connesso"
+
+#: app/templates/dashboard/connect.html:18
+#, python-format
+msgid "Connected on %(date)s"
+msgstr "Connesso il %(date)s"
+
+#: app/templates/dashboard/connect.html:25
+msgid "View sites"
+msgstr "Vedi siti"
+
+#: app/templates/dashboard/connect.html:29
+msgid "Disconnect"
+msgstr "Disconnetti"
+
+#: app/templates/dashboard/connect.html:38
+msgid "No account connected yet"
+msgstr "Nessun account ancora connesso"
+
+#: app/templates/dashboard/connect.html:40
+msgid ""
+"Connect your Google Search Console account to start tracking which pages are"
+" losing organic traffic."
+msgstr ""
+"Collega il tuo account Google Search Console per iniziare a monitorare quali"
+" pagine stanno perdendo traffico organico."
+
+#: app/templates/dashboard/connect.html:47
+msgid ""
+"We only request read-only access to your Search Console performance data, "
+"used solely to generate the insights shown in this app. See our"
+msgstr ""
+"Richiediamo solo accesso in sola lettura ai dati di rendimento di Search "
+"Console, usati esclusivamente per generare gli insight mostrati in questa "
+"app. Consulta la nostra"
+
+#: app/templates/dashboard/connect.html:48
+#: app/templates/dashboard/declining.html:45
+#: app/templates/dashboard/insights.html:46
+#: app/templates/dashboard/layout.html:122
+msgid "Privacy Policy"
+msgstr "Informativa sulla privacy"
+
+#: app/templates/dashboard/connect.html:49
+msgid "for details, and revoke access anytime from your"
+msgstr "per i dettagli, e revoca l'accesso in qualsiasi momento dalle tue"
+
+#: app/templates/dashboard/connect.html:50
+msgid "Google Account settings"
+msgstr "impostazioni dell'account Google"
+
+#: app/templates/dashboard/declining.html:2
+#: app/templates/dashboard/declining.html:12
+#: app/templates/dashboard/layout.html:62
+msgid "Declining Pages"
+msgstr "Pagine in calo"
+
+#: app/templates/dashboard/declining.html:14
+msgid ""
+"Pages that are losing organic traffic on their own, ordered by priority."
+msgstr ""
+"Pagine che stanno perdendo traffico organico autonomamente, ordinate per "
+"priorità."
+
+#: app/templates/dashboard/declining.html:27
+#: app/templates/dashboard/insights.html:28
+#: app/templates/dashboard/overview.html:45
+msgid "Loading sites…"
+msgstr "Caricamento siti…"
+
+#: app/templates/dashboard/declining.html:36
+#: app/templates/dashboard/insights.html:37
+msgid "No Search Console account connected"
+msgstr "Nessun account Search Console connesso"
+
+#: app/templates/dashboard/declining.html:38
+#: app/templates/dashboard/insights.html:39
+msgid ""
+"Connect your Google Search Console account to see which pages are losing "
+"organic traffic."
+msgstr ""
+"Collega il tuo account Google Search Console per vedere quali pagine stanno "
+"perdendo traffico organico."
+
+#: app/templates/dashboard/declining.html:45
+#: app/templates/dashboard/insights.html:46
+msgid "Read-only access. See our"
+msgstr "Accesso in sola lettura. Consulta la nostra"
+
+#: app/templates/dashboard/declining.html:53
+msgid "Filter by status"
+msgstr "Filtra per stato"
+
+#: app/templates/dashboard/declining.html:54
+msgid "New"
+msgstr "Nuova"
+
+#: app/templates/dashboard/declining.html:55
+msgid "Acknowledged"
+msgstr "Riconosciuta"
+
+#: app/templates/dashboard/declining.html:56
+msgid "Done"
+msgstr "Fatta"
+
+#: app/templates/dashboard/declining.html:57
+msgid "All"
+msgstr "Tutte"
+
+#: app/templates/dashboard/declining.html:71
+#: app/templates/dashboard/insights.html:87
+#: app/templates/dashboard/overview.html:89
+msgid "Something went wrong loading your data."
+msgstr "Si è verificato un errore nel caricamento dei dati."
+
+#: app/templates/dashboard/declining.html:78
+msgid "No pages in true decline in the last period"
+msgstr "Nessuna pagina in vero calo nell'ultimo periodo"
+
+#: app/templates/dashboard/declining.html:80
+msgid "Nothing to report — no page is losing traffic on its own."
+msgstr ""
+"Niente da segnalare — nessuna pagina sta perdendo traffico autonomamente."
+
+#: app/templates/dashboard/insights.html:2
+#: app/templates/dashboard/insights.html:13
+#: app/templates/dashboard/layout.html:56
+msgid "Insights"
+msgstr "Insights"
+
+#: app/templates/dashboard/insights.html:15
+msgid ""
+"Organic performance from Google Search Console — pages losing traffic first."
+msgstr ""
+"Rendimento organico da Google Search Console — pagine che perdono traffico "
+"per prime."
+
+#: app/templates/dashboard/insights.html:54
+msgid "Time range"
+msgstr "Intervallo di tempo"
+
+#: app/templates/dashboard/insights.html:55
+msgid "7 days"
+msgstr "7 giorni"
+
+#: app/templates/dashboard/insights.html:56
+msgid "28 days"
+msgstr "28 giorni"
+
+#: app/templates/dashboard/insights.html:57
+msgid "90 days"
+msgstr "90 giorni"
+
+#: app/templates/dashboard/insights.html:61
+msgid "AI analyzer"
+msgstr "Analizzatore AI"
+
+#: app/templates/dashboard/insights.html:65
+msgid "Weekly AI suggestions"
+msgstr "Suggerimenti AI settimanali"
+
+#: app/templates/dashboard/insights.html:69
+msgid "Run now"
+msgstr "Esegui ora"
+
+#: app/templates/dashboard/insights.html:72
+msgid "Runs weekly when enabled."
+msgstr "Si esegue settimanalmente se attivo."
+
+#: app/templates/dashboard/insights.html:93
+#: app/templates/dashboard/overview.html:95
+msgid "No verified sites found"
+msgstr "Nessun sito verificato trovato"
+
+#: app/templates/dashboard/insights.html:95
+#: app/templates/dashboard/overview.html:97
+msgid ""
+"The connected Google account doesn't own any verified Search Console "
+"properties."
+msgstr ""
+"L'account Google connesso non possiede proprietà Search Console verificate."
+
+#: app/templates/dashboard/insights.html:108
+#: app/templates/dashboard/layout.html:50
+#: app/templates/dashboard/overview.html:2
+#: app/templates/dashboard/overview.html:12
+msgid "Overview"
+msgstr "Panoramica"
+
+#: app/templates/dashboard/insights.html:111
+msgid "Clicks over time"
+msgstr "Click nel tempo"
+
+#: app/templates/dashboard/insights.html:119
+msgid "Pages"
+msgstr "Pagine"
+
+#: app/templates/dashboard/insights.html:126
+msgid "Page"
+msgstr "Pagina"
+
+#: app/templates/dashboard/insights.html:127
+#: app/templates/dashboard/insights.html:152
+msgid "Clicks"
+msgstr "Click"
+
+#: app/templates/dashboard/insights.html:128
+#: app/templates/dashboard/insights.html:153
+msgid "Impr."
+msgstr "Impr."
+
+#: app/templates/dashboard/insights.html:129
+#: app/templates/dashboard/insights.html:154
+msgid "CTR"
+msgstr "CTR"
+
+#: app/templates/dashboard/insights.html:130
+#: app/templates/dashboard/insights.html:155
+msgid "Pos."
+msgstr "Pos."
+
+#: app/templates/dashboard/insights.html:131
+msgid "Δ clicks"
+msgstr "Δ click"
+
+#: app/templates/dashboard/insights.html:132
+msgid "Health"
+msgstr "Salute"
+
+#: app/templates/dashboard/insights.html:133
+msgid "AI"
+msgstr "AI"
+
+#: app/templates/dashboard/insights.html:144
+msgid "Queries"
+msgstr "Query"
+
+#: app/templates/dashboard/insights.html:151
+msgid "Query"
+msgstr "Query"
+
+#: app/templates/dashboard/insights.html:175
+msgid "AI suggestions"
+msgstr "Suggerimenti AI"
+
+#: app/templates/dashboard/insights.html:180
+msgid "Click a card to cycle through suggestions."
+msgstr "Clicca su una card per scorrere i suggerimenti."
+
+#: app/templates/dashboard/layout.html:10
+msgid "Open sidebar"
+msgstr "Apri barra laterale"
+
+#: app/templates/dashboard/layout.html:24
+#, python-format
+msgid "Trial: %(num)s day left"
+msgid_plural "Trial: %(num)s days left"
+msgstr[0] "Trial: %(num)s giorno rimasto"
+msgstr[1] "Trial: %(num)s giorni rimasti"
+
+#: app/templates/dashboard/layout.html:26
+msgid "Your trial has ended"
+msgstr "Il tuo trial è terminato"
+
+#: app/templates/dashboard/layout.html:68
+msgid "Connector"
+msgstr "Connettore"
+
+#: app/templates/dashboard/layout.html:80
+#: app/templates/dashboard/layout.html:110 app/templates/settings/index.html:2
+#: app/templates/settings/index.html:6
+msgid "Settings"
+msgstr "Impostazioni"
+
+#: app/templates/dashboard/layout.html:96
+msgid "Open account menu"
+msgstr "Apri il menu account"
+
+#: app/templates/dashboard/layout.html:128
+msgid "Terms"
+msgstr "Termini"
+
+#: app/templates/dashboard/overview.html:17
+msgid "Free plan · up to 3 pages"
+msgstr "Piano gratuito · fino a 3 pagine"
+
+#: app/templates/dashboard/overview.html:25
+msgid "Connect Google"
+msgstr "Collega Google"
+
+#: app/templates/dashboard/overview.html:27
+msgid ""
+"To use the service, connect the Google account that owns the websites you "
+"want to monitor."
+msgstr ""
+"Per usare il servizio, collega l'account Google proprietario dei siti che "
+"vuoi monitorare."
+
+#: app/templates/dashboard/overview.html:32
+msgid "Connect"
+msgstr "Collega"
+
+#: app/templates/dashboard/overview.html:50
+msgid "Full insights"
+msgstr "Insights completi"
+
+#: app/templates/dashboard/overview.html:113
+msgid "Monitored pages"
+msgstr "Pagine monitorate"
+
+#: app/templates/dashboard/overview.html:119
+msgid "Monitoring more pages is coming soon."
+msgstr "Il monitoraggio di altre pagine arriverà presto."
+
+#: app/templates/dashboard/overview.html:125
+msgid "Your site"
+msgstr "Il tuo sito"
+
+#: app/templates/dashboard/overview.html:131
+msgid "Site preview"
+msgstr "Anteprima sito"
+
+#: app/templates/dashboard/overview.html:136
+msgid ""
+"Some sites block being embedded — if the preview stays blank, that's why."
+msgstr ""
+"Alcuni siti bloccano l'incorporamento — se l'anteprima resta vuota, è per "
+"questo."
+
+#: app/templates/emails/weekly_digest.html:10
+#, python-format
+msgid "Hi %(name)s,"
+msgstr "Ciao %(name)s,"
+
+#: app/templates/emails/weekly_digest.html:15
+#, python-format
+msgid "Organic performance for %(site)s, ranked by priority."
+msgstr "Rendimento organico per %(site)s, ordinato per priorità."
+
+#: app/templates/emails/weekly_digest.html:26
+#, python-format
+msgid "−%(clicks)s clicks/month (%(pct)s%%)"
+msgstr "−%(clicks)s click/mese (%(pct)s%%)"
+
+#: app/templates/emails/weekly_digest.html:28
+#, python-format
+msgid "position %(before)s → %(after)s"
+msgstr "posizione %(before)s → %(after)s"
+
+#: app/templates/emails/weekly_digest.html:39
+msgid "Open Declining Pages"
+msgstr "Apri Declining Pages"
+
+#: app/templates/emails/weekly_digest.html:42
+msgid ""
+"You're receiving this because weekly email digests are on for your account. "
+"You can turn them off anytime from Settings."
+msgstr ""
+"Ricevi questa email perché il digest settimanale è attivo per il tuo "
+"account. Puoi disattivarlo in qualsiasi momento da Impostazioni."
+
+#: app/templates/errors/error.html:12
+msgid "Back home"
+msgstr "Torna alla home"
+
+#: app/templates/errors/error.html:14
+msgid "Go back"
+msgstr "Indietro"
+
+#: app/templates/settings/index.html:7
+msgid "Manage your account details and preferences."
+msgstr "Gestisci i dettagli e le preferenze del tuo account."
+
+#: app/templates/settings/index.html:13
+msgid "Profile"
+msgstr "Profilo"
+
+#: app/templates/settings/index.html:42
+msgid "Notifications"
+msgstr "Notifiche"

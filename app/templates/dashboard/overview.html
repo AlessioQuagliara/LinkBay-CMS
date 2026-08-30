@@ -1,5 +1,5 @@
 {% extends "dashboard/layout.html" %}
-{% block title %}Overview{% endblock %}
+{% block title %}{{ _("Overview") }}{% endblock %}
 {% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
 {% block dashboard_content %}
 
@@ -9,12 +9,12 @@
 
 <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
   <div>
-    <h1 class="text-2xl font-semibold">Overview</h1>
-    <p class="text-base-content/60 mt-1">Welcome, {{ current_user.name }}.</p>
+    <h1 class="text-2xl font-semibold">{{ _("Overview") }}</h1>
+    <p class="text-base-content/60 mt-1">{{ _("Welcome, %(name)s.", name=current_user.name) }}</p>
   </div>
   <div class="badge badge-soft badge-primary gap-1">
     <span class="iconify size-3.5" data-icon="lucide:sparkles"></span>
-    Free plan · up to 3 pages
+    {{ _("Free plan · up to 3 pages") }}
   </div>
 </div>
 
@@ -22,14 +22,14 @@
   {# Nessun account collegato: unico caso in cui mostriamo il connettore. #}
   <div class="card card-border bg-base-100 max-w-md shadow-xs">
     <div class="card-body">
-      <h2 class="card-title">Connect Google</h2>
+      <h2 class="card-title">{{ _("Connect Google") }}</h2>
       <p class="text-base-content/70">
-        To use the service, connect the Google account that owns the websites you want to monitor.
+        {{ _("To use the service, connect the Google account that owns the websites you want to monitor.") }}
       </p>
       <div class="justify-end card-actions mt-2">
         <a class="btn btn-primary" href="{{ url_for('dashboard.connect') }}">
           <span class="iconify size-4" data-icon="lucide:unplug"></span>
-          Connect
+          {{ _("Connect") }}
         </a>
       </div>
     </div>
@@ -42,12 +42,12 @@
               data-sites-url="{{ url_for('gsc.api_sites') }}"
               data-insights-url="{{ url_for('gsc.api_insights') }}"
               data-page-limit="3">
-        <option>Loading sites…</option>
+        <option>{{ _("Loading sites…") }}</option>
       </select>
     </label>
     <a class="btn btn-sm btn-ghost" href="{{ url_for('dashboard.insights') }}">
       <span class="iconify size-4" data-icon="lucide:trending-down"></span>
-      Full insights
+      {{ _("Full insights") }}
     </a>
   </div>
 
@@ -86,15 +86,15 @@
   </div>
 
   <div id="state-error" class="alert alert-error alert-soft hidden">
-    <span id="state-error-msg">Something went wrong loading your data.</span>
+    <span id="state-error-msg">{{ _("Something went wrong loading your data.") }}</span>
   </div>
 
   <div id="state-empty" class="card card-border bg-base-100 shadow-xs hidden">
     <div class="card-body items-center text-center py-12">
       <span class="iconify text-base-content/30 size-10" data-icon="lucide:search-x"></span>
-      <p class="font-medium mt-3">No verified sites found</p>
+      <p class="font-medium mt-3">{{ _("No verified sites found") }}</p>
       <p class="text-sm text-base-content/60 max-w-sm mt-1">
-        The connected Google account doesn't own any verified Search Console properties.
+        {{ _("The connected Google account doesn't own any verified Search Console properties.") }}
       </p>
     </div>
   </div>
@@ -110,35 +110,37 @@
       {# Pagine monitorate (free = 3), quelle che perdono più traffico prima #}
       <div>
         <div class="mb-3 flex items-center justify-between">
-          <h2 class="font-semibold">Monitored pages</h2>
+          <h2 class="font-semibold">{{ _("Monitored pages") }}</h2>
           <span class="text-xs text-base-content/50" id="pages-note"></span>
         </div>
         <div class="flex flex-col gap-3" id="pages-list"></div>
         <p class="text-xs text-base-content/40 mt-3">
           <span class="iconify size-3.5 align-[-2px]" data-icon="lucide:lock"></span>
-          Monitoring more pages is coming soon.
+          {{ _("Monitoring more pages is coming soon.") }}
         </p>
       </div>
 
       {# Anteprima del sito #}
       <div>
-        <h2 class="font-semibold mb-3">Your site</h2>
+        <h2 class="font-semibold mb-3">{{ _("Your site") }}</h2>
         <div class="mockup-browser bg-base-100 w-full border border-base-300">
           <div class="mockup-browser-toolbar">
             <div class="input" id="site-preview-url">https://…</div>
           </div>
           <div class="bg-base-200 h-80 overflow-hidden">
-            <iframe id="site-preview" title="Site preview" class="w-full h-full border-0" loading="lazy"
+            <iframe id="site-preview" title="{{ _('Site preview') }}" class="w-full h-full border-0" loading="lazy"
                     sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
           </div>
         </div>
         <p class="text-xs text-base-content/40 mt-2">
-          Some sites block being embedded — if the preview stays blank, that's why.
+          {{ _("Some sites block being embedded — if the preview stays blank, that's why.") }}
         </p>
       </div>
     </div>
   </div>
 
+  <script>window.APP_LOCALE = {{ get_locale()|tojson }};</script>
+  <script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
   <script src="{{ url_for('static', filename='js/overview.js') }}"></script>
 {% endif %}
 {% endblock %}

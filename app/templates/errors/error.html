@@ -9,9 +9,9 @@
     <div class="mt-8 flex justify-center gap-3">
       <a href="{{ url_for('main.index') }}" class="btn btn-error text-white">
         <span class="iconify size-4" data-icon="lucide:house"></span>
-        Back home
+        {{ _("Back home") }}
       </a>
-      <button onclick="history.back()" class="btn btn-ghost">Go back</button>
+      <button onclick="history.back()" class="btn btn-ghost">{{ _("Go back") }}</button>
     </div>
   </div>
 </div>

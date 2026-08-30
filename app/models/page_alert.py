@@ -44,6 +44,15 @@ class PageAlert(db.Model):
     # cambiarlo arriva nel Prompt 5 (vedi ciclo di vita in ARCHITECTURE.md §11).
     status = db.Column(db.String(20), nullable=False, default="new")
 
+    # Quando lo stato è passato a "done" (app/alerts/routes.py). Non è
+    # `updated_at`: quel campo viene sovrascritto anche dal refresh settimanale
+    # (app/rules/service.py::run_for_site) e non è affidabile per calcolare
+    # "30/60 giorni dopo". Un nuovo "done" lo aggiorna e azzera i due campi
+    # sotto, ripartendo il conto alla rovescia (vedi app/rules/recovery.py).
+    done_at = db.Column(db.DateTime(timezone=True))
+    checked_30d_at = db.Column(db.DateTime(timezone=True))
+    checked_60d_at = db.Column(db.DateTime(timezone=True))
+
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(
         db.DateTime,

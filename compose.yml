@@ -26,5 +26,19 @@ services:
     volumes:
       - .:/app
 
+  # Job ricorrenti (vedi ./crontab). In dev serve soprattutto per test manuali
+  # una tantum: `docker compose run --rm cron flask <comando>`.
+  cron:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://linkbay:linkbay@db:5432/linkbay_cms
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    command: ["supercronic", "/app/crontab"]
+
 volumes:
   pgdata:

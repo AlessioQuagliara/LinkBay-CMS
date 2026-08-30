@@ -1,5 +1,5 @@
 {% extends "dashboard/layout.html" %}
-{% block title %}Declining Pages{% endblock %}
+{% block title %}{{ _("Declining Pages") }}{% endblock %}
 {% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
 {% block dashboard_content %}
 
@@ -9,9 +9,9 @@
 
 <div class="mb-4 flex flex-wrap items-end justify-between gap-4">
   <div>
-    <h1 class="text-2xl font-semibold">Declining Pages</h1>
+    <h1 class="text-2xl font-semibold">{{ _("Declining Pages") }}</h1>
     <p class="text-base-content/60 mt-1">
-      Pages that are losing organic traffic on their own, ordered by priority.
+      {{ _("Pages that are losing organic traffic on their own, ordered by priority.") }}
     </p>
   </div>
 
@@ -24,7 +24,7 @@
             data-trend-url="{{ url_for('alerts.api_trend') }}"
             data-query-losses-url="{{ url_for('alerts.api_query_losses') }}"
             data-status-url="{{ url_for('alerts.api_status') }}">
-      <option>Loading sites…</option>
+      <option>{{ _("Loading sites…") }}</option>
     </select>
   </label>
 </div>
@@ -33,16 +33,16 @@
   <div class="card card-border bg-base-100 shadow-xs">
     <div class="card-body items-center text-center py-12">
       <span class="iconify text-base-content/30 size-10" data-icon="lucide:cable"></span>
-      <p class="font-medium mt-3">No Search Console account connected</p>
+      <p class="font-medium mt-3">{{ _("No Search Console account connected") }}</p>
       <p class="text-sm text-base-content/60 max-w-sm mt-1">
-        Connect your Google Search Console account to see which pages are losing organic traffic.
+        {{ _("Connect your Google Search Console account to see which pages are losing organic traffic.") }}
       </p>
       <a class="btn btn-primary mt-5" href="{{ url_for('gsc.authorize') }}">
         <span class="iconify size-4" data-icon="lucide:link"></span>
-        Connect Search Console
+        {{ _("Connect Search Console") }}
       </a>
       <p class="text-xs text-base-content/50 mt-4">
-        Read-only access. See our <a class="link link-hover" href="{{ url_for('main.privacy_policy') }}" target="_blank" rel="noopener">Privacy Policy</a>.
+        {{ _("Read-only access. See our") }} <a class="link link-hover" href="{{ url_for('main.privacy_policy') }}" target="_blank" rel="noopener">{{ _("Privacy Policy") }}</a>.
       </p>
     </div>
   </div>
@@ -50,11 +50,11 @@
 
   {# Filtro per stato #}
   <div class="mb-5 overflow-x-auto">
-    <div class="join" id="status-filter" role="group" aria-label="Filter by status">
-      <button class="join-item btn btn-sm btn-active" data-status="new">New</button>
-      <button class="join-item btn btn-sm" data-status="acknowledged">Acknowledged</button>
-      <button class="join-item btn btn-sm" data-status="done">Done</button>
-      <button class="join-item btn btn-sm" data-status="all">All</button>
+    <div class="join" id="status-filter" role="group" aria-label="{{ _('Filter by status') }}">
+      <button class="join-item btn btn-sm btn-active" data-status="new">{{ _("New") }}</button>
+      <button class="join-item btn btn-sm" data-status="acknowledged">{{ _("Acknowledged") }}</button>
+      <button class="join-item btn btn-sm" data-status="done">{{ _("Done") }}</button>
+      <button class="join-item btn btn-sm" data-status="all">{{ _("All") }}</button>
     </div>
   </div>
 
@@ -68,16 +68,16 @@
   </div>
 
   <div id="state-error" class="alert alert-error alert-soft hidden">
-    <span id="state-error-msg">Something went wrong loading your data.</span>
+    <span id="state-error-msg">{{ _("Something went wrong loading your data.") }}</span>
   </div>
 
   {# Stato vuoto: messaggio positivo, non un errore #}
   <div id="state-empty" class="card card-border bg-base-100 shadow-xs hidden">
     <div class="card-body items-center text-center py-12">
       <span class="iconify text-success/60 size-10" data-icon="lucide:circle-check"></span>
-      <p class="font-medium mt-3">No pages in true decline in the last period</p>
+      <p class="font-medium mt-3">{{ _("No pages in true decline in the last period") }}</p>
       <p class="text-sm text-base-content/60 max-w-sm mt-1">
-        Nothing to report — no page is losing traffic on its own.
+        {{ _("Nothing to report — no page is losing traffic on its own.") }}
       </p>
     </div>
   </div>
@@ -85,6 +85,8 @@
   {# Stato: dati (una card per alert, iniettate via JS) #}
   <div id="state-data" class="hidden"></div>
 
+  <script>window.APP_LOCALE = {{ get_locale()|tojson }};</script>
+  <script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
   <script src="{{ url_for('static', filename='js/declining.js') }}"></script>
 {% endif %}
 {% endblock %}

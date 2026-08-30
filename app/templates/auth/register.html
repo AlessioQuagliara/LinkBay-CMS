@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Sign up{% endblock %}
+{% block title %}{{ _("Sign up") }}{% endblock %}
 {% block content %}
 <div class="min-h-screen flex items-center justify-center p-6">
   <div class="card w-full max-w-sm bg-base-100 border border-base-300 shadow-sm">
@@ -7,7 +7,7 @@
       <a class="flex justify-center mb-4" href="{{ url_for('main.index') }}">
         <img class="h-7 w-auto" src="{{ url_for('static', filename='shared/logo.png') }}" alt="LinkBayCMS">
       </a>
-      <h1 class="text-xl font-medium text-center mb-4">Create account</h1>
+      <h1 class="text-xl font-medium text-center mb-4">{{ _("Create account") }}</h1>
 
       <form method="post" novalidate>
         {{ form.hidden_tag() }}
@@ -34,7 +34,7 @@
           <legend class="fieldset-legend">{{ form.password.label.text }}</legend>
           <label class="input w-full focus-within:outline-0">
             <span class="iconify text-base-content/60 size-5" data-icon="lucide:key-round"></span>
-            {{ form.password(class_="grow focus:outline-0", placeholder="Minimum 8 characters") }}
+            {{ form.password(class_="grow focus:outline-0", placeholder=_("Minimum 8 characters")) }}
           </label>
           {% for error in form.password.errors %}<p class="text-error text-sm mt-1">{{ error }}</p>{% endfor %}
         </fieldset>
@@ -43,7 +43,7 @@
           <legend class="fieldset-legend">{{ form.confirm_password.label.text }}</legend>
           <label class="input w-full focus-within:outline-0">
             <span class="iconify text-base-content/60 size-5" data-icon="lucide:key-round"></span>
-            {{ form.confirm_password(class_="grow focus:outline-0", placeholder="Repeat password") }}
+            {{ form.confirm_password(class_="grow focus:outline-0", placeholder=_("Repeat password")) }}
           </label>
           {% for error in form.confirm_password.errors %}<p class="text-error text-sm mt-1">{{ error }}</p>{% endfor %}
         </fieldset>
@@ -52,8 +52,10 @@
       </form>
 
       <p class="text-center text-sm text-base-content/60 mt-4">
-        Already have an account? <a class="link" href="{{ url_for('auth.login') }}">Sign in</a>
+        {{ _("Already have an account?") }} <a class="link" href="{{ url_for('auth.login') }}">{{ _("Sign in") }}</a>
       </p>
+
+      {% include "partials/lang_switcher.html" %}
     </div>
   </div>
 </div>

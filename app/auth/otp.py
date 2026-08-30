@@ -15,6 +15,7 @@ import secrets
 from datetime import datetime, timedelta, timezone
 
 from flask import current_app, render_template
+from flask_babel import gettext as _
 
 from app.emails import resend_configured, send_email
 from app.extensions import db
@@ -96,21 +97,21 @@ def verify_code(user_id, purpose, code):
         .first()
     )
     if otp is None:
-        return False, "No active code. Request a new one."
+        return False, _("No active code. Request a new one.")
     if otp.is_expired():
-        return False, "This code has expired. Request a new one."
+        return False, _("This code has expired. Request a new one.")
 
     max_attempts = current_app.config["OTP_MAX_ATTEMPTS"]
     if otp.attempts >= max_attempts:
-        return False, "Too many attempts. Request a new code."
+        return False, _("Too many attempts. Request a new code.")
 
     if not otp.check_code((code or "").strip()):
         otp.attempts += 1
         db.session.commit()
         left = max_attempts - otp.attempts
         if left <= 0:
-            return False, "Too many attempts. Request a new code."
-        return False, f"Incorrect code. {left} attempt(s) left."
+            return False, _("Too many attempts. Request a new code.")
+        return False, _("Incorrect code. %(left)s attempt(s) left.", left=left)
 
     otp.consumed_at = _now()
     db.session.commit()

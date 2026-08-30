@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Verify your email{% endblock %}
+{% block title %}{{ _("Verify your email") }}{% endblock %}
 {% block head %}
 <style>
   /* OTP a 6 caselle = 6 input reali da 1 carattere (pattern robusto: niente
@@ -27,10 +27,10 @@
         <img class="h-7 w-auto" src="{{ url_for('static', filename='shared/logo.png') }}" alt="LinkBayCMS">
       </a>
       <h1 class="text-xl font-medium text-center">
-        {% if purpose == "register" %}Confirm your email{% else %}Enter your code{% endif %}
+        {% if purpose == "register" %}{{ _("Confirm your email") }}{% else %}{{ _("Enter your code") }}{% endif %}
       </h1>
       <p class="text-center text-sm text-base-content/60 mt-1 mb-6">
-        We sent a 6-digit code to<br>
+        {{ _("We sent a 6-digit code to") }}<br>
         <span class="font-medium text-base-content">{{ email }}</span>
       </p>
 
@@ -39,34 +39,42 @@
         {# Valore completo ricomposto dal JS dalle 6 caselle. #}
         <input type="hidden" name="code" id="otp-code">
 
-        <div class="otp" data-otp aria-label="6-digit verification code">
-          <input inputmode="numeric" autocomplete="one-time-code" maxlength="1" pattern="[0-9]" aria-label="Digit 1" autofocus>
-          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Digit 2">
-          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Digit 3">
-          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Digit 4">
-          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Digit 5">
-          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Digit 6">
+        <div class="otp" data-otp aria-label="{{ _('6-digit verification code') }}">
+          <input inputmode="numeric" autocomplete="one-time-code" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=1) }}" autofocus>
+          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=2) }}">
+          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=3) }}">
+          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=4) }}">
+          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=5) }}">
+          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=6) }}">
         </div>
         {% for error in form.code.errors %}
           <p class="text-error text-sm mt-3 text-center">{{ error }}</p>
         {% endfor %}
+
+        <p class="text-center text-xs text-base-content/40 mt-3">
+          {{ _("Press %(kbd)s to refocus the code field.", kbd='<kbd class="kbd kbd-sm">Shift</kbd>'|safe) }}
+        </p>
 
         {{ form.submit(class_="btn btn-error text-white btn-block mt-6") }}
       </form>
 
       <form method="post" action="{{ url_for('auth.resend') }}" class="mt-4 text-center">
         {{ form.csrf_token }}
-        <span class="text-sm text-base-content/60">Didn't get the email?</span>
+        <span class="text-sm text-base-content/60">{{ _("Didn't get the email?") }}</span>
         <button id="resend-btn" type="submit"
                 class="link text-sm ms-1"
+                data-label-default="{{ _('Resend code') }}"
+                data-label-cooldown-tpl="{{ _('Resend in {s}s') }}"
                 {% if cooldown_left and cooldown_left > 0 %}disabled data-cooldown="{{ cooldown_left }}"{% endif %}>
-          <span id="resend-label">Resend code</span>
+          <span id="resend-label">{{ _("Resend code") }}</span>
         </button>
       </form>
 
       <p class="text-center text-sm text-base-content/50 mt-4">
-        <a class="link" href="{{ url_for('auth.cancel_verify') }}">Use a different account</a>
+        <a class="link" href="{{ url_for('auth.cancel_verify') }}">{{ _("Use a different account") }}</a>
       </p>
+
+      {% include "partials/lang_switcher.html" %}
     </div>
   </div>
 </div>
@@ -117,8 +125,8 @@
     if (btn && btn.dataset.cooldown) {
       let left = parseInt(btn.dataset.cooldown, 10);
       const tick = () => {
-        if (left <= 0) { btn.disabled = false; label.textContent = "Resend code"; return; }
-        label.textContent = "Resend in " + left + "s";
+        if (left <= 0) { btn.disabled = false; label.textContent = btn.dataset.labelDefault; return; }
+        label.textContent = btn.dataset.labelCooldownTpl.replace("{s}", left);
         left -= 1;
         setTimeout(tick, 1000);
       };

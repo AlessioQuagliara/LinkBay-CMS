@@ -1,10 +1,15 @@
+from datetime import datetime, timedelta, timezone
+
 from flask import Blueprint, flash, redirect, render_template, session, url_for
+from flask_babel import gettext as _
 from flask_login import current_user, login_required, login_user, logout_user
 
 from app.auth import otp as otp_service
 from app.auth.forms import LoginForm, OtpForm, RegisterForm
 from app.extensions import db
 from app.models import User
+
+TRIAL_DAYS = 14
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -30,12 +35,12 @@ def _start_otp_flow(user, purpose):
 
 def _flash_code_status(sent, code):
     if sent:
-        flash("We've emailed you a 6-digit verification code.", "success")
+        flash(_("We've emailed you a 6-digit verification code."), "success")
     elif otp_service.dev_fallback_enabled():
         # Solo in sviluppo senza Resend: mostriamo il codice per poter testare.
-        flash(f"Dev mode (email not configured): your code is {code}.", "info")
+        flash(_("Dev mode (email not configured): your code is %(code)s.", code=code), "info")
     else:
-        flash("We couldn't send the email right now. Please try again.", "error")
+        flash(_("We couldn't send the email right now. Please try again."), "error")
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
@@ -47,10 +52,11 @@ def register():
     if form.validate_on_submit():
         email = form.email.data.lower().strip()
         if User.query.filter_by(email=email).first():
-            flash("There is already an account with this email address.", "error")
+            flash(_("There is already an account with this email address."), "error")
         else:
             user = User(name=form.name.data.strip(), email=email)
             user.set_password(form.password.data)
+            user.trial_ends_at = datetime.now(timezone.utc) + timedelta(days=TRIAL_DAYS)
             db.session.add(user)
             db.session.commit()
             # Niente login immediato: prima l'utente conferma l'email con l'OTP.
@@ -71,7 +77,7 @@ def login():
         if user and user.check_password(form.password.data):
             # Password corretta: secondo fattore via email prima di entrare.
             return _start_otp_flow(user, otp_service.PURPOSE_LOGIN)
-        flash("Incorrect email or password.", "error")
+        flash(_("Incorrect email or password."), "error")
 
     return render_template("auth/login.html", form=form)
 
@@ -84,7 +90,7 @@ def verify():
     user_id = session.get(_PENDING_USER)
     purpose = session.get(_PENDING_PURPOSE)
     if not user_id or not purpose:
-        flash("Start by signing in.", "info")
+        flash(_("Start by signing in."), "info")
         return redirect(url_for("auth.login"))
 
     form = OtpForm()
@@ -94,18 +100,18 @@ def verify():
             user = db.session.get(User, user_id)
             if user is None:
                 _clear_pending()
-                flash("Something went wrong. Please sign in again.", "error")
+                flash(_("Something went wrong. Please sign in again."), "error")
                 return redirect(url_for("auth.login"))
             if not user.email_verified:
                 user.email_verified = True
                 db.session.commit()
             login_user(user)
             _clear_pending()
-            flash(f"Welcome, {user.name}.", "success")
+            flash(_("Welcome, %(name)s.", name=user.name), "success")
             return redirect(url_for("dashboard.overview"))
         flash(error, "error")
 
-    _, cooldown_left = otp_service.can_resend(user_id, purpose)
+    _can_resend, cooldown_left = otp_service.can_resend(user_id, purpose)
     return render_template(
         "auth/verify.html",
         form=form,
@@ -124,7 +130,7 @@ def resend():
 
     allowed, remaining = otp_service.can_resend(user_id, purpose)
     if not allowed:
-        flash(f"Please wait {remaining}s before requesting a new code.", "error")
+        flash(_("Please wait %(seconds)ss before requesting a new code.", seconds=remaining), "error")
         return redirect(url_for("auth.verify"))
 
     user = db.session.get(User, user_id)
@@ -153,5 +159,5 @@ def _clear_pending():
 @login_required
 def logout():
     logout_user()
-    flash("You've been logged out.", "success")
+    flash(_("You've been logged out."), "success")
     return redirect(url_for("auth.login"))

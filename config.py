@@ -61,3 +61,9 @@ class Config:
     OTP_TTL_SECONDS = int(os.environ.get("OTP_TTL_SECONDS", "600"))
     OTP_MAX_ATTEMPTS = int(os.environ.get("OTP_MAX_ATTEMPTS", "5"))
     OTP_RESEND_COOLDOWN = int(os.environ.get("OTP_RESEND_COOLDOWN", "60"))
+
+    # Lemon Squeezy — abbonamento Pro dopo il trial di 14 giorni (vedi app/billing/).
+    LEMONSQUEEZY_API_KEY = os.environ.get("LEMONSQUEEZY_API_KEY")
+    LEMONSQUEEZY_STORE_ID = os.environ.get("LEMONSQUEEZY_STORE_ID")
+    LEMONSQUEEZY_VARIANT_ID = os.environ.get("LEMONSQUEEZY_VARIANT_ID")
+    LEMONSQUEEZY_WEBHOOK_SECRET = os.environ.get("LEMONSQUEEZY_WEBHOOK_SECRET")

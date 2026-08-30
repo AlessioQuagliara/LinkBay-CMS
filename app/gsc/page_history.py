@@ -61,13 +61,25 @@ def _months_back(n: int) -> list[date]:
 
 
 def _query_pages(service, site_url, start, end):
-    body = {
-        "startDate": start.isoformat(),
-        "endDate": end.isoformat(),
-        "dimensions": ["page"],
-        "rowLimit": MAX_ROWS,
-    }
-    return service.searchanalytics().query(siteUrl=site_url, body=body).execute().get("rows", [])
+    """Pagina la query finché l'API continua a restituire pagine piene di
+    MAX_ROWS righe: senza questo loop, un mese con più di 25.000 pagine attive
+    perdeva silenziosamente la coda (una sola chiamata, senza startRow)."""
+    all_rows = []
+    start_row = 0
+    while True:
+        body = {
+            "startDate": start.isoformat(),
+            "endDate": end.isoformat(),
+            "dimensions": ["page"],
+            "rowLimit": MAX_ROWS,
+            "startRow": start_row,
+        }
+        rows = service.searchanalytics().query(siteUrl=site_url, body=body).execute().get("rows", [])
+        all_rows.extend(rows)
+        if len(rows) < MAX_ROWS:
+            break
+        start_row += MAX_ROWS
+    return all_rows
 
 
 def sync_page_monthly(service, user_id, site_url):

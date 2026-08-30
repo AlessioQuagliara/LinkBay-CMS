@@ -1,6 +1,9 @@
 from datetime import date
 
-from flask import Blueprint, Response, current_app, render_template, url_for
+from flask import Blueprint, Response, current_app, redirect, render_template, request, session, url_for
+from flask_login import current_user
+
+from app.i18n import SUPPORTED_LOCALES
 
 main_bp = Blueprint("main", __name__)
 
@@ -27,6 +30,21 @@ def _public_base():
 @main_bp.route("/")
 def index():
     return render_template("landing/index.html")
+
+
+@main_bp.route("/lang/<code>")
+def set_locale(code):
+    """Cambia lingua (EN/IT). Per chi è loggato persiste su User.locale
+    (sovrascritta comunque dalla pagina Settings); per gli anonimi resta
+    solo in sessione. Vedi app/i18n.py::get_locale per l'ordine di priorità."""
+    if code in SUPPORTED_LOCALES:
+        session["locale"] = code
+        if current_user.is_authenticated:
+            from app.extensions import db
+
+            current_user.locale = code
+            db.session.commit()
+    return redirect(request.referrer or url_for("main.index"))
 
 
 def _legal_ctx(page_title, page_description):

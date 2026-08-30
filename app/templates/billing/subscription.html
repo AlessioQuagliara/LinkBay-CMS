@@ -1,0 +1,78 @@
+{% extends "dashboard/layout.html" %}
+{% block title %}{{ _("Subscription") }}{% endblock %}
+{% block dashboard_content %}
+
+<div class="mb-6">
+  <h1 class="text-2xl font-semibold">{{ _("Subscription") }}</h1>
+  <p class="text-base-content/60 mt-1">{{ _("Your plan and billing status.") }}</p>
+</div>
+
+<div class="card card-border bg-base-100 shadow-xs max-w-xl">
+  <div class="card-body gap-4">
+    {% if current_user.subscription_status == "lifetime" %}
+      <div class="flex items-center gap-3">
+        <span class="iconify text-success size-6" data-icon="lucide:infinity"></span>
+        <div>
+          <p class="font-medium">{{ _("Lifetime") }}</p>
+          <p class="text-sm text-base-content/60">{{ _("Activated with an AppSumo code — nothing to manage.") }}</p>
+        </div>
+      </div>
+    {% elif current_user.subscription_status == "active" %}
+      <div class="flex items-center gap-3">
+        <span class="iconify text-success size-6" data-icon="lucide:circle-check-big"></span>
+        <div>
+          <p class="font-medium">{{ _("Pro — active") }}</p>
+          <p class="text-sm text-base-content/60">{{ price_label }}</p>
+        </div>
+      </div>
+      <div class="card-actions">
+        <a class="btn btn-outline btn-sm" href="{{ url_for('billing.portal') }}">
+          <span class="iconify size-4" data-icon="lucide:settings"></span>
+          {{ _("Manage subscription") }}
+        </a>
+      </div>
+    {% elif current_user.subscription_status == "trialing" %}
+      <div class="flex items-center gap-3">
+        <span class="iconify {{ 'text-primary' if current_user.trial_days_left > 0 else 'text-error' }} size-6" data-icon="lucide:sparkles"></span>
+        <div>
+          {% if current_user.trial_days_left > 0 %}
+            <p class="font-medium">
+              {% if current_user.trial_days_left == 1 %}
+                {{ _("Free trial — 1 day left") }}
+              {% else %}
+                {{ _("Free trial — %(days)s days left", days=current_user.trial_days_left) }}
+              {% endif %}
+            </p>
+          {% else %}
+            <p class="font-medium">{{ _("Free trial ended") }}</p>
+          {% endif %}
+          <p class="text-sm text-base-content/60">{{ _("No credit card on file.") }}</p>
+        </div>
+      </div>
+      <div class="card-actions">
+        <a class="btn btn-primary btn-sm" href="{{ url_for('billing.upgrade') }}">
+          {{ _("Upgrade to Pro — %(price)s", price=price_label) }}
+        </a>
+      </div>
+    {% else %}
+      <div class="flex items-center gap-3">
+        <span class="iconify text-error size-6" data-icon="lucide:circle-x"></span>
+        <div>
+          <p class="font-medium">{{ _("No active subscription") }}</p>
+          <p class="text-sm text-base-content/60">{{ _("Your subscription was canceled.") }}</p>
+        </div>
+      </div>
+      <div class="card-actions">
+        <a class="btn btn-primary btn-sm" href="{{ url_for('billing.upgrade') }}">
+          {{ _("Resubscribe — %(price)s", price=price_label) }}
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<p class="text-sm text-base-content/50 mt-4 max-w-xl">
+  {{ _("Have an AppSumo code?") }}
+  <a class="link link-hover" href="{{ url_for('billing.redeem') }}">{{ _("Redeem it here") }}</a>.
+</p>
+{% endblock %}

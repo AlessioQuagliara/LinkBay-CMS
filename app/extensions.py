@@ -7,6 +7,7 @@ dentro `create_app()` (app/__init__.py). Qualunque modulo può importare
 from flask import redirect, url_for
 from flask_admin import Admin, AdminIndexView
 from flask_admin.theme import Bootstrap4Theme
+from flask_babel import Babel
 from flask_login import LoginManager, current_user
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
@@ -14,6 +15,7 @@ from flask_wtf import CSRFProtect
 db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CSRFProtect()
+babel = Babel()
 
 
 class AdminAuthMixin:

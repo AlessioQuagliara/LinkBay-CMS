@@ -7,6 +7,8 @@
   const select = document.getElementById("site-select");
   if (!select) return; // account non collegato: la pagina mostra il connettore
 
+  const t = (window.I18N && window.I18N.t) || ((k) => k);
+
   const SITES_URL = select.dataset.sitesUrl;
   const INSIGHTS_URL = select.dataset.insightsUrl;
   const PAGE_LIMIT = parseInt(select.dataset.pageLimit || "3", 10);
@@ -56,13 +58,13 @@
   // Delta come descrizione stat (freccia + colore semantico).
   function deltaDesc(deltaPct, lowerIsBetter) {
     if (deltaPct === null || deltaPct === undefined) {
-      return '<span class="text-base-content/40">no prior data</span>';
+      return `<span class="text-base-content/40">${t("noPriorData")}</span>`;
     }
     const good = lowerIsBetter ? deltaPct < 0 : deltaPct > 0;
     const flat = Math.abs(deltaPct) < 0.05;
     const arrow = flat ? "→" : deltaPct > 0 ? "↗︎" : "↘︎";
     const cls = flat ? "text-base-content/50" : good ? "text-success" : "text-error";
-    return `<span class="${cls}">${arrow} ${Math.abs(deltaPct).toFixed(0)}% vs prev.</span>`;
+    return `<span class="${cls}">${arrow} ${Math.abs(deltaPct).toFixed(0)}% ${t("vsPrev")}</span>`;
   }
 
   function starsHtml(stars, seed) {
@@ -93,9 +95,9 @@
          <div class="stat-desc">${deltaHtml}</div>
        </div>`;
     host.innerHTML =
-      cell("Clicks", fmtInt(o.clicks.value), deltaDesc(o.clicks.delta_pct, false)) +
-      cell("Impressions", fmtInt(o.impressions.value), deltaDesc(o.impressions.delta_pct, false)) +
-      cell("Avg. position", fmtPos(o.position.value), deltaDesc(o.position.delta_pct, true));
+      cell(t("statClicks"), fmtInt(o.clicks.value), deltaDesc(o.clicks.delta_pct, false)) +
+      cell(t("statImpressions"), fmtInt(o.impressions.value), deltaDesc(o.impressions.delta_pct, false)) +
+      cell(t("statAvgPosition"), fmtPos(o.position.value), deltaDesc(o.position.delta_pct, true));
   }
 
   function renderPages(pages) {
@@ -106,7 +108,7 @@
 
     if (!monitored.length) {
       host.innerHTML =
-        '<p class="text-sm text-base-content/50">No page data yet for this period.</p>';
+        `<p class="text-sm text-base-content/50">${t("noPageData")}</p>`;
       return;
     }
 
@@ -114,7 +116,7 @@
       .map((p, i) => {
         const delta =
           p.clicks_delta_pct === null || p.clicks_delta_pct === undefined
-            ? '<span class="text-base-content/40">— new</span>'
+            ? `<span class="text-base-content/40">— ${t("newDelta")}</span>`
             : deltaDesc(p.clicks_delta_pct, false);
         return `<div class="card card-border bg-base-100">
           <div class="card-body p-4 gap-2">
@@ -124,7 +126,7 @@
               ${starsHtml(p.stars, i)}
             </div>
             <div class="flex items-center justify-between text-sm">
-              <span class="text-base-content/70">${fmtInt(p.clicks)} clicks</span>
+              <span class="text-base-content/70">${fmtInt(p.clicks)} ${t("statClicks")}</span>
               <span>${delta}</span>
             </div>
           </div>
@@ -143,7 +145,13 @@
 
   function renderRange(range) {
     const el = document.getElementById("range-label");
-    if (el && range) el.textContent = `${shortDate(range.start)} – ${shortDate(range.end)} · last ${range.days} days`;
+    if (el && range) {
+      el.textContent = t("rangeLabel", {
+        start: shortDate(range.start),
+        end: shortDate(range.end),
+        days: range.days,
+      });
+    }
   }
 
   // --- Data flow -------------------------------------------------------------
@@ -164,7 +172,7 @@
         renderPages(data.pages || []);
         show("data");
       })
-      .catch(() => showError("We couldn't load your Search Console data. Please try again."));
+      .catch(() => showError(t("loadInsightsError")));
   }
 
   function init() {
@@ -184,7 +192,7 @@
         select.addEventListener("change", () => loadInsights(select.value));
         loadInsights(sites[0]);
       })
-      .catch(() => showError("We couldn't reach your connected account. Try reconnecting from Connector."));
+      .catch(() => showError(t("loadSitesError")));
   }
 
   init();

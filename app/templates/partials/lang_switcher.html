@@ -1,0 +1,12 @@
+{# Selettore lingua compatto (EN / IT) per pagine fuori dalla dashboard, dove
+   non c'è la pagina Settings a disposizione (es. login/register/verify). #}
+<p class="text-center text-xs text-base-content/40 mt-4">
+  {% for code in supported_locales %}
+    {%- if not loop.first %} · {% endif -%}
+    {% if get_locale() == code %}
+      <span class="font-semibold text-base-content/70">{{ code|upper }}</span>
+    {% else %}
+      <a class="link link-hover" href="{{ url_for('main.set_locale', code=code) }}">{{ code|upper }}</a>
+    {% endif %}
+  {% endfor %}
+</p>

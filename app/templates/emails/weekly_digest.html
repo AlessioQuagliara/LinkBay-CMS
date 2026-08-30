@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="{{ locale }}">
+  <body style="margin:0;padding:0;background:#f4f4f5;font-family:'Helvetica Neue',Arial,sans-serif;color:#18181b;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;overflow:hidden;">
+            <tr>
+              <td style="padding:28px 32px 8px;">
+                <p style="margin:0;font-size:15px;color:#52525b;">{{ _("Hi %(name)s,", name=name) }}</p>
+                <h1 style="margin:12px 0 4px;font-size:20px;font-weight:600;color:#18181b;">
+                  {{ _("Your top declining pages this week") }}
+                </h1>
+                <p style="margin:0 0 4px;font-size:15px;line-height:1.6;color:#52525b;">
+                  {{ _("Organic performance for %(site)s, ranked by priority.", site=site_url) }}
+                </p>
+              </td>
+            </tr>
+            {% for page in pages %}
+            <tr>
+              <td style="padding:16px 32px;border-top:1px solid #f4f4f5;">
+                <p style="margin:0 0 4px;font-size:14px;font-weight:600;color:#18181b;word-break:break-all;">
+                  <a href="{{ page.url }}" style="color:#e11d48;text-decoration:none;">{{ page.url }}</a>
+                </p>
+                <p style="margin:0;font-size:13px;color:#71717a;">
+                  {{ _("−%(clicks)s clicks/month (%(pct)s%%)", clicks=(page.click_loss_abs or 0)|abs, pct=((page.click_loss_pct or 0)|abs)|round|int) }}
+                  ·
+                  {{ _("position %(before)s → %(after)s", before="%.1f"|format(page.position_before or 0), after="%.1f"|format(page.position_after or 0)) }}
+                </p>
+                {% if page.reason_text %}
+                <p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:#52525b;">{{ page.reason_text.split("\n")[0] }}</p>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+            <tr>
+              <td style="padding:20px 32px 28px;">
+                <a href="{{ dashboard_url }}" style="display:inline-block;background:#e11d48;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:10px 20px;border-radius:8px;">
+                  {{ _("Open Declining Pages") }}
+                </a>
+                <p style="margin:16px 0 0;font-size:12px;line-height:1.6;color:#a1a1aa;">
+                  {{ _("You're receiving this because weekly email digests are on for your account. You can turn them off anytime from Settings.") }}
+                </p>
+              </td>
+            </tr>
+          </table>
+          <p style="margin:20px 0 0;font-size:12px;color:#a1a1aa;">© LinkBayCMS</p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

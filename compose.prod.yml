@@ -70,6 +70,21 @@ services:
       - "traefik.http.middlewares.redirect-to-www.redirectregex.replacement=https://www.linkbay-cms.com/$${1}"
       - "traefik.http.middlewares.redirect-to-www.redirectregex.permanent=true"
 
+  # Job ricorrenti (storico, digest email, recovery check — vedi ./crontab).
+  # Stessa immagine di "web", ma esegue supercronic invece di gunicorn: nessun
+  # servizio esterno o crontab di sistema da configurare a mano sul server.
+  cron:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://linkbay:linkbay@db:5432/linkbay_cms
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    command: ["supercronic", "/app/crontab"]
+
 volumes:
   pgdata:
   traefik-certs:

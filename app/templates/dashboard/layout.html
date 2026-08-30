@@ -7,7 +7,7 @@
   <div class="drawer-content flex min-h-screen min-w-0 flex-col">
     {# Header mobile: hamburger + logo. Nascosto da lg in su (la sidebar è sempre visibile). #}
     <header class="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-3 border-b border-base-300 bg-base-100 px-4 lg:hidden">
-      <label for="dashboard-drawer" class="btn btn-square btn-ghost btn-sm" aria-label="Open sidebar">
+      <label for="dashboard-drawer" class="btn btn-square btn-ghost btn-sm" aria-label="{{ _('Open sidebar') }}">
         <span class="iconify size-5" data-icon="lucide:menu"></span>
       </label>
       <a class="flex items-center" href="{{ url_for('dashboard.overview') }}">
@@ -16,6 +16,18 @@
       <span class="grow"></span>
       <span class="truncate text-sm text-base-content/60 max-w-[45%]">{{ current_user.email }}</span>
     </header>
+
+    {% if current_user.subscription_status == "trialing" %}
+      <div class="bg-primary text-primary-content flex flex-wrap items-center justify-center gap-2 px-4 py-2 text-sm">
+        <span class="iconify size-4" data-icon="lucide:sparkles"></span>
+        {% if current_user.trial_days_left > 0 %}
+          {{ ngettext("Trial: %(num)s day left", "Trial: %(num)s days left", current_user.trial_days_left) }}
+        {% else %}
+          {{ _("Your trial has ended") }}
+        {% endif %}
+        <a class="link link-hover font-semibold" href="{{ url_for('billing.upgrade') }}">{{ _("Upgrade to Pro") }}</a>
+      </div>
+    {% endif %}
 
     <main class="min-w-0 flex-1 lg:m-3 lg:ms-0 lg:rounded-3xl lg:border lg:border-base-300 lg:bg-base-100 lg:shadow-xs">
       <div class="mx-auto w-full max-w-6xl p-4 sm:p-6 lg:p-10">
@@ -35,25 +47,37 @@
         <li>
           <a class="{{ 'menu-active' if request.endpoint == 'dashboard.overview' }}" href="{{ url_for('dashboard.overview') }}">
             <span class="iconify size-4" data-icon="lucide:panels-top-left"></span>
-            Overview
+            {{ _("Overview") }}
           </a>
         </li>
         <li>
           <a class="{{ 'menu-active' if request.endpoint == 'dashboard.insights' }}" href="{{ url_for('dashboard.insights') }}">
             <span class="iconify size-4" data-icon="lucide:chart-line"></span>
-            Insights
+            {{ _("Insights") }}
           </a>
         </li>
         <li>
           <a class="{{ 'menu-active' if request.endpoint == 'dashboard.declining' }}" href="{{ url_for('dashboard.declining') }}">
             <span class="iconify size-4" data-icon="lucide:trending-down"></span>
-            Declining Pages
+            {{ _("Declining Pages") }}
           </a>
         </li>
         <li>
           <a class="{{ 'menu-active' if request.endpoint == 'dashboard.connect' }}" href="{{ url_for('dashboard.connect') }}">
             <span class="iconify size-4" data-icon="lucide:cable"></span>
-            Connector
+            {{ _("Connector") }}
+          </a>
+        </li>
+        <li>
+          <a class="{{ 'menu-active' if request.endpoint == 'billing.subscription' }}" href="{{ url_for('billing.subscription') }}">
+            <span class="iconify size-4" data-icon="lucide:credit-card"></span>
+            {{ _("Subscription") }}
+          </a>
+        </li>
+        <li>
+          <a class="{{ 'menu-active' if request.endpoint == 'settings.index' }}" href="{{ url_for('settings.index') }}">
+            <span class="iconify size-4" data-icon="lucide:settings"></span>
+            {{ _("Settings") }}
           </a>
         </li>
         {% if current_user.is_admin %}
@@ -66,10 +90,10 @@
         {% endif %}
       </ul>
 
-      {# Account: avatar con iniziale + popover con logout/legal. #}
+      {# Account: avatar con iniziale + popover con lingua/logout/legal. #}
       <div class="sticky bottom-0 mt-auto border-t border-base-content/10 bg-base-200 p-3">
         <div class="dropdown dropdown-top dropdown-end w-full">
-          <button type="button" tabindex="0" class="btn btn-ghost h-auto w-full justify-start gap-3 px-2 py-2" aria-label="Open account menu">
+          <button type="button" tabindex="0" class="btn btn-ghost h-auto w-full justify-start gap-3 px-2 py-2" aria-label="{{ _('Open account menu') }}">
             <span class="bg-primary text-primary-content flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
               {{ (current_user.name or current_user.email)[0] | upper }}
             </span>
@@ -81,21 +105,33 @@
           </button>
           <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-30 mb-2 w-56 border border-base-300 p-2 shadow-lg">
             <li>
+              <a href="{{ url_for('settings.index') }}">
+                <span class="iconify size-4" data-icon="lucide:settings"></span>
+                {{ _("Settings") }}
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('billing.subscription') }}">
+                <span class="iconify size-4" data-icon="lucide:credit-card"></span>
+                {{ _("Subscription") }}
+              </a>
+            </li>
+            <li>
               <a href="{{ url_for('main.privacy_policy') }}" target="_blank" rel="noopener">
                 <span class="iconify size-4" data-icon="lucide:shield-check"></span>
-                Privacy Policy
+                {{ _("Privacy Policy") }}
               </a>
             </li>
             <li>
               <a href="{{ url_for('main.terms_of_service') }}" target="_blank" rel="noopener">
                 <span class="iconify size-4" data-icon="lucide:file-text"></span>
-                Terms
+                {{ _("Terms") }}
               </a>
             </li>
             <li>
               <a href="{{ url_for('auth.logout') }}">
                 <span class="iconify size-4" data-icon="lucide:log-out"></span>
-                Logout
+                {{ _("Logout") }}
               </a>
             </li>
           </ul>
