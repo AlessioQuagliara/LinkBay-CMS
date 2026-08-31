@@ -22,6 +22,7 @@ def create_app(config_class=Config):
     _register_access_gate(app)
     _register_cli(app)
     _register_error_handlers(app)
+    _register_context_processors(app)
     # NB: la creazione delle tabelle NON avviene più qui. Con gunicorn ogni
     # worker importa run:app e chiamerebbe create_all() in parallelo → race su
     # pg_type (UniqueViolation). Ora è fatta una volta sola: nel master via
@@ -35,6 +36,24 @@ def _register_error_handlers(app):
     from app.errors import register_error_handlers
 
     register_error_handlers(app)
+
+
+def _register_context_processors(app):
+    @app.context_processor
+    def inject_ai_credit_topups_allowed():
+        # dashboard/layout.html è condiviso da più blueprint (dashboard,
+        # billing): un context processor globale invece che scoped a un
+        # singolo blueprint, così il link "AI Credits" in sidebar compare per
+        # ogni pagina che estende quel layout, non solo per le route di
+        # dashboard_bp. Nessuna query aggiuntiva: get_plan_limits legge da
+        # PLAN_LIMITS, non dal DB.
+        from flask_login import current_user
+
+        if not current_user.is_authenticated:
+            return {"ai_credit_topups_allowed": False}
+        from app.entitlements.service import get_plan_limits
+
+        return {"ai_credit_topups_allowed": get_plan_limits(current_user).ai_credit_topups_allowed}
 
 
 def _register_extensions(app):
@@ -73,6 +92,7 @@ def _register_blueprints(app):
     from app.auth.routes import auth_bp
     from app.billing.access import init_rate_limits
     from app.billing.routes import billing_bp
+    from app.audits.routes import audits_bp
     from app.chat.routes import chat_bp
     from app.dashboard.routes import dashboard_bp
     from app.exports.routes import exports_bp
@@ -83,7 +103,7 @@ def _register_blueprints(app):
     # Rate limit per piano (vedi app/billing/access.py) — va applicato prima
     # della registrazione sull'app, idioma standard dei limiti a livello di
     # blueprint di Flask-Limiter.
-    init_rate_limits([dashboard_bp, gsc_bp, ai_bp, alerts_bp, exports_bp])
+    init_rate_limits([dashboard_bp, gsc_bp, ai_bp, alerts_bp, exports_bp, audits_bp])
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
@@ -95,6 +115,7 @@ def _register_blueprints(app):
     app.register_blueprint(settings_bp)
     app.register_blueprint(exports_bp)
     app.register_blueprint(chat_bp)
+    app.register_blueprint(audits_bp)
 
 
 def _register_access_gate(app):

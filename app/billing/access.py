@@ -12,7 +12,7 @@ from app.extensions import limiter
 # billing, Flask-Admin, static) resta raggiungibile anche a trial scaduto.
 # Sono anche i blueprint con rate limit per piano (vedi init_rate_limits):
 # stessa superficie, stessa filosofia "solo le feature a pagamento".
-GATED_BLUEPRINTS = {"dashboard", "gsc", "ai", "alerts", "exports"}
+GATED_BLUEPRINTS = {"dashboard", "gsc", "ai", "alerts", "exports", "audits"}
 
 
 def init_access_gate(app):

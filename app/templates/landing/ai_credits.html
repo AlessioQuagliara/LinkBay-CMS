@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="{{ get_locale() }}" class="group/html">
+    <head>
+        {% include "landing/partials/head-assets.html" %}
+        <title>{{ page_title }} — LinkBayCMS</title>
+        <meta name="description" content="{{ page_description }}" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="{{ site_url }}{{ request.path }}" />
+
+        {# Structured data: FAQ per questa pagina, coerente col contenuto visibile
+           sotto (vedi la nota equivalente in landing/partials/head.html). #}
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Do AI credits expire?",
+              "acceptedAnswer": { "@type": "Answer", "text": "No — purchased credit packs never expire." }
+            },
+            {
+              "@type": "Question",
+              "name": "Does AI replace the data analysis?",
+              "acceptedAnswer": { "@type": "Answer", "text": "No. The AI interprets and suggests actions on data already collected by LinkBayCMS from Google Search Console — it doesn't invent metrics or guarantee results." }
+            },
+            {
+              "@type": "Question",
+              "name": "What happens when included credits run out?",
+              "acceptedAnswer": { "@type": "Answer", "text": "AppSumo users can buy a one-time top-up pack. Pro subscribers get their quota renewed next billing cycle and can track usage from the dashboard." }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I use AI credits to raise my site, page, or scan limits?",
+              "acceptedAnswer": { "@type": "Answer", "text": "No — AI credits don't change your plan's infrastructure limits (sites, pages, scan frequency)." }
+            },
+            {
+              "@type": "Question",
+              "name": "How is usage calculated?",
+              "acceptedAnswer": { "@type": "Answer", "text": "The credit cost of every AI action is shown before you run it." }
+            }
+          ]
+        }
+        </script>
+    </head>
+
+    <body>
+        {% include "landing/partials/topbar.html" %}
+
+        <section class="py-12 lg:py-20">
+            <div class="container max-w-3xl text-center">
+                <p class="text-error mb-4 text-sm font-semibold uppercase tracking-wide">
+                    {{ _("AI Credits") }}
+                </p>
+                <h1 class="text-4xl font-bold tracking-tight lg:text-5xl">
+                    {{ _("Turn traffic drops into clear SEO actions.") }}
+                </h1>
+                <p class="text-base-content/80 mt-6 sm:text-lg">
+                    {{ _("LinkBayCMS already finds and ranks your Quick Wins from Google Search Console data — for free, on every plan. AI credits pay for going deeper on a specific page or site: a plain-English explanation, a detailed suggestion, or a step-by-step recovery plan. The AI never replaces the data — it interprets what's already been measured.") }}
+                </p>
+            </div>
+        </section>
+
+        <section class="py-8 lg:py-16" id="how-it-works">
+            <div class="container max-w-3xl">
+                <h2 class="text-2xl font-semibold text-center sm:text-3xl">{{ _("How credits work") }}</h2>
+                <div class="overflow-x-auto mt-8">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>{{ _("Action") }}</th>
+                                <th class="text-right">{{ _("Cost") }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ _("Short explanation of a page") }}</td>
+                                <td class="text-right">{{ ngettext("%(num)s credit", "%(num)s credits", action_costs.explain) }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ _("Detailed operational suggestion") }}</td>
+                                <td class="text-right">{{ ngettext("%(num)s credit", "%(num)s credits", action_costs.suggestion) }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ _("Full analysis of a page") }}</td>
+                                <td class="text-right">{{ ngettext("%(num)s credit", "%(num)s credits", action_costs.full_analysis) }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ _("Multi-step recovery plan") }}</td>
+                                <td class="text-right">{{ ngettext("%(num)s credit", "%(num)s credits", action_costs.recovery_plan) }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ _("Audit presentation (browsable slide deck)") }}</td>
+                                <td class="text-right">{{ ngettext("%(num)s credit", "%(num)s credits", action_costs.audit_presentation) }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ _("AI report for one site") }}</td>
+                                <td class="text-right">{{ ngettext("%(num)s credit", "%(num)s credits", action_costs.site_report) }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ _("Multi-site / agency AI report") }}</td>
+                                <td class="text-right">~{{ action_costs.multi_site_report }} {{ _("credits") }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-base-content/60 text-center text-sm mt-4">
+                    {{ _("Purchased credits never expire.") }}
+                </p>
+            </div>
+        </section>
+
+        <section class="py-8 lg:py-16 bg-base-200" id="packages">
+            <div class="container">
+                <h2 class="text-2xl font-semibold text-center sm:text-3xl">{{ _("Top-up packages") }}</h2>
+                <p class="text-base-content/70 text-center mt-2 max-w-xl mx-auto">
+                    {{ _("One-time purchase via Lemon Squeezy, available for AppSumo workspaces. Credits are added to your balance immediately after checkout.") }}
+                </p>
+
+                <div class="grid gap-4 sm:grid-cols-3 mt-8 max-w-3xl mx-auto">
+                    {% for pack in packs %}
+                        <div class="card card-border bg-base-100 shadow-xs">
+                            <div class="card-body items-center text-center gap-2">
+                                <span class="iconify text-primary size-6" data-icon="lucide:sparkles"></span>
+                                <h3 class="font-semibold">{{ pack.label }}</h3>
+                                <p class="text-2xl font-semibold">{{ "{:,}".format(pack.amount) }}</p>
+                                <p class="text-sm text-base-content/60">{{ _("credits") }}</p>
+                                <p class="text-lg font-medium mt-2">€{{ pack.price }}</p>
+
+                                {% if can_topup %}
+                                    <form method="post" action="{{ url_for('billing.checkout') }}" class="w-full mt-2">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="product_key" value="{{ pack.product_key }}">
+                                        <button class="btn btn-primary btn-sm w-full" type="submit">{{ _("Buy") }}</button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="text-center mt-8">
+                    {% if not current_user.is_authenticated %}
+                        <p class="text-base-content/70">
+                            {{ _("Credit packs are available to AppSumo workspaces after signup.") }}
+                        </p>
+                        <div class="mt-4 inline-flex gap-3">
+                            <a href="{{ url_for('auth.register') }}"><button class="btn btn-error text-white">{{ _("Get started free") }}</button></a>
+                            <a href="{{ url_for('billing.redeem') }}"><button class="btn btn-outline">{{ _("Have an AppSumo code?") }}</button></a>
+                        </div>
+                    {% elif not can_topup %}
+                        <p class="text-base-content/70">
+                            {{ _("Your plan already includes a monthly AI credit quota — no need to buy a pack. Track your usage from the dashboard.") }}
+                        </p>
+                        <a class="mt-4 inline-block" href="{{ url_for('dashboard.overview') }}">
+                            <button class="btn btn-primary">{{ _("Go to dashboard") }}</button>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <section class="py-8 lg:py-16" id="ai-credits-faq">
+            <div class="container">
+                <h2 class="text-2xl font-semibold text-center sm:text-3xl">{{ _("FAQs") }}</h2>
+                <div class="mt-8 flex justify-center">
+                    <div class="space-y-4 lg:w-1/2">
+                        <div class="collapse-arrow border-base-content/10 collapse border">
+                            <input name="ai-credits-faq" type="radio" aria-label="open/close" checked="checked" />
+                            <div class="collapse-title text-lg font-medium">{{ _("Do credits expire?") }}</div>
+                            <div class="collapse-content">
+                                <p class="text-base">{{ _("No — purchased credits never expire.") }}</p>
+                            </div>
+                        </div>
+                        <div class="collapse-arrow border-base-content/10 collapse border">
+                            <input name="ai-credits-faq" type="radio" aria-label="open/close" />
+                            <div class="collapse-title text-lg font-medium">{{ _("Does AI replace the data analysis?") }}</div>
+                            <div class="collapse-content">
+                                <p class="text-base">{{ _("No. The AI interprets and suggests actions on data already gathered by LinkBayCMS and Google Search Console — it doesn't invent metrics or guarantee results.") }}</p>
+                            </div>
+                        </div>
+                        <div class="collapse-arrow border-base-content/10 collapse border">
+                            <input name="ai-credits-faq" type="radio" aria-label="open/close" />
+                            <div class="collapse-title text-lg font-medium">{{ _("What happens when my included credits run out?") }}</div>
+                            <div class="collapse-content">
+                                <p class="text-base">{{ _("AppSumo users can buy a one-time top-up pack anytime. Pro subscribers get their quota renewed on the next billing cycle and can track consumption in the dashboard.") }}</p>
+                            </div>
+                        </div>
+                        <div class="collapse-arrow border-base-content/10 collapse border">
+                            <input name="ai-credits-faq" type="radio" aria-label="open/close" />
+                            <div class="collapse-title text-lg font-medium">{{ _("Can I use credits to raise my site/page/scan limits?") }}</div>
+                            <div class="collapse-content">
+                                <p class="text-base">{{ _("No — AI credits never change the infrastructure limits of your plan (sites, pages, scan frequency).") }}</p>
+                            </div>
+                        </div>
+                        <div class="collapse-arrow border-base-content/10 collapse border">
+                            <input name="ai-credits-faq" type="radio" aria-label="open/close" />
+                            <div class="collapse-title text-lg font-medium">{{ _("How is consumption calculated?") }}</div>
+                            <div class="collapse-content">
+                                <p class="text-base">{{ _("The credit cost of an AI action is always shown before you run it.") }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {% include "landing/partials/footer.html" %}
+
+        {% include "landing/partials/theme-toggle.html" %}
+
+        {% include "landing/partials/cookie-consent.html" %}
+
+        <script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+    </body>
+</html>

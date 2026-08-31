@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="{{ get_locale() }}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>{{ presentation.title }} — LinkBayCMS</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='shared/favicon.png') }}" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <style>
+      :root {
+        --brand-primary: #ff5758;
+        --brand-dark: #16181d;
+      }
+      html, body { height: 100%; background: #ffffff; }
+      body { font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+
+      .reveal { background: #ffffff; }
+      .reveal .slides section {
+        text-align: left;
+        color: var(--brand-dark);
+        padding-bottom: 90px; /* spazio per l'onda/logo fissi in basso */
+      }
+      .reveal h1, .reveal h2 { color: var(--brand-dark); font-weight: 700; }
+      .reveal h1 { font-size: 2.4em; }
+      .reveal h2 {
+        font-size: 1.5em;
+        border-bottom: 3px solid var(--brand-primary);
+        padding-bottom: 0.25em;
+        margin-bottom: 0.6em;
+        display: inline-block;
+      }
+      .reveal ul { list-style: none; margin: 0; padding: 0; }
+      .reveal ul li {
+        font-size: 0.8em;
+        line-height: 1.5;
+        margin-bottom: 0.6em;
+        padding-left: 1.4em;
+        position: relative;
+      }
+      .reveal ul li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0.5em;
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--brand-primary);
+      }
+
+      .audit-title-slide { text-align: center !important; }
+      .audit-title-slide h1 { color: var(--brand-primary); }
+      .audit-meta { color: #6b7280; font-size: 0.55em; margin-top: 0.3em; }
+
+      /* Branding persistente: onda + logo fissi in basso, sopra le slide ma
+         sotto i controlli di reveal.js (z-index 1-30 a seconda del plugin) —
+         pointer-events:none così non intercetta i click/swipe di navigazione. */
+      #audit-brand-footer {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 90px;
+        pointer-events: none;
+        z-index: 5;
+      }
+      #audit-brand-footer svg { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; }
+      #audit-brand-footer img {
+        position: absolute;
+        bottom: 14px;
+        left: 24px;
+        height: 20px;
+        width: auto;
+        filter: brightness(0) invert(1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        {{ slides_html | safe }}
+      </div>
+    </div>
+
+    <div id="audit-brand-footer" aria-hidden="true">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+        <path d="M0,64 C240,110 480,10 720,55 C960,100 1200,20 1440,60 L1440,120 L0,120 Z" fill="#FF5758" opacity="0.12" />
+        <path d="M0,84 C240,120 480,40 720,75 C960,110 1200,45 1440,80 L1440,120 L0,120 Z" fill="#FF5758" />
+      </svg>
+      <img src="{{ url_for('static', filename='shared/logo.png', _external=True) }}" alt="LinkBayCMS" />
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+    <script>
+      Reveal.initialize({
+        hash: true,
+        controls: true,
+        progress: true,
+        center: false,
+        transition: "slide",
+      });
+    </script>
+  </body>
+</html>

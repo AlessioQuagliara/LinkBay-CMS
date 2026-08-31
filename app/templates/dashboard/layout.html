@@ -75,11 +75,25 @@
           </a>
         </li>
         <li>
+          <a class="{{ 'menu-active' if request.endpoint and request.endpoint.startswith('audits.') }}" href="{{ url_for('audits.index') }}">
+            <span class="iconify size-4" data-icon="lucide:presentation"></span>
+            {{ _("Audit Presentations") }}
+          </a>
+        </li>
+        <li>
           <a class="{{ 'menu-active' if request.endpoint == 'billing.subscription' }}" href="{{ url_for('billing.subscription') }}">
             <span class="iconify size-4" data-icon="lucide:credit-card"></span>
             {{ _("Subscription") }}
           </a>
         </li>
+        {% if ai_credit_topups_allowed %}
+        <li>
+          <a class="{{ 'menu-active' if request.endpoint == 'billing.credits' }}" href="{{ url_for('billing.credits') }}">
+            <span class="iconify size-4" data-icon="lucide:sparkles"></span>
+            {{ _("AI Credits") }}
+          </a>
+        </li>
+        {% endif %}
         <li>
           <a class="{{ 'menu-active' if request.endpoint == 'settings.index' }}" href="{{ url_for('settings.index') }}">
             <span class="iconify size-4" data-icon="lucide:settings"></span>

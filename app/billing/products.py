@@ -21,22 +21,22 @@ PRODUCT_CATALOG = {
         "billing_interval": "annual",
         "recurring": True,
     },
+    "credits_50": {
+        "variant_env": "LEMONSQUEEZY_VARIANT_CREDITS_50",
+        "kind": "credits",
+        "amount": 50,
+        "recurring": False,
+    },
+    "credits_150": {
+        "variant_env": "LEMONSQUEEZY_VARIANT_CREDITS_150",
+        "kind": "credits",
+        "amount": 150,
+        "recurring": False,
+    },
     "credits_500": {
         "variant_env": "LEMONSQUEEZY_VARIANT_CREDITS_500",
         "kind": "credits",
         "amount": 500,
-        "recurring": False,
-    },
-    "credits_1500": {
-        "variant_env": "LEMONSQUEEZY_VARIANT_CREDITS_1500",
-        "kind": "credits",
-        "amount": 1500,
-        "recurring": False,
-    },
-    "credits_5000": {
-        "variant_env": "LEMONSQUEEZY_VARIANT_CREDITS_5000",
-        "kind": "credits",
-        "amount": 5000,
         "recurring": False,
     },
 }

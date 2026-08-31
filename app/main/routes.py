@@ -90,10 +90,45 @@ def cookie_policy():
     )
 
 
+@main_bp.route("/ai-credits")
+def ai_credits():
+    """Landing standalone sui crediti AI (separata dalla pricing del piano
+    Pro — vedi #pricing in landing/index.html). Tutti i numeri vengono da
+    app/entitlements/limits.py, unica fonte di verità: nessun prezzo/costo
+    hardcoded qui o nel template."""
+    from app.entitlements.limits import AI_CREDIT_ACTION_COSTS, AI_CREDIT_PACK_LABELS, AI_CREDIT_PACKS
+
+    packs = [
+        {"product_key": f"credits_{amount}", "amount": amount, "price": price, "label": AI_CREDIT_PACK_LABELS[amount]}
+        for amount, price in sorted(AI_CREDIT_PACKS.items())
+    ]
+
+    # CTA condizionale: riusa get_plan_limits invece di ricontrollare
+    # plan_type a mano (stessa fonte di verità di billing/routes.py::credits
+    # e billing/access.py) — un utente autenticato con ai_credit_topups_allowed
+    # può comprare pacchetti (AppSumo); chi non può (Pro, trial) va invece
+    # verso la dashboard, la quota è già inclusa nel suo piano.
+    can_topup = False
+    if current_user.is_authenticated:
+        from app.entitlements.service import get_plan_limits
+
+        can_topup = get_plan_limits(current_user).ai_credit_topups_allowed
+
+    return render_template(
+        "landing/ai_credits.html",
+        page_title="AI Credits",
+        page_description="How AI credits work in LinkBayCMS: cost per action, one-time top-up packs, and how they relate to your plan.",
+        packs=packs,
+        action_costs=AI_CREDIT_ACTION_COSTS,
+        can_topup=can_topup,
+    )
+
+
 # Pagine pubbliche e indicizzabili incluse nella sitemap. (endpoint, priority,
 # changefreq): l'host assoluto viene anteposto usando APP_BASE_URL.
 _SITEMAP_ROUTES = [
     ("main.index", 1.0, "weekly"),
+    ("main.ai_credits", 0.6, "monthly"),
     ("auth.register", 0.8, "monthly"),
 ]
 

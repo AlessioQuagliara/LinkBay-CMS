@@ -149,7 +149,7 @@ def test_subscription_payment_success_grants_monthly_ai_quota_for_credit_plan(cl
     )
     _post_webhook(client, "subscription_payment_success", {"id": "sub_5", "attributes": {}})
     db_session.refresh(user)
-    assert user.ai_credit_balance == 5000  # PLAN_LIMITS["subscription_monthly"].ai_credit_grant
+    assert user.ai_credit_balance == 100  # PLAN_LIMITS["subscription_monthly"].ai_credit_grant
 
 
 def test_subscription_cancelled_sets_canceled(client, db_session, make_user):
@@ -193,10 +193,10 @@ def test_order_created_is_idempotent(client, db_session, make_user):
     for _ in range(2):
         _post_webhook(
             client, "order_created", {"id": "order_2", "attributes": {}},
-            custom_data={"user_id": str(user.id), "product_key": "credits_1500"},
+            custom_data={"user_id": str(user.id), "product_key": "credits_150"},
         )
     db_session.refresh(user)
-    assert user.ai_credit_balance == 1500  # non 3000: il secondo webhook non doppio-accredita
+    assert user.ai_credit_balance == 150  # non 300: il secondo webhook non doppio-accredita
 
 
 def test_order_created_ignores_plan_products(client, db_session, make_user):

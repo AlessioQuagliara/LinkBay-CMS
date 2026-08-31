@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-31 18:25+0200\n"
+"POT-Creation-Date: 2026-09-01 00:14+0200\n"
 "PO-Revision-Date: 2026-08-30 15:01+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: it <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/__init__.py:52
+#: app/__init__.py:71
 msgid "Please sign in to continue."
 msgstr "Effettua l'accesso per continuare."
 
@@ -61,7 +61,7 @@ msgid "The service is temporarily unavailable. Please try again shortly."
 msgstr "Il servizio è temporaneamente non disponibile. Riprova tra poco."
 
 #: app/auth/forms.py:8 app/settings/forms.py:8
-#: app/templates/landing/partials/footer.html:54
+#: app/templates/landing/partials/footer.html:55
 msgid "Name"
 msgstr "Nome"
 
@@ -92,7 +92,7 @@ msgstr "Crea account"
 
 #: app/auth/forms.py:23 app/templates/auth/login.html:2
 #: app/templates/auth/login.html:10 app/templates/auth/register.html:55
-#: app/templates/landing/partials/footer.html:38
+#: app/templates/landing/partials/footer.html:39
 msgid "Sign in"
 msgstr "Accedi"
 
@@ -301,7 +301,7 @@ msgid "Don't have an account?"
 msgstr "Non hai un account?"
 
 #: app/templates/auth/login.html:37 app/templates/auth/register.html:2
-#: app/templates/landing/partials/footer.html:37
+#: app/templates/landing/partials/footer.html:38
 msgid "Sign up"
 msgstr "Registrati"
 
@@ -362,6 +362,9 @@ msgid "Use a different account"
 msgstr "Usa un altro account"
 
 #: app/templates/billing/credits.html:2 app/templates/billing/credits.html:6
+#: app/templates/dashboard/layout.html:93
+#: app/templates/landing/ai_credits.html:53
+#: app/templates/landing/partials/footer.html:31
 msgid "AI Credits"
 msgstr "Crediti AI"
 
@@ -375,10 +378,13 @@ msgid "Current balance: %(balance)s credits"
 msgstr "Saldo attuale: %(balance)s crediti"
 
 #: app/templates/billing/credits.html:21
+#: app/templates/landing/ai_credits.html:102
+#: app/templates/landing/ai_credits.html:127
 msgid "credits"
 msgstr "crediti"
 
 #: app/templates/billing/credits.html:27
+#: app/templates/landing/ai_credits.html:134
 msgid "Buy"
 msgstr "Acquista"
 
@@ -391,7 +397,7 @@ msgid "Redeem AppSumo code"
 msgstr "Riscatta codice AppSumo"
 
 #: app/templates/billing/redeem.html:10 app/templates/billing/upgrade.html:10
-#: app/templates/dashboard/layout.html:140
+#: app/templates/dashboard/layout.html:154
 msgid "Logout"
 msgstr "Esci"
 
@@ -419,8 +425,8 @@ msgstr "Non hai un codice? Vedi il piano Pro"
 
 #: app/templates/billing/subscription.html:2
 #: app/templates/billing/subscription.html:6
-#: app/templates/dashboard/layout.html:80
-#: app/templates/dashboard/layout.html:122
+#: app/templates/dashboard/layout.html:86
+#: app/templates/dashboard/layout.html:136
 msgid "Subscription"
 msgstr "Abbonamento"
 
@@ -515,11 +521,12 @@ msgstr "Riattiva l'abbonamento — %(price)s"
 
 #: app/templates/billing/subscription.html:114
 #: app/templates/billing/upgrade.html:89
+#: app/templates/landing/ai_credits.html:149
 msgid "Have an AppSumo code?"
 msgstr "Hai un codice AppSumo?"
 
 #: app/templates/billing/subscription.html:115
-#: app/templates/landing/index.html:323
+#: app/templates/landing/index.html:307
 msgid "Redeem it here"
 msgstr "Riscattalo qui"
 
@@ -538,6 +545,7 @@ msgstr ""
 "Stiamo attivando il tuo abbonamento Pro — di solito richiede pochi secondi."
 
 #: app/templates/billing/success.html:14
+#: app/templates/landing/ai_credits.html:156
 msgid "Go to dashboard"
 msgstr "Vai alla dashboard"
 
@@ -597,8 +605,7 @@ msgstr "Insights e Declining Pages senza limiti"
 msgid "AI suggestions on declining pages"
 msgstr "Suggerimenti AI sulle pagine in calo"
 
-#: app/templates/billing/upgrade.html:65 app/templates/landing/index.html:282
-#: app/templates/landing/index.html:310
+#: app/templates/billing/upgrade.html:65 app/templates/landing/index.html:294
 msgid "Full history from the day you connect your site"
 msgstr "Storico completo da quando colleghi il sito"
 
@@ -611,6 +618,53 @@ msgstr "Mensile — %(price)s"
 #, python-format
 msgid "Annual — %(price)s"
 msgstr "Annuale — %(price)s"
+
+#: app/templates/dashboard/audits.html:2 app/templates/dashboard/audits.html:7
+#: app/templates/dashboard/layout.html:80
+msgid "Audit Presentations"
+msgstr "Presentazioni di Audit"
+
+#: app/templates/dashboard/audits.html:9
+msgid ""
+"Turn a site's declining pages into a browsable slide deck you can share — "
+"generated from your own data, saved with a date."
+msgstr ""
+"Trasforma le pagine in calo di un sito in una presentazione sfogliabile da "
+"condividere — generata dai tuoi dati, salvata con una data."
+
+#: app/templates/dashboard/audits.html:17
+msgid "Site"
+msgstr "Sito"
+
+#: app/templates/dashboard/audits.html:26
+msgid "Generate presentation"
+msgstr "Genera presentazione"
+
+#: app/templates/dashboard/audits.html:30
+#, python-format
+msgid "Costs %(num)s AI credit."
+msgid_plural "Costs %(num)s AI credits."
+msgstr[0] "Costa %(num)s credito AI."
+msgstr[1] "Costa %(num)s crediti AI."
+
+#: app/templates/dashboard/audits.html:35
+msgid "Connect a site first from"
+msgstr "Collega prima un sito da"
+
+#: app/templates/dashboard/audits.html:36
+#: app/templates/dashboard/layout.html:56 app/templates/dashboard/sites.html:2
+#: app/templates/dashboard/sites.html:8
+#: app/templates/partials/usage_widget.html:26
+msgid "Sites"
+msgstr "Siti"
+
+#: app/templates/dashboard/audits.html:55
+msgid "View"
+msgstr "Apri"
+
+#: app/templates/dashboard/audits.html:65
+msgid "No presentations generated yet."
+msgstr "Nessuna presentazione generata finora."
 
 #: app/templates/dashboard/connect.html:2
 #: app/templates/dashboard/connect.html:44
@@ -673,7 +727,7 @@ msgstr ""
 #: app/templates/dashboard/connect.html:48
 #: app/templates/dashboard/declining.html:45
 #: app/templates/dashboard/insights.html:48
-#: app/templates/dashboard/layout.html:128
+#: app/templates/dashboard/layout.html:142
 msgid "Privacy Policy"
 msgstr "Informativa sulla privacy"
 
@@ -905,28 +959,22 @@ msgstr[1] "Trial: %(num)s giorni rimasti"
 msgid "Your trial has ended"
 msgstr "Il tuo trial è terminato"
 
-#: app/templates/dashboard/layout.html:56 app/templates/dashboard/sites.html:2
-#: app/templates/dashboard/sites.html:8
-#: app/templates/partials/usage_widget.html:26
-msgid "Sites"
-msgstr "Siti"
-
 #: app/templates/dashboard/layout.html:74
 msgid "Connector"
 msgstr "Connettore"
 
-#: app/templates/dashboard/layout.html:86
-#: app/templates/dashboard/layout.html:116 app/templates/settings/index.html:2
+#: app/templates/dashboard/layout.html:100
+#: app/templates/dashboard/layout.html:130 app/templates/settings/index.html:2
 #: app/templates/settings/index.html:6
 msgid "Settings"
 msgstr "Impostazioni"
 
-#: app/templates/dashboard/layout.html:102
+#: app/templates/dashboard/layout.html:116
 msgid "Open account menu"
 msgstr "Apri il menu account"
 
-#: app/templates/dashboard/layout.html:134
-#: app/templates/landing/partials/footer.html:88
+#: app/templates/dashboard/layout.html:148
+#: app/templates/landing/partials/footer.html:89
 msgid "Terms"
 msgstr "Termini"
 
@@ -1049,6 +1097,175 @@ msgstr "Torna alla home"
 msgid "Go back"
 msgstr "Indietro"
 
+#: app/templates/landing/ai_credits.html:56
+msgid "Turn traffic drops into clear SEO actions."
+msgstr "Trasforma i cali di traffico in azioni SEO chiare."
+
+#: app/templates/landing/ai_credits.html:59
+msgid ""
+"LinkBayCMS already finds and ranks your Quick Wins from Google Search "
+"Console data — for free, on every plan. AI credits pay for going deeper on a"
+" specific page or site: a plain-English explanation, a detailed suggestion, "
+"or a step-by-step recovery plan. The AI never replaces the data — it "
+"interprets what's already been measured."
+msgstr ""
+"LinkBayCMS individua e ordina già le tue Quick Wins dai dati di Google "
+"Search Console — gratis, su ogni piano. I crediti AI servono per "
+"approfondire una pagina o un sito specifico: una spiegazione in linguaggio "
+"semplice, un suggerimento dettagliato, o un piano di recupero passo passo. "
+"L'AI non sostituisce mai i dati: interpreta quello che è già stato misurato."
+
+#: app/templates/landing/ai_credits.html:66
+msgid "How credits work"
+msgstr "Come funzionano i crediti"
+
+#: app/templates/landing/ai_credits.html:71
+msgid "Action"
+msgstr "Azione"
+
+#: app/templates/landing/ai_credits.html:72
+msgid "Cost"
+msgstr "Costo"
+
+#: app/templates/landing/ai_credits.html:77
+msgid "Short explanation of a page"
+msgstr "Spiegazione breve di una pagina"
+
+#: app/templates/landing/ai_credits.html:78
+#: app/templates/landing/ai_credits.html:82
+#: app/templates/landing/ai_credits.html:86
+#: app/templates/landing/ai_credits.html:90
+#: app/templates/landing/ai_credits.html:94
+#: app/templates/landing/ai_credits.html:98
+#, python-format
+msgid "%(num)s credit"
+msgid_plural "%(num)s credits"
+msgstr[0] "%(num)s credito"
+msgstr[1] "%(num)s crediti"
+
+#: app/templates/landing/ai_credits.html:81
+msgid "Detailed operational suggestion"
+msgstr "Suggerimento operativo dettagliato"
+
+#: app/templates/landing/ai_credits.html:85
+msgid "Full analysis of a page"
+msgstr "Analisi completa di una pagina"
+
+#: app/templates/landing/ai_credits.html:89
+msgid "Multi-step recovery plan"
+msgstr "Recovery plan multi-step"
+
+#: app/templates/landing/ai_credits.html:93
+msgid "Audit presentation (browsable slide deck)"
+msgstr "Presentazione di audit (sfogliabile)"
+
+#: app/templates/landing/ai_credits.html:97
+msgid "AI report for one site"
+msgstr "Report AI per un sito"
+
+#: app/templates/landing/ai_credits.html:101
+msgid "Multi-site / agency AI report"
+msgstr "Report AI multi-sito/agenzia"
+
+#: app/templates/landing/ai_credits.html:108
+msgid "Purchased credits never expire."
+msgstr "I crediti acquistati non scadono mai."
+
+#: app/templates/landing/ai_credits.html:115
+msgid "Top-up packages"
+msgstr "Pacchetti ricarica"
+
+#: app/templates/landing/ai_credits.html:117
+msgid ""
+"One-time purchase via Lemon Squeezy, available for AppSumo workspaces. "
+"Credits are added to your balance immediately after checkout."
+msgstr ""
+"Acquisto una tantum tramite Lemon Squeezy, disponibile per i workspace "
+"AppSumo. I crediti vengono accreditati subito dopo il checkout."
+
+#: app/templates/landing/ai_credits.html:145
+msgid "Credit packs are available to AppSumo workspaces after signup."
+msgstr ""
+"I pacchetti di crediti sono disponibili per i workspace AppSumo dopo la "
+"registrazione."
+
+#: app/templates/landing/ai_credits.html:148
+#: app/templates/landing/index.html:29
+msgid "Get started free"
+msgstr "Inizia gratis"
+
+#: app/templates/landing/ai_credits.html:153
+msgid ""
+"Your plan already includes a monthly AI credit quota — no need to buy a "
+"pack. Track your usage from the dashboard."
+msgstr ""
+"Il tuo piano include già una quota mensile di crediti AI — non serve "
+"comprare un pacchetto. Controlla il consumo dalla dashboard."
+
+#: app/templates/landing/ai_credits.html:165
+#: app/templates/landing/index.html:317
+#: app/templates/landing/partials/footer.html:20
+msgid "FAQs"
+msgstr "Domande frequenti"
+
+#: app/templates/landing/ai_credits.html:170
+msgid "Do credits expire?"
+msgstr "I crediti scadono?"
+
+#: app/templates/landing/ai_credits.html:172
+msgid "No — purchased credits never expire."
+msgstr "No — i crediti acquistati non scadono mai."
+
+#: app/templates/landing/ai_credits.html:177
+msgid "Does AI replace the data analysis?"
+msgstr "L'AI sostituisce l'analisi dei dati?"
+
+#: app/templates/landing/ai_credits.html:179
+msgid ""
+"No. The AI interprets and suggests actions on data already gathered by "
+"LinkBayCMS and Google Search Console — it doesn't invent metrics or "
+"guarantee results."
+msgstr ""
+"No. L'AI interpreta e suggerisce azioni sui dati già raccolti da LinkBayCMS "
+"e Google Search Console — non inventa metriche né garantisce risultati."
+
+#: app/templates/landing/ai_credits.html:184
+msgid "What happens when my included credits run out?"
+msgstr "Cosa succede se finiscono i crediti inclusi?"
+
+#: app/templates/landing/ai_credits.html:186
+msgid ""
+"AppSumo users can buy a one-time top-up pack anytime. Pro subscribers get "
+"their quota renewed on the next billing cycle and can track consumption in "
+"the dashboard."
+msgstr ""
+"Gli utenti AppSumo possono comprare un pacchetto one-time in qualsiasi "
+"momento. Gli utenti Pro ricevono la quota rinnovata al ciclo di fatturazione"
+" successivo e vedono il consumo in dashboard."
+
+#: app/templates/landing/ai_credits.html:191
+msgid "Can I use credits to raise my site/page/scan limits?"
+msgstr ""
+"Posso usare i crediti per aumentare i limiti di siti/pagine/scansioni?"
+
+#: app/templates/landing/ai_credits.html:193
+msgid ""
+"No — AI credits never change the infrastructure limits of your plan (sites, "
+"pages, scan frequency)."
+msgstr ""
+"No — i crediti AI non modificano mai i limiti infrastrutturali del tuo piano"
+" (siti, pagine, frequenza di scansione)."
+
+#: app/templates/landing/ai_credits.html:198
+msgid "How is consumption calculated?"
+msgstr "Come viene calcolato il consumo?"
+
+#: app/templates/landing/ai_credits.html:200
+msgid "The credit cost of an AI action is always shown before you run it."
+msgstr ""
+"Il costo in crediti di un'azione AI viene sempre mostrato prima di "
+"eseguirla."
+
 #: app/templates/landing/index.html:15
 msgid "SEO traffic monitoring for publishers"
 msgstr "Monitoraggio del traffico SEO per editori"
@@ -1076,10 +1293,6 @@ msgstr ""
 "e ti consegna una breve lista ordinata di pagine in calo — ognuna con una "
 "motivazione in linguaggio semplice. Pensato per editori e siti editoriali "
 "che vivono di ricerca organica."
-
-#: app/templates/landing/index.html:29
-msgid "Get started free"
-msgstr "Inizia gratis"
 
 #: app/templates/landing/index.html:32
 msgid "See how it works"
@@ -1275,73 +1488,83 @@ msgstr "Prezzi semplici, mensili o annuali."
 msgid "Try it free for 13 days, no credit card required."
 msgstr "Provalo gratis per 13 giorni, senza carta di credito."
 
+#: app/templates/landing/index.html:265
+msgid "Monthly"
+msgstr "Mensile"
+
 #: app/templates/landing/index.html:267
-msgid "Pro Monthly"
-msgstr "Pro Mensile"
+msgid "Annual"
+msgstr "Annuale"
 
 #: app/templates/landing/index.html:268
+#, python-format
+msgid "Save ~17%%"
+msgstr "Risparmia ~17%%"
+
+#: app/templates/landing/index.html:277
+msgid "Pro"
+msgstr "Pro"
+
+#: app/templates/landing/index.html:278
 msgid "13-day free trial"
 msgstr "13 giorni di prova gratuita"
 
-#: app/templates/landing/index.html:272
+#: app/templates/landing/index.html:282
 msgid "/month"
 msgstr "/mese"
 
-#: app/templates/landing/index.html:275
+#: app/templates/landing/index.html:282
+msgid "/year"
+msgstr "/anno"
+
+#: app/templates/landing/index.html:285 app/templates/landing/index.html:287
 msgid "No credit card to start. Cancel anytime once you're on the paid plan."
 msgstr ""
 "Nessuna carta di credito per iniziare. Annulla quando vuoi una volta sul "
 "piano a pagamento."
 
-#: app/templates/landing/index.html:280 app/templates/landing/index.html:308
+#: app/templates/landing/index.html:286
+#, python-format
+msgid ""
+"Billed once a year — %(price)s/month equivalent. Save €158/year (about "
+"17%%)."
+msgstr ""
+"Fatturato una volta l'anno — equivalente a %(price)s/mese. Risparmi "
+"€158/anno (circa il 17%%)."
+
+#: app/templates/landing/index.html:292
 msgid "Declining pages, prioritized automatically"
 msgstr "Pagine in calo, ordinate automaticamente per priorità"
 
-#: app/templates/landing/index.html:281 app/templates/landing/index.html:309
+#: app/templates/landing/index.html:293
 msgid "AI suggestions on the pages losing traffic"
 msgstr "Suggerimenti AI sulle pagine che perdono traffico"
 
-#: app/templates/landing/index.html:287 app/templates/landing/index.html:315
+#: app/templates/landing/index.html:299
 msgid "Start your free trial"
 msgstr "Inizia la tua prova gratuita"
 
-#: app/templates/landing/index.html:295
-msgid "Pro Annual"
-msgstr "Pro Annuale"
-
-#: app/templates/landing/index.html:296
-#, python-format
-msgid "Save ~17%%"
-msgstr "Risparmia ~17%%"
-
-#: app/templates/landing/index.html:300
-msgid "/year"
-msgstr "/anno"
-
-#: app/templates/landing/index.html:303
-#, python-format
-msgid "Same Pro plan, billed once a year — %(price)s/month equivalent."
-msgstr ""
-"Stesso piano Pro, fatturato una volta l'anno — equivalente a %(price)s/mese."
-
-#: app/templates/landing/index.html:322
+#: app/templates/landing/index.html:306
 msgid "Got an AppSumo code?"
 msgstr "Hai un codice AppSumo?"
 
-#: app/templates/landing/index.html:331
-#: app/templates/landing/partials/footer.html:20
-msgid "FAQs"
-msgstr "Domande frequenti"
+#: app/templates/landing/index.html:308
+msgid "Curious how AI credits work?"
+msgstr "Curioso di sapere come funzionano i crediti AI?"
 
-#: app/templates/landing/index.html:333
+#: app/templates/landing/index.html:309
+msgid "See AI Credits"
+msgstr "Scopri i Crediti AI"
+
+#: app/templates/landing/index.html:319
 msgid "The questions every SEO asks in the first two minutes of a demo."
 msgstr "Le domande che ogni SEO fa nei primi due minuti di una demo."
 
-#: app/templates/landing/index.html:346
+#: app/templates/landing/index.html:332
 msgid "How is this different from Google Search Console?"
 msgstr "In cosa è diverso da Google Search Console?"
 
-#: app/templates/landing/index.html:350
+#: app/templates/landing/index.html:336
 msgid ""
 "Search Console gives you the data — thousands of rows and no particular "
 "order. LinkBayCMS gives you the five things to fix Monday morning, ranked by"
@@ -1353,12 +1576,12 @@ msgstr ""
 "valore e probabilità di recupero. Non è un altro archivio; è una lista "
 "breve."
 
-#: app/templates/landing/index.html:357
+#: app/templates/landing/index.html:343
 msgid "How do you know a page is really declining, and not just noisy?"
 msgstr ""
 "Come fate a sapere che una pagina è davvero in calo e non solo rumore?"
 
-#: app/templates/landing/index.html:361
+#: app/templates/landing/index.html:347
 #, python-format
 msgid ""
 "A page only makes the list if it clears a minimum relevance threshold, has "
@@ -1375,11 +1598,11 @@ msgstr ""
 "dei falsi allarmi — è la differenza tra \"la tua pagina è rotta\" e \"Google"
 " ha rilasciato un aggiornamento e tutto il sito si è mosso.\""
 
-#: app/templates/landing/index.html:368
+#: app/templates/landing/index.html:354
 msgid "Do I need to install anything on my site?"
 msgstr "Devo installare qualcosa sul mio sito?"
 
-#: app/templates/landing/index.html:372
+#: app/templates/landing/index.html:358
 msgid ""
 "No. LinkBayCMS is not a CMS and doesn't touch your site — it reads your "
 "existing Google Search Console data with read-only access. Nothing to embed,"
@@ -1389,11 +1612,11 @@ msgstr ""
 " di Google Search Console con accesso in sola lettura. Niente da "
 "incorporare, nessun plugin, nessuna modifica al codice."
 
-#: app/templates/landing/index.html:379
+#: app/templates/landing/index.html:365
 msgid "Is this built for e-commerce or SaaS marketing sites too?"
 msgstr "È pensato anche per e-commerce o siti marketing SaaS?"
 
-#: app/templates/landing/index.html:383
+#: app/templates/landing/index.html:369
 msgid ""
 "Not really — it's built specifically for publishers and editorial sites with"
 " 500 to 20,000 indexed pages and at least 20,000 organic clicks a month, "
@@ -1409,11 +1632,11 @@ msgstr ""
 " meno affidabili. Preferiamo dirtelo subito piuttosto che farti iscrivere e "
 "perderti al secondo mese."
 
-#: app/templates/landing/index.html:390
+#: app/templates/landing/index.html:376
 msgid "Is my Search Console data safe?"
 msgstr "I miei dati di Search Console sono al sicuro?"
 
-#: app/templates/landing/index.html:394
+#: app/templates/landing/index.html:380
 msgid ""
 "We connect via Google's standard read-only access — we can see your "
 "performance data, we can't change anything on your property. We never invent"
@@ -1495,7 +1718,7 @@ msgid "Preferences"
 msgstr "Preferenze"
 
 #: app/templates/landing/partials/cookie-consent.html:42
-#: app/templates/landing/partials/footer.html:91
+#: app/templates/landing/partials/footer.html:92
 msgid "Cookie preferences"
 msgstr "Preferenze cookie"
 
@@ -1596,19 +1819,19 @@ msgstr "Come funziona"
 msgid "Pricing"
 msgstr "Prezzi"
 
-#: app/templates/landing/partials/footer.html:34
+#: app/templates/landing/partials/footer.html:35
 msgid "Get started"
 msgstr "Inizia"
 
-#: app/templates/landing/partials/footer.html:47
+#: app/templates/landing/partials/footer.html:48
 msgid "Free audit"
 msgstr "Audit gratuito"
 
-#: app/templates/landing/partials/footer.html:48
+#: app/templates/landing/partials/footer.html:49
 msgid "Want us to look at your site first?"
 msgstr "Vuoi che diamo prima un'occhiata al tuo sito?"
 
-#: app/templates/landing/partials/footer.html:50
+#: app/templates/landing/partials/footer.html:51
 msgid ""
 "We're running free traffic-decline audits for the first 20 publishers who "
 "sign up for the beta. Leave your details and we'll show you what's declining"
@@ -1618,28 +1841,28 @@ msgstr ""
 "iscrivono alla beta. Lasciaci i tuoi dati e ti mostriamo cosa sta calando — "
 "senza impegno."
 
-#: app/templates/landing/partials/footer.html:59
+#: app/templates/landing/partials/footer.html:60
 msgid "Your name"
 msgstr "Il tuo nome"
 
-#: app/templates/landing/partials/footer.html:64
+#: app/templates/landing/partials/footer.html:65
 msgid "Email Address"
 msgstr "Indirizzo email"
 
-#: app/templates/landing/partials/footer.html:76
+#: app/templates/landing/partials/footer.html:77
 msgid "Get my free audit"
 msgstr "Ottieni il mio audit gratuito"
 
-#: app/templates/landing/partials/footer.html:85
+#: app/templates/landing/partials/footer.html:86
 #, python-format
 msgid "Made with ❤️ and ☕️ by %(founder)s"
 msgstr "Fatto con ❤️ e ☕️ da %(founder)s"
 
-#: app/templates/landing/partials/footer.html:89
+#: app/templates/landing/partials/footer.html:90
 msgid "Privacy"
 msgstr "Privacy"
 
-#: app/templates/landing/partials/footer.html:90
+#: app/templates/landing/partials/footer.html:91
 msgid "Cookies"
 msgstr "Cookie"
 
@@ -1741,3 +1964,23 @@ msgstr "White label"
 
 #~ msgid "One plan. Everything included."
 #~ msgstr "Un solo piano. Tutto incluso."
+
+#~ msgid "SEO Assistant"
+#~ msgstr "Assistente SEO"
+
+#~ msgid ""
+#~ "Ask about your declining pages, priorities, and what to check first. Answers"
+#~ " are grounded in your own Search Console data."
+#~ msgstr ""
+#~ "Chiedi delle tue pagine in calo, delle priorità e di cosa controllare prima."
+#~ " Le risposte si basano sui tuoi dati Search Console."
+
+#~ msgid ""
+#~ "Hi! Ask me about a specific page, a site, or what to fix first — I'll answer"
+#~ " using your own data."
+#~ msgstr ""
+#~ "Ciao! Chiedimi di una pagina specifica, di un sito, o cosa sistemare prima —"
+#~ " rispondo usando i tuoi dati."
+
+#~ msgid "e.g. Why is my homepage losing traffic?"
+#~ msgstr "es. Perché la mia homepage sta perdendo traffico?"

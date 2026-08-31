@@ -10,13 +10,13 @@ LinkBayCMS ha 3 modelli commerciali:
 1) APPSUMO LIFETIME DEAL (pagamento una tantum, licenza a vita) — 3 tier:
    - Tier 1 ($79 one-time): 3 siti collegati, 1.500 pagine monitorate totali,
      refresh dati ogni 7 giorni, 1 export PDF/CSV al mese, niente white
-     label, 100 crediti AI al mese inclusi (+ pacchetti extra acquistabili).
+     label, 10 crediti AI al mese inclusi (+ pacchetti extra acquistabili).
    - Tier 2 ($149 one-time): 10 siti, 8.000 pagine, refresh ogni 3 giorni,
-     export illimitati, niente white label, 500 crediti AI al mese inclusi
+     export illimitati, niente white label, 30 crediti AI al mese inclusi
      (+ pacchetti extra acquistabili).
    - Tier 3 ($239 one-time): 50 siti, 40.000 pagine, refresh giornaliero,
      export illimitati, white label incluso, fino a 3 scansioni
-     contemporanee, 1.500 crediti AI al mese inclusi (+ pacchetti extra
+     contemporanee, 75 crediti AI al mese inclusi (+ pacchetti extra
      acquistabili).
    I codici AppSumo si riscattano dopo la registrazione, da una pagina
    dedicata (Redeem AppSumo code). Un account AppSumo non passa
@@ -26,21 +26,22 @@ LinkBayCMS ha 3 modelli commerciali:
 2) PRO MENSILE (abbonamento ricorrente, Lemon Squeezy) — €79/mese:
    100 siti collegati, fino a circa 250.000 pagine monitorate, refresh dati
    giornaliero, export PDF/CSV illimitati, white label incluso, quota AI
-   generosa (5.000 crediti al mese inclusi), coda con priorità alta,
-   supporto prioritario. Prova gratuita di 13 giorni, nessuna carta di
-   credito richiesta. Cancellabile in ogni momento (l'accesso resta attivo
-   fino a fine periodo già pagato).
+   inclusa (100 crediti al mese), coda con priorità alta, supporto
+   prioritario. Prova gratuita di 13 giorni, nessuna carta di credito
+   richiesta. Cancellabile in ogni momento (l'accesso resta attivo fino a
+   fine periodo già pagato).
 
 3) PRO ANNUALE (abbonamento ricorrente, Lemon Squeezy) — €790/anno
-   (equivalente a circa €65,83/mese, risparmio di circa il 17% rispetto al
-   mensile): stessi identici limiti tecnici del Pro Mensile, cambia solo la
-   fatturazione (una volta l'anno invece che ogni mese). Stessa prova
-   gratuita di 13 giorni.
+   (equivalente a circa €65,83/mese, risparmio di €158/anno, circa il 17%
+   rispetto al mensile): stessi identici limiti tecnici del Pro Mensile,
+   cambia solo la fatturazione (una volta l'anno invece che ogni mese).
+   Stessa prova gratuita di 13 giorni.
 
 CREDITI AI EXTRA (solo per chi ha un piano AppSumo, non per Pro — il piano
-Pro include già una quota mensile generosa): pacchetti one-time da 500,
-1.500 o 5.000 crediti, acquistabili in qualsiasi momento dopo la
-registrazione, non scadono mai.
+Pro include già la sua quota mensile): pacchetti one-time "AI Starter" (50
+crediti, €7), "AI Growth" (150 crediti, €15) o "AI Scale" (500 crediti,
+€39), acquistabili in qualsiasi momento dopo la registrazione, non scadono
+mai.
 
 COME FUNZIONA IL PRODOTTO: ci si collega in sola lettura al proprio account
 Google Search Console (nessuna modifica al sito, nessun codice da

@@ -45,35 +45,35 @@ PLAN_LIMITS: dict[str, PlanLimits] = {
     "appsumo_tier1": PlanLimits(
         name="AppSumo Tier 1",
         site_limit=3, page_limit=1_500, refresh_days=7, export_limit_month=1,
-        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=True,
+        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=10, ai_credit_topups_allowed=True,
         white_label=False, concurrent_scans=1, api_rate_per_min=30, queue_priority="default",
     ),
     # AppSumo Tier 2 — $149 one-time.
     "appsumo_tier2": PlanLimits(
         name="AppSumo Tier 2",
         site_limit=10, page_limit=8_000, refresh_days=3, export_limit_month=-1,
-        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=500, ai_credit_topups_allowed=True,
+        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=30, ai_credit_topups_allowed=True,
         white_label=False, concurrent_scans=2, api_rate_per_min=60, queue_priority="default",
     ),
     # AppSumo Tier 3 — $239 one-time.
     "appsumo_tier3": PlanLimits(
         name="AppSumo Tier 3",
         site_limit=50, page_limit=40_000, refresh_days=1, export_limit_month=-1,
-        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=1_500, ai_credit_topups_allowed=True,
+        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=75, ai_credit_topups_allowed=True,
         white_label=True, concurrent_scans=3, api_rate_per_min=120, queue_priority="high",
     ),
     # Pro Mensile — €79/mese, Lemon Squeezy.
     "subscription_monthly": PlanLimits(
         name="Pro Monthly",
         site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
-        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=5_000, ai_credit_topups_allowed=False,
+        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
         white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
     ),
     # Pro Annuale — €790/anno (~16.7% di sconto vs mensile), stessi limiti tecnici del mensile.
     "subscription_annual": PlanLimits(
         name="Pro Annual",
         site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
-        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=5_000, ai_credit_topups_allowed=False,
+        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
         white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
     ),
 }
@@ -81,12 +81,34 @@ PLAN_LIMITS: dict[str, PlanLimits] = {
 DEFAULT_PLAN_TYPE = "trial"
 
 # Prezzi dei pacchetti crediti AI one-time (solo AppSumo — vedi
-# ai_credit_topups_allowed). Placeholder di prezzo, non specificati nella
-# scheda tecnica: da confermare prima del lancio.
+# ai_credit_topups_allowed). Non scadono mai (nessuna logica di expiry nel
+# ledger, vedi app/entitlements/ai_credits.py).
 AI_CREDIT_PACKS = {
-    500: 19,
-    1500: 49,
-    5000: 129,
+    50: 7,
+    150: 15,
+    500: 39,
+}
+
+# Etichette commerciali dei pacchetti sopra, per la landing /ai-credits e la
+# pagina di acquisto — stessa chiave (crediti) di AI_CREDIT_PACKS, un solo
+# posto da aggiornare se cambia il naming.
+AI_CREDIT_PACK_LABELS = {
+    50: "AI Starter",
+    150: "AI Growth",
+    500: "AI Scale",
+}
+
+# Costo in crediti di ogni tipo di azione AI (AI Analyzer, audit presentation).
+# Fonte unica per app/audits/service.py e per la tabella "Come funzionano" della
+# landing /ai-credits — non duplicare questi numeri altrove.
+AI_CREDIT_ACTION_COSTS = {
+    "explain": 1,               # spiegazione breve di una pagina
+    "suggestion": 2,            # suggerimento operativo dettagliato
+    "full_analysis": 3,         # analisi completa di una pagina
+    "recovery_plan": 5,         # recovery plan multi-step
+    "audit_presentation": 5,    # presentazione reveal.js delle criticità di un sito
+    "site_report": 10,          # report AI per sito
+    "multi_site_report": 25,    # report AI multi-sito/agency (20-30 crediti)
 }
 
 # Prezzi/etichette dei piani ricorrenti e one-time, per la UI (pricing landing,

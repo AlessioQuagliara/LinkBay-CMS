@@ -100,3 +100,43 @@ def run_ai_analysis_job(user_id: int, site_url: str) -> dict:
             record_usage(user, "ai_analysis", site_url=site_url, credits_consumed=AI_CREDIT_COST_PER_RUN if limits.ai_mode == "credit" else None)
 
         return {"ok": True}
+
+
+def run_audit_presentation_job(user_id: int, site_url: str) -> dict:
+    """Stessa forma di ritorno/gestione errori di run_ai_analysis_job — solo
+    la generazione (app/audits/service.py::build_presentation) e il consumo
+    crediti differiscono: qui il costo è AI_CREDIT_ACTION_COSTS["audit_presentation"]
+    (5, non 1) e non c'è nessun freno a cooldown, solo il gate a crediti già
+    fatto sincrono in app/audits/routes.py prima di accodare il job."""
+    app = get_worker_app()
+    with app.app_context():
+        from app.ai.deepseek import DeepSeekError
+        from app.audits.service import NoDataError, build_presentation
+        from app.entitlements.ai_credits import consume_credits
+        from app.entitlements.limits import AI_CREDIT_ACTION_COSTS
+        from app.entitlements.service import get_plan_limits, record_usage
+        from app.extensions import db
+        from app.models import User
+
+        try:
+            presentation = build_presentation(user_id, site_url)
+        except NoDataError:
+            return {"ok": False, "error": "no_data"}
+        except DeepSeekError as e:
+            return {"ok": False, "error": "ai_failed", "message": str(e)}
+        except Exception:
+            app.logger.exception("Audit presentation job failed for %s (user %s)", site_url, user_id)
+            return {"ok": False, "error": "query_failed"}
+
+        cost = AI_CREDIT_ACTION_COSTS["audit_presentation"]
+        user = db.session.get(User, user_id)
+        if user:
+            limits = get_plan_limits(user)
+            if limits.ai_mode == "credit":
+                consume_credits(user, cost, site_url=site_url)
+            record_usage(
+                user, "audit_presentation", site_url=site_url,
+                credits_consumed=cost if limits.ai_mode == "credit" else None,
+            )
+
+        return {"ok": True, "presentation_id": presentation.id}

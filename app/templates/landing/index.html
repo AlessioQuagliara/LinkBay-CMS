@@ -260,47 +260,31 @@
                     </p>
                 </div>
 
-                <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:max-w-2xl lg:mx-auto">
-                    <div class="card border-base-300 border p-3">
-                        <div class="bg-primary/10 rounded-box p-6">
-                            <div class="flex justify-between">
-                                <h3 class="text-error text-xl font-semibold">{{ _("Pro Monthly") }}</h3>
-                                <div class="badge badge-primary badge-sm">{{ _("13-day free trial") }}</div>
-                            </div>
-                            <p class="mt-4 flex items-baseline">
-                                <span class="text-5xl font-semibold tracking-tight">€79</span>
-                                <span class="ml-1 text-xl font-medium">{{ _("/month") }}</span>
-                            </p>
-                            <p class="mt-2">
-                                {{ _("No credit card to start. Cancel anytime once you're on the paid plan.") }}
-                            </p>
-                        </div>
-                        <div class="p-6">
-                            <ul class="list-inside list-disc space-y-3" role="list">
-                                <li><span class="ms-3">{{ _("Declining pages, prioritized automatically") }}</span></li>
-                                <li><span class="ms-3">{{ _("AI suggestions on the pages losing traffic") }}</span></li>
-                                <li><span class="ms-3">{{ _("Full history from the day you connect your site") }}</span></li>
-                            </ul>
-                        </div>
-                        <a href="{{ url_for('auth.register') }}">
-                            <button class="btn btn-error text-white btn-block mt-auto">
-                                {{ _("Start your free trial") }}
-                            </button>
-                        </a>
+                <div class="mt-8 flex justify-center">
+                    <div class="join">
+                        <button type="button" class="btn join-item" data-pricing-toggle="monthly">{{ _("Monthly") }}</button>
+                        <button type="button" class="btn join-item" data-pricing-toggle="annual">
+                            {{ _("Annual") }}
+                            <span class="badge badge-primary badge-sm ms-1">{{ _("Save ~17%%") }}</span>
+                        </button>
                     </div>
+                </div>
 
+                <div class="mt-6 lg:max-w-md lg:mx-auto" data-pricing-card>
                     <div class="card border-primary border p-3">
                         <div class="bg-primary/10 rounded-box p-6">
                             <div class="flex justify-between">
-                                <h3 class="text-error text-xl font-semibold">{{ _("Pro Annual") }}</h3>
-                                <div class="badge badge-primary badge-sm">{{ _("Save ~17%%") }}</div>
+                                <h3 class="text-error text-xl font-semibold">{{ _("Pro") }}</h3>
+                                <div class="badge badge-primary badge-sm">{{ _("13-day free trial") }}</div>
                             </div>
                             <p class="mt-4 flex items-baseline">
-                                <span class="text-5xl font-semibold tracking-tight">€790</span>
-                                <span class="ml-1 text-xl font-medium">{{ _("/year") }}</span>
+                                <span class="text-5xl font-semibold tracking-tight" data-pricing-amount data-monthly="€79" data-annual="€790">€79</span>
+                                <span class="ml-1 text-xl font-medium" data-pricing-period data-monthly="{{ _('/month') }}" data-annual="{{ _('/year') }}">{{ _("/month") }}</span>
                             </p>
-                            <p class="mt-2">
-                                {{ _("Same Pro plan, billed once a year — %(price)s/month equivalent.", price="€65.83") }}
+                            <p class="mt-2" data-pricing-note
+                               data-monthly="{{ _("No credit card to start. Cancel anytime once you're on the paid plan.") }}"
+                               data-annual="{{ _('Billed once a year — %(price)s/month equivalent. Save €158/year (about 17%%).', price='€65.83') }}">
+                                {{ _("No credit card to start. Cancel anytime once you're on the paid plan.") }}
                             </p>
                         </div>
                         <div class="p-6">
@@ -321,6 +305,8 @@
                 <p class="text-base-content/60 text-center text-sm mt-6">
                     {{ _("Got an AppSumo code?") }}
                     <a class="link link-hover" href="{{ url_for('billing.redeem') }}">{{ _("Redeem it here") }}</a>.
+                    {{ _("Curious how AI credits work?") }}
+                    <a class="link link-hover" href="{{ url_for('main.ai_credits') }}">{{ _("See AI Credits") }}</a>.
                 </p>
             </div>
         </section>
