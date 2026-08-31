@@ -6,7 +6,7 @@ Adattato dalla bozza originale: qui l'account collegato è lo `User` loggato
 app/gsc/repository.py, non in sessione e non su file.
 """
 import os
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 from flask import Blueprint, current_app, flash, jsonify, redirect, request, session, url_for
 from flask_babel import gettext as _
@@ -15,17 +15,34 @@ import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 
+from app.entitlements.service import check_site_limit, get_plan_limits, record_usage
 from app.gsc.history import get_site_series, sync_site_daily
 from app.gsc.insights import build_insights
 from app.gsc.page_history import sync_page_monthly
 from app.gsc.repository import (
     credentials_to_dict,
     delete_gsc_credentials,
-    get_monitored_site,
     load_gsc_credentials,
     save_gsc_credentials,
-    save_monitored_site,
 )
+from app.gsc.sites import (
+    add_monitored_site,
+    deactivate_monitored_site,
+    get_monitored_site_row,
+    list_monitored_sites,
+    touch_last_synced,
+)
+from app.jobs.concurrency import acquire_scan_slot
+from app.jobs.queue import get_queue, job_status_payload, queue_name_for_user
+from app.jobs.tasks import run_gsc_scan_job
+
+
+def _aware(dt):
+    # Stesso pattern di User._aware: SQLite (test) torna datetime naive, li
+    # normalizziamo a UTC per poterli confrontare con datetime.now(timezone.utc).
+    if dt is not None and dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
 
 gsc_bp = Blueprint("gsc", __name__, url_prefix="/gsc")
 
@@ -199,24 +216,53 @@ def api_sites():
     ]
 
     save_gsc_credentials(current_user.id, credentials_to_dict(credentials))
+    monitored = list_monitored_sites(current_user.id)
     return jsonify({
         "sites": sites,
-        "monitored_site_url": get_monitored_site(current_user.id),
+        "monitored_site_urls": [row.site_url for row in monitored],
+        # Alias singolare deprecato: mantenuto per un ciclo di deploy così il
+        # JS esistente (overview.js/insights.js/declining.js), che legge
+        # ancora questo campo per preselezionare la tendina, continua a
+        # funzionare senza modifiche. Va rimosso in Fase 6 (UI multi-sito).
+        "monitored_site_url": monitored[0].site_url if monitored else None,
     })
+
+
+@gsc_bp.route("/api/monitored-sites")
+@login_required
+def api_monitored_sites():
+    """Elenco dei soli siti scelti dall'utente per il monitoraggio (a
+    differenza di /api/sites, che elenca tutte le proprietà verificate su
+    Google)."""
+    rows = list_monitored_sites(current_user.id)
+    return jsonify({"sites": [row.site_url for row in rows]})
 
 
 @gsc_bp.route("/api/monitored-site", methods=["POST"])
 @login_required
 def api_monitored_site():
-    """Persiste il sito scelto dall'utente per il monitoraggio e avvia subito
-    il backfill dello storico (giornaliero + mensile per pagina), invece di
+    """Aggiunge un sito al monitoraggio dell'utente e avvia subito il
+    backfill dello storico (giornaliero + mensile per pagina), invece di
     aspettare la prima visita a Insights o il cron settimanale. È il momento
-    giusto per farlo: prima di scegliere il sito non sappiamo ancora quale
-    storico backfillare."""
+    giusto per farlo: prima di aggiungere il sito non sappiamo ancora quale
+    storico backfillare.
+
+    Il limite di siti del piano (app/entitlements) è bloccante: un sito già
+    attivo per l'utente non conta come "nuovo" (idempotente), quindi
+    ri-aggiungere lo stesso sito non fa scattare il limite per errore."""
     site = request.form.get("site")
     if not site:
         return jsonify({"error": "missing_site"}), 400
-    save_monitored_site(current_user.id, site)
+
+    already_active = any(row.site_url == site for row in list_monitored_sites(current_user.id))
+    if not already_active:
+        check = check_site_limit(current_user)
+        if not check.allowed:
+            return jsonify({"error": "site_limit_reached", "message": check.message, "upsell": check.upsell}), 403
+
+    add_monitored_site(current_user.id, site)
+    if not already_active:
+        record_usage(current_user, "site_added", site_url=site)
 
     try:
         creds = load_gsc_credentials(current_user.id)
@@ -226,8 +272,9 @@ def api_monitored_site():
             sync_site_daily(service, current_user.id, site, days=28)
             sync_page_monthly(service, current_user.id, site)
             save_gsc_credentials(current_user.id, credentials_to_dict(credentials))
+            touch_last_synced(current_user.id, site)
     except Exception:
-        # Non bloccare la selezione del sito se il backfill fallisce: il cron
+        # Non bloccare l'aggiunta del sito se il backfill fallisce: il cron
         # notturno/settimanale (flask sync-full-history / run-decay-rules)
         # recupera comunque lo storico più avanti.
         current_app.logger.exception("Backfill iniziale fallito per %s (user %s)", site, current_user.id)
@@ -235,7 +282,65 @@ def api_monitored_site():
     return jsonify({"monitored_site_url": site})
 
 
+@gsc_bp.route("/api/monitored-site/remove", methods=["POST"])
+@login_required
+def api_monitored_site_remove():
+    """Disattiva un sito dal monitoraggio (non cancella lo storico raccolto:
+    vedi app/models/monitored_site.py)."""
+    site = request.form.get("site")
+    if not site:
+        return jsonify({"error": "missing_site"}), 400
+    removed = deactivate_monitored_site(current_user.id, site)
+    if not removed:
+        return jsonify({"error": "not_found"}), 404
+    return jsonify({"removed": site})
+
+
 ALLOWED_PERIODS = {7, 28, 90}
+
+
+def _maybe_queue_background_scan(user, site_url) -> bool:
+    """Se il sito non è mai stato sincronizzato o l'ultimo sync è più
+    vecchio del refresh_interval del piano, mette in coda un aggiornamento
+    di GscSiteDaily/GscPageMonthly/PageAlert in background invece di farlo
+    dentro la request (comportamento precedente). Ritorna True se i dati di
+    storico mostrati potrebbero essere indietro rispetto a Search Console —
+    la UI può usare questo flag per mostrare "aggiornamento in corso"
+    (cablaggio lato frontend rimandato a una fase successiva).
+
+    Nota: NON elimina le chiamate GSC live che build_insights() fa comunque
+    per il periodo corrente (overview/pagine/query) — quelle leggono
+    direttamente dall'API per il range richiesto (7/28/90gg) e non hanno
+    un equivalente pre-aggregato in DB oggi (solo storico giornaliero di
+    sito e mensile per pagina, non giornaliero per pagina). Qui si accoda
+    solo il refresh dello storico persistito, che prima girava sincrono e
+    ripetuto ad ogni apertura della pagina indipendentemente dal piano."""
+    row = get_monitored_site_row(user.id, site_url)
+    limits = get_plan_limits(user)
+    last_synced = _aware(row.last_synced_at) if row else None
+    stale = last_synced is None or (
+        datetime.now(timezone.utc) - last_synced >= timedelta(days=limits.refresh_days)
+    )
+    if not stale:
+        return False
+
+    # Silenzioso se non c'è uno slot di concorrenza libero: è un refresh
+    # passivo (non un click esplicito dell'utente), non deve mostrare un
+    # errore — semplicemente non accoda un altro job finché quello in corso
+    # non libera lo slot.
+    if acquire_scan_slot(user.id, limits.concurrent_scans):
+        try:
+            get_queue(queue_name_for_user(user)).enqueue(
+                run_gsc_scan_job, user.id, site_url, job_timeout=300
+            )
+        except Exception:
+            current_app.logger.exception(
+                "Impossibile accodare lo scan in background per %s (user %s)", site_url, user.id
+            )
+            from app.jobs.concurrency import release_scan_slot
+
+            release_scan_slot(user.id)
+    return True
 
 
 @gsc_bp.route("/api/insights")
@@ -262,9 +367,6 @@ def api_insights():
     service = _build_service(credentials)
 
     try:
-        # Prima allinea lo storico su DB (backfill/refresh), poi calcola i
-        # numeri del periodo live e rileggi la serie dal DB per il grafico.
-        sync_site_daily(service, current_user.id, site_url, days)
         data = build_insights(service, site_url, days=days)
         data["series"] = get_site_series(current_user.id, site_url, days)
     except Exception:
@@ -272,7 +374,54 @@ def api_insights():
         return jsonify({"error": "query_failed"}), 502
 
     save_gsc_credentials(current_user.id, credentials_to_dict(credentials))
+    # Lo storico persistito (grafico, declining pages) si aggiorna in
+    # background quando è più vecchio del refresh_interval del piano, non
+    # più in sincrono ad ogni apertura di questa pagina (vedi Fase 2 del
+    # piano multi-tier).
+    data["stale"] = _maybe_queue_background_scan(current_user, site_url)
     return jsonify(data)
+
+
+@gsc_bp.route("/api/scan-now", methods=["POST"])
+@login_required
+def api_scan_now():
+    """Refresh manuale di un sito già monitorato. Bloccato da due limiti del
+    piano: il refresh_interval minimo (evita di aggirare il rate-limit di
+    refresh ricliccando) e concurrent_scans (semaforo Redis, vedi
+    app/jobs/concurrency.py)."""
+    site_url = request.form.get("site")
+    if not site_url:
+        return jsonify({"error": "missing_site"}), 400
+
+    row = get_monitored_site_row(current_user.id, site_url)
+    if row is None or not row.is_active:
+        return jsonify({"error": "not_monitored"}), 404
+
+    limits = get_plan_limits(current_user)
+    last_synced = _aware(row.last_synced_at)
+    if last_synced is not None:
+        elapsed = datetime.now(timezone.utc) - last_synced
+        min_interval = timedelta(days=limits.refresh_days)
+        if elapsed < min_interval:
+            retry_after = min_interval - elapsed
+            return jsonify({
+                "error": "refresh_too_soon",
+                "retry_after_hours": max(1, int(retry_after.total_seconds() // 3600)),
+            }), 429
+
+    if not acquire_scan_slot(current_user.id, limits.concurrent_scans):
+        return jsonify({"error": "concurrent_limit"}), 409
+
+    job = get_queue(queue_name_for_user(current_user)).enqueue(
+        run_gsc_scan_job, current_user.id, site_url, job_timeout=300
+    )
+    return jsonify({"status": "queued", "job_id": job.id})
+
+
+@gsc_bp.route("/api/scan-status/<job_id>")
+@login_required
+def api_scan_status(job_id):
+    return jsonify(job_status_payload(job_id))
 
 
 @gsc_bp.route("/analytics/<path:site_url>")

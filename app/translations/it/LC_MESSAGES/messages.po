@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-30 18:19+0200\n"
+"POT-Creation-Date: 2026-08-31 18:25+0200\n"
 "PO-Revision-Date: 2026-08-30 15:01+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: it <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/__init__.py:51
+#: app/__init__.py:52
 msgid "Please sign in to continue."
 msgstr "Effettua l'accesso per continuare."
 
@@ -61,6 +61,7 @@ msgid "The service is temporarily unavailable. Please try again shortly."
 msgstr "Il servizio è temporaneamente non disponibile. Riprova tra poco."
 
 #: app/auth/forms.py:8 app/settings/forms.py:8
+#: app/templates/landing/partials/footer.html:54
 msgid "Name"
 msgstr "Nome"
 
@@ -73,7 +74,7 @@ msgstr "Email"
 msgid "Password"
 msgstr "Password"
 
-#: app/auth/forms.py:11 app/settings/forms.py:21
+#: app/auth/forms.py:11 app/settings/forms.py:26
 msgid "Minimum 8 characters."
 msgstr "Minimo 8 caratteri."
 
@@ -81,7 +82,7 @@ msgstr "Minimo 8 caratteri."
 msgid "Confirm password"
 msgstr "Conferma password"
 
-#: app/auth/forms.py:15 app/settings/forms.py:25
+#: app/auth/forms.py:15 app/settings/forms.py:30
 msgid "Passwords do not match."
 msgstr "Le password non coincidono."
 
@@ -91,6 +92,7 @@ msgstr "Crea account"
 
 #: app/auth/forms.py:23 app/templates/auth/login.html:2
 #: app/templates/auth/login.html:10 app/templates/auth/register.html:55
+#: app/templates/landing/partials/footer.html:38
 msgid "Sign in"
 msgstr "Accedi"
 
@@ -123,20 +125,20 @@ msgstr "Troppi tentativi. Richiedi un nuovo codice."
 msgid "Incorrect code. %(left)s attempt(s) left."
 msgstr "Codice errato. %(left)s tentativo/i rimasti."
 
-#: app/auth/routes.py:38
+#: app/auth/routes.py:37
 msgid "We've emailed you a 6-digit verification code."
 msgstr "Ti abbiamo inviato via email un codice di verifica a 6 cifre."
 
-#: app/auth/routes.py:41
+#: app/auth/routes.py:40
 #, python-format
 msgid "Dev mode (email not configured): your code is %(code)s."
 msgstr "Modalità sviluppo (email non configurata): il tuo codice è %(code)s."
 
-#: app/auth/routes.py:43
+#: app/auth/routes.py:42
 msgid "We couldn't send the email right now. Please try again."
 msgstr "Non è stato possibile inviare l'email in questo momento. Riprova."
 
-#: app/auth/routes.py:55
+#: app/auth/routes.py:54
 msgid "There is already an account with this email address."
 msgstr "Esiste già un account con questo indirizzo email."
 
@@ -166,36 +168,60 @@ msgstr "Attendi %(seconds)ss prima di richiedere un nuovo codice."
 msgid "You've been logged out."
 msgstr "Sei stato disconnesso."
 
-#: app/billing/routes.py:23
+#: app/billing/routes.py:33 app/billing/routes.py:35
 msgid "€79/month"
 msgstr "€79/mese"
 
-#: app/billing/routes.py:45
+#: app/billing/routes.py:34
+msgid "€790/year"
+msgstr "€790/anno"
+
+#: app/billing/routes.py:69 app/billing/routes.py:101
+msgid ""
+"Your plan already includes a generous monthly AI quota — extra credit packs "
+"aren't needed."
+msgstr ""
+"Il tuo piano include già una quota AI mensile generosa — non servono "
+"pacchetti crediti extra."
+
+#: app/billing/routes.py:88 app/billing/routes.py:108
 msgid "We couldn't start checkout. Please try again shortly."
 msgstr "Non è stato possibile avviare il pagamento. Riprova tra poco."
 
-#: app/billing/routes.py:65
+#: app/billing/routes.py:98
+msgid ""
+"AppSumo lifetime accounts can't switch to a monthly/annual plan directly. "
+"Contact support to migrate your account."
+msgstr ""
+"Gli account AppSumo lifetime non possono passare direttamente a un piano "
+"mensile/annuale. Contatta il supporto per migrare il tuo account."
+
+#: app/billing/routes.py:128
 msgid "We couldn't open subscription management. Please try again shortly."
 msgstr ""
 "Non è stato possibile aprire la gestione abbonamento. Riprova tra poco."
 
-#: app/billing/routes.py:77
+#: app/billing/routes.py:140
 msgid "Invalid code."
 msgstr "Codice non valido."
 
-#: app/billing/routes.py:79
+#: app/billing/routes.py:142
 msgid "This code has already been used."
 msgstr "Questo codice è già stato utilizzato."
 
-#: app/billing/routes.py:85
+#: app/billing/routes.py:148
+msgid "This code isn't ready yet. Please contact support."
+msgstr "Questo codice non è ancora pronto. Contatta il supporto."
+
+#: app/billing/routes.py:155
 msgid "Code redeemed: your account is now lifetime."
 msgstr "Codice riscattato: il tuo account è ora a vita."
 
-#: app/emails/digest.py:51 app/templates/emails/weekly_digest.html:12
+#: app/emails/digest.py:53 app/templates/emails/weekly_digest.html:12
 msgid "Your top declining pages this week"
 msgstr "Le tue top declining pages di questa settimana"
 
-#: app/gsc/gsc.py:95
+#: app/gsc/gsc.py:112
 msgid ""
 "Google Search Console is not configured on this server yet (missing "
 "GOOGLE_CLIENT_ID/SECRET)."
@@ -203,25 +229,25 @@ msgstr ""
 "Google Search Console non è ancora configurato su questo server (manca "
 "GOOGLE_CLIENT_ID/SECRET)."
 
-#: app/gsc/gsc.py:125
+#: app/gsc/gsc.py:142
 msgid "Could not verify the connection request. Please try connecting again."
 msgstr ""
 "Non è stato possibile verificare la richiesta di connessione. Riprova a "
 "connetterti."
 
-#: app/gsc/gsc.py:129
+#: app/gsc/gsc.py:146
 msgid "The connection request expired. Please try connecting again."
 msgstr "La richiesta di connessione è scaduta. Riprova a connetterti."
 
-#: app/gsc/gsc.py:143
+#: app/gsc/gsc.py:160
 msgid "Google didn't confirm the connection. Please try again."
 msgstr "Google non ha confermato la connessione. Riprova."
 
-#: app/gsc/gsc.py:148
+#: app/gsc/gsc.py:165
 msgid "Google Search Console connected."
 msgstr "Google Search Console collegato."
 
-#: app/gsc/gsc.py:156
+#: app/gsc/gsc.py:173
 msgid "Google Search Console disconnected."
 msgstr "Google Search Console disconnesso."
 
@@ -229,7 +255,7 @@ msgstr "Google Search Console disconnesso."
 msgid "Language"
 msgstr "Lingua"
 
-#: app/settings/forms.py:10 app/settings/forms.py:15
+#: app/settings/forms.py:10 app/settings/forms.py:15 app/settings/forms.py:20
 msgid "Save changes"
 msgstr "Salva modifiche"
 
@@ -238,30 +264,35 @@ msgid "Weekly email with my top declining pages"
 msgstr "Email settimanale con le mie top declining pages"
 
 #: app/settings/forms.py:19
+msgid "Hide LinkBayCMS branding from PDF/CSV exports"
+msgstr "Nascondi il branding LinkBayCMS dagli export PDF/CSV"
+
+#: app/settings/forms.py:24
 msgid "Current password"
 msgstr "Password attuale"
 
-#: app/settings/forms.py:21
+#: app/settings/forms.py:26
 msgid "New password"
 msgstr "Nuova password"
 
-#: app/settings/forms.py:24
+#: app/settings/forms.py:29
 msgid "Confirm new password"
 msgstr "Conferma nuova password"
 
-#: app/settings/forms.py:27 app/templates/settings/index.html:58
+#: app/settings/forms.py:32 app/templates/settings/index.html:76
 msgid "Change password"
 msgstr "Cambia password"
 
-#: app/settings/routes.py:26 app/settings/routes.py:32
+#: app/settings/routes.py:31 app/settings/routes.py:37
+#: app/settings/routes.py:56
 msgid "Settings saved."
 msgstr "Impostazioni salvate."
 
-#: app/settings/routes.py:37
+#: app/settings/routes.py:42
 msgid "Current password is incorrect."
 msgstr "La password attuale non è corretta."
 
-#: app/settings/routes.py:41
+#: app/settings/routes.py:46
 msgid "Password changed."
 msgstr "Password cambiata."
 
@@ -270,6 +301,7 @@ msgid "Don't have an account?"
 msgstr "Non hai un account?"
 
 #: app/templates/auth/login.html:37 app/templates/auth/register.html:2
+#: app/templates/landing/partials/footer.html:37
 msgid "Sign up"
 msgstr "Registrati"
 
@@ -301,45 +333,65 @@ msgstr "Inserisci il tuo codice"
 msgid "We sent a 6-digit code to"
 msgstr "Abbiamo inviato un codice a 6 cifre a"
 
-#: app/templates/auth/verify.html:42
+#: app/templates/auth/verify.html:54
 msgid "6-digit verification code"
 msgstr "Codice di verifica a 6 cifre"
 
-#: app/templates/auth/verify.html:43 app/templates/auth/verify.html:44
-#: app/templates/auth/verify.html:45 app/templates/auth/verify.html:46
-#: app/templates/auth/verify.html:47 app/templates/auth/verify.html:48
+#: app/templates/auth/verify.html:55 app/templates/auth/verify.html:56
+#: app/templates/auth/verify.html:57 app/templates/auth/verify.html:58
+#: app/templates/auth/verify.html:59 app/templates/auth/verify.html:60
 #, python-format
 msgid "Digit %(n)s"
 msgstr "Cifra %(n)s"
 
-#: app/templates/auth/verify.html:55
-#, python-format
-msgid "Press %(kbd)s to refocus the code field."
-msgstr "Premi %(kbd)s per rimettere il focus sul campo del codice."
-
-#: app/templates/auth/verify.html:63
+#: app/templates/auth/verify.html:71
 msgid "Didn't get the email?"
 msgstr "Non hai ricevuto l'email?"
 
-#: app/templates/auth/verify.html:66 app/templates/auth/verify.html:69
+#: app/templates/auth/verify.html:74 app/templates/auth/verify.html:77
 msgid "Resend code"
 msgstr "Invia di nuovo"
 
-#: app/templates/auth/verify.html:67
+#: app/templates/auth/verify.html:75
 #, python-brace-format
 msgid "Resend in {s}s"
 msgstr "Reinvia tra {s}s"
 
-#: app/templates/auth/verify.html:74
+#: app/templates/auth/verify.html:82
 msgid "Use a different account"
 msgstr "Usa un altro account"
+
+#: app/templates/billing/credits.html:2 app/templates/billing/credits.html:6
+msgid "AI Credits"
+msgstr "Crediti AI"
+
+#: app/templates/billing/credits.html:8
+msgid "Extra AI suggestions on top of your plan. Credits never expire."
+msgstr "Suggerimenti AI extra oltre al tuo piano. I crediti non scadono mai."
+
+#: app/templates/billing/credits.html:11
+#, python-format
+msgid "Current balance: %(balance)s credits"
+msgstr "Saldo attuale: %(balance)s crediti"
+
+#: app/templates/billing/credits.html:21
+msgid "credits"
+msgstr "crediti"
+
+#: app/templates/billing/credits.html:27
+msgid "Buy"
+msgstr "Acquista"
+
+#: app/templates/billing/credits.html:36
+msgid "Back to subscription"
+msgstr "Torna all'abbonamento"
 
 #: app/templates/billing/redeem.html:2
 msgid "Redeem AppSumo code"
 msgstr "Riscatta codice AppSumo"
 
 #: app/templates/billing/redeem.html:10 app/templates/billing/upgrade.html:10
-#: app/templates/dashboard/layout.html:134
+#: app/templates/dashboard/layout.html:140
 msgid "Logout"
 msgstr "Esci"
 
@@ -367,8 +419,8 @@ msgstr "Non hai un codice? Vedi il piano Pro"
 
 #: app/templates/billing/subscription.html:2
 #: app/templates/billing/subscription.html:6
-#: app/templates/dashboard/layout.html:74
-#: app/templates/dashboard/layout.html:116
+#: app/templates/dashboard/layout.html:80
+#: app/templates/dashboard/layout.html:122
 msgid "Subscription"
 msgstr "Abbonamento"
 
@@ -376,66 +428,98 @@ msgstr "Abbonamento"
 msgid "Your plan and billing status."
 msgstr "Il tuo piano e lo stato di fatturazione."
 
-#: app/templates/billing/subscription.html:16
+#: app/templates/billing/subscription.html:18
+#, python-format
+msgid "AppSumo — %(tier)s"
+msgstr "AppSumo — %(tier)s"
+
+#: app/templates/billing/subscription.html:20
 msgid "Lifetime"
 msgstr "A vita"
 
-#: app/templates/billing/subscription.html:17
+#: app/templates/billing/subscription.html:23
 #: app/templates/billing/upgrade.html:19
 msgid "Activated with an AppSumo code — nothing to manage."
 msgstr "Attivato con un codice AppSumo — nessun abbonamento da gestire."
 
-#: app/templates/billing/subscription.html:24
+#: app/templates/billing/subscription.html:30
+#, python-format
+msgid "AI credits: %(balance)s — buy more"
+msgstr "Crediti AI: %(balance)s — acquistane altri"
+
+#: app/templates/billing/subscription.html:35
+#: app/templates/billing/subscription.html:54
+#, python-format
+msgid "AI credits: %(balance)s"
+msgstr "Crediti AI: %(balance)s"
+
+#: app/templates/billing/subscription.html:43
 msgid "Pro — active"
 msgstr "Pro — attivo"
 
-#: app/templates/billing/subscription.html:31
-#: app/templates/billing/upgrade.html:27
+#: app/templates/billing/subscription.html:50
+#: app/templates/billing/upgrade.html:33
 msgid "Manage subscription"
 msgstr "Gestisci abbonamento"
 
-#: app/templates/billing/subscription.html:41
+#: app/templates/billing/subscription.html:61
+msgid "Payment failed"
+msgstr "Pagamento fallito"
+
+#: app/templates/billing/subscription.html:63
+msgid ""
+"We couldn't process your last payment. Update your payment method within the"
+" grace period to keep access."
+msgstr ""
+"Non siamo riusciti a elaborare il tuo ultimo pagamento. Aggiorna il metodo "
+"di pagamento entro il periodo di grazia per mantenere l'accesso."
+
+#: app/templates/billing/subscription.html:70
+msgid "Update payment method"
+msgstr "Aggiorna metodo di pagamento"
+
+#: app/templates/billing/subscription.html:80
 msgid "Free trial — 1 day left"
 msgstr "Prova gratuita — 1 giorno rimasto"
 
-#: app/templates/billing/subscription.html:43
+#: app/templates/billing/subscription.html:82
 #, python-format
 msgid "Free trial — %(days)s days left"
 msgstr "Prova gratuita — %(days)s giorni rimasti"
 
-#: app/templates/billing/subscription.html:47
+#: app/templates/billing/subscription.html:86
 msgid "Free trial ended"
 msgstr "Prova gratuita terminata"
 
-#: app/templates/billing/subscription.html:49
+#: app/templates/billing/subscription.html:88
 msgid "No credit card on file."
 msgstr "Nessuna carta di credito registrata."
 
-#: app/templates/billing/subscription.html:54
-#: app/templates/billing/upgrade.html:68
+#: app/templates/billing/subscription.html:93
 #, python-format
 msgid "Upgrade to Pro — %(price)s"
 msgstr "Passa a Pro — %(price)s"
 
-#: app/templates/billing/subscription.html:61
+#: app/templates/billing/subscription.html:100
 msgid "No active subscription"
 msgstr "Nessun abbonamento attivo"
 
-#: app/templates/billing/subscription.html:62
+#: app/templates/billing/subscription.html:101
 msgid "Your subscription was canceled."
 msgstr "Il tuo abbonamento è stato annullato."
 
-#: app/templates/billing/subscription.html:67
+#: app/templates/billing/subscription.html:106
 #, python-format
 msgid "Resubscribe — %(price)s"
 msgstr "Riattiva l'abbonamento — %(price)s"
 
-#: app/templates/billing/subscription.html:75
-#: app/templates/billing/upgrade.html:73
+#: app/templates/billing/subscription.html:114
+#: app/templates/billing/upgrade.html:89
 msgid "Have an AppSumo code?"
 msgstr "Hai un codice AppSumo?"
 
-#: app/templates/billing/subscription.html:76
+#: app/templates/billing/subscription.html:115
+#: app/templates/landing/index.html:323
 msgid "Redeem it here"
 msgstr "Riscattalo qui"
 
@@ -465,35 +549,39 @@ msgstr "Upgrade"
 msgid "Your account is lifetime"
 msgstr "Il tuo account è a vita"
 
-#: app/templates/billing/upgrade.html:20 app/templates/billing/upgrade.html:29
+#: app/templates/billing/upgrade.html:23
+msgid "Buy AI credits"
+msgstr "Acquista crediti AI"
+
+#: app/templates/billing/upgrade.html:26 app/templates/billing/upgrade.html:35
 msgid "Back to dashboard"
 msgstr "Torna alla dashboard"
 
-#: app/templates/billing/upgrade.html:23
+#: app/templates/billing/upgrade.html:29
 msgid "Your Pro subscription is active"
 msgstr "Il tuo abbonamento Pro è attivo"
 
-#: app/templates/billing/upgrade.html:24
+#: app/templates/billing/upgrade.html:30
 msgid "You can manage or cancel it anytime."
 msgstr "Puoi gestirlo o annullarlo in qualsiasi momento."
 
-#: app/templates/billing/upgrade.html:34
+#: app/templates/billing/upgrade.html:40
 #, python-format
 msgid "%(num)s day left in your trial"
 msgid_plural "%(num)s days left in your trial"
 msgstr[0] "%(num)s giorno rimasto nel trial"
 msgstr[1] "%(num)s giorni rimasti nel trial"
 
-#: app/templates/billing/upgrade.html:39
+#: app/templates/billing/upgrade.html:45
 msgid "Trial ended"
 msgstr "Prova terminata"
 
-#: app/templates/billing/upgrade.html:43
+#: app/templates/billing/upgrade.html:49
 #: app/templates/dashboard/layout.html:28
 msgid "Upgrade to Pro"
 msgstr "Passa a Pro"
 
-#: app/templates/billing/upgrade.html:45
+#: app/templates/billing/upgrade.html:51
 msgid ""
 "Keep monitoring declining pages and getting AI suggestions, without "
 "interruption."
@@ -501,22 +589,34 @@ msgstr ""
 "Continua a monitorare le pagine in calo e a ricevere suggerimenti AI, senza "
 "interruzioni."
 
-#: app/templates/billing/upgrade.html:52
+#: app/templates/billing/upgrade.html:57
 msgid "Unlimited Insights and Declining Pages"
 msgstr "Insights e Declining Pages senza limiti"
 
-#: app/templates/billing/upgrade.html:56
+#: app/templates/billing/upgrade.html:61
 msgid "AI suggestions on declining pages"
 msgstr "Suggerimenti AI sulle pagine in calo"
 
-#: app/templates/billing/upgrade.html:60
+#: app/templates/billing/upgrade.html:65 app/templates/landing/index.html:282
+#: app/templates/landing/index.html:310
 msgid "Full history from the day you connect your site"
 msgstr "Storico completo da quando colleghi il sito"
+
+#: app/templates/billing/upgrade.html:75
+#, python-format
+msgid "Monthly — %(price)s"
+msgstr "Mensile — %(price)s"
+
+#: app/templates/billing/upgrade.html:83
+#, python-format
+msgid "Annual — %(price)s"
+msgstr "Annuale — %(price)s"
 
 #: app/templates/dashboard/connect.html:2
 #: app/templates/dashboard/connect.html:44
 #: app/templates/dashboard/declining.html:42
-#: app/templates/dashboard/insights.html:43
+#: app/templates/dashboard/insights.html:45
+#: app/templates/landing/index.html:155
 msgid "Connect Search Console"
 msgstr "Collega Search Console"
 
@@ -572,8 +672,8 @@ msgstr ""
 
 #: app/templates/dashboard/connect.html:48
 #: app/templates/dashboard/declining.html:45
-#: app/templates/dashboard/insights.html:46
-#: app/templates/dashboard/layout.html:122
+#: app/templates/dashboard/insights.html:48
+#: app/templates/dashboard/layout.html:128
 msgid "Privacy Policy"
 msgstr "Informativa sulla privacy"
 
@@ -587,7 +687,7 @@ msgstr "impostazioni dell'account Google"
 
 #: app/templates/dashboard/declining.html:2
 #: app/templates/dashboard/declining.html:12
-#: app/templates/dashboard/layout.html:62
+#: app/templates/dashboard/layout.html:68
 msgid "Declining Pages"
 msgstr "Pagine in calo"
 
@@ -599,18 +699,18 @@ msgstr ""
 "priorità."
 
 #: app/templates/dashboard/declining.html:27
-#: app/templates/dashboard/insights.html:28
+#: app/templates/dashboard/insights.html:30
 #: app/templates/dashboard/overview.html:45
 msgid "Loading sites…"
 msgstr "Caricamento siti…"
 
 #: app/templates/dashboard/declining.html:36
-#: app/templates/dashboard/insights.html:37
+#: app/templates/dashboard/insights.html:39
 msgid "No Search Console account connected"
 msgstr "Nessun account Search Console connesso"
 
 #: app/templates/dashboard/declining.html:38
-#: app/templates/dashboard/insights.html:39
+#: app/templates/dashboard/insights.html:41
 msgid ""
 "Connect your Google Search Console account to see which pages are losing "
 "organic traffic."
@@ -619,7 +719,7 @@ msgstr ""
 "perdendo traffico organico."
 
 #: app/templates/dashboard/declining.html:45
-#: app/templates/dashboard/insights.html:46
+#: app/templates/dashboard/insights.html:48
 msgid "Read-only access. See our"
 msgstr "Accesso in sola lettura. Consulta la nostra"
 
@@ -644,8 +744,9 @@ msgid "All"
 msgstr "Tutte"
 
 #: app/templates/dashboard/declining.html:71
-#: app/templates/dashboard/insights.html:87
+#: app/templates/dashboard/insights.html:89
 #: app/templates/dashboard/overview.html:89
+#: app/templates/dashboard/sites.html:33
 msgid "Something went wrong loading your data."
 msgstr "Si è verificato un errore nel caricamento dei dati."
 
@@ -658,9 +759,27 @@ msgid "Nothing to report — no page is losing traffic on its own."
 msgstr ""
 "Niente da segnalare — nessuna pagina sta perdendo traffico autonomamente."
 
+#: app/templates/dashboard/declining.html:89
+#: app/templates/dashboard/insights.html:95
+#: app/templates/dashboard/overview.html:95
+msgid "No sites monitored yet"
+msgstr "Nessun sito ancora monitorato"
+
+#: app/templates/dashboard/declining.html:91
+#: app/templates/dashboard/insights.html:97
+#: app/templates/dashboard/overview.html:97
+msgid "Add a Search Console property to start monitoring it."
+msgstr "Aggiungi una proprietà Search Console per iniziare a monitorarla."
+
+#: app/templates/dashboard/declining.html:95
+#: app/templates/dashboard/insights.html:101
+#: app/templates/dashboard/overview.html:101
+msgid "Add a site"
+msgstr "Aggiungi un sito"
+
 #: app/templates/dashboard/insights.html:2
 #: app/templates/dashboard/insights.html:13
-#: app/templates/dashboard/layout.html:56
+#: app/templates/dashboard/layout.html:62
 msgid "Insights"
 msgstr "Insights"
 
@@ -671,115 +790,103 @@ msgstr ""
 "Rendimento organico da Google Search Console — pagine che perdono traffico "
 "per prime."
 
-#: app/templates/dashboard/insights.html:54
+#: app/templates/dashboard/insights.html:56
 msgid "Time range"
 msgstr "Intervallo di tempo"
 
-#: app/templates/dashboard/insights.html:55
+#: app/templates/dashboard/insights.html:57
 msgid "7 days"
 msgstr "7 giorni"
 
-#: app/templates/dashboard/insights.html:56
+#: app/templates/dashboard/insights.html:58
 msgid "28 days"
 msgstr "28 giorni"
 
-#: app/templates/dashboard/insights.html:57
+#: app/templates/dashboard/insights.html:59
 msgid "90 days"
 msgstr "90 giorni"
 
-#: app/templates/dashboard/insights.html:61
+#: app/templates/dashboard/insights.html:63
 msgid "AI analyzer"
 msgstr "Analizzatore AI"
 
-#: app/templates/dashboard/insights.html:65
+#: app/templates/dashboard/insights.html:67
 msgid "Weekly AI suggestions"
 msgstr "Suggerimenti AI settimanali"
 
-#: app/templates/dashboard/insights.html:69
+#: app/templates/dashboard/insights.html:71
 msgid "Run now"
 msgstr "Esegui ora"
 
-#: app/templates/dashboard/insights.html:72
+#: app/templates/dashboard/insights.html:74
 msgid "Runs weekly when enabled."
 msgstr "Si esegue settimanalmente se attivo."
 
-#: app/templates/dashboard/insights.html:93
-#: app/templates/dashboard/overview.html:95
-msgid "No verified sites found"
-msgstr "Nessun sito verificato trovato"
-
-#: app/templates/dashboard/insights.html:95
-#: app/templates/dashboard/overview.html:97
-msgid ""
-"The connected Google account doesn't own any verified Search Console "
-"properties."
-msgstr ""
-"L'account Google connesso non possiede proprietà Search Console verificate."
-
-#: app/templates/dashboard/insights.html:108
+#: app/templates/dashboard/insights.html:114
 #: app/templates/dashboard/layout.html:50
 #: app/templates/dashboard/overview.html:2
 #: app/templates/dashboard/overview.html:12
 msgid "Overview"
 msgstr "Panoramica"
 
-#: app/templates/dashboard/insights.html:111
+#: app/templates/dashboard/insights.html:117
 msgid "Clicks over time"
 msgstr "Click nel tempo"
 
-#: app/templates/dashboard/insights.html:119
+#: app/templates/dashboard/insights.html:125
+#: app/templates/partials/usage_widget.html:34
 msgid "Pages"
 msgstr "Pagine"
 
-#: app/templates/dashboard/insights.html:126
+#: app/templates/dashboard/insights.html:132
 msgid "Page"
 msgstr "Pagina"
 
-#: app/templates/dashboard/insights.html:127
-#: app/templates/dashboard/insights.html:152
+#: app/templates/dashboard/insights.html:133
+#: app/templates/dashboard/insights.html:158
 msgid "Clicks"
 msgstr "Click"
 
-#: app/templates/dashboard/insights.html:128
-#: app/templates/dashboard/insights.html:153
+#: app/templates/dashboard/insights.html:134
+#: app/templates/dashboard/insights.html:159
 msgid "Impr."
 msgstr "Impr."
 
-#: app/templates/dashboard/insights.html:129
-#: app/templates/dashboard/insights.html:154
+#: app/templates/dashboard/insights.html:135
+#: app/templates/dashboard/insights.html:160
 msgid "CTR"
 msgstr "CTR"
 
-#: app/templates/dashboard/insights.html:130
-#: app/templates/dashboard/insights.html:155
+#: app/templates/dashboard/insights.html:136
+#: app/templates/dashboard/insights.html:161
 msgid "Pos."
 msgstr "Pos."
 
-#: app/templates/dashboard/insights.html:131
+#: app/templates/dashboard/insights.html:137
 msgid "Δ clicks"
 msgstr "Δ click"
 
-#: app/templates/dashboard/insights.html:132
+#: app/templates/dashboard/insights.html:138
 msgid "Health"
 msgstr "Salute"
 
-#: app/templates/dashboard/insights.html:133
+#: app/templates/dashboard/insights.html:139
 msgid "AI"
 msgstr "AI"
 
-#: app/templates/dashboard/insights.html:144
+#: app/templates/dashboard/insights.html:150
 msgid "Queries"
 msgstr "Query"
 
-#: app/templates/dashboard/insights.html:151
+#: app/templates/dashboard/insights.html:157
 msgid "Query"
 msgstr "Query"
 
-#: app/templates/dashboard/insights.html:175
+#: app/templates/dashboard/insights.html:181
 msgid "AI suggestions"
 msgstr "Suggerimenti AI"
 
-#: app/templates/dashboard/insights.html:180
+#: app/templates/dashboard/insights.html:186
 msgid "Click a card to cycle through suggestions."
 msgstr "Clicca su una card per scorrere i suggerimenti."
 
@@ -798,33 +905,38 @@ msgstr[1] "Trial: %(num)s giorni rimasti"
 msgid "Your trial has ended"
 msgstr "Il tuo trial è terminato"
 
-#: app/templates/dashboard/layout.html:68
+#: app/templates/dashboard/layout.html:56 app/templates/dashboard/sites.html:2
+#: app/templates/dashboard/sites.html:8
+#: app/templates/partials/usage_widget.html:26
+msgid "Sites"
+msgstr "Siti"
+
+#: app/templates/dashboard/layout.html:74
 msgid "Connector"
 msgstr "Connettore"
 
-#: app/templates/dashboard/layout.html:80
-#: app/templates/dashboard/layout.html:110 app/templates/settings/index.html:2
+#: app/templates/dashboard/layout.html:86
+#: app/templates/dashboard/layout.html:116 app/templates/settings/index.html:2
 #: app/templates/settings/index.html:6
 msgid "Settings"
 msgstr "Impostazioni"
 
-#: app/templates/dashboard/layout.html:96
+#: app/templates/dashboard/layout.html:102
 msgid "Open account menu"
 msgstr "Apri il menu account"
 
-#: app/templates/dashboard/layout.html:128
+#: app/templates/dashboard/layout.html:134
+#: app/templates/landing/partials/footer.html:88
 msgid "Terms"
 msgstr "Termini"
 
-#: app/templates/dashboard/overview.html:17
-msgid "Free plan · up to 3 pages"
-msgstr "Piano gratuito · fino a 3 pagine"
-
 #: app/templates/dashboard/overview.html:25
+#: app/templates/dashboard/sites.html:17
 msgid "Connect Google"
 msgstr "Collega Google"
 
 #: app/templates/dashboard/overview.html:27
+#: app/templates/dashboard/sites.html:19
 msgid ""
 "To use the service, connect the Google account that owns the websites you "
 "want to monitor."
@@ -833,6 +945,7 @@ msgstr ""
 "vuoi monitorare."
 
 #: app/templates/dashboard/overview.html:32
+#: app/templates/dashboard/sites.html:24
 msgid "Connect"
 msgstr "Collega"
 
@@ -840,28 +953,61 @@ msgstr "Collega"
 msgid "Full insights"
 msgstr "Insights completi"
 
-#: app/templates/dashboard/overview.html:113
+#: app/templates/dashboard/overview.html:117
 msgid "Monitored pages"
 msgstr "Pagine monitorate"
 
-#: app/templates/dashboard/overview.html:119
-msgid "Monitoring more pages is coming soon."
-msgstr "Il monitoraggio di altre pagine arriverà presto."
+#: app/templates/dashboard/overview.html:124
+#, python-format
+msgid "Your plan monitors up to %(limit)s pages."
+msgstr "Il tuo piano monitora fino a %(limit)s pagine."
 
 #: app/templates/dashboard/overview.html:125
+msgid "Upgrade for more"
+msgstr "Passa a un piano superiore per averne di più"
+
+#: app/templates/dashboard/overview.html:132
 msgid "Your site"
 msgstr "Il tuo sito"
 
-#: app/templates/dashboard/overview.html:131
+#: app/templates/dashboard/overview.html:138
 msgid "Site preview"
 msgstr "Anteprima sito"
 
-#: app/templates/dashboard/overview.html:136
+#: app/templates/dashboard/overview.html:143
 msgid ""
 "Some sites block being embedded — if the preview stays blank, that's why."
 msgstr ""
 "Alcuni siti bloccano l'incorporamento — se l'anteprima resta vuota, è per "
 "questo."
+
+#: app/templates/dashboard/sites.html:9
+msgid "Choose which Search Console properties to monitor."
+msgstr "Scegli quali proprietà Search Console monitorare."
+
+#: app/templates/dashboard/sites.html:39
+msgid "Monitored sites"
+msgstr "Siti monitorati"
+
+#: app/templates/dashboard/sites.html:42
+msgid "No sites monitored yet — add one below."
+msgstr "Nessun sito ancora monitorato — aggiungine uno qui sotto."
+
+#: app/templates/dashboard/sites.html:49
+msgid "Available Search Console properties"
+msgstr "Proprietà Search Console disponibili"
+
+#: app/templates/dashboard/sites.html:52
+msgid "All your verified properties are already monitored."
+msgstr "Tutte le tue proprietà verificate sono già monitorate."
+
+#: app/templates/dashboard/sites.html:55
+msgid "You've reached the site limit for your plan."
+msgstr "Hai raggiunto il limite di siti del tuo piano."
+
+#: app/templates/dashboard/sites.html:56
+msgid "Upgrade to add more"
+msgstr "Passa a un piano superiore per aggiungerne altri"
 
 #: app/templates/emails/weekly_digest.html:10
 #, python-format
@@ -903,6 +1049,662 @@ msgstr "Torna alla home"
 msgid "Go back"
 msgstr "Indietro"
 
+#: app/templates/landing/index.html:15
+msgid "SEO traffic monitoring for publishers"
+msgstr "Monitoraggio del traffico SEO per editori"
+
+#: app/templates/landing/index.html:18
+msgid "Find out which pages are"
+msgstr "Scopri quali pagine stanno"
+
+#: app/templates/landing/index.html:19
+msgid "losing organic traffic"
+msgstr "perdendo traffico organico"
+
+#: app/templates/landing/index.html:20
+msgid "— before it costs you 10x more to fix."
+msgstr "— prima che sistemarle costi 10 volte di più."
+
+#: app/templates/landing/index.html:23
+msgid ""
+"LinkBayCMS reads your Google Search Console data, filters out the noise, and"
+" hands you a short, ranked list of declining pages — each with a plain-"
+"English reason. Built for publishers and editorial sites that live off "
+"organic search."
+msgstr ""
+"LinkBayCMS legge i dati di Google Search Console, filtra il rumore di fondo "
+"e ti consegna una breve lista ordinata di pagine in calo — ognuna con una "
+"motivazione in linguaggio semplice. Pensato per editori e siti editoriali "
+"che vivono di ricerca organica."
+
+#: app/templates/landing/index.html:29
+msgid "Get started free"
+msgstr "Inizia gratis"
+
+#: app/templates/landing/index.html:32
+msgid "See how it works"
+msgstr "Guarda come funziona"
+
+#: app/templates/landing/index.html:56
+msgid "Three signals. One prioritized list."
+msgstr "Tre segnali. Una lista ordinata per priorità."
+
+#: app/templates/landing/index.html:58
+msgid ""
+"No dashboard to interpret, no 3,000-row spreadsheet. Just the pages that "
+"need attention, in order — and why."
+msgstr ""
+"Nessuna dashboard da interpretare, nessun foglio da 3.000 righe. Solo le "
+"pagine che richiedono attenzione, in ordine — e il motivo."
+
+#: app/templates/landing/index.html:72
+msgid "Detection"
+msgstr "Rilevamento"
+
+#: app/templates/landing/index.html:74
+msgid "We isolate real decline, not daily noise"
+msgstr "Isoliamo il calo reale, non il rumore quotidiano"
+
+#: app/templates/landing/index.html:77
+msgid ""
+"Traffic wobbles every day — that's not a signal, it's weather. LinkBayCMS "
+"looks at the trend over months and only flags a page when the drop is real."
+msgstr ""
+"Il traffico oscilla ogni giorno — non è un segnale, è rumore di fondo. "
+"LinkBayCMS guarda il trend nel tempo e segnala una pagina solo quando il "
+"calo è reale."
+
+#: app/templates/landing/index.html:80
+msgid "Filters out normal month-to-month swings"
+msgstr "Filtra le normali oscillazioni mese su mese"
+
+#: app/templates/landing/index.html:81
+msgid "Compares each page to your site's own trend, not the whole internet's"
+msgstr ""
+"Confronta ogni pagina con il trend del tuo sito, non con quello di internet"
+
+#: app/templates/landing/index.html:82
+msgid "Checks the same quarter last year to rule out seasonality"
+msgstr ""
+"Controlla lo stesso trimestre dell'anno scorso per escludere la stagionalità"
+
+#: app/templates/landing/index.html:83
+msgid "Only flags drops that hold for 2+ consecutive months"
+msgstr "Segnala solo i cali che persistono per 2+ mesi consecutivi"
+
+#: app/templates/landing/index.html:90
+msgid "Prioritization"
+msgstr "Prioritizzazione"
+
+#: app/templates/landing/index.html:91
+msgid "Know what's worth fixing first"
+msgstr "Sai cosa vale la pena sistemare per primo"
+
+#: app/templates/landing/index.html:93
+msgid ""
+"A page that dropped from 4,000 to 900 visits is not the same emergency as "
+"one that dropped from 50 to 20. Every page gets ranked by how much it's "
+"worth and how likely it is to recover."
+msgstr ""
+"Una pagina che è passata da 4.000 a 900 visite non è la stessa emergenza di "
+"una passata da 50 a 20. Ogni pagina viene ordinata in base al suo valore e "
+"alla probabilità di recupero."
+
+#: app/templates/landing/index.html:97
+msgid "Ranked by clicks lost per month, not vanity metrics"
+msgstr "Ordinate per click persi al mese, non per metriche di vanità"
+
+#: app/templates/landing/index.html:98
+msgid "Flags pages that are close to recovering (small ranking drop)"
+msgstr "Segnala le pagine vicine al recupero (piccolo calo di posizionamento)"
+
+#: app/templates/landing/index.html:99
+msgid "Tells you when demand itself has disappeared — no point fixing that"
+msgstr ""
+"Ti dice quando è la domanda stessa a essere sparita — inutile sistemare "
+"quella"
+
+#: app/templates/landing/index.html:100
+msgid "Every score ships with a plain-English reason, never a bare number"
+msgstr ""
+"Ogni punteggio arriva con una motivazione in linguaggio semplice, mai un "
+"numero nudo"
+
+#: app/templates/landing/index.html:117
+msgid "Clarity"
+msgstr "Chiarezza"
+
+#: app/templates/landing/index.html:119
+msgid "Real numbers, never invented ones"
+msgstr "Numeri reali, mai inventati"
+
+#: app/templates/landing/index.html:122
+msgid ""
+"Clicks lost per month is real, verifiable data straight from Search Console."
+" A revenue estimate only ever appears if you give us the input — and it's "
+"always labeled as an estimate."
+msgstr ""
+"I click persi al mese sono dati reali e verificabili, presi direttamente da "
+"Search Console. Una stima di ricavo compare solo se ci fornisci il valore — "
+"ed è sempre etichettata come stima."
+
+#: app/templates/landing/index.html:125
+msgid "Clicks lost per month, pulled directly from Search Console"
+msgstr "Click persi al mese, presi direttamente da Search Console"
+
+#: app/templates/landing/index.html:126
+msgid "Optional revenue estimate, only if you provide the value per visit"
+msgstr "Stima di ricavo opzionale, solo se fornisci il valore per visita"
+
+#: app/templates/landing/index.html:127
+msgid "Every number is labeled with exactly where it came from"
+msgstr "Ogni numero è etichettato con la sua fonte esatta"
+
+#: app/templates/landing/index.html:128
+msgid "No made-up dollar figures, ever"
+msgstr "Nessuna cifra inventata, mai"
+
+#: app/templates/landing/index.html:139
+msgid "Works with the data you already have"
+msgstr "Funziona con i dati che hai già"
+
+#: app/templates/landing/index.html:141
+msgid "No tracking code, no site access, nothing to install on your CMS."
+msgstr ""
+"Nessun codice di tracciamento, nessun accesso al sito, niente da installare "
+"sul tuo CMS."
+
+#: app/templates/landing/index.html:148
+msgid "Connect Google Search Console once. Get a ranked list from then on."
+msgstr ""
+"Collega Google Search Console una volta sola. Ricevi una lista ordinata da "
+"quel momento in poi."
+
+#: app/templates/landing/index.html:151
+msgid ""
+"LinkBayCMS reads directly from the Search Console data you already collect —"
+" read-only, nothing is changed on your site. It doesn't replace your CMS, "
+"your analytics, or your workflow; it just tells you where to look first."
+msgstr ""
+"LinkBayCMS legge direttamente i dati di Search Console che già raccogli — "
+"sola lettura, nulla viene modificato sul tuo sito. Non sostituisce il tuo "
+"CMS, la tua analytics o il tuo flusso di lavoro; ti dice solo dove guardare "
+"per primo."
+
+#: app/templates/landing/index.html:185
+msgid "Monday morning email"
+msgstr "Email del lunedì mattina"
+
+#: app/templates/landing/index.html:191
+msgid ""
+"A short email with your top declining pages, sent automatically every Monday"
+" — on the Pro plan."
+msgstr ""
+"Una breve email con le tue pagine in calo più importanti, inviata "
+"automaticamente ogni lunedì — nel piano Pro."
+
+#: app/templates/landing/index.html:219
+msgid "Full history, not just 16 months"
+msgstr "Storico completo, non solo 16 mesi"
+
+#: app/templates/landing/index.html:225
+msgid ""
+"Search Console deletes data after 16 months. We keep your site's history "
+"from the day you connect, and never throw it away."
+msgstr ""
+"Search Console elimina i dati dopo 16 mesi. Noi conserviamo lo storico del "
+"tuo sito dal giorno in cui lo colleghi, e non lo buttiamo mai via."
+
+#: app/templates/landing/index.html:240
+msgid "Mark as done, track recovery"
+msgstr "Segna come fatto, monitora il recupero"
+
+#: app/templates/landing/index.html:246
+msgid ""
+"Flag a page as fixed and we check back at 30 and 60 days to confirm whether "
+"it actually recovered."
+msgstr ""
+"Segnala una pagina come sistemata e ricontrolliamo a 30 e 60 giorni per "
+"confermare se ha davvero recuperato."
+
+#: app/templates/landing/index.html:257
+msgid "Simple pricing, monthly or annual."
+msgstr "Prezzi semplici, mensili o annuali."
+
+#: app/templates/landing/index.html:259
+msgid "Try it free for 13 days, no credit card required."
+msgstr "Provalo gratis per 13 giorni, senza carta di credito."
+
+#: app/templates/landing/index.html:267
+msgid "Pro Monthly"
+msgstr "Pro Mensile"
+
+#: app/templates/landing/index.html:268
+msgid "13-day free trial"
+msgstr "13 giorni di prova gratuita"
+
+#: app/templates/landing/index.html:272
+msgid "/month"
+msgstr "/mese"
+
+#: app/templates/landing/index.html:275
+msgid "No credit card to start. Cancel anytime once you're on the paid plan."
+msgstr ""
+"Nessuna carta di credito per iniziare. Annulla quando vuoi una volta sul "
+"piano a pagamento."
+
+#: app/templates/landing/index.html:280 app/templates/landing/index.html:308
+msgid "Declining pages, prioritized automatically"
+msgstr "Pagine in calo, ordinate automaticamente per priorità"
+
+#: app/templates/landing/index.html:281 app/templates/landing/index.html:309
+msgid "AI suggestions on the pages losing traffic"
+msgstr "Suggerimenti AI sulle pagine che perdono traffico"
+
+#: app/templates/landing/index.html:287 app/templates/landing/index.html:315
+msgid "Start your free trial"
+msgstr "Inizia la tua prova gratuita"
+
+#: app/templates/landing/index.html:295
+msgid "Pro Annual"
+msgstr "Pro Annuale"
+
+#: app/templates/landing/index.html:296
+#, python-format
+msgid "Save ~17%%"
+msgstr "Risparmia ~17%%"
+
+#: app/templates/landing/index.html:300
+msgid "/year"
+msgstr "/anno"
+
+#: app/templates/landing/index.html:303
+#, python-format
+msgid "Same Pro plan, billed once a year — %(price)s/month equivalent."
+msgstr ""
+"Stesso piano Pro, fatturato una volta l'anno — equivalente a %(price)s/mese."
+
+#: app/templates/landing/index.html:322
+msgid "Got an AppSumo code?"
+msgstr "Hai un codice AppSumo?"
+
+#: app/templates/landing/index.html:331
+#: app/templates/landing/partials/footer.html:20
+msgid "FAQs"
+msgstr "Domande frequenti"
+
+#: app/templates/landing/index.html:333
+msgid "The questions every SEO asks in the first two minutes of a demo."
+msgstr "Le domande che ogni SEO fa nei primi due minuti di una demo."
+
+#: app/templates/landing/index.html:346
+msgid "How is this different from Google Search Console?"
+msgstr "In cosa è diverso da Google Search Console?"
+
+#: app/templates/landing/index.html:350
+msgid ""
+"Search Console gives you the data — thousands of rows and no particular "
+"order. LinkBayCMS gives you the five things to fix Monday morning, ranked by"
+" how much they're worth and how likely they are to recover. It's not another"
+" archive; it's a shortlist."
+msgstr ""
+"Search Console ti dà i dati — migliaia di righe senza un ordine particolare."
+" LinkBayCMS ti dà le cinque cose da sistemare lunedì mattina, ordinate per "
+"valore e probabilità di recupero. Non è un altro archivio; è una lista "
+"breve."
+
+#: app/templates/landing/index.html:357
+msgid "How do you know a page is really declining, and not just noisy?"
+msgstr ""
+"Come fate a sapere che una pagina è davvero in calo e non solo rumore?"
+
+#: app/templates/landing/index.html:361
+#, python-format
+msgid ""
+"A page only makes the list if it clears a minimum relevance threshold, has "
+"dropped at least 30%% and at least 20 clicks/month, held that drop for two "
+"consecutive months, and is falling faster than the rest of your site in the "
+"same period. That last check alone removes most of the false alarms — it's "
+"the difference between \"your page is broken\" and \"Google shipped an "
+"update and your whole site moved.\""
+msgstr ""
+"Una pagina entra in lista solo se supera una soglia minima di rilevanza, è "
+"calata di almeno il 30%% e almeno 20 click/mese, ha mantenuto quel calo per "
+"due mesi consecutivi, ed è in calo più velocemente del resto del tuo sito "
+"nello stesso periodo. Solo quest'ultimo controllo elimina la maggior parte "
+"dei falsi allarmi — è la differenza tra \"la tua pagina è rotta\" e \"Google"
+" ha rilasciato un aggiornamento e tutto il sito si è mosso.\""
+
+#: app/templates/landing/index.html:368
+msgid "Do I need to install anything on my site?"
+msgstr "Devo installare qualcosa sul mio sito?"
+
+#: app/templates/landing/index.html:372
+msgid ""
+"No. LinkBayCMS is not a CMS and doesn't touch your site — it reads your "
+"existing Google Search Console data with read-only access. Nothing to embed,"
+" no plugin, no code changes."
+msgstr ""
+"No. LinkBayCMS non è un CMS e non tocca il tuo sito — legge i dati esistenti"
+" di Google Search Console con accesso in sola lettura. Niente da "
+"incorporare, nessun plugin, nessuna modifica al codice."
+
+#: app/templates/landing/index.html:379
+msgid "Is this built for e-commerce or SaaS marketing sites too?"
+msgstr "È pensato anche per e-commerce o siti marketing SaaS?"
+
+#: app/templates/landing/index.html:383
+msgid ""
+"Not really — it's built specifically for publishers and editorial sites with"
+" 500 to 20,000 indexed pages and at least 20,000 organic clicks a month, "
+"where organic search is the main source of revenue. Below that volume, "
+"declines are hard to tell apart from noise, and our output gets less "
+"reliable. We'd rather tell you that upfront than sign you up and have you "
+"churn in month two."
+msgstr ""
+"Non proprio — è pensato specificamente per editori e siti editoriali con "
+"500-20.000 pagine indicizzate e almeno 20.000 click organici al mese, dove "
+"la ricerca organica è la principale fonte di ricavo. Sotto quel volume, i "
+"cali sono difficili da distinguere dal rumore e i nostri risultati diventano"
+" meno affidabili. Preferiamo dirtelo subito piuttosto che farti iscrivere e "
+"perderti al secondo mese."
+
+#: app/templates/landing/index.html:390
+msgid "Is my Search Console data safe?"
+msgstr "I miei dati di Search Console sono al sicuro?"
+
+#: app/templates/landing/index.html:394
+msgid ""
+"We connect via Google's standard read-only access — we can see your "
+"performance data, we can't change anything on your property. We never invent"
+" numbers: click figures come straight from Search Console, and any revenue "
+"estimate is only shown if you provide it, always labeled as an estimate."
+msgstr ""
+"Ci colleghiamo tramite l'accesso standard in sola lettura di Google — "
+"possiamo vedere i tuoi dati di rendimento, non possiamo modificare nulla "
+"sulla tua proprietà. Non inventiamo mai numeri: i click arrivano "
+"direttamente da Search Console, e ogni stima di ricavo è mostrata solo se la"
+" fornisci tu, sempre etichettata come stima."
+
+#: app/templates/landing/legal_base.html:32
+msgid "Back to home"
+msgstr "Torna alla home"
+
+#: app/templates/landing/legal_base.html:35
+#, python-format
+msgid "Last updated: %(date)s"
+msgstr "Ultimo aggiornamento: %(date)s"
+
+#: app/templates/landing/partials/chat-widget.html:9
+msgid "Chat with us"
+msgstr "Chatta con noi"
+
+#: app/templates/landing/partials/chat-widget.html:20
+msgid "Ask about plans & pricing"
+msgstr "Chiedi su piani e prezzi"
+
+#: app/templates/landing/partials/chat-widget.html:26
+msgid "Hi! Ask me anything about LinkBayCMS plans, pricing or features."
+msgstr ""
+"Ciao! Chiedimi qualsiasi cosa sui piani, i prezzi o le funzionalità di "
+"LinkBayCMS."
+
+#: app/templates/landing/partials/chat-widget.html:36
+msgid "Type your question…"
+msgstr "Scrivi la tua domanda…"
+
+#: app/templates/landing/partials/chat-widget.html:39
+msgid "Send"
+msgstr "Invia"
+
+#: app/templates/landing/partials/cookie-consent.html:10
+msgid "Cookie consent"
+msgstr "Consenso cookie"
+
+#: app/templates/landing/partials/cookie-consent.html:15
+msgid "We value your privacy"
+msgstr "Rispettiamo la tua privacy"
+
+#: app/templates/landing/partials/cookie-consent.html:18
+msgid ""
+"We use cookies to run the site and, with your consent, to measure traffic "
+"and improve LinkBayCMS. You can accept, reject non-essential cookies, or "
+"choose exactly what to allow. See our"
+msgstr ""
+"Usiamo i cookie per far funzionare il sito e, con il tuo consenso, per "
+"misurare il traffico e migliorare LinkBayCMS. Puoi accettare, rifiutare i "
+"cookie non essenziali, o scegliere esattamente cosa consentire. Consulta la "
+"nostra"
+
+#: app/templates/landing/partials/cookie-consent.html:19
+msgid "Cookie Policy"
+msgstr "Cookie Policy"
+
+#: app/templates/landing/partials/cookie-consent.html:23
+#: app/templates/landing/partials/cookie-consent.html:88
+msgid "Accept all"
+msgstr "Accetta tutti"
+
+#: app/templates/landing/partials/cookie-consent.html:26
+#: app/templates/landing/partials/cookie-consent.html:87
+msgid "Reject non-essential"
+msgstr "Rifiuta non essenziali"
+
+#: app/templates/landing/partials/cookie-consent.html:29
+msgid "Preferences"
+msgstr "Preferenze"
+
+#: app/templates/landing/partials/cookie-consent.html:42
+#: app/templates/landing/partials/footer.html:91
+msgid "Cookie preferences"
+msgstr "Preferenze cookie"
+
+#: app/templates/landing/partials/cookie-consent.html:45
+msgid ""
+"Choose which categories you allow. Necessary cookies are always on because "
+"the site can't work without them."
+msgstr ""
+"Scegli quali categorie consentire. I cookie necessari sono sempre attivi "
+"perché il sito non può funzionare senza."
+
+#: app/templates/landing/partials/cookie-consent.html:52
+msgid "Strictly necessary"
+msgstr "Strettamente necessari"
+
+#: app/templates/landing/partials/cookie-consent.html:54
+msgid "Required for security, login and core features. Always active."
+msgstr ""
+"Necessari per sicurezza, accesso e funzionalità principali. Sempre attivi."
+
+#: app/templates/landing/partials/cookie-consent.html:57
+msgid "Necessary cookies (always on)"
+msgstr "Cookie necessari (sempre attivi)"
+
+#: app/templates/landing/partials/cookie-consent.html:64
+msgid "Analytics"
+msgstr "Statistiche"
+
+#: app/templates/landing/partials/cookie-consent.html:66
+msgid "Anonymous usage measurement so we can improve the product."
+msgstr "Misurazione anonima dell'utilizzo per migliorare il prodotto."
+
+#: app/templates/landing/partials/cookie-consent.html:69
+msgid "Analytics cookies"
+msgstr "Cookie statistici"
+
+#: app/templates/landing/partials/cookie-consent.html:76
+msgid "Marketing"
+msgstr "Marketing"
+
+#: app/templates/landing/partials/cookie-consent.html:78
+msgid "Used to measure campaigns and show relevant content off-site."
+msgstr ""
+"Usati per misurare le campagne e mostrare contenuti rilevanti fuori dal "
+"sito."
+
+#: app/templates/landing/partials/cookie-consent.html:81
+msgid "Marketing cookies"
+msgstr "Cookie di marketing"
+
+#: app/templates/landing/partials/cookie-consent.html:89
+msgid "Save preferences"
+msgstr "Salva preferenze"
+
+#: app/templates/landing/partials/footer.html:8
+msgid ""
+"the SEO monitoring tool that turns your Google Search Console data into a "
+"short, prioritized list of the pages losing organic traffic. Built for "
+"publishers who live off organic search."
+msgstr ""
+"lo strumento di monitoraggio SEO che trasforma i dati di Google Search "
+"Console in una breve lista ordinata delle pagine che perdono traffico "
+"organico. Pensato per editori che vivono di ricerca organica."
+
+#: app/templates/landing/partials/footer.html:16
+msgid "Company"
+msgstr "Azienda"
+
+#: app/templates/landing/partials/footer.html:19
+#: app/templates/landing/partials/topbar.html:31
+#: app/templates/landing/partials/topbar.html:60
+msgid "Home"
+msgstr "Home"
+
+#: app/templates/landing/partials/footer.html:21
+msgid "About the founder"
+msgstr "Chi è il founder"
+
+#: app/templates/landing/partials/footer.html:25
+msgid "Product"
+msgstr "Prodotto"
+
+#: app/templates/landing/partials/footer.html:28
+#: app/templates/landing/partials/topbar.html:32
+#: app/templates/landing/partials/topbar.html:61
+msgid "Features"
+msgstr "Funzionalità"
+
+#: app/templates/landing/partials/footer.html:29
+#: app/templates/landing/partials/topbar.html:33
+#: app/templates/landing/partials/topbar.html:62
+msgid "How it works"
+msgstr "Come funziona"
+
+#: app/templates/landing/partials/footer.html:30
+#: app/templates/landing/partials/topbar.html:34
+#: app/templates/landing/partials/topbar.html:63
+msgid "Pricing"
+msgstr "Prezzi"
+
+#: app/templates/landing/partials/footer.html:34
+msgid "Get started"
+msgstr "Inizia"
+
+#: app/templates/landing/partials/footer.html:47
+msgid "Free audit"
+msgstr "Audit gratuito"
+
+#: app/templates/landing/partials/footer.html:48
+msgid "Want us to look at your site first?"
+msgstr "Vuoi che diamo prima un'occhiata al tuo sito?"
+
+#: app/templates/landing/partials/footer.html:50
+msgid ""
+"We're running free traffic-decline audits for the first 20 publishers who "
+"sign up for the beta. Leave your details and we'll show you what's declining"
+" — no strings attached."
+msgstr ""
+"Offriamo audit gratuiti sul calo di traffico ai primi 20 editori che si "
+"iscrivono alla beta. Lasciaci i tuoi dati e ti mostriamo cosa sta calando — "
+"senza impegno."
+
+#: app/templates/landing/partials/footer.html:59
+msgid "Your name"
+msgstr "Il tuo nome"
+
+#: app/templates/landing/partials/footer.html:64
+msgid "Email Address"
+msgstr "Indirizzo email"
+
+#: app/templates/landing/partials/footer.html:76
+msgid "Get my free audit"
+msgstr "Ottieni il mio audit gratuito"
+
+#: app/templates/landing/partials/footer.html:85
+#, python-format
+msgid "Made with ❤️ and ☕️ by %(founder)s"
+msgstr "Fatto con ❤️ e ☕️ da %(founder)s"
+
+#: app/templates/landing/partials/footer.html:89
+msgid "Privacy"
+msgstr "Privacy"
+
+#: app/templates/landing/partials/footer.html:90
+msgid "Cookies"
+msgstr "Cookie"
+
+#: app/templates/landing/partials/theme-toggle.html:5
+msgid "Theme"
+msgstr "Tema"
+
+#: app/templates/landing/partials/theme-toggle.html:14
+msgid "System"
+msgstr "Sistema"
+
+#: app/templates/landing/partials/theme-toggle.html:22
+msgid "Light"
+msgstr "Chiaro"
+
+#: app/templates/landing/partials/theme-toggle.html:30
+msgid "Dark"
+msgstr "Scuro"
+
+#: app/templates/landing/partials/topbar.html:3
+msgid "Beta:"
+msgstr "Beta:"
+
+#: app/templates/landing/partials/topbar.html:4
+msgid ""
+"We're running free traffic-decline audits for the first 20 publishers —"
+msgstr "Offriamo audit gratuiti sul calo di traffico ai primi 20 editori —"
+
+#: app/templates/landing/partials/topbar.html:5
+msgid "get yours"
+msgstr "ottieni il tuo"
+
+#: app/templates/landing/partials/topbar.html:35
+#: app/templates/landing/partials/topbar.html:64
+msgid "FAQ"
+msgstr "FAQ"
+
+#: app/templates/landing/partials/topbar.html:41
+msgid "Log out"
+msgstr "Esci"
+
+#: app/templates/landing/partials/topbar.html:42
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: app/templates/landing/partials/topbar.html:44
+msgid "Sign Up"
+msgstr "Registrati"
+
+#: app/templates/landing/partials/topbar.html:45
+msgid "Sign In"
+msgstr "Accedi"
+
+#: app/templates/partials/usage_widget.html:19
+msgid "Manage plan"
+msgstr "Gestisci piano"
+
+#: app/templates/partials/usage_widget.html:43
+msgid "AI credits"
+msgstr "Crediti AI"
+
+#: app/templates/partials/usage_widget.html:50
+msgid "Exports this month"
+msgstr "Export questo mese"
+
 #: app/templates/settings/index.html:7
 msgid "Manage your account details and preferences."
 msgstr "Gestisci i dettagli e le preferenze del tuo account."
@@ -914,3 +1716,28 @@ msgstr "Profilo"
 #: app/templates/settings/index.html:42
 msgid "Notifications"
 msgstr "Notifiche"
+
+#: app/templates/settings/index.html:59
+msgid "White label"
+msgstr "White label"
+
+#~ msgid "Press %(kbd)s to refocus the code field."
+#~ msgstr "Premi %(kbd)s per rimettere il focus sul campo del codice."
+
+#~ msgid "No verified sites found"
+#~ msgstr "Nessun sito verificato trovato"
+
+#~ msgid ""
+#~ "The connected Google account doesn't own any verified Search Console "
+#~ "properties."
+#~ msgstr ""
+#~ "L'account Google connesso non possiede proprietà Search Console verificate."
+
+#~ msgid "Monitoring more pages is coming soon."
+#~ msgstr "Il monitoraggio di altre pagine arriverà presto."
+
+#~ msgid "You don't need to replace anything you already use"
+#~ msgstr "Non devi sostituire nulla di quello che già usi"
+
+#~ msgid "One plan. Everything included."
+#~ msgstr "Un solo piano. Tutto incluso."

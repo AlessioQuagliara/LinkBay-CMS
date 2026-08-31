@@ -5,10 +5,7 @@
                 <div class="flex justify-between gap-8">
                     <img src="{{ url_for('static', filename='shared/logo.png') }}" alt="LinkBayCMS" class="h-6 w-auto" />
                     <p class="max-w-sm">
-                        <span class="font-semibold">LinkBayCMS</span> — the SEO monitoring tool
-                        that turns your Google Search Console data into a short, prioritized list
-                        of the pages losing organic traffic. Built for publishers who live off
-                        organic search.
+                        <span class="font-semibold">LinkBayCMS</span> — {{ _("the SEO monitoring tool that turns your Google Search Console data into a short, prioritized list of the pages losing organic traffic. Built for publishers who live off organic search.") }}
                     </p>
                 </div>
             </div>
@@ -16,29 +13,29 @@
             <div class="p-8 sm:p-10 md:px-16 xl:px-40 xl:py-16">
                 <div class="grid grid-cols-2 gap-6 md:grid-cols-3">
                     <div>
-                        <h2 class="text-lg font-medium">Company</h2>
+                        <h2 class="text-lg font-medium">{{ _("Company") }}</h2>
                         <div
                             class="**:hover:text-error mt-4 space-y-2 **:block **:transition-all">
-                            <a href="{{ url_for('main.index') }}">Home</a>
-                            <a href="#faq">FAQs</a>
-                            <a href="https://www.alessioquagliara.com" target="_blank" rel="noopener">About the founder</a>
+                            <a href="{{ url_for('main.index') }}">{{ _("Home") }}</a>
+                            <a href="#faq">{{ _("FAQs") }}</a>
+                            <a href="https://www.alessioquagliara.com" target="_blank" rel="noopener">{{ _("About the founder") }}</a>
                         </div>
                     </div>
                     <div>
-                        <h2 class="text-lg font-medium">Product</h2>
+                        <h2 class="text-lg font-medium">{{ _("Product") }}</h2>
                         <div
                             class="**:hover:text-error mt-4 space-y-2 **:block **:transition-all">
-                            <a href="#features">Features</a>
-                            <a href="#integrations">How it works</a>
-                            <a href="#pricing">Pricing</a>
+                            <a href="#features">{{ _("Features") }}</a>
+                            <a href="#integrations">{{ _("How it works") }}</a>
+                            <a href="#pricing">{{ _("Pricing") }}</a>
                         </div>
                     </div>
                     <div>
-                        <h2 class="text-lg font-medium">Get started</h2>
+                        <h2 class="text-lg font-medium">{{ _("Get started") }}</h2>
                         <div
                             class="**:hover:text-error mt-4 space-y-2 **:block **:transition-all">
-                            <a href="{{ url_for('auth.register') }}">Sign up</a>
-                            <a href="{{ url_for('auth.login') }}">Sign in</a>
+                            <a href="{{ url_for('auth.register') }}">{{ _("Sign up") }}</a>
+                            <a href="{{ url_for('auth.login') }}">{{ _("Sign in") }}</a>
                         </div>
                     </div>
                 </div>
@@ -47,26 +44,24 @@
 
         <div class="order-first lg:order-last">
             <form class="p-8 lg:p-20">
-                <div class="badge badge-ghost">Free audit</div>
-                <h2 class="mt-4 text-2xl font-medium sm:text-3xl">Want us to look at your site first?</h2>
+                <div class="badge badge-ghost">{{ _("Free audit") }}</div>
+                <h2 class="mt-4 text-2xl font-medium sm:text-3xl">{{ _("Want us to look at your site first?") }}</h2>
                 <p class="text-base-content/80 mt-2">
-                    We're running free traffic-decline audits for the first 20 publishers who sign up
-                    for the beta. Leave your details and we'll show you what's declining — no strings
-                    attached.
+                    {{ _("We're running free traffic-decline audits for the first 20 publishers who sign up for the beta. Leave your details and we'll show you what's declining — no strings attached.") }}
                 </p>
                 <div class="mt-4 space-y-2">
                     <fieldset class="fieldset">
-                        <legend class="fieldset-legend">Name</legend>
+                        <legend class="fieldset-legend">{{ _("Name") }}</legend>
                         <label class="input w-72 focus:outline-0">
                             <span class="iconify text-base-content/80 size-5" data-icon="lucide:user"></span>
                             <input
                                 class="grow focus:outline-0"
-                                placeholder="Your name"
+                                placeholder="{{ _('Your name') }}"
                                 type="text" />
                         </label>
                     </fieldset>
                     <fieldset class="fieldset">
-                        <legend class="fieldset-legend">Email Address</legend>
+                        <legend class="fieldset-legend">{{ _("Email Address") }}</legend>
                         <label class="input w-72 focus:outline-0">
                             <span class="iconify text-base-content/80 size-5" data-icon="lucide:mail"></span>
                             <input
@@ -78,7 +73,7 @@
                 </div>
 
                 <div class="mt-6 flex items-center gap-2">
-                    <a href="{{ url_for('auth.register') }}"><button class="btn btn-error text-white" type="button">Get my free audit</button></a>
+                    <a href="{{ url_for('auth.register') }}"><button class="btn btn-error text-white" type="button">{{ _("Get my free audit") }}</button></a>
                 </div>
             </form>
         </div>
@@ -87,13 +82,13 @@
     <div class="border-base-300 border-t px-8 py-4 lg:px-40">
         <div class="flex flex-col items-center justify-between gap-3 sm:flex-row">
             <p class="text-center">
-                Made with ❤️ and ☕️ by <a href="https://www.alessioquagliara.com" target="_blank" rel="noopener">Alessio Quagliara</a>
+                {{ _("Made with ❤️ and ☕️ by %(founder)s", founder='<a href="https://www.alessioquagliara.com" target="_blank" rel="noopener">Alessio Quagliara</a>'|safe) }}
             </p>
             <nav class="**:hover:text-error flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm">
-                <a href="{{ url_for('main.terms_of_service') }}">Terms</a>
-                <a href="{{ url_for('main.privacy_policy') }}">Privacy</a>
-                <a href="{{ url_for('main.cookie_policy') }}">Cookies</a>
-                <button type="button" class="cursor-pointer" data-cookie-action="prefs">Cookie preferences</button>
+                <a href="{{ url_for('main.terms_of_service') }}">{{ _("Terms") }}</a>
+                <a href="{{ url_for('main.privacy_policy') }}">{{ _("Privacy") }}</a>
+                <a href="{{ url_for('main.cookie_policy') }}">{{ _("Cookies") }}</a>
+                <button type="button" class="cursor-pointer" data-cookie-action="prefs">{{ _("Cookie preferences") }}</button>
             </nav>
         </div>
     </div>

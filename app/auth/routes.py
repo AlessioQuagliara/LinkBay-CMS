@@ -6,10 +6,9 @@ from flask_login import current_user, login_required, login_user, logout_user
 
 from app.auth import otp as otp_service
 from app.auth.forms import LoginForm, OtpForm, RegisterForm
+from app.entitlements.limits import TRIAL_DAYS
 from app.extensions import db
 from app.models import User
-
-TRIAL_DAYS = 14
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -57,6 +56,7 @@ def register():
             user = User(name=form.name.data.strip(), email=email)
             user.set_password(form.password.data)
             user.trial_ends_at = datetime.now(timezone.utc) + timedelta(days=TRIAL_DAYS)
+            user.plan_type = "trial"
             db.session.add(user)
             db.session.commit()
             # Niente login immediato: prima l'utente conferma l'email con l'OTP.

@@ -63,6 +63,16 @@ window.I18N = (function () {
       trendNotAvailable: "Trend not available.",
       queriesNotAvailable: "Queries not available.",
       loadListError: "Couldn't load the list. Please try again.",
+
+      // sites.js
+      removeSite: "Remove",
+      addSite: "Add",
+      sitesCount: "{used} of {limit} sites",
+      siteAdded: "Site added.",
+      siteRemoved: "Site removed.",
+      addSiteError: "Couldn't add this site. Please try again.",
+      removeSiteError: "Couldn't remove this site. Please try again.",
+      noSitesOption: "No sites monitored yet",
     },
     it: {
       noPriorData: "nessun dato precedente",
@@ -118,6 +128,15 @@ window.I18N = (function () {
       trendNotAvailable: "Trend non disponibile.",
       queriesNotAvailable: "Query non disponibili.",
       loadListError: "Non è stato possibile caricare la lista. Riprova.",
+
+      removeSite: "Rimuovi",
+      addSite: "Aggiungi",
+      sitesCount: "{used} di {limit} siti",
+      siteAdded: "Sito aggiunto.",
+      siteRemoved: "Sito rimosso.",
+      addSiteError: "Non è stato possibile aggiungere il sito. Riprova.",
+      removeSiteError: "Non è stato possibile rimuovere il sito. Riprova.",
+      noSitesOption: "Nessun sito ancora monitorato",
     },
   };
 

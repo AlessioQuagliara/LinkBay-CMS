@@ -12,18 +12,16 @@
   const t = (window.I18N && window.I18N.t) || ((k) => k);
 
   const SITES_URL = select.dataset.sitesUrl;
-  const MONITORED_URL = select.dataset.monitoredUrl;
   const LIST_URL = select.dataset.listUrl;
   const TREND_URL = select.dataset.trendUrl;
   const QUERY_LOSSES_URL = select.dataset.queryLossesUrl;
   const STATUS_URL = select.dataset.statusUrl;
 
-  const CSRF = (document.querySelector('meta[name="csrf-token"]') || {}).content || "";
-
   const states = {
     loading: document.getElementById("state-loading"),
     error: document.getElementById("state-error"),
     empty: document.getElementById("state-empty"),
+    noSites: document.getElementById("state-no-sites"),
     data: document.getElementById("state-data"),
   };
 
@@ -45,11 +43,7 @@
   const fmtInt = (n) => nf.format(Math.round(n || 0));
   const fmtPos = (n) => (n || 0).toFixed(1);
 
-  function esc(s) {
-    const d = document.createElement("div");
-    d.textContent = s == null ? "" : s;
-    return d.innerHTML;
-  }
+  const esc = window.Common.esc;
   function shortUrl(url) {
     try {
       const u = new URL(url);
@@ -77,13 +71,7 @@
     return { cls: "badge-neutral", label: t("priorityLow") };
   }
 
-  async function postForm(url, params) {
-    return fetch(url, {
-      method: "POST",
-      headers: { "X-CSRFToken": CSRF, "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams(params).toString(),
-    });
-  }
+  const postForm = window.Common.postForm;
 
   // --- Sparkline trend (SVG inline, single series, tema-aware) ----------------
   function renderSparkline(host, series) {
@@ -322,30 +310,21 @@
   async function init() {
     show("loading");
     try {
+      // Sorgente: solo i siti già aggiunti al monitoraggio — puro switcher,
+      // aggiungerne di nuovi si fa dalla pagina Sites (/dashboard/sites).
       const res = await fetch(SITES_URL, { headers: { Accept: "application/json" } });
       if (!res.ok) throw new Error("HTTP " + res.status);
-      const { sites, monitored_site_url } = await res.json();
+      const { sites } = await res.json();
       if (!sites || !sites.length) {
-        select.innerHTML = "<option>No sites</option>";
-        show("empty");
+        select.innerHTML = `<option>${esc(t("noSitesOption"))}</option>`;
+        show("noSites");
         return;
       }
-      select.innerHTML = sites
-        .map((s) => `<option value="${esc(s.siteUrl)}">${esc(s.siteUrl)}</option>`)
-        .join("");
-      select.disabled = false;
+      select.innerHTML = sites.map((s) => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
+      select.disabled = sites.length < 2;
 
-      const preselect =
-        monitored_site_url && sites.some((s) => s.siteUrl === monitored_site_url)
-          ? monitored_site_url
-          : sites[0].siteUrl;
-      select.value = preselect;
-
-      select.addEventListener("change", () => {
-        postForm(MONITORED_URL, { site: select.value }).catch(() => {});
-        loadAlerts(select.value);
-      });
-      loadAlerts(preselect);
+      select.addEventListener("change", () => loadAlerts(select.value));
+      loadAlerts(sites[0]);
     } catch (e) {
       showError(t("loadSitesReconnectError"));
     }

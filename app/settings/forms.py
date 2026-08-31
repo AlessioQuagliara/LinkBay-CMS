@@ -15,6 +15,11 @@ class NotificationsForm(FlaskForm):
     submit = SubmitField(_l("Save changes"))
 
 
+class WhiteLabelForm(FlaskForm):
+    white_label_enabled = BooleanField(_l("Hide LinkBayCMS branding from PDF/CSV exports"))
+    submit = SubmitField(_l("Save changes"))
+
+
 class PasswordForm(FlaskForm):
     current_password = PasswordField(_l("Current password"), validators=[DataRequired()])
     new_password = PasswordField(

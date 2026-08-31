@@ -1,0 +1,58 @@
+{# Widget di utilizzo del piano — sostituisce il vecchio badge statico
+   "Free plan · up to 3 pages" (puramente client-side, zero enforcement
+   reale) con i numeri veri da app/entitlements/service.py::get_usage_summary.
+   Richiede `usage` (UsageSummary), `usage_levels` (dict con "ok"/"warn_80"/
+   "warn_95"/"blocked" per sites/pages/exports) e `plan_name` nel contesto. #}
+{% macro _badge_class(level) -%}
+  {%- if level == "blocked" -%}badge-error
+  {%- elif level == "warn_95" -%}badge-error
+  {%- elif level == "warn_80" -%}badge-warning
+  {%- else -%}badge-ghost
+  {%- endif -%}
+{% endmacro %}
+
+<div class="card card-border bg-base-100 shadow-xs mb-6">
+  <div class="card-body gap-4 py-4">
+    <div class="flex items-center justify-between">
+      <span class="text-sm font-medium">{{ plan_name }}</span>
+      <a class="link link-hover text-xs text-base-content/50" href="{{ url_for('billing.subscription') }}">
+        {{ _("Manage plan") }}
+      </a>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div>
+        <div class="flex items-center justify-between text-xs text-base-content/60 mb-1">
+          <span>{{ _("Sites") }}</span>
+          <span class="badge badge-sm {{ _badge_class(usage_levels.sites) }}">
+            {{ usage.sites_used }}{% if usage.sites_limit >= 0 %}/{{ usage.sites_limit }}{% endif %}
+          </span>
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center justify-between text-xs text-base-content/60 mb-1">
+          <span>{{ _("Pages") }}</span>
+          <span class="badge badge-sm {{ _badge_class(usage_levels.pages) }}">
+            {{ usage.pages_used }}{% if usage.pages_limit >= 0 %}/{{ usage.pages_limit }}{% endif %}
+          </span>
+        </div>
+      </div>
+      {% if usage.ai_credits_monthly_quota > 0 or usage.ai_credits_balance > 0 %}
+      <div>
+        <div class="flex items-center justify-between text-xs text-base-content/60 mb-1">
+          <span>{{ _("AI credits") }}</span>
+          <span class="badge badge-sm badge-ghost">{{ usage.ai_credits_balance }}</span>
+        </div>
+      </div>
+      {% endif %}
+      <div>
+        <div class="flex items-center justify-between text-xs text-base-content/60 mb-1">
+          <span>{{ _("Exports this month") }}</span>
+          <span class="badge badge-sm {{ _badge_class(usage_levels.exports) }}">
+            {{ usage.exports_used_this_month }}{% if usage.exports_limit >= 0 %}/{{ usage.exports_limit }}{% endif %}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -8,6 +8,8 @@ from flask import redirect, url_for
 from flask_admin import Admin, AdminIndexView
 from flask_admin.theme import Bootstrap4Theme
 from flask_babel import Babel
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from flask_login import LoginManager, current_user
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
@@ -16,6 +18,10 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CSRFProtect()
 babel = Babel()
+# key_func di default (usato per le route non decorate esplicitamente);
+# i blueprint gated (app/billing/access.py::init_rate_limits) sovrascrivono
+# sia la chiave (per utente, non per IP) sia il limite (dinamico per piano).
+limiter = Limiter(key_func=get_remote_address)
 
 
 class AdminAuthMixin:

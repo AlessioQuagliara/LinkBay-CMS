@@ -10,13 +10,11 @@
   const t = (window.I18N && window.I18N.t) || ((k) => k);
 
   const SITES_URL = select.dataset.sitesUrl;
-  const MONITORED_URL = select.dataset.monitoredUrl;
   const INSIGHTS_URL = select.dataset.insightsUrl;
   const AI_STATUS_URL = select.dataset.aiStatusUrl;
   const AI_TOGGLE_URL = select.dataset.aiToggleUrl;
   const AI_ANALYZE_URL = select.dataset.aiAnalyzeUrl;
-
-  const CSRF = (document.querySelector('meta[name="csrf-token"]') || {}).content || "";
+  const AI_ANALYZE_STATUS_URL_TPL = select.dataset.aiAnalyzeStatusUrl; // contiene "__job_id__" da sostituire
 
   const states = {
     loading: document.getElementById("state-loading"),
@@ -45,11 +43,7 @@
   const fmtPct = (frac) => (100 * (frac || 0)).toFixed(1) + "%";
   const fmtPos = (n) => (n || 0).toFixed(1);
 
-  function esc(s) {
-    const d = document.createElement("div");
-    d.textContent = s == null ? "" : s;
-    return d.innerHTML;
-  }
+  const esc = window.Common.esc;
   function shortUrl(url) {
     try {
       const u = new URL(url);
@@ -322,14 +316,7 @@
     }
   }
 
-  async function postForm(url, params) {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "X-CSRFToken": CSRF, "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams(params).toString(),
-    });
-    return res;
-  }
+  const postForm = window.Common.postForm;
 
   aiToggle.addEventListener("change", async () => {
     const site = select.value;
@@ -343,23 +330,60 @@
     }
   });
 
+  // L'analisi gira in background (coda RQ, vedi app/jobs/): la POST accoda
+  // il job e ritorna subito un job_id, poi si fa polling finché non è
+  // "finished"/"failed" invece di aspettarsi il risultato nella risposta.
+  const AI_POLL_INTERVAL_MS = 2000;
+  const AI_POLL_MAX_ATTEMPTS = 60; // ~2 minuti, poi si arrende con un errore
+
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  async function pollAiJob(jobId, site) {
+    const statusUrl = AI_ANALYZE_STATUS_URL_TPL.replace("__job_id__", encodeURIComponent(jobId));
+    for (let attempt = 0; attempt < AI_POLL_MAX_ATTEMPTS; attempt++) {
+      await sleep(AI_POLL_INTERVAL_MS);
+      let data;
+      try {
+        const res = await fetch(statusUrl + "?site=" + encodeURIComponent(site), {
+          headers: { Accept: "application/json" },
+        });
+        data = await res.json();
+      } catch (e) {
+        continue; // errore di rete transitorio: ritenta al prossimo giro
+      }
+      if (data.status === "finished" || data.status === "failed" || data.status === "not_found") {
+        return data;
+      }
+    }
+    return { status: "timeout" };
+  }
+
   aiRun.addEventListener("click", async () => {
     const site = select.value;
     aiRun.disabled = true;
     aiStatusText.textContent = t("aiRunning");
     try {
-      const res = await postForm(AI_ANALYZE_URL, { site });
-      const data = await res.json();
-      if (res.ok) {
-        applyAiStatus(data);
+      const queueRes = await postForm(AI_ANALYZE_URL, { site });
+      const queueData = await queueRes.json();
+      if (!queueRes.ok) {
+        if (queueRes.status === 429) {
+          aiStatusText.textContent = t("aiCooldownError", { days: queueData.days_left });
+        } else if (queueData.error === "disabled") {
+          aiStatusText.textContent = t("aiDisabledError");
+        } else {
+          aiStatusText.textContent = t("aiFailedError");
+        }
+        return;
+      }
+
+      const outcome = await pollAiJob(queueData.job_id, site);
+      const jobResult = outcome.job_result || {};
+      if (outcome.status === "finished" && jobResult.ok && outcome.ai_status) {
+        applyAiStatus(outcome.ai_status);
         renderPages(lastPages); // ridisegna con gli score aggiornati
         aiStatusText.textContent = t("aiRunComplete");
-      } else if (res.status === 429) {
-        aiStatusText.textContent = t("aiCooldownError", { days: data.days_left });
-      } else if (data.error === "ai_failed") {
+      } else if (jobResult.error === "ai_failed") {
         aiStatusText.textContent = t("aiProviderError");
-      } else if (data.error === "disabled") {
-        aiStatusText.textContent = t("aiDisabledError");
       } else {
         aiStatusText.textContent = t("aiFailedError");
       }
@@ -411,32 +435,22 @@
   async function init() {
     show("loading");
     try {
+      // Sorgente: solo i siti già aggiunti al monitoraggio (non tutte le
+      // proprietà verificate GSC) — aggiungerne di nuovi si fa dalla pagina
+      // Sites (/dashboard/sites), qui il selettore è un puro switcher.
       const res = await fetch(SITES_URL, { headers: { Accept: "application/json" } });
       if (!res.ok) throw new Error("HTTP " + res.status);
-      const { sites, monitored_site_url } = await res.json();
+      const { sites } = await res.json();
       if (!sites || !sites.length) {
-        select.innerHTML = "<option>No sites</option>";
+        select.innerHTML = `<option>${esc(t("noSitesOption"))}</option>`;
         show("empty");
         return;
       }
-      select.innerHTML = sites.map((s) => `<option value="${esc(s.siteUrl)}">${esc(s.siteUrl)}</option>`).join("");
-      select.disabled = false;
+      select.innerHTML = sites.map((s) => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
+      select.disabled = sites.length < 2;
 
-      // Preseleziona il sito monitorato salvato, se è ancora tra quelli
-      // verificati; altrimenti resta il primo (comportamento di default).
-      const preselect =
-        monitored_site_url && sites.some((s) => s.siteUrl === monitored_site_url)
-          ? monitored_site_url
-          : sites[0].siteUrl;
-      select.value = preselect;
-
-      // Ogni cambio sito: persisti la scelta (fire-and-forget, non blocca il
-      // caricamento dati) e ricarica gli insight.
-      select.addEventListener("change", () => {
-        postForm(MONITORED_URL, { site: select.value }).catch(() => {});
-        loadSite(select.value);
-      });
-      loadSite(preselect);
+      select.addEventListener("change", () => loadSite(select.value));
+      loadSite(sites[0]);
     } catch (e) {
       showError(t("loadSitesReconnectError"));
     }

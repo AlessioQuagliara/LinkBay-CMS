@@ -39,8 +39,20 @@
         {# Valore completo ricomposto dal JS dalle 6 caselle. #}
         <input type="hidden" name="code" id="otp-code">
 
+        {# Campo dedicato all'autofill del codice via SMS/QuickType (iOS) o SMS
+           Retriever (Android): `autocomplete="one-time-code"` su una casella
+           reale da 1 carattere fa sì che il sistema tenga il focus/tastiera in
+           attesa del codice, bloccando la digitazione manuale finché non si
+           preme un tasto qualsiasi (su desktop; su mobile non c'è modo). Va
+           isolato su un campo separato, non visibile ma non `display:none`
+           (Safari non fa autofill su elementi che non prendono spazio nel
+           layout), che poi distribuisce le cifre nelle 6 caselle visibili. #}
+        <input type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6"
+               id="otp-autofill" tabindex="-1" aria-hidden="true"
+               class="absolute opacity-0 pointer-events-none h-px w-px overflow-hidden">
+
         <div class="otp" data-otp aria-label="{{ _('6-digit verification code') }}">
-          <input inputmode="numeric" autocomplete="one-time-code" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=1) }}" autofocus>
+          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=1) }}" autofocus>
           <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=2) }}">
           <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=3) }}">
           <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=4) }}">
@@ -50,10 +62,6 @@
         {% for error in form.code.errors %}
           <p class="text-error text-sm mt-3 text-center">{{ error }}</p>
         {% endfor %}
-
-        <p class="text-center text-xs text-base-content/40 mt-3">
-          {{ _("Press %(kbd)s to refocus the code field.", kbd='<kbd class="kbd kbd-sm">Shift</kbd>'|safe) }}
-        </p>
 
         {{ form.submit(class_="btn btn-error text-white btn-block mt-6") }}
       </form>
@@ -86,12 +94,19 @@
       const boxes = [...wrap.querySelectorAll("input")];
       const hidden = document.getElementById("otp-code");
       const form = document.getElementById("otp-form");
+      const autofill = document.getElementById("otp-autofill");
       const sync = () => { hidden.value = boxes.map(b => b.value).join(""); };
       const maybeSubmit = () => {
         if (boxes.every(b => b.value)) {
           sync();
           if (form.requestSubmit) form.requestSubmit(); else form.submit();
         }
+      };
+      const fillFrom = (digits) => {
+        digits.split("").forEach((d, k) => { if (boxes[k]) boxes[k].value = d; });
+        boxes[Math.min(digits.length, boxes.length - 1)].focus();
+        sync();
+        maybeSubmit();
       };
       boxes.forEach((box, i) => {
         box.addEventListener("input", () => {
@@ -109,14 +124,31 @@
         box.addEventListener("paste", (e) => {
           e.preventDefault();
           const digits = (e.clipboardData.getData("text") || "").replace(/\D/g, "").slice(0, boxes.length);
-          if (!digits) return;
-          digits.split("").forEach((d, k) => { if (boxes[k]) boxes[k].value = d; });
-          boxes[Math.min(digits.length, boxes.length - 1)].focus();
-          sync();
-          maybeSubmit();
+          if (digits) fillFrom(digits);
         });
       });
       sync();
+
+      // L'autofill del sistema (QuickType su iOS, SMS Retriever su Android)
+      // riempie questo campo dedicato invece delle caselle visibili — tenerlo
+      // separato evita che rimanga in attesa del codice bloccando la
+      // digitazione manuale nelle caselle (vedi commento nell'HTML).
+      if (autofill) {
+        autofill.addEventListener("input", () => {
+          const digits = autofill.value.replace(/\D/g, "").slice(0, boxes.length);
+          autofill.value = "";
+          if (digits) fillFrom(digits);
+        });
+      }
+
+      // Rete di sicurezza mobile: un tap che cade nel gutter tra le caselle
+      // (non su un input) non deve sembrare "morto" — porta il focus alla
+      // prima casella vuota.
+      wrap.addEventListener("click", (e) => {
+        if (e.target === wrap) {
+          (boxes.find((b) => !b.value) || boxes[boxes.length - 1]).focus();
+        }
+      });
     }
 
     // Countdown del pulsante "Resend" quando è ancora in cooldown.

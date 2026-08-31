@@ -51,6 +51,12 @@
           </a>
         </li>
         <li>
+          <a class="{{ 'menu-active' if request.endpoint == 'dashboard.sites' }}" href="{{ url_for('dashboard.sites') }}">
+            <span class="iconify size-4" data-icon="lucide:globe"></span>
+            {{ _("Sites") }}
+          </a>
+        </li>
+        <li>
           <a class="{{ 'menu-active' if request.endpoint == 'dashboard.insights' }}" href="{{ url_for('dashboard.insights') }}">
             <span class="iconify size-4" data-icon="lucide:chart-line"></span>
             {{ _("Insights") }}

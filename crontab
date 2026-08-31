@@ -17,3 +17,12 @@
 # Recovery check: pagine marcate "done" da 30 o 60 giorni, verifica se il
 # traffico è tornato (vedi app/rules/recovery.py).
 0 5 * * *   flask check-page-recovery
+
+# Quota AI mensile per gli utenti AppSumo (Tier 1/2/3 — nessun abbonamento
+# Lemon Squeezy che la accrediti da solo, a differenza di Pro — vedi
+# app/billing/routes.py::_handle_payment_success). Idempotente per mese.
+0 6 1 * *   flask grant-monthly-ai-credits
+
+# Tagging "heavy user" per il monitoraggio costi infrastrutturali (vedi
+# app/entitlements/heavy_user.py) — rivalutato ogni settimana, non one-way.
+0 7 * * 0   flask flag-heavy-users

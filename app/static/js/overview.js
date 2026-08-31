@@ -1,6 +1,7 @@
-// Dashboard Overview: sceglie il sito verificato, scarica i dati aggregati
-// (/gsc/api/insights) e mostra KPI rapidi, le pagine monitorate (piano free =
-// 3, quelle che perdono più traffico per prime) e un'anteprima del sito.
+// Dashboard Overview: sceglie il sito monitorato, scarica i dati aggregati
+// (/gsc/api/insights) e mostra KPI rapidi, le pagine monitorate (limite
+// dipende dal piano, vedi app/entitlements — quelle che perdono più
+// traffico per prime) e un'anteprima del sito.
 (function () {
   "use strict";
 
@@ -37,11 +38,7 @@
   const fmtInt = (n) => nf.format(Math.round(n || 0));
   const fmtPos = (n) => (n || 0).toFixed(1);
 
-  function esc(s) {
-    const d = document.createElement("div");
-    d.textContent = s == null ? "" : s;
-    return d.innerHTML;
-  }
+  const esc = window.Common.esc;
   function shortUrl(url) {
     try {
       const u = new URL(url);
@@ -176,13 +173,16 @@
   }
 
   function init() {
+    // Sorgente: solo i siti già aggiunti al monitoraggio (non tutte le
+    // proprietà verificate GSC) — aggiungerne di nuovi si fa dalla pagina
+    // Sites (/dashboard/sites), qui il selettore è un puro switcher.
     fetch(SITES_URL, { headers: { "X-Requested-With": "fetch" } })
       .then((r) => {
         if (r.status === 401) throw new Error("not_connected");
         return r.json();
       })
       .then((data) => {
-        const sites = (data.sites || []).map((s) => s.siteUrl);
+        const sites = data.sites || [];
         if (!sites.length) {
           show("empty");
           return;

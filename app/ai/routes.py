@@ -1,21 +1,18 @@
 """Route AI Analyzer (JSON). CSRF: le POST richiedono l'header X-CSRFToken
 (Flask-WTF), che il frontend legge dal <meta name="csrf-token">."""
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, jsonify, request
 from flask_login import current_user, login_required
 
-from app.ai.deepseek import DeepSeekError
 from app.ai.service import (
+    AI_CREDIT_COST_PER_RUN,
     _cooldown_remaining,
-    analyze_declining,
-    analyze_site,
     get_or_create_config,
     get_status,
     set_enabled,
 )
-from app.gsc.gsc import get_user_gsc_service
-from app.gsc.insights import build_insights
-from app.gsc.repository import credentials_to_dict, save_gsc_credentials
-from app.models import PageAlert
+from app.entitlements.service import check_ai_credits, get_plan_limits
+from app.jobs.queue import get_queue, job_status_payload, queue_name_for_user
+from app.jobs.tasks import run_ai_analysis_job
 
 ai_bp = Blueprint("ai", __name__, url_prefix="/ai")
 
@@ -43,6 +40,10 @@ def toggle():
 @ai_bp.route("/analyze", methods=["POST"])
 @login_required
 def analyze():
+    """Accoda l'analisi invece di chiamare DeepSeek dentro la request (prima
+    girava sincrona qui — vedi app/jobs/tasks.py::run_ai_analysis_job per la
+    stessa logica spostata in background). Il frontend fa polling su
+    GET /ai/analyze-status/<job_id> finché il job non è "finished"/"failed"."""
     site = request.form.get("site")
     if not site:
         return jsonify({"error": "missing_site"}), 400
@@ -51,41 +52,35 @@ def analyze():
     if not cfg.enabled:
         return jsonify({"error": "disabled"}), 400
 
-    remaining = _cooldown_remaining(cfg)
-    if remaining > 0:
-        return jsonify({"error": "cooldown", "days_left": remaining}), 429
+    limits = get_plan_limits(current_user)
+    if limits.ai_mode == "credit":
+        # Piani Pro (e AppSumo Tier 3 per la quota mensile): freno a crediti,
+        # non a tempo — vedi app/entitlements/ai_credits.py.
+        check = check_ai_credits(current_user, cost=AI_CREDIT_COST_PER_RUN)
+        if not check.allowed:
+            return jsonify({"error": "insufficient_credits", "message": check.message, "upsell": check.upsell}), 402
+    else:
+        remaining = _cooldown_remaining(cfg, limits)
+        if remaining > 0:
+            return jsonify({"error": "cooldown", "days_left": remaining}), 429
 
-    # Se il rule engine ha già prodotto alert attivi per questo sito, analizziamo
-    # quelli con il contesto arricchito (perdita reale su base mensile, motivo del
-    # calo). Altrimenti — sito nuovo, prima settimana, storico insufficiente —
-    # ricadiamo sul flusso classico su tutte le pagine da build_insights, così la
-    # UI di /dashboard/insights continua a funzionare invariata.
-    has_alerts = (
-        PageAlert.query.filter(
-            PageAlert.user_id == current_user.id,
-            PageAlert.site_url == site,
-            PageAlert.status.in_(("new", "acknowledged")),
-        ).first()
-        is not None
+    job = get_queue(queue_name_for_user(current_user)).enqueue(
+        run_ai_analysis_job, current_user.id, site, job_timeout=180
     )
+    return jsonify({"status": "queued", "job_id": job.id})
 
-    try:
-        if has_alerts:
-            # Il contesto arriva da page_alerts (DB): niente chiamata a GSC.
-            analyze_declining(current_user.id, site)
-        else:
-            service, credentials = get_user_gsc_service(current_user.id)
-            if service is None:
-                return jsonify({"error": "not_connected"}), 401
-            data = build_insights(service, site, days=28)
-            analyze_site(current_user.id, site, data["pages"])
-            # Refresh trasparente del token dopo l'uso del service.
-            save_gsc_credentials(current_user.id, credentials_to_dict(credentials))
-    except DeepSeekError as e:
-        current_app.logger.warning("DeepSeek analyze failed: %s", e)
-        return jsonify({"error": "ai_failed", "message": str(e)}), 502
-    except Exception:
-        current_app.logger.exception("AI analyze failed for %s", site)
-        return jsonify({"error": "query_failed"}), 502
 
-    return jsonify(get_status(current_user.id, site))
+@ai_bp.route("/analyze-status/<job_id>")
+@login_required
+def analyze_status(job_id):
+    """Polling per il job accodato da /ai/analyze. `job_result` è l'esito di
+    business del job (vedi run_ai_analysis_job: {"ok": True} oppure
+    {"ok": False, "error": ...}). Quando il job è concluso con successo,
+    allega anche get_status() aggiornato così il frontend può ridisegnare
+    punteggi/cooldown con una sola chiamata."""
+    site = request.args.get("site")
+    payload = job_status_payload(job_id)
+    job_result = payload.get("job_result") or {}
+    if payload["status"] == "finished" and job_result.get("ok") and site:
+        payload["ai_status"] = get_status(current_user.id, site)
+    return jsonify(payload)

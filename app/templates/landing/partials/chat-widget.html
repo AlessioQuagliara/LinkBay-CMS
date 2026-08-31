@@ -1,0 +1,50 @@
+{# Widget di chat assistenza — pubblico, nessun login. Risponde a domande su
+   piani/prezzi/funzionalità usando DeepSeek (vedi app/chat/). Posizionato
+   sopra il theme-toggle (bottom-5) per non sovrapporsi. #}
+<div class="fixed end-5 bottom-24 z-40" id="chat-widget">
+    <button
+        type="button"
+        id="chat-widget-toggle"
+        class="btn btn-error btn-circle text-white shadow-lg"
+        aria-label="{{ _('Chat with us') }}"
+        aria-expanded="false">
+        <span class="iconify size-5" data-icon="lucide:message-circle" id="chat-widget-icon-open"></span>
+        <span class="iconify size-5 hidden" data-icon="lucide:x" id="chat-widget-icon-close"></span>
+    </button>
+
+    <div
+        id="chat-widget-panel"
+        class="hidden card bg-base-100 border-base-300 absolute bottom-16 end-0 w-80 sm:w-96 border shadow-xl">
+        <div class="bg-error text-white flex items-center gap-2 rounded-t-box px-4 py-3">
+            <span class="iconify size-4.5" data-icon="lucide:sparkles"></span>
+            <span class="font-medium text-sm">{{ _("Ask about plans & pricing") }}</span>
+        </div>
+
+        <div id="chat-widget-messages" class="flex flex-col gap-2 overflow-y-auto p-3" style="height: 340px;">
+            <div class="chat chat-start">
+                <div class="chat-bubble chat-bubble-error text-white text-sm">
+                    {{ _("Hi! Ask me anything about LinkBayCMS plans, pricing or features.") }}
+                </div>
+            </div>
+        </div>
+
+        <form id="chat-widget-form" class="border-base-300 flex items-center gap-2 border-t p-2">
+            <input
+                type="text"
+                id="chat-widget-input"
+                class="input input-sm w-full focus:outline-0"
+                placeholder="{{ _('Type your question…') }}"
+                maxlength="600"
+                autocomplete="off" />
+            <button type="submit" class="btn btn-error btn-sm btn-circle text-white" aria-label="{{ _('Send') }}">
+                <span class="iconify size-4" data-icon="lucide:send"></span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script
+    id="chat-widget-script"
+    src="{{ url_for('static', filename='js/chat-widget.js') }}"
+    data-ask-url="{{ url_for('chat.ask') }}"
+    data-lang="{{ get_locale() }}"></script>

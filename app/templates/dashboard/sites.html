@@ -1,0 +1,75 @@
+{% extends "dashboard/layout.html" %}
+{% block title %}{{ _("Sites") }}{% endblock %}
+{% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
+{% block dashboard_content %}
+
+<div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-semibold">{{ _("Sites") }}</h1>
+    <p class="text-base-content/60 mt-1">{{ _("Choose which Search Console properties to monitor.") }}</p>
+  </div>
+  <span class="badge badge-soft badge-primary hidden" id="sites-count-badge"></span>
+</div>
+
+{% if not connection %}
+  <div class="card card-border bg-base-100 max-w-md shadow-xs">
+    <div class="card-body">
+      <h2 class="card-title">{{ _("Connect Google") }}</h2>
+      <p class="text-base-content/70">
+        {{ _("To use the service, connect the Google account that owns the websites you want to monitor.") }}
+      </p>
+      <div class="justify-end card-actions mt-2">
+        <a class="btn btn-primary" href="{{ url_for('dashboard.connect') }}">
+          <span class="iconify size-4" data-icon="lucide:unplug"></span>
+          {{ _("Connect") }}
+        </a>
+      </div>
+    </div>
+  </div>
+{% else %}
+
+  <div id="sites-loading" class="skeleton h-40 w-full max-w-xl"></div>
+  <div id="sites-error" class="alert alert-error alert-soft hidden max-w-xl">
+    <span>{{ _("Something went wrong loading your data.") }}</span>
+  </div>
+
+  <div id="sites-content" class="hidden grid gap-6 max-w-xl">
+    <div class="card card-border bg-base-100 shadow-xs">
+      <div class="card-body">
+        <h2 class="card-title text-base">{{ _("Monitored sites") }}</h2>
+        <div class="flex flex-col divide-y divide-base-200" id="monitored-list"></div>
+        <p class="text-sm text-base-content/50 hidden" id="monitored-empty">
+          {{ _("No sites monitored yet — add one below.") }}
+        </p>
+      </div>
+    </div>
+
+    <div class="card card-border bg-base-100 shadow-xs">
+      <div class="card-body">
+        <h2 class="card-title text-base">{{ _("Available Search Console properties") }}</h2>
+        <div class="flex flex-col divide-y divide-base-200" id="available-list"></div>
+        <p class="text-sm text-base-content/50 hidden" id="available-empty">
+          {{ _("All your verified properties are already monitored.") }}
+        </p>
+        <p class="text-sm text-error hidden" id="site-limit-hint">
+          {{ _("You've reached the site limit for your plan.") }}
+          <a class="link" href="{{ url_for('billing.upgrade') }}">{{ _("Upgrade to add more") }}</a>
+        </p>
+      </div>
+    </div>
+
+    <p class="text-sm hidden" id="sites-feedback"></p>
+  </div>
+
+  <script>window.APP_LOCALE = {{ get_locale()|tojson }};</script>
+  <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
+  <script
+    id="sites-script"
+    src="{{ url_for('static', filename='js/sites.js') }}"
+    data-sites-url="{{ url_for('gsc.api_sites') }}"
+    data-add-url="{{ url_for('gsc.api_monitored_site') }}"
+    data-remove-url="{{ url_for('gsc.api_monitored_site_remove') }}"
+    data-site-limit="{{ site_limit }}"></script>
+{% endif %}
+{% endblock %}

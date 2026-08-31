@@ -39,6 +39,14 @@ class Config:
         ).split(",") if s.strip()
     ]
 
+    # Redis — broker della coda RQ (app/jobs/): scan GSC on-demand e run AI
+    # Analyzer eseguiti da un worker separato invece che dentro la request.
+    REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+    # Flask-Limiter: stesso Redis, non lo storage in-memory di default — con
+    # gunicorn multi-worker un limite in-memory sarebbe per-processo, non
+    # condiviso, quindi inaffidabile (vedi app/billing/access.py::init_rate_limits).
+    RATELIMIT_STORAGE_URI = REDIS_URL
+
     # Chiave Fernet per cifrare access/refresh token in DB (obbligatoria per app/gsc).
     # Generane una con: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
     TOKEN_ENCRYPTION_KEY = os.environ.get("TOKEN_ENCRYPTION_KEY")
@@ -62,8 +70,19 @@ class Config:
     OTP_MAX_ATTEMPTS = int(os.environ.get("OTP_MAX_ATTEMPTS", "5"))
     OTP_RESEND_COOLDOWN = int(os.environ.get("OTP_RESEND_COOLDOWN", "60"))
 
-    # Lemon Squeezy — abbonamento Pro dopo il trial di 14 giorni (vedi app/billing/).
+    # Lemon Squeezy — piani Pro (mensile/annuale) + pacchetti crediti AI dopo
+    # il trial di 14 giorni (vedi app/billing/). Ogni prodotto/variante va
+    # creato a mano nella dashboard Lemon Squeezy (vedi piano multi-tier) — il
+    # suo variant ID va qui. LEMONSQUEEZY_VARIANT_ID (singolare) resta come
+    # fallback deprecato per "pro_monthly" finché non si migra del tutto a
+    # LEMONSQUEEZY_VARIANT_PRO_MONTHLY, per non causare un'interruzione a
+    # metà deploy — vedi app/billing/products.py.
     LEMONSQUEEZY_API_KEY = os.environ.get("LEMONSQUEEZY_API_KEY")
     LEMONSQUEEZY_STORE_ID = os.environ.get("LEMONSQUEEZY_STORE_ID")
-    LEMONSQUEEZY_VARIANT_ID = os.environ.get("LEMONSQUEEZY_VARIANT_ID")
     LEMONSQUEEZY_WEBHOOK_SECRET = os.environ.get("LEMONSQUEEZY_WEBHOOK_SECRET")
+    LEMONSQUEEZY_VARIANT_ID = os.environ.get("LEMONSQUEEZY_VARIANT_ID")  # deprecato, vedi sopra
+    LEMONSQUEEZY_VARIANT_PRO_MONTHLY = os.environ.get("LEMONSQUEEZY_VARIANT_PRO_MONTHLY")
+    LEMONSQUEEZY_VARIANT_PRO_ANNUAL = os.environ.get("LEMONSQUEEZY_VARIANT_PRO_ANNUAL")
+    LEMONSQUEEZY_VARIANT_CREDITS_500 = os.environ.get("LEMONSQUEEZY_VARIANT_CREDITS_500")
+    LEMONSQUEEZY_VARIANT_CREDITS_1500 = os.environ.get("LEMONSQUEEZY_VARIANT_CREDITS_1500")
+    LEMONSQUEEZY_VARIANT_CREDITS_5000 = os.environ.get("LEMONSQUEEZY_VARIANT_CREDITS_5000")

@@ -29,10 +29,10 @@
             <div class="container max-w-3xl">
                 <a href="{{ url_for('main.index') }}" class="text-base-content/70 hover:text-error inline-flex items-center gap-1 text-sm">
                     <span class="iconify size-4" data-icon="lucide:arrow-left"></span>
-                    Back to home
+                    {{ _("Back to home") }}
                 </a>
                 <h1 class="mt-4 text-3xl font-bold tracking-tight lg:text-4xl">{{ page_title }}</h1>
-                <p class="text-base-content/60 mt-2 text-sm">Last updated: {{ last_updated }}</p>
+                <p class="text-base-content/60 mt-2 text-sm">{{ _("Last updated: %(date)s", date=last_updated) }}</p>
 
                 <div class="legal-content text-base-content/90 mt-8">
                     {% block content %}{% endblock %}

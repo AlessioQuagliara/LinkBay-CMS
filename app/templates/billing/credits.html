@@ -1,0 +1,38 @@
+{% extends "dashboard/layout.html" %}
+{% block title %}{{ _("AI Credits") }}{% endblock %}
+{% block dashboard_content %}
+
+<div class="mb-6">
+  <h1 class="text-2xl font-semibold">{{ _("AI Credits") }}</h1>
+  <p class="text-base-content/60 mt-1">
+    {{ _("Extra AI suggestions on top of your plan. Credits never expire.") }}
+  </p>
+  <p class="text-sm text-base-content/60 mt-1">
+    {{ _("Current balance: %(balance)s credits", balance=current_user.ai_credit_balance) }}
+  </p>
+</div>
+
+<div class="grid gap-4 sm:grid-cols-3 max-w-3xl">
+  {% for pack in packs %}
+    <div class="card card-border bg-base-100 shadow-xs">
+      <div class="card-body items-center text-center gap-2">
+        <span class="iconify text-primary size-6" data-icon="lucide:sparkles"></span>
+        <p class="text-2xl font-semibold">{{ "{:,}".format(pack.amount) }}</p>
+        <p class="text-sm text-base-content/60">{{ _("credits") }}</p>
+        <p class="text-lg font-medium mt-2">€{{ pack.price }}</p>
+        <form method="post" action="{{ url_for('billing.checkout') }}" class="w-full mt-2">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="product_key" value="{{ pack.product_key }}">
+          <button class="btn btn-primary btn-sm w-full" type="submit">
+            {{ _("Buy") }}
+          </button>
+        </form>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<p class="text-sm text-base-content/50 mt-6 max-w-xl">
+  <a class="link link-hover" href="{{ url_for('billing.subscription') }}">{{ _("Back to subscription") }}</a>
+</p>
+{% endblock %}

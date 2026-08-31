@@ -53,6 +53,24 @@
     </div>
   </div>
 
+  {% if white_label_available %}
+  <div class="card card-border bg-base-100 shadow-xs">
+    <div class="card-body">
+      <h2 class="card-title">{{ _("White label") }}</h2>
+      <form method="post" class="mt-2 flex flex-col gap-4">
+        {{ white_label_form.hidden_tag() }}
+
+        <label class="label cursor-pointer justify-start gap-3">
+          {{ white_label_form.white_label_enabled(class_="toggle toggle-primary") }}
+          <span class="label-text">{{ white_label_form.white_label_enabled.label.text }}</span>
+        </label>
+
+        {{ white_label_form.submit(class_="btn btn-primary self-start") }}
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
   <div class="card card-border bg-base-100 shadow-xs">
     <div class="card-body">
       <h2 class="card-title">{{ _("Change password") }}</h2>

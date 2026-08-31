@@ -13,9 +13,28 @@
       <div class="flex items-center gap-3">
         <span class="iconify text-success size-6" data-icon="lucide:infinity"></span>
         <div>
-          <p class="font-medium">{{ _("Lifetime") }}</p>
+          <p class="font-medium">
+            {% if current_user.plan_type and current_user.plan_type.startswith("appsumo") %}
+              {{ _("AppSumo — %(tier)s", tier=current_user.plan_type.replace("appsumo_tier", "Tier ")) }}
+            {% else %}
+              {{ _("Lifetime") }}
+            {% endif %}
+          </p>
           <p class="text-sm text-base-content/60">{{ _("Activated with an AppSumo code — nothing to manage.") }}</p>
         </div>
+      </div>
+      <div class="card-actions">
+        {% if limits.ai_credit_topups_allowed %}
+        <a class="btn btn-outline btn-sm" href="{{ url_for('billing.credits') }}">
+          <span class="iconify size-4" data-icon="lucide:sparkles"></span>
+          {{ _("AI credits: %(balance)s — buy more", balance=current_user.ai_credit_balance) }}
+        </a>
+        {% else %}
+        <span class="badge badge-ghost gap-1">
+          <span class="iconify size-3.5" data-icon="lucide:sparkles"></span>
+          {{ _("AI credits: %(balance)s", balance=current_user.ai_credit_balance) }}
+        </span>
+        {% endif %}
       </div>
     {% elif current_user.subscription_status == "active" %}
       <div class="flex items-center gap-3">
@@ -25,10 +44,30 @@
           <p class="text-sm text-base-content/60">{{ price_label }}</p>
         </div>
       </div>
-      <div class="card-actions">
+      <div class="card-actions flex-wrap gap-2">
         <a class="btn btn-outline btn-sm" href="{{ url_for('billing.portal') }}">
           <span class="iconify size-4" data-icon="lucide:settings"></span>
           {{ _("Manage subscription") }}
+        </a>
+        <span class="badge badge-ghost gap-1">
+          <span class="iconify size-3.5" data-icon="lucide:sparkles"></span>
+          {{ _("AI credits: %(balance)s", balance=current_user.ai_credit_balance) }}
+        </span>
+      </div>
+    {% elif current_user.subscription_status == "past_due" %}
+      <div class="flex items-center gap-3">
+        <span class="iconify text-warning size-6" data-icon="lucide:triangle-alert"></span>
+        <div>
+          <p class="font-medium">{{ _("Payment failed") }}</p>
+          <p class="text-sm text-base-content/60">
+            {{ _("We couldn't process your last payment. Update your payment method within the grace period to keep access.") }}
+          </p>
+        </div>
+      </div>
+      <div class="card-actions">
+        <a class="btn btn-primary btn-sm" href="{{ url_for('billing.portal') }}">
+          <span class="iconify size-4" data-icon="lucide:credit-card"></span>
+          {{ _("Update payment method") }}
         </a>
       </div>
     {% elif current_user.subscription_status == "trialing" %}

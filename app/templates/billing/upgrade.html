@@ -17,6 +17,12 @@
           <span class="iconify text-success size-8" data-icon="lucide:infinity"></span>
           <h1 class="text-xl font-semibold">{{ _("Your account is lifetime") }}</h1>
           <p class="text-base-content/60">{{ _("Activated with an AppSumo code — nothing to manage.") }}</p>
+          {% if current_user.plan_type and current_user.plan_type.startswith("appsumo") %}
+            <a class="btn btn-outline btn-sm mt-2" href="{{ url_for('billing.credits') }}">
+              <span class="iconify size-4" data-icon="lucide:sparkles"></span>
+              {{ _("Buy AI credits") }}
+            </a>
+          {% endif %}
           <a class="link link-hover text-sm" href="{{ url_for('dashboard.overview') }}">{{ _("Back to dashboard") }}</a>
         {% elif current_user.subscription_status == "active" %}
           <span class="iconify text-success size-8" data-icon="lucide:circle-check-big"></span>
@@ -44,7 +50,6 @@
           <p class="text-base-content/60">
             {{ _("Keep monitoring declining pages and getting AI suggestions, without interruption.") }}
           </p>
-          <p class="text-3xl font-bold mt-2">{{ price_label }}</p>
 
           <ul class="text-sm text-base-content/70 text-left w-full mt-2 space-y-2">
             <li class="flex items-center gap-2">
@@ -61,13 +66,24 @@
             </li>
           </ul>
 
-          <form method="post" action="{{ url_for('billing.checkout') }}" class="w-full mt-2">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button class="btn btn-primary w-full" type="submit">
-              <span class="iconify size-4" data-icon="lucide:credit-card"></span>
-              {{ _("Upgrade to Pro — %(price)s", price=price_label) }}
-            </button>
-          </form>
+          <div class="w-full mt-2 space-y-2">
+            <form method="post" action="{{ url_for('billing.checkout') }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="product_key" value="pro_monthly">
+              <button class="btn btn-primary w-full" type="submit">
+                <span class="iconify size-4" data-icon="lucide:credit-card"></span>
+                {{ _("Monthly — %(price)s", price=price_label) }}
+              </button>
+            </form>
+            <form method="post" action="{{ url_for('billing.checkout') }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="product_key" value="pro_annual">
+              <button class="btn btn-outline w-full" type="submit">
+                <span class="iconify size-4" data-icon="lucide:credit-card"></span>
+                {{ _("Annual — %(price)s", price=price_label_annual) }}
+              </button>
+            </form>
+          </div>
 
           <a class="link link-hover text-sm text-base-content/60" href="{{ url_for('billing.redeem') }}">
             {{ _("Have an AppSumo code?") }}

@@ -2,6 +2,16 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
+# Librerie di sistema richieste da WeasyPrint (render HTML/CSS -> PDF per gli
+# export, vedi app/exports/pdf_export.py) — non sono pacchetti Python, vanno
+# installate a livello OS. shared-mime-info serve al rilevamento MIME interno
+# di WeasyPrint, fonts-dejavu-core dà un fallback di font sempre disponibile
+# per il rendering dei PDF anche senza font custom.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf-2.0-0 libcairo2 libffi-dev \
+    shared-mime-info fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 

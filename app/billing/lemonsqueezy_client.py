@@ -13,6 +13,8 @@ import hmac
 import requests
 from flask import current_app, url_for
 
+from app.billing.products import variant_id_for
+
 API_BASE = "https://api.lemonsqueezy.com/v1"
 
 
@@ -24,18 +26,24 @@ def _headers():
     }
 
 
-def create_checkout_url(user):
-    """Crea una Checkout Session Lemon Squeezy per l'abbonamento Pro di `user`.
-    Ritorna l'URL hosted a cui reindirizzare il browser. `custom.user_id`
-    torna intatto nel webhook (meta.custom_data): è così che colleghiamo
-    l'abbonamento creato su Lemon Squeezy al nostro User."""
+def create_checkout_url(user, product_key: str = "pro_monthly"):
+    """Crea una Checkout Session Lemon Squeezy per `product_key` (vedi
+    app/billing/products.py::PRODUCT_CATALOG — piano ricorrente o pacchetto
+    crediti one-time). Ritorna l'URL hosted a cui reindirizzare il browser.
+
+    `custom.user_id` torna intatto nel webhook (meta.custom_data): è così che
+    colleghiamo l'ordine/abbonamento creato su Lemon Squeezy al nostro User.
+    `custom.product_key` è necessario in più per gli acquisti one-time (i
+    pacchetti crediti): un evento order_created non porta contesto di
+    abbonamento, quindi senza questo il webhook non saprebbe cosa è stato
+    comprato."""
     payload = {
         "data": {
             "type": "checkouts",
             "attributes": {
                 "checkout_data": {
                     "email": user.email,
-                    "custom": {"user_id": str(user.id)},
+                    "custom": {"user_id": str(user.id), "product_key": product_key},
                 },
                 "product_options": {
                     "redirect_url": url_for("billing.success", _external=True),
@@ -46,7 +54,7 @@ def create_checkout_url(user):
                     "data": {"type": "stores", "id": str(current_app.config["LEMONSQUEEZY_STORE_ID"])}
                 },
                 "variant": {
-                    "data": {"type": "variants", "id": str(current_app.config["LEMONSQUEEZY_VARIANT_ID"])}
+                    "data": {"type": "variants", "id": variant_id_for(product_key)}
                 },
             },
         }

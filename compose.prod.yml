@@ -46,8 +46,10 @@ services:
     env_file: .env
     environment:
       DATABASE_URL: postgresql://linkbay:linkbay@db:5432/linkbay_cms
+      REDIS_URL: redis://redis:6379/0
     depends_on:
       - db
+      - redis
     volumes:
       - .:/app
     labels:
@@ -79,12 +81,39 @@ services:
     env_file: .env
     environment:
       DATABASE_URL: postgresql://linkbay:linkbay@db:5432/linkbay_cms
+      REDIS_URL: redis://redis:6379/0
     depends_on:
       - db
+      - redis
     volumes:
       - .:/app
     command: ["supercronic", "/app/crontab"]
 
+  # Broker per la coda RQ (app/jobs/) — scan GSC on-demand e run AI Analyzer
+  # eseguiti in background invece che dentro la request. Vedi app/jobs/queue.py.
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+
+  # Consuma le code RQ in ordine di priorità (high > default > low, vedi
+  # PlanLimits.queue_priority). Stessa immagine di "web"/"cron".
+  worker:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://linkbay:linkbay@db:5432/linkbay_cms
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+    command: ["rq", "worker", "high", "default", "low", "--url", "redis://redis:6379/0"]
+
 volumes:
   pgdata:
   traefik-certs:
+  redisdata:

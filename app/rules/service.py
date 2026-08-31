@@ -6,13 +6,13 @@ l'engine si aspetta, e riscrivere il risultato in page_alerts. La logica delle
 regole resta interamente in engine.py/filters.py/scoring.py, qui non si decide
 nulla — si orchestra soltanto.
 """
-from datetime import date, datetime, timezone
+from datetime import date
 
 from flask import current_app
 from sqlalchemy import extract, func
 
 from app.extensions import db
-from app.models import GscConnection, GscPageMonthly, GscSiteDaily, PageAlert
+from app.models import GscPageMonthly, GscSiteDaily, MonitoredSite, PageAlert
 from app.rules.engine import evaluate_site
 from app.rules.types import PageSeries, SiteSeries
 
@@ -172,35 +172,37 @@ def run_for_site(user_id: int, site_url: str) -> list:
 
 
 def run_weekly() -> dict:
-    """Job settimanale: per ogni utente con un sito monitorato, sincronizza lo
-    storico mensile per pagina e applica le regole. Un utente che va in errore
-    (es. token scaduto) non ferma il job: si logga e si passa al prossimo."""
+    """Job settimanale: per ogni sito attivamente monitorato, sincronizza lo
+    storico mensile per pagina e applica le regole. Un utente/sito che va in
+    errore (es. token scaduto) non ferma il job: si logga e si passa al
+    prossimo. Da quando esiste il multi-sito (app/models/monitored_site.py),
+    itera MonitoredSite invece di GscConnection.monitored_site_url — un
+    utente con più siti viene processato una volta per sito."""
     from app.gsc import page_history
     from app.gsc.gsc import get_user_gsc_service
+    from app.gsc.sites import touch_last_synced
 
-    connections = (
-        GscConnection.query.filter(GscConnection.monitored_site_url.isnot(None)).all()
-    )
+    sites = MonitoredSite.query.filter_by(is_active=True).all()
 
     processed = 0
     errors = []
-    for conn in connections:
-        site_url = conn.monitored_site_url
+    for row in sites:
         try:
-            service, _ = get_user_gsc_service(conn.user_id)
+            service, _ = get_user_gsc_service(row.user_id)
             if service is None:
-                errors.append(f"user {conn.user_id}: non connesso a GSC")
+                errors.append(f"user {row.user_id}: non connesso a GSC")
                 continue
-            page_history.sync_page_monthly(service, conn.user_id, site_url)
-            run_for_site(conn.user_id, site_url)
+            page_history.sync_page_monthly(service, row.user_id, row.site_url)
+            run_for_site(row.user_id, row.site_url)
+            touch_last_synced(row.user_id, row.site_url)
             processed += 1
-        except Exception as exc:  # noqa: BLE001 — un utente non deve fermare il job
+        except Exception as exc:  # noqa: BLE001 — un sito non deve fermare il job
             current_app.logger.exception(
-                "run_weekly fallito per user %s (%s)", conn.user_id, site_url
+                "run_weekly fallito per user %s (%s)", row.user_id, row.site_url
             )
             # Annulla la transazione fallita, altrimenti il prossimo utente
             # eredita una sessione in stato di errore (Postgres aborta la tx).
             db.session.rollback()
-            errors.append(f"user {conn.user_id} ({site_url}): {exc}")
+            errors.append(f"user {row.user_id} ({row.site_url}): {exc}")
 
     return {"processed": processed, "errors": errors}

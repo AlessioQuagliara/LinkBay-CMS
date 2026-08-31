@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="group/html">
+<html lang="{{ get_locale() }}" class="group/html">
     <head>
         {% include "landing/partials/head.html" %}
     </head>
@@ -12,26 +12,24 @@
                 <div class="grid gap-8 lg:grid-cols-2 lg:gap-16">
                     <div class="max-lg:order-2">
                         <p class="text-error mb-4 text-sm font-semibold uppercase tracking-wide">
-                            SEO traffic monitoring for publishers
+                            {{ _("SEO traffic monitoring for publishers") }}
                         </p>
                         <h1 class="text-4xl font-bold tracking-tight lg:text-6xl lg:leading-none">
-                            Find out which pages are
-                            <span class="text-error">losing organic traffic</span>
-                            — before it costs you 10x more to fix.
+                            {{ _("Find out which pages are") }}
+                            <span class="text-error">{{ _("losing organic traffic") }}</span>
+                            {{ _("— before it costs you 10x more to fix.") }}
                         </h1>
                         <p class="text-base-content/80 mt-8 sm:text-lg">
-                            LinkBayCMS reads your Google Search Console data, filters out the noise, and
-                            hands you a short, ranked list of declining pages — each with a plain-English
-                            reason. Built for publishers and editorial sites that live off organic search.
+                            {{ _("LinkBayCMS reads your Google Search Console data, filters out the noise, and hands you a short, ranked list of declining pages — each with a plain-English reason. Built for publishers and editorial sites that live off organic search.") }}
                         </p>
                         <div class="mt-8 inline-flex gap-3 sm:mt-16">
                             <a href="{{ url_for('auth.register') }}">
                                 <button class="btn btn-error text-white">
                                     <span class="iconify size-4" data-icon="lucide:rocket"></span>
-                                    Get started free
+                                    {{ _("Get started free") }}
                                 </button>
                             </a>
-                            <a href="#features"><button class="btn btn-ghost">See how it works</button></a>
+                            <a href="#features"><button class="btn btn-ghost">{{ _("See how it works") }}</button></a>
                         </div>
                     </div>
 
@@ -44,30 +42,6 @@
                     </div>
                 </div>
 
-                <h2 class="text-base-content/60 mt-12 text-center text-2xl font-medium lg:mt-32">
-                    You don't need to replace anything you already use
-                </h2>
-
-                <div
-                    class="mt-12 grid grid-cols-2 justify-center gap-8 **:cursor-pointer **:grayscale **:transition-all **:duration-500 **:hover:grayscale-0 sm:grid-cols-3 md:grid-cols-5">
-                    <img class="mx-auto h-8" src="{{ url_for('static', filename='img/landing/logo/google.svg') }}" alt="google logo" />
-                    <img
-                        class="mx-auto h-6"
-                        src="{{ url_for('static', filename='img/landing/logo/microsoft.svg') }}"
-                        alt="microsoft logo" />
-                    <img
-                        class="mx-auto hidden h-6 md:inline"
-                        src="{{ url_for('static', filename='img/landing/logo/netflix.svg') }}"
-                        alt="netflix logo" />
-                    <img
-                        class="mx-auto hidden h-8 md:inline"
-                        src="{{ url_for('static', filename='img/landing/logo/spotify.svg') }}"
-                        alt="spotify logo" />
-                    <img
-                        class="mx-auto hidden h-8 sm:inline"
-                        src="{{ url_for('static', filename='img/landing/logo/paypal.svg') }}"
-                        alt="paypal logo" />
-                </div>
             </div>
         </section>
 
@@ -79,10 +53,9 @@
 
             <div class="container">
                 <div class="flex flex-col items-center">
-                    <h2 class="text-3xl font-semibold sm:text-4xl">Three signals. One prioritized list.</h2>
+                    <h2 class="text-3xl font-semibold sm:text-4xl">{{ _("Three signals. One prioritized list.") }}</h2>
                     <p class="text-base-content/80 mt-4 max-w-2xl text-center sm:text-lg">
-                        No dashboard to interpret, no 3,000-row spreadsheet. Just the pages that need
-                        attention, in order — and why.
+                        {{ _("No dashboard to interpret, no 3,000-row spreadsheet. Just the pages that need attention, in order — and why.") }}
                     </p>
                 </div>
 
@@ -96,38 +69,35 @@
                         </div>
 
                         <div class="lg:mt-8">
-                            <div class="badge badge-soft badge-primary">Detection</div>
+                            <div class="badge badge-soft badge-primary">{{ _("Detection") }}</div>
                             <h3 class="mt-3 text-xl font-medium sm:text-2xl">
-                                We isolate real decline, not daily noise
+                                {{ _("We isolate real decline, not daily noise") }}
                             </h3>
                             <p class="text-base-content/80 mt-1">
-                                Traffic wobbles every day — that's not a signal, it's weather. LinkBayCMS
-                                looks at the trend over months and only flags a page when the drop is real.
+                                {{ _("Traffic wobbles every day — that's not a signal, it's weather. LinkBayCMS looks at the trend over months and only flags a page when the drop is real.") }}
                             </p>
                             <ul class="mt-4 list-inside list-disc">
-                                <li>Filters out normal month-to-month swings</li>
-                                <li>Compares each page to your site's own trend, not the whole internet's</li>
-                                <li>Checks the same quarter last year to rule out seasonality</li>
-                                <li>Only flags drops that hold for 2+ consecutive months</li>
+                                <li>{{ _("Filters out normal month-to-month swings") }}</li>
+                                <li>{{ _("Compares each page to your site's own trend, not the whole internet's") }}</li>
+                                <li>{{ _("Checks the same quarter last year to rule out seasonality") }}</li>
+                                <li>{{ _("Only flags drops that hold for 2+ consecutive months") }}</li>
                             </ul>
                         </div>
                     </div>
 
                     <div class="grid gap-8 lg:grid-cols-2 lg:gap-16">
                         <div>
-                            <div class="badge badge-soft badge-secondary">Prioritization</div>
-                            <h3 class="mt-3 text-xl font-medium sm:text-2xl">Know what's worth fixing first</h3>
+                            <div class="badge badge-soft badge-secondary">{{ _("Prioritization") }}</div>
+                            <h3 class="mt-3 text-xl font-medium sm:text-2xl">{{ _("Know what's worth fixing first") }}</h3>
                             <p class="text-base-content/80 mt-1">
-                                A page that dropped from 4,000 to 900 visits is not the same emergency as
-                                one that dropped from 50 to 20. Every page gets ranked by how much it's
-                                worth and how likely it is to recover.
+                                {{ _("A page that dropped from 4,000 to 900 visits is not the same emergency as one that dropped from 50 to 20. Every page gets ranked by how much it's worth and how likely it is to recover.") }}
                             </p>
 
                             <ul class="mt-4 list-inside list-disc">
-                                <li>Ranked by clicks lost per month, not vanity metrics</li>
-                                <li>Flags pages that are close to recovering (small ranking drop)</li>
-                                <li>Tells you when demand itself has disappeared — no point fixing that</li>
-                                <li>Every score ships with a plain-English reason, never a bare number</li>
+                                <li>{{ _("Ranked by clicks lost per month, not vanity metrics") }}</li>
+                                <li>{{ _("Flags pages that are close to recovering (small ranking drop)") }}</li>
+                                <li>{{ _("Tells you when demand itself has disappeared — no point fixing that") }}</li>
+                                <li>{{ _("Every score ships with a plain-English reason, never a bare number") }}</li>
                             </ul>
                         </div>
 
@@ -144,20 +114,18 @@
                         </div>
 
                         <div class="lg:mt-8">
-                            <div class="badge badge-soft badge-error">Clarity</div>
+                            <div class="badge badge-soft badge-error">{{ _("Clarity") }}</div>
                             <h3 class="mt-3 text-xl font-medium sm:text-2xl">
-                                Real numbers, never invented ones
+                                {{ _("Real numbers, never invented ones") }}
                             </h3>
                             <p class="text-base-content/80 mt-1">
-                                Clicks lost per month is real, verifiable data straight from Search
-                                Console. A revenue estimate only ever appears if you give us the input —
-                                and it's always labeled as an estimate.
+                                {{ _("Clicks lost per month is real, verifiable data straight from Search Console. A revenue estimate only ever appears if you give us the input — and it's always labeled as an estimate.") }}
                             </p>
                             <ul class="mt-4 list-inside list-disc">
-                                <li>Clicks lost per month, pulled directly from Search Console</li>
-                                <li>Optional revenue estimate, only if you provide the value per visit</li>
-                                <li>Every number is labeled with exactly where it came from</li>
-                                <li>No made-up dollar figures, ever</li>
+                                <li>{{ _("Clicks lost per month, pulled directly from Search Console") }}</li>
+                                <li>{{ _("Optional revenue estimate, only if you provide the value per visit") }}</li>
+                                <li>{{ _("Every number is labeled with exactly where it came from") }}</li>
+                                <li>{{ _("No made-up dollar figures, ever") }}</li>
                             </ul>
                         </div>
                     </div>
@@ -168,78 +136,30 @@
         <section class="py-8 lg:py-20" id="integrations">
             <div class="container">
                 <div class="text-center">
-                    <h2 class="text-3xl font-semibold sm:text-4xl">Works with the data you already have</h2>
+                    <h2 class="text-3xl font-semibold sm:text-4xl">{{ _("Works with the data you already have") }}</h2>
                     <p class="text-base-content/80 mt-4 sm:text-lg">
-                        No tracking code, no site access, nothing to install on your CMS.
+                        {{ _("No tracking code, no site access, nothing to install on your CMS.") }}
                     </p>
                 </div>
                 <div class="bg-base-200 rounded-box mt-12 p-8 lg:p-16">
                     <div class="grid items-center gap-12 lg:grid-cols-5">
                         <div class="lg:col-span-3">
                             <h3 class="text-2xl font-medium sm:text-3xl">
-                                Connect Google Search Console once. Get a ranked list from then on.
+                                {{ _("Connect Google Search Console once. Get a ranked list from then on.") }}
                             </h3>
                             <p class="text-base-content/80 mt-4 sm:text-lg">
-                                LinkBayCMS reads directly from the Search Console data you already
-                                collect — read-only, nothing is changed on your site. It doesn't replace
-                                your CMS, your analytics, or your workflow; it just tells you where to
-                                look first.
+                                {{ _("LinkBayCMS reads directly from the Search Console data you already collect — read-only, nothing is changed on your site. It doesn't replace your CMS, your analytics, or your workflow; it just tells you where to look first.") }}
                             </p>
 
                             <div class="mt-8 flex justify-center lg:justify-start">
-                                <a href="{{ url_for('auth.register') }}"><button class="btn btn-error text-white">Connect Search Console</button></a>
+                                <a href="{{ url_for('auth.register') }}"><button class="btn btn-error text-white">{{ _("Connect Search Console") }}</button></a>
                             </div>
                         </div>
 
-                        <div
-                            class="grid grid-cols-2 justify-center gap-6 md:grid-cols-3 lg:col-span-2">
-                            <div class="text-center">
-                                <div
-                                    class="inline-flex items-center justify-center rounded-full bg-white p-6 shadow">
-                                    <img
-                                        alt="amazon"
-                                        class="size-12"
-                                        src="{{ url_for('static', filename='img/landing/logo/amazon-mini.svg') }}" />
-                                </div>
-                            </div>
-                            <div class="text-center">
-                                <div
-                                    class="inline-flex items-center justify-center rounded-full bg-white p-6 shadow">
-                                    <img alt="slack" class="size-12" src="{{ url_for('static', filename='img/landing/logo/slack.svg') }}" />
-                                </div>
-                            </div>
-                            <div class="text-center">
-                                <div
-                                    class="inline-flex items-center justify-center rounded-full bg-white p-6 shadow">
-                                    <img
-                                        alt="openai"
-                                        class="size-12"
-                                        src="{{ url_for('static', filename='img/landing/logo/openai.svg') }}" />
-                                </div>
-                            </div>
-                            <div class="text-center">
-                                <div
-                                    class="inline-flex items-center justify-center rounded-full bg-white p-6 shadow">
-                                    <img
-                                        alt="meta"
-                                        class="size-12"
-                                        src="{{ url_for('static', filename='img/landing/logo/meta-mini.svg') }}" />
-                                </div>
-                            </div>
-                            <div class="text-center">
-                                <div
-                                    class="inline-flex items-center justify-center rounded-full bg-white p-6 shadow">
-                                    <img
-                                        alt="whatsapp"
-                                        class="size-12"
-                                        src="{{ url_for('static', filename='img/landing/logo/whatsapp.svg') }}" />
-                                </div>
-                            </div>
-                            <div class="text-center">
-                                <div
-                                    class="inline-flex items-center justify-center rounded-full bg-white p-6 shadow">
-                                    <img alt="x" class="size-12" src="{{ url_for('static', filename='img/landing/logo/x.svg') }}" />
-                                </div>
+                        <div class="flex items-center justify-center lg:col-span-2">
+                            <div class="inline-flex items-center gap-3 rounded-full bg-white px-8 py-6 shadow">
+                                <img alt="Google Search Console" class="size-10" src="{{ url_for('static', filename='img/landing/logo/google.svg') }}" />
+                                <span class="font-medium text-neutral-800">Search Console</span>
                             </div>
                         </div>
                     </div>
@@ -262,14 +182,13 @@
 
 
                                 </div>
-                                <h3 class="text-lg font-medium">Monday morning email</h3>
+                                <h3 class="text-lg font-medium">{{ _("Monday morning email") }}</h3>
                                 <button class="btn btn-circle ms-auto" aria-label="Details">
                                     <span class="iconify size-4" data-icon="lucide:arrow-right"></span>
                                 </button>
                             </div>
                             <p class="mt-2 line-clamp-2 overflow-ellipsis">
-                                A short email with your top declining pages, sent automatically every
-                                Monday — on the Pro plan.
+                                {{ _("A short email with your top declining pages, sent automatically every Monday — on the Pro plan.") }}
                             </p>
                         </div>
                     </div>
@@ -297,14 +216,13 @@
                                     </svg>
 
                                 </div>
-                                <h3 class="text-lg font-medium">Full history, not just 16 months</h3>
+                                <h3 class="text-lg font-medium">{{ _("Full history, not just 16 months") }}</h3>
                                 <button class="btn btn-circle ms-auto" aria-label="Details">
                                     <span class="iconify size-4" data-icon="lucide:arrow-right"></span>
                                 </button>
                             </div>
                             <p class="mt-2 line-clamp-2 overflow-ellipsis">
-                                Search Console deletes data after 16 months. We keep your site's
-                                history from the day you connect, and never throw it away.
+                                {{ _("Search Console deletes data after 16 months. We keep your site's history from the day you connect, and never throw it away.") }}
                             </p>
                         </div>
                     </div>
@@ -315,18 +233,17 @@
                                 <div
                                     class="bg-base-200 flex items-center justify-center rounded-full p-3">
                                     <img
-                                        alt="slack"
+                                        alt="recovery tracking"
                                         class="size-6"
                                         src="{{ url_for('static', filename='img/landing/logo/bitbucket-mini.svg') }}" />
                                 </div>
-                                <h3 class="text-lg font-medium">Mark as done, track recovery</h3>
+                                <h3 class="text-lg font-medium">{{ _("Mark as done, track recovery") }}</h3>
                                 <button class="btn btn-circle ms-auto" aria-label="Details">
                                     <span class="iconify size-4" data-icon="lucide:arrow-right"></span>
                                 </button>
                             </div>
                             <p class="mt-2 line-clamp-2 overflow-ellipsis">
-                                Flag a page as fixed and we check back at 30 and 60 days to confirm
-                                whether it actually recovered.
+                                {{ _("Flag a page as fixed and we check back at 30 and 60 days to confirm whether it actually recovered.") }}
                             </p>
                         </div>
                     </div>
@@ -337,50 +254,83 @@
         <section class="py-8 lg:py-20" id="pricing">
             <div class="container">
                 <div class="text-center">
-                    <h2 class="text-3xl font-semibold sm:text-4xl">One plan. Everything included.</h2>
+                    <h2 class="text-3xl font-semibold sm:text-4xl">{{ _("Simple pricing, monthly or annual.") }}</h2>
                     <p class="text-base-content/80 mt-2 sm:text-lg">
-                        Try it free for 14 days, no credit card required.
+                        {{ _("Try it free for 13 days, no credit card required.") }}
                     </p>
                 </div>
 
-                <div class="mt-8 lg:max-w-md lg:mx-auto">
+                <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:max-w-2xl lg:mx-auto">
                     <div class="card border-base-300 border p-3">
                         <div class="bg-primary/10 rounded-box p-6">
                             <div class="flex justify-between">
-                                <h3 class="text-error text-xl font-semibold">Pro</h3>
-                                <div class="badge badge-primary badge-sm">14-day free trial</div>
+                                <h3 class="text-error text-xl font-semibold">{{ _("Pro Monthly") }}</h3>
+                                <div class="badge badge-primary badge-sm">{{ _("13-day free trial") }}</div>
                             </div>
                             <p class="mt-4 flex items-baseline">
                                 <span class="text-5xl font-semibold tracking-tight">€79</span>
-                                <span class="ml-1 text-xl font-medium">/month</span>
+                                <span class="ml-1 text-xl font-medium">{{ _("/month") }}</span>
                             </p>
                             <p class="mt-2">
-                                No credit card to start. Cancel anytime once you're on the paid plan.
+                                {{ _("No credit card to start. Cancel anytime once you're on the paid plan.") }}
                             </p>
                         </div>
                         <div class="p-6">
                             <ul class="list-inside list-disc space-y-3" role="list">
-                                <li><span class="ms-3">Declining pages, prioritized automatically</span></li>
-                                <li><span class="ms-3">AI suggestions on the pages losing traffic</span></li>
-                                <li><span class="ms-3">Full history from the day you connect your site</span></li>
+                                <li><span class="ms-3">{{ _("Declining pages, prioritized automatically") }}</span></li>
+                                <li><span class="ms-3">{{ _("AI suggestions on the pages losing traffic") }}</span></li>
+                                <li><span class="ms-3">{{ _("Full history from the day you connect your site") }}</span></li>
                             </ul>
                         </div>
                         <a href="{{ url_for('auth.register') }}">
                             <button class="btn btn-error text-white btn-block mt-auto">
-                                Start your free trial
+                                {{ _("Start your free trial") }}
+                            </button>
+                        </a>
+                    </div>
+
+                    <div class="card border-primary border p-3">
+                        <div class="bg-primary/10 rounded-box p-6">
+                            <div class="flex justify-between">
+                                <h3 class="text-error text-xl font-semibold">{{ _("Pro Annual") }}</h3>
+                                <div class="badge badge-primary badge-sm">{{ _("Save ~17%%") }}</div>
+                            </div>
+                            <p class="mt-4 flex items-baseline">
+                                <span class="text-5xl font-semibold tracking-tight">€790</span>
+                                <span class="ml-1 text-xl font-medium">{{ _("/year") }}</span>
+                            </p>
+                            <p class="mt-2">
+                                {{ _("Same Pro plan, billed once a year — %(price)s/month equivalent.", price="€65.83") }}
+                            </p>
+                        </div>
+                        <div class="p-6">
+                            <ul class="list-inside list-disc space-y-3" role="list">
+                                <li><span class="ms-3">{{ _("Declining pages, prioritized automatically") }}</span></li>
+                                <li><span class="ms-3">{{ _("AI suggestions on the pages losing traffic") }}</span></li>
+                                <li><span class="ms-3">{{ _("Full history from the day you connect your site") }}</span></li>
+                            </ul>
+                        </div>
+                        <a href="{{ url_for('auth.register') }}">
+                            <button class="btn btn-primary btn-block mt-auto">
+                                {{ _("Start your free trial") }}
                             </button>
                         </a>
                     </div>
                 </div>
+
+                <p class="text-base-content/60 text-center text-sm mt-6">
+                    {{ _("Got an AppSumo code?") }}
+                    <a class="link link-hover" href="{{ url_for('billing.redeem') }}">{{ _("Redeem it here") }}</a>.
+                </p>
             </div>
         </section>
 
         <section class="py-8 lg:py-20" id="faq">
             <div class="container">
                 <div class="text-center">
-                    <h2 class="text-3xl font-semibold sm:text-4xl">FAQs</h2>
+                    <h2 class="text-3xl font-semibold sm:text-4xl">{{ _("FAQs") }}</h2>
                     <p class="text-base-content/80 mt-2 sm:text-lg">
-                        The questions every SEO asks in the first two minutes of a demo.
+                        {{ _("The questions every SEO asks in the first two minutes of a demo.") }}
                     </p>
                 </div>
 
@@ -393,75 +343,55 @@
                                 type="radio"
                                 aria-label="open/close" />
                             <div class="collapse-title text-xl font-medium">
-                                How is this different from Google Search Console?
+                                {{ _("How is this different from Google Search Console?") }}
                             </div>
                             <div class="collapse-content">
                                 <p class="text-base">
-                                    Search Console gives you the data — thousands of rows and no
-                                    particular order. LinkBayCMS gives you the five things to fix
-                                    Monday morning, ranked by how much they're worth and how likely
-                                    they are to recover. It's not another archive; it's a shortlist.
+                                    {{ _("Search Console gives you the data — thousands of rows and no particular order. LinkBayCMS gives you the five things to fix Monday morning, ranked by how much they're worth and how likely they are to recover. It's not another archive; it's a shortlist.") }}
                                 </p>
                             </div>
                         </div>
                         <div class="collapse-arrow border-base-content/10 collapse border">
                             <input name="faq" type="radio" aria-label="open/close" />
                             <div class="collapse-title text-xl font-medium">
-                                How do you know a page is really declining, and not just noisy?
+                                {{ _("How do you know a page is really declining, and not just noisy?") }}
                             </div>
                             <div class="collapse-content">
                                 <p class="text-base">
-                                    A page only makes the list if it clears a minimum relevance
-                                    threshold, has dropped at least 30% and at least 20 clicks/month,
-                                    held that drop for two consecutive months, and is falling faster
-                                    than the rest of your site in the same period. That last check
-                                    alone removes most of the false alarms — it's the difference
-                                    between "your page is broken" and "Google shipped an update and
-                                    your whole site moved."
+                                    {{ _('A page only makes the list if it clears a minimum relevance threshold, has dropped at least 30%% and at least 20 clicks/month, held that drop for two consecutive months, and is falling faster than the rest of your site in the same period. That last check alone removes most of the false alarms — it\'s the difference between "your page is broken" and "Google shipped an update and your whole site moved."') }}
                                 </p>
                             </div>
                         </div>
                         <div class="collapse-arrow border-base-content/10 collapse border">
                             <input name="faq" type="radio" aria-label="open/close" />
                             <div class="collapse-title text-xl font-medium">
-                                Do I need to install anything on my site?
+                                {{ _("Do I need to install anything on my site?") }}
                             </div>
                             <div class="collapse-content">
                                 <p class="text-base">
-                                    No. LinkBayCMS is not a CMS and doesn't touch your site — it reads
-                                    your existing Google Search Console data with read-only access.
-                                    Nothing to embed, no plugin, no code changes.
+                                    {{ _("No. LinkBayCMS is not a CMS and doesn't touch your site — it reads your existing Google Search Console data with read-only access. Nothing to embed, no plugin, no code changes.") }}
                                 </p>
                             </div>
                         </div>
                         <div class="collapse-arrow border-base-content/10 collapse border">
                             <input name="faq" type="radio" aria-label="open/close" />
                             <div class="collapse-title text-xl font-medium">
-                                Is this built for e-commerce or SaaS marketing sites too?
+                                {{ _("Is this built for e-commerce or SaaS marketing sites too?") }}
                             </div>
                             <div class="collapse-content">
                                 <p class="text-base">
-                                    Not really — it's built specifically for publishers and editorial
-                                    sites with 500 to 20,000 indexed pages and at least 20,000 organic
-                                    clicks a month, where organic search is the main source of
-                                    revenue. Below that volume, declines are hard to tell apart from
-                                    noise, and our output gets less reliable. We'd rather tell you
-                                    that upfront than sign you up and have you churn in month two.
+                                    {{ _("Not really — it's built specifically for publishers and editorial sites with 500 to 20,000 indexed pages and at least 20,000 organic clicks a month, where organic search is the main source of revenue. Below that volume, declines are hard to tell apart from noise, and our output gets less reliable. We'd rather tell you that upfront than sign you up and have you churn in month two.") }}
                                 </p>
                             </div>
                         </div>
                         <div class="collapse-arrow border-base-content/10 collapse border">
                             <input name="faq" type="radio" aria-label="open/close" />
                             <div class="collapse-title text-xl font-medium">
-                                Is my Search Console data safe?
+                                {{ _("Is my Search Console data safe?") }}
                             </div>
                             <div class="collapse-content">
                                 <p class="text-base">
-                                    We connect via Google's standard read-only access — we can see
-                                    your performance data, we can't change anything on your property.
-                                    We never invent numbers: click figures come straight from Search
-                                    Console, and any revenue estimate is only shown if you provide it,
-                                    always labeled as an estimate.
+                                    {{ _("We connect via Google's standard read-only access — we can see your performance data, we can't change anything on your property. We never invent numbers: click figures come straight from Search Console, and any revenue estimate is only shown if you provide it, always labeled as an estimate.") }}
                                 </p>
                             </div>
                         </div>
@@ -473,6 +403,8 @@
         {% include "landing/partials/footer.html" %}
 
         {% include "landing/partials/theme-toggle.html" %}
+
+        {% include "landing/partials/chat-widget.html" %}
 
         {% include "landing/partials/cookie-consent.html" %}
 

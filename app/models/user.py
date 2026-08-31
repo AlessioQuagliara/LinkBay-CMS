@@ -40,15 +40,53 @@ class User(db.Model, UserMixin):
     # app/auth/routes.py::register). Scaduto il trial senza un abbonamento
     # attivo, app/billing/access.py blocca l'accesso alla app.
     trial_ends_at = db.Column(db.DateTime(timezone=True))
-    # "trialing" | "active" | "canceled" | "lifetime". "active"/"canceled"
-    # sono aggiornati dai webhook Lemon Squeezy (app/billing/routes.py).
-    # "lifetime" è impostato una tantum al riscatto di un codice AppSumo
-    # (app/models/appsumo_code.py) e non scade mai. Niente stato "past_due":
-    # qualunque cosa diversa da "active"/"lifetime" durante l'abbonamento
-    # viene trattata come non pagante (blocco netto).
+    # "trialing" | "active" | "past_due" | "canceled" | "lifetime".
+    # "active"/"past_due"/"canceled" sono aggiornati dai webhook Lemon
+    # Squeezy (app/billing/routes.py). "lifetime" è impostato una tantum al
+    # riscatto di un codice AppSumo (app/models/appsumo_code.py) e non scade
+    # mai. "past_due" (pagamento fallito, subscription_payment_failed) dà un
+    # periodo di grazia fino a grace_period_ends_at prima del blocco netto —
+    # vedi has_active_access.
     subscription_status = db.Column(db.String(20), nullable=False, default="trialing")
     ls_customer_id = db.Column(db.String(255))
     ls_subscription_id = db.Column(db.String(255))
+
+    # Piano/tier per i limiti tecnici (app/entitlements/) — ORTOGONALE a
+    # subscription_status: quest'ultimo risponde "ha accesso ora?" (gate
+    # binario usato da app/billing/access.py, invariato), plan_type risponde
+    # "quali limiti si applicano?". Valori: "trial" | "subscription_monthly"
+    # | "subscription_annual" | "appsumo_tier1" | "appsumo_tier2" |
+    # "appsumo_tier3". NULL per utenti non ancora migrati — vedi
+    # `flask backfill-plan-type` e app/entitlements/service.py::get_plan_limits
+    # (fallback sicuro a "trial" se NULL).
+    plan_type = db.Column(db.String(30), nullable=True)
+    billing_interval = db.Column(db.String(10), nullable=True)  # "monthly" | "annual" | None
+
+    # Periodo di grazia dopo un pagamento fallito (subscription_payment_failed,
+    # vedi app/billing/routes.py::webhook) prima di revocare l'accesso.
+    grace_period_ends_at = db.Column(db.DateTime(timezone=True), nullable=True)
+
+    # Saldo crediti AI denormalizzato (letture veloci) — il registro delle
+    # transazioni è AiCreditTransaction, fonte di verità per l'audit; questo
+    # campo va sempre aggiornato in coppia con un inserimento nel ledger, mai
+    # scritto direttamente altrove (vedi app/entitlements/ai_credits.py).
+    ai_credit_balance = db.Column(db.Integer, nullable=False, default=0)
+
+    # Flag di monitoraggio costi infrastrutturali (utenti che consumano
+    # molto più della norma) — calcolato periodicamente da un job, non
+    # editabile dall'utente. Vedi app/entitlements/heavy_user.py.
+    heavy_user_flag = db.Column(db.Boolean, nullable=False, default=False)
+    heavy_user_flagged_at = db.Column(db.DateTime(timezone=True), nullable=True)
+
+    # White label sugli export PDF/CSV — onorato solo se il piano dell'utente
+    # lo consente (PlanLimits.white_label); il toggle da solo non basta.
+    white_label_enabled = db.Column(db.Boolean, nullable=False, default=False)
+
+    # Escape hatch per la migrazione controllata AppSumo→abbonamento: un
+    # utente appsumo_* non può auto-servirsi da /billing/checkout finché
+    # questo flag non viene attivato a mano dal supporto (Flask-Admin), dopo
+    # una conversazione — mai da un bottone self-service.
+    appsumo_migration_unlocked = db.Column(db.Boolean, nullable=False, default=False)
 
     gsc_connection = db.relationship(
         "GscConnection", back_populates="user", uselist=False, cascade="all, delete-orphan"
@@ -75,6 +113,8 @@ class User(db.Model, UserMixin):
             return True
         if self.subscription_status == "trialing" and self.trial_ends_at:
             return datetime.now(timezone.utc) < self._aware(self.trial_ends_at)
+        if self.subscription_status == "past_due" and self.grace_period_ends_at:
+            return datetime.now(timezone.utc) < self._aware(self.grace_period_ends_at)
         return False
 
     @property

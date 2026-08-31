@@ -2,7 +2,7 @@
 <div class="fixed end-5 bottom-5 z-10 flex flex-col items-center">
     <div class="dropdown dropdown-end dropdown-top">
         <div class="btn mt-2" role="button" tabindex="0">
-            Theme
+            {{ _("Theme") }}
             <span class="iconify size-3.5" data-icon="lucide:chevron-up"></span>
         </div>
         <ul class="menu dropdown-content rounded-box bg-base-100 w-52 shadow" tabindex="0">
@@ -11,7 +11,7 @@
                     data-theme-control="system"
                     class="group-[:not([data-theme])]/html:bg-base-200 flex items-center">
                     <span class="iconify size-4.5" data-icon="lucide:laptop"></span>
-                    System
+                    {{ _("System") }}
                 </div>
             </li>
             <li>
@@ -19,7 +19,7 @@
                     data-theme-control="light"
                     class="group-data-[theme=light]/html:bg-base-200 flex items-center">
                     <span class="iconify size-4.5" data-icon="lucide:sun"></span>
-                    Light
+                    {{ _("Light") }}
                 </div>
             </li>
             <li>
@@ -27,7 +27,7 @@
                     data-theme-control="dark"
                     class="group-data-[theme=dark]/html:bg-base-200 flex items-center">
                     <span class="iconify size-4.5" data-icon="lucide:moon"></span>
-                    Dark
+                    {{ _("Dark") }}
                 </div>
             </li>
         </ul>

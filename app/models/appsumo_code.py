@@ -17,6 +17,13 @@ class AppSumoCode(db.Model):
     redeemed_at = db.Column(db.DateTime(timezone=True))
     redeemed_by_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
 
+    # Tier 1/2/3 del deal AppSumo (vedi piano multi-tier) — nullable perché i
+    # codici importati prima dell'introduzione dei tier multipli non hanno un
+    # valore recuperabile via query; vanno corretti a mano incrociando
+    # l'export vendite di AppSumo. La redenzione (app/billing/routes.py)
+    # rifiuta un codice con tier NULL.
+    tier = db.Column(db.Integer, nullable=True)
+
     redeemed_by = db.relationship("User")
 
     @property

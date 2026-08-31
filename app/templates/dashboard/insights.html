@@ -16,15 +16,17 @@
     </p>
   </div>
 
-  {# Selettore sito: popolato via JS da /gsc/api/sites #}
+  {# Selettore sito: puro switcher tra i siti già monitorati (popolato via JS
+     da /gsc/api/monitored-sites) — aggiungerne di nuovi si fa dalla pagina
+     Sites. #}
   <label class="form-control w-full max-w-xs">
     <select id="site-select" class="select select-bordered" disabled
-            data-sites-url="{{ url_for('gsc.api_sites') }}"
-            data-monitored-url="{{ url_for('gsc.api_monitored_site') }}"
+            data-sites-url="{{ url_for('gsc.api_monitored_sites') }}"
             data-insights-url="{{ url_for('gsc.api_insights') }}"
             data-ai-status-url="{{ url_for('ai.status') }}"
             data-ai-toggle-url="{{ url_for('ai.toggle') }}"
-            data-ai-analyze-url="{{ url_for('ai.analyze') }}">
+            data-ai-analyze-url="{{ url_for('ai.analyze') }}"
+            data-ai-analyze-status-url="{{ url_for('ai.analyze_status', job_id='__job_id__') }}">
       <option>{{ _("Loading sites…") }}</option>
     </select>
   </label>
@@ -89,11 +91,15 @@
 
   <div id="state-empty" class="card card-border bg-base-100 shadow-xs hidden">
     <div class="card-body items-center text-center py-12">
-      <span class="iconify text-base-content/30 size-10" data-icon="lucide:search-x"></span>
-      <p class="font-medium mt-3">{{ _("No verified sites found") }}</p>
+      <span class="iconify text-base-content/30 size-10" data-icon="lucide:globe"></span>
+      <p class="font-medium mt-3">{{ _("No sites monitored yet") }}</p>
       <p class="text-sm text-base-content/60 max-w-sm mt-1">
-        {{ _("The connected Google account doesn't own any verified Search Console properties.") }}
+        {{ _("Add a Search Console property to start monitoring it.") }}
       </p>
+      <a class="btn btn-primary btn-sm mt-4" href="{{ url_for('dashboard.sites') }}">
+        <span class="iconify size-4" data-icon="lucide:plus"></span>
+        {{ _("Add a site") }}
+      </a>
     </div>
   </div>
 
@@ -186,6 +192,7 @@
   </dialog>
 
   <script>window.APP_LOCALE = {{ get_locale()|tojson }};</script>
+  <script src="{{ url_for('static', filename='js/common.js') }}"></script>
   <script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
   <script src="{{ url_for('static', filename='js/insights.js') }}"></script>
 {% endif %}

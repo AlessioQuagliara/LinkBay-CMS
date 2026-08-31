@@ -6,7 +6,7 @@ individuato dal rule engine, app/rules/engine.py) come baseline: nessun nuovo
 calcolo, solo un confronto con i click più recenti disponibili in
 GscPageMonthly (tenuti freschi dal job settimanale run-decay-rules, vedi
 app/rules/service.py::run_weekly)."""
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 from flask import current_app
 

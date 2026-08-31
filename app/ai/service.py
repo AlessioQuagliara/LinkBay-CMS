@@ -14,7 +14,8 @@ from app.models import AiAnalyzerConfig, AiPageAnalysis, PageAlert
 MAX_PAGES = 25          # pagine inviate al prompt (limite costo/token)
 MAX_SUGGESTIONS = 5
 SUGGESTION_MAXLEN = 200
-RUN_COOLDOWN_DAYS = 7   # una vera analisi a settimana
+RUN_COOLDOWN_DAYS = 7   # freno per i piani ai_mode=="cooldown" (AppSumo Tier 1/2)
+AI_CREDIT_COST_PER_RUN = 1  # crediti consumati per run, piani ai_mode=="credit"
 
 SYSTEM_PROMPT = (
     "You are a senior technical SEO consultant. You receive Google Search Console "
@@ -62,8 +63,16 @@ def set_enabled(user_id, site_url, enabled: bool):
     return cfg
 
 
-def _cooldown_remaining(cfg):
-    """Giorni mancanti al prossimo run consentito (0 se disponibile ora)."""
+def _cooldown_remaining(cfg, limits=None):
+    """Giorni mancanti al prossimo run consentito (0 se disponibile ora).
+
+    `limits` (app.entitlements.limits.PlanLimits) è opzionale per non rompere
+    i chiamanti esistenti, ma va passato quando disponibile: se
+    limits.ai_mode == "credit" (Pro mensile/annuale) il freno è a crediti,
+    non a tempo — il cooldown è sempre 0 e il controllo reale è
+    app.entitlements.service.check_ai_credits, chiamato dal chiamante."""
+    if limits is not None and limits.ai_mode == "credit":
+        return 0
     if not cfg.last_run_at:
         return 0
     next_run = cfg.last_run_at + timedelta(days=RUN_COOLDOWN_DAYS)
@@ -214,7 +223,12 @@ def analyze_declining(user_id, site_url):
 
 
 def get_status(user_id, site_url):
-    """Stato AI per la UI: switch, ultimo run, cooldown, risultati salvati."""
+    """Stato AI per la UI: switch, ultimo run, cooldown/crediti, risultati
+    salvati."""
+    from app.entitlements.service import get_plan_limits
+    from app.extensions import db
+    from app.models import User
+
     cfg = AiAnalyzerConfig.query.filter_by(user_id=user_id, site_url=site_url).first()
     rows = AiPageAnalysis.query.filter_by(user_id=user_id, site_url=site_url).all()
     analyses = {
@@ -225,9 +239,15 @@ def get_status(user_id, site_url):
         }
         for r in rows
     }
+
+    user = db.session.get(User, user_id)
+    limits = get_plan_limits(user) if user else None
+
     return {
         "enabled": bool(cfg and cfg.enabled),
         "last_run_at": cfg.last_run_at.isoformat() if cfg and cfg.last_run_at else None,
-        "cooldown_days_left": _cooldown_remaining(cfg) if cfg else 0,
+        "cooldown_days_left": _cooldown_remaining(cfg, limits) if cfg else 0,
+        "ai_mode": limits.ai_mode if limits else "cooldown",
+        "ai_credit_balance": user.ai_credit_balance if user else 0,
         "analyses": analyses,
     }

@@ -15,11 +15,11 @@
     </p>
   </div>
 
-  {# Stesso selettore sito di Insights: popolato via JS da /gsc/api/sites #}
+  {# Stesso selettore sito di Insights: puro switcher tra i siti già
+     monitorati (popolato via JS da /gsc/api/monitored-sites) #}
   <label class="form-control w-full max-w-xs">
     <select id="site-select" class="select select-bordered" disabled
-            data-sites-url="{{ url_for('gsc.api_sites') }}"
-            data-monitored-url="{{ url_for('gsc.api_monitored_site') }}"
+            data-sites-url="{{ url_for('gsc.api_monitored_sites') }}"
             data-list-url="{{ url_for('alerts.api_list') }}"
             data-trend-url="{{ url_for('alerts.api_trend') }}"
             data-query-losses-url="{{ url_for('alerts.api_query_losses') }}"
@@ -82,10 +82,26 @@
     </div>
   </div>
 
+  {# Stato: nessun sito ancora monitorato (diverso da "nessun calo") #}
+  <div id="state-no-sites" class="card card-border bg-base-100 shadow-xs hidden">
+    <div class="card-body items-center text-center py-12">
+      <span class="iconify text-base-content/30 size-10" data-icon="lucide:globe"></span>
+      <p class="font-medium mt-3">{{ _("No sites monitored yet") }}</p>
+      <p class="text-sm text-base-content/60 max-w-sm mt-1">
+        {{ _("Add a Search Console property to start monitoring it.") }}
+      </p>
+      <a class="btn btn-primary btn-sm mt-4" href="{{ url_for('dashboard.sites') }}">
+        <span class="iconify size-4" data-icon="lucide:plus"></span>
+        {{ _("Add a site") }}
+      </a>
+    </div>
+  </div>
+
   {# Stato: dati (una card per alert, iniettate via JS) #}
   <div id="state-data" class="hidden"></div>
 
   <script>window.APP_LOCALE = {{ get_locale()|tojson }};</script>
+  <script src="{{ url_for('static', filename='js/common.js') }}"></script>
   <script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
   <script src="{{ url_for('static', filename='js/declining.js') }}"></script>
 {% endif %}
