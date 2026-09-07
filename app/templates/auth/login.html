@@ -28,6 +28,9 @@
             {{ form.password(class_="grow focus:outline-0", placeholder="••••••••") }}
           </label>
           {% for error in form.password.errors %}<p class="text-error text-sm mt-1">{{ error }}</p>{% endfor %}
+          <div class="text-right mt-1">
+            <a class="link text-sm text-base-content/60" href="{{ url_for('auth.forgot_password') }}">{{ _("Forgot password?") }}</a>
+          </div>
         </fieldset>
 
         {{ form.submit(class_="btn btn-error text-white btn-block mt-4") }}

@@ -45,14 +45,13 @@ class TestConfig(Config):
     # già "non configurato" senza eccezioni (vedi dev_fallback_enabled in
     # app/auth/otp.py, resend_configured in app/emails/__init__.py, ecc.).
     RESEND_API = None
-    LEMONSQUEEZY_API_KEY = None
-    LEMONSQUEEZY_WEBHOOK_SECRET = "test-webhook-secret"
-    LEMONSQUEEZY_VARIANT_PRO_MONTHLY = "1001"
-    LEMONSQUEEZY_VARIANT_PRO_ANNUAL = "1002"
-    LEMONSQUEEZY_VARIANT_CREDITS_50 = "1003"
-    LEMONSQUEEZY_VARIANT_CREDITS_150 = "1004"
-    LEMONSQUEEZY_VARIANT_CREDITS_500 = "1005"
     DEEPSEEK_API = None
+    # Link Revolut di test — non reali, solo per verificare che le CTA in
+    # /billing/upgrade si abilitino quando configurati (vedi
+    # tests/test_revolut_activation.py per il caso "non configurato").
+    REVOLUT_PAYMENT_LINK_1M = "https://pay.revolut.com/test-1m"
+    REVOLUT_PAYMENT_LINK_3M = "https://pay.revolut.com/test-3m"
+    REVOLUT_PAYMENT_LINK_12M = "https://pay.revolut.com/test-12m"
 
 
 @pytest.fixture(scope="session")

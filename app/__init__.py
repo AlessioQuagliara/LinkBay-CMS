@@ -373,12 +373,23 @@ def _register_cli(app):
 
     @app.cli.command("grant-monthly-ai-credits")
     def grant_monthly_ai_credits_cmd():
-        """Accredita la quota AI mensile a ogni piano AppSumo (tutti i tier
-        sono ai_mode=="credit"): non hanno un abbonamento Lemon Squeezy
-        ricorrente che possa scatenare subscription_payment_success come Pro
-        mensile/annuale, la cui quota si accredita lì — vedi
-        app/billing/routes.py::_handle_payment_success. Idempotente per
-        mese: non doppio-accredita se rilanciato più volte nello stesso mese."""
+        """Accredita la quota AI mensile a ogni piano ai_mode=="credit" con
+        una quota da accreditare (AppSumo + Pro/Revolut).
+
+        Prima della rimozione di Lemon Squeezy, i piani Pro (subscription_monthly/
+        annual) ricevevano la quota da un webhook (subscription_payment_success,
+        ora eliminato insieme al resto dell'integrazione — vedi
+        app/billing/revolut_manual_activation.py). Con l'attivazione Revolut
+        manuale non c'è più un evento di rinnovo ricorrente da cui agganciarsi,
+        quindi da qui in poi TUTTI i piani a crediti passano da questo comando
+        mensile, non solo AppSumo — altrimenti gli utenti Pro (Revolut o
+        Lemon Squeezy legacy ancora attivo) smetterebbero silenziosamente di
+        ricevere la quota inclusa nel piano.
+
+        Salta chi non ha accesso attivo in questo momento (has_active_access) —
+        un piano Revolut scaduto non ancora sistemato da un admin non deve
+        continuare ad accumulare crediti. Idempotente per mese: non
+        doppio-accredita se rilanciato più volte nello stesso mese."""
         from datetime import datetime, timezone
 
         from app.entitlements.ai_credits import grant_credits
@@ -390,9 +401,11 @@ def _register_cli(app):
 
         granted = skipped = 0
         for plan_type, limits in PLAN_LIMITS.items():
-            if limits.ai_mode != "credit" or limits.ai_credit_grant <= 0 or not limits.ai_credit_topups_allowed:
-                continue  # Pro: la quota si accredita da webhook, non da qui (vedi docstring).
+            if limits.ai_mode != "credit" or limits.ai_credit_grant <= 0:
+                continue
             for user in User.query.filter_by(plan_type=plan_type).all():
+                if not user.has_active_access:
+                    continue
                 already_this_month = (
                     AiCreditTransaction.query.filter(
                         AiCreditTransaction.user_id == user.id,
@@ -407,7 +420,7 @@ def _register_cli(app):
                 grant_credits(user, limits.ai_credit_grant, type="grant_monthly_quota")
                 granted += 1
 
-        print(f"Quota AI mensile accreditata a {granted} utenti AppSumo, {skipped} già accreditati questo mese.")
+        print(f"Quota AI mensile accreditata a {granted} utenti, {skipped} già accreditati questo mese o senza accesso attivo.")
 
     @app.cli.command("flag-heavy-users")
     def flag_heavy_users_cmd():
@@ -418,6 +431,37 @@ def _register_cli(app):
 
         result = flag_heavy_users()
         print(f"{len(result['flagged'])} utenti segnalati come heavy user, {len(result['unflagged'])} rimossi dal flag.")
+
+    @app.cli.command("seed-demo-account")
+    @click.option("--email", default="alessio@linkbay-cms.com", show_default=True,
+                  help="Email dell'account demo (creato se non esiste, riusato se già presente).")
+    @click.option("--password", default=None,
+                  help="Password dell'account demo. Se omessa, ne viene generata una e stampata a schermo.")
+    @click.option("--name", default="Alessio Demo", show_default=True, help="Nome visualizzato dell'account demo.")
+    def seed_demo_account_cmd(email, password, name):
+        """Crea/ripristina un account demo con siti e storico Search Console
+        sintetici, alert generati dal vero rule engine e una audit
+        presentation — per testare/registrare Pagine in calo e Audit senza
+        toccare account reali. Ogni run azzera e rigenera SOLO i dati di
+        questo indirizzo email (vedi app/demo/seed_account.py)."""
+        import secrets
+
+        from app.demo.seed_account import seed_demo_account
+
+        generated_password = password or secrets.token_urlsafe(9)
+        summary = seed_demo_account(email, generated_password, name=name)
+
+        print(f"Account demo pronto: {summary['email']} (id {summary['user_id']})")
+        if not password:
+            print(f"Password generata: {generated_password}")
+        for site in summary["sites"]:
+            print(f"  - {site['site_url']}: {site['pages']} pagine, {site['alerts']} alert generati dal rule engine")
+        if summary.get("audit_presentation"):
+            ap = summary["audit_presentation"]
+            print(f"Audit presentation creata: #{ap['id']} — {ap['title']}")
+        elif summary.get("audit_presentation_error"):
+            print(f"Audit presentation non generata ({summary['audit_presentation_error']}) "
+                  "— riprova più tardi dal bottone Genera in /dashboard/audits.")
 
 
 def _ensure_tables(app):
@@ -570,6 +614,44 @@ def _ensure_columns(db):
             conn.execute(
                 text(
                     f"ALTER TABLE users ADD COLUMN appsumo_migration_unlocked BOOLEAN NOT NULL DEFAULT {default}"
+                )
+            )
+
+    # users: attivazione manuale abbonamenti Revolut (vedi
+    # app/billing/revolut_manual_activation.py e app/models/user.py) — le
+    # colonne ls_customer_id/ls_subscription_id restano dove sono, invariate,
+    # per l'audit storico Lemon Squeezy.
+    if has_column("users", "id") and not has_column("users", "subscription_expires_at"):
+        with db.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE users ADD COLUMN subscription_expires_at TIMESTAMPTZ"))
+    if has_column("users", "id") and not has_column("users", "subscription_source"):
+        with db.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE users ADD COLUMN subscription_source VARCHAR(30)"))
+    if has_column("users", "id") and not has_column("users", "subscription_activated_at"):
+        with db.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE users ADD COLUMN subscription_activated_at TIMESTAMPTZ"))
+    if has_column("users", "id") and not has_column("users", "subscription_activated_by_id"):
+        with db.engine.begin() as conn:
+            conn.execute(
+                text(
+                    "ALTER TABLE users ADD COLUMN subscription_activated_by_id INTEGER "
+                    "REFERENCES users(id)"
+                )
+            )
+    if has_column("users", "id") and not has_column("users", "subscription_activation_reference"):
+        with db.engine.begin() as conn:
+            conn.execute(
+                text(
+                    "ALTER TABLE users ADD COLUMN subscription_activation_reference VARCHAR(255)"
+                )
+            )
+            # UNIQUE standard (non parziale): sia Postgres sia SQLite trattano
+            # ogni NULL come distinto dagli altri, quindi più utenti senza
+            # riferimento convivono senza violare il vincolo.
+            conn.execute(
+                text(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS ix_users_subscription_activation_reference "
+                    "ON users (subscription_activation_reference)"
                 )
             )
 

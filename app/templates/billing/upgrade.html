@@ -11,86 +11,95 @@
   </header>
 
   <main class="flex-1 flex items-center justify-center px-4 pb-16">
-    <div class="card card-border bg-base-100 shadow-xs w-full max-w-md">
-      <div class="card-body items-center text-center gap-4">
-        {% if current_user.subscription_status == "lifetime" %}
+    {% if current_user.subscription_status == "lifetime" %}
+      <div class="card card-border bg-base-100 shadow-xs w-full max-w-md">
+        <div class="card-body items-center text-center gap-4">
           <span class="iconify text-success size-8" data-icon="lucide:infinity"></span>
           <h1 class="text-xl font-semibold">{{ _("Your account is lifetime") }}</h1>
           <p class="text-base-content/60">{{ _("Activated with an AppSumo code — nothing to manage.") }}</p>
           {% if current_user.plan_type and current_user.plan_type.startswith("appsumo") %}
             <a class="btn btn-outline btn-sm mt-2" href="{{ url_for('billing.credits') }}">
               <span class="iconify size-4" data-icon="lucide:sparkles"></span>
-              {{ _("Buy AI credits") }}
+              {{ _("AI credits") }}
             </a>
           {% endif %}
           <a class="link link-hover text-sm" href="{{ url_for('dashboard.overview') }}">{{ _("Back to dashboard") }}</a>
-        {% elif current_user.subscription_status == "active" %}
+        </div>
+      </div>
+    {% elif current_user.subscription_status == "active" %}
+      <div class="card card-border bg-base-100 shadow-xs w-full max-w-md">
+        <div class="card-body items-center text-center gap-4">
           <span class="iconify text-success size-8" data-icon="lucide:circle-check-big"></span>
-          <h1 class="text-xl font-semibold">{{ _("Your Pro subscription is active") }}</h1>
-          <p class="text-base-content/60">{{ _("You can manage or cancel it anytime.") }}</p>
-          <a class="btn btn-primary mt-2" href="{{ url_for('billing.portal') }}">
-            <span class="iconify size-4" data-icon="lucide:settings"></span>
-            {{ _("Manage subscription") }}
-          </a>
+          <h1 class="text-xl font-semibold">{{ _("Your Pro plan is active") }}</h1>
+          {% if current_user.subscription_expires_at %}
+            <p class="text-base-content/60">
+              {{ _("Valid until %(date)s.", date=current_user.subscription_expires_at.strftime("%d %b %Y")) }}
+            </p>
+          {% endif %}
+          <a class="link link-hover text-sm" href="{{ url_for('billing.subscription') }}">{{ _("View subscription details") }}</a>
           <a class="link link-hover text-sm" href="{{ url_for('dashboard.overview') }}">{{ _("Back to dashboard") }}</a>
-        {% else %}
+        </div>
+      </div>
+    {% else %}
+      <div class="w-full max-w-4xl">
+        <div class="text-center mb-8">
           {% if current_user.subscription_status == "trialing" and current_user.trial_days_left > 0 %}
-            <span class="badge badge-soft badge-primary gap-1">
+            <span class="badge badge-soft badge-primary gap-1 mb-3">
               <span class="iconify size-3.5" data-icon="lucide:sparkles"></span>
               {{ ngettext("%(num)s day left in your trial", "%(num)s days left in your trial", current_user.trial_days_left) }}
             </span>
           {% else %}
-            <span class="badge badge-soft badge-error gap-1">
+            <span class="badge badge-soft badge-error gap-1 mb-3">
               <span class="iconify size-3.5" data-icon="lucide:lock"></span>
               {{ _("Trial ended") }}
             </span>
           {% endif %}
-
           <h1 class="text-2xl font-semibold">{{ _("Upgrade to Pro") }}</h1>
-          <p class="text-base-content/60">
+          <p class="text-base-content/60 mt-1">
             {{ _("Keep monitoring declining pages and getting AI suggestions, without interruption.") }}
           </p>
+        </div>
 
-          <ul class="text-sm text-base-content/70 text-left w-full mt-2 space-y-2">
-            <li class="flex items-center gap-2">
-              <span class="iconify text-success size-4 shrink-0" data-icon="lucide:check"></span>
-              {{ _("Unlimited Insights and Declining Pages") }}
-            </li>
-            <li class="flex items-center gap-2">
-              <span class="iconify text-success size-4 shrink-0" data-icon="lucide:check"></span>
-              {{ _("AI suggestions on declining pages") }}
-            </li>
-            <li class="flex items-center gap-2">
-              <span class="iconify text-success size-4 shrink-0" data-icon="lucide:check"></span>
-              {{ _("Full history from the day you connect your site") }}
-            </li>
-          </ul>
+        <div class="grid gap-4 sm:grid-cols-3">
+          {% for plan in plans %}
+            <div class="card card-border bg-base-100 shadow-xs {{ 'border-primary' if plan.savings_label }}">
+              <div class="card-body items-center text-center gap-2">
+                {% if plan.savings_label %}
+                  <span class="badge badge-primary badge-sm">{{ _("Save about %(pct)s", pct=plan.savings_label) }}</span>
+                {% endif %}
+                <h3 class="text-lg font-semibold">{{ plan.label }}</h3>
+                <p class="text-3xl font-semibold">€{{ "%.2f"|format(plan.price) }}</p>
 
-          <div class="w-full mt-2 space-y-2">
-            <form method="post" action="{{ url_for('billing.checkout') }}">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <input type="hidden" name="product_key" value="pro_monthly">
-              <button class="btn btn-primary w-full" type="submit">
-                <span class="iconify size-4" data-icon="lucide:credit-card"></span>
-                {{ _("Monthly — %(price)s", price=price_label) }}
-              </button>
-            </form>
-            <form method="post" action="{{ url_for('billing.checkout') }}">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <input type="hidden" name="product_key" value="pro_annual">
-              <button class="btn btn-outline w-full" type="submit">
-                <span class="iconify size-4" data-icon="lucide:credit-card"></span>
-                {{ _("Annual — %(price)s", price=price_label_annual) }}
-              </button>
-            </form>
-          </div>
+                {% if plan.link %}
+                  <a
+                    class="btn btn-primary btn-sm w-full mt-2"
+                    href="{{ plan.link }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <span class="iconify size-4" data-icon="lucide:external-link"></span>
+                    {{ _("Pay with Revolut") }}
+                  </a>
+                {% else %}
+                  <button class="btn btn-disabled btn-sm w-full mt-2" type="button" disabled>
+                    {{ _("Payment link not configured yet") }}
+                  </button>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
 
-          <a class="link link-hover text-sm text-base-content/60" href="{{ url_for('billing.redeem') }}">
-            {{ _("Have an AppSumo code?") }}
-          </a>
-        {% endif %}
+        <p class="text-sm text-base-content/60 text-center mt-6 max-w-lg mx-auto">
+          <span class="iconify size-4 align-text-bottom" data-icon="lucide:shield-check"></span>
+          {{ _("Payment is handled entirely by Revolut. After we verify it, your access is activated manually — usually within one business day.") }}
+        </p>
+
+        <p class="text-base-content/60 text-center text-sm mt-4">
+          <a class="link link-hover" href="{{ url_for('billing.redeem') }}">{{ _("Have an AppSumo code?") }}</a>
+        </p>
       </div>
-    </div>
+    {% endif %}
   </main>
 </div>
 {% endblock %}

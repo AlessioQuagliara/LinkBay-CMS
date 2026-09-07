@@ -1,6 +1,14 @@
-"""Riscatto codici AppSumo multi-tier (app/billing/routes.py::redeem) e
-migrazione controllata AppSumo->abbonamento (checkout() bloccato senza
-appsumo_migration_unlocked)."""
+"""Riscatto codici AppSumo multi-tier (app/billing/routes.py::redeem) —
+invariato dalla rimozione di Lemon Squeezy (vedi
+app/billing/revolut_manual_activation.py).
+
+Nota: i test sulla migrazione controllata AppSumo->abbonamento
+(appsumo_migration_unlocked bloccava un POST a /billing/checkout verso Lemon
+Squeezy) sono stati rimossi insieme alla route stessa — /billing/checkout non
+esiste più: il piano Pro si paga su un link Revolut statico, non più su un
+checkout interno da gatekeepare. Il flag appsumo_migration_unlocked resta sul
+modello/Flask-Admin ma non ha oggi alcun consumer applicativo (vedi
+app/models/user.py)."""
 from app.extensions import db
 from app.models import AppSumoCode
 
@@ -71,61 +79,9 @@ def test_redeem_rejects_unknown_code(client, db_session, make_user):
     assert user.plan_type == "trial"
 
 
-# --- migrazione controllata AppSumo -> abbonamento ------------------------
-
-
-def test_checkout_blocked_for_appsumo_user_without_migration_unlock(client, db_session, make_user):
-    user = make_user(
-        plan_type="appsumo_tier1", subscription_status="lifetime",
-        appsumo_migration_unlocked=False,
-    )
-    _login(client, user)
-    res = client.post("/billing/checkout", data={"product_key": "pro_monthly"}, follow_redirects=False)
-    # Redirect a billing.subscription, NON a Lemon Squeezy (nessuna chiamata HTTP esterna).
-    assert res.status_code == 302
-    assert "/billing/subscription" in res.headers["Location"]
-
-
-def test_checkout_allowed_for_appsumo_user_with_migration_unlocked(client, db_session, make_user, monkeypatch):
-    user = make_user(
-        plan_type="appsumo_tier1", subscription_status="lifetime",
-        appsumo_migration_unlocked=True,
-    )
-    _login(client, user)
-
-    monkeypatch.setattr(
-        "app.billing.routes.ls.create_checkout_url",
-        lambda user, product_key: "https://checkout.lemonsqueezy.com/fake",
-    )
-    res = client.post("/billing/checkout", data={"product_key": "pro_monthly"}, follow_redirects=False)
-    assert res.status_code == 302
-    assert res.headers["Location"] == "https://checkout.lemonsqueezy.com/fake"
-
-
-def test_checkout_credits_never_blocked_for_appsumo_user(client, db_session, make_user, monkeypatch):
-    # I pacchetti crediti sono l'upsell naturale per gli utenti AppSumo — mai
-    # bloccati dalla guardia di migrazione (quella riguarda solo i piani Pro).
-    user = make_user(
-        plan_type="appsumo_tier1", subscription_status="lifetime",
-        appsumo_migration_unlocked=False,
-    )
-    _login(client, user)
-    monkeypatch.setattr(
-        "app.billing.routes.ls.create_checkout_url",
-        lambda user, product_key: "https://checkout.lemonsqueezy.com/fake-credits",
-    )
-    res = client.post("/billing/checkout", data={"product_key": "credits_500"}, follow_redirects=False)
-    assert res.status_code == 302
-    assert res.headers["Location"] == "https://checkout.lemonsqueezy.com/fake-credits"
-
-
-def test_checkout_not_blocked_for_subscription_user(client, db_session, make_user, monkeypatch):
-    user = make_user(plan_type="subscription_monthly", subscription_status="active")
-    _login(client, user)
-    monkeypatch.setattr(
-        "app.billing.routes.ls.create_checkout_url",
-        lambda user, product_key: "https://checkout.lemonsqueezy.com/fake",
-    )
-    res = client.post("/billing/checkout", data={"product_key": "pro_annual"}, follow_redirects=False)
-    assert res.status_code == 302
-    assert res.headers["Location"] == "https://checkout.lemonsqueezy.com/fake"
+def test_lemonsqueezy_checkout_and_webhook_routes_are_gone(client):
+    # Regressione esplicita Fase 7: nessun endpoint Lemon Squeezy raggiungibile.
+    assert client.post("/billing/checkout", data={"product_key": "pro_monthly"}).status_code == 404
+    assert client.post("/billing/webhook", data=b"{}").status_code == 404
+    assert client.get("/billing/portal").status_code == 404
+    assert client.get("/billing/success").status_code == 404

@@ -27,7 +27,7 @@
         {% if limits.ai_credit_topups_allowed %}
         <a class="btn btn-outline btn-sm" href="{{ url_for('billing.credits') }}">
           <span class="iconify size-4" data-icon="lucide:sparkles"></span>
-          {{ _("AI credits: %(balance)s — buy more", balance=current_user.ai_credit_balance) }}
+          {{ _("AI credits: %(balance)s", balance=current_user.ai_credit_balance) }}
         </a>
         {% else %}
         <span class="badge badge-ghost gap-1">
@@ -40,34 +40,40 @@
       <div class="flex items-center gap-3">
         <span class="iconify text-success size-6" data-icon="lucide:circle-check-big"></span>
         <div>
-          <p class="font-medium">{{ _("Pro — active") }}</p>
-          <p class="text-sm text-base-content/60">{{ price_label }}</p>
+          <p class="font-medium">{{ _("Pro — %(plan)s", plan=plan_name) }}</p>
+          {% if current_user.subscription_expires_at %}
+            <p class="text-sm text-base-content/60">
+              {{ _("Valid until %(date)s.", date=current_user.subscription_expires_at.strftime("%d %b %Y")) }}
+            </p>
+          {% else %}
+            <p class="text-sm text-base-content/60">{{ _("No expiry on record.") }}</p>
+          {% endif %}
         </div>
       </div>
       <div class="card-actions flex-wrap gap-2">
-        <a class="btn btn-outline btn-sm" href="{{ url_for('billing.portal') }}">
-          <span class="iconify size-4" data-icon="lucide:settings"></span>
-          {{ _("Manage subscription") }}
-        </a>
         <span class="badge badge-ghost gap-1">
           <span class="iconify size-3.5" data-icon="lucide:sparkles"></span>
           {{ _("AI credits: %(balance)s", balance=current_user.ai_credit_balance) }}
         </span>
       </div>
+      <p class="text-xs text-base-content/50">
+        {{ _("To renew or change your plan, pick a new duration from the upgrade page — your admin will confirm the payment and extend your access.") }}
+        <a class="link link-hover" href="{{ url_for('billing.upgrade') }}">{{ _("Go to plans") }}</a>
+      </p>
     {% elif current_user.subscription_status == "past_due" %}
       <div class="flex items-center gap-3">
         <span class="iconify text-warning size-6" data-icon="lucide:triangle-alert"></span>
         <div>
-          <p class="font-medium">{{ _("Payment failed") }}</p>
+          <p class="font-medium">{{ _("Payment issue on your previous plan") }}</p>
           <p class="text-sm text-base-content/60">
-            {{ _("We couldn't process your last payment. Update your payment method within the grace period to keep access.") }}
+            {{ _("Your access is in a grace period. Contact us or renew your plan to keep access.") }}
           </p>
         </div>
       </div>
       <div class="card-actions">
-        <a class="btn btn-primary btn-sm" href="{{ url_for('billing.portal') }}">
+        <a class="btn btn-primary btn-sm" href="{{ url_for('billing.upgrade') }}">
           <span class="iconify size-4" data-icon="lucide:credit-card"></span>
-          {{ _("Update payment method") }}
+          {{ _("View plans") }}
         </a>
       </div>
     {% elif current_user.subscription_status == "trialing" %}
@@ -90,7 +96,7 @@
       </div>
       <div class="card-actions">
         <a class="btn btn-primary btn-sm" href="{{ url_for('billing.upgrade') }}">
-          {{ _("Upgrade to Pro — %(price)s", price=price_label) }}
+          {{ _("Upgrade to Pro") }}
         </a>
       </div>
     {% else %}
@@ -98,12 +104,12 @@
         <span class="iconify text-error size-6" data-icon="lucide:circle-x"></span>
         <div>
           <p class="font-medium">{{ _("No active subscription") }}</p>
-          <p class="text-sm text-base-content/60">{{ _("Your subscription was canceled.") }}</p>
+          <p class="text-sm text-base-content/60">{{ _("Your plan has expired or was canceled.") }}</p>
         </div>
       </div>
       <div class="card-actions">
         <a class="btn btn-primary btn-sm" href="{{ url_for('billing.upgrade') }}">
-          {{ _("Resubscribe — %(price)s", price=price_label) }}
+          {{ _("View plans") }}
         </a>
       </div>
     {% endif %}

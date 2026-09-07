@@ -27,7 +27,7 @@
             {
               "@type": "Question",
               "name": "What happens when included credits run out?",
-              "acceptedAnswer": { "@type": "Answer", "text": "AppSumo users can buy a one-time top-up pack. Pro subscribers get their quota renewed next billing cycle and can track usage from the dashboard." }
+              "acceptedAnswer": { "@type": "Answer", "text": "AppSumo users can normally buy a one-time top-up pack (purchasing is temporarily unavailable — contact support). Pro subscribers get their quota renewed on their plan's next cycle and can track usage from the dashboard." }
             },
             {
               "@type": "Question",
@@ -114,7 +114,7 @@
             <div class="container">
                 <h2 class="text-2xl font-semibold text-center sm:text-3xl">{{ _("Top-up packages") }}</h2>
                 <p class="text-base-content/70 text-center mt-2 max-w-xl mx-auto">
-                    {{ _("One-time purchase via Lemon Squeezy, available for AppSumo workspaces. Credits are added to your balance immediately after checkout.") }}
+                    {{ _("One-time top-up packs for AppSumo workspaces. Purchasing is temporarily unavailable — contact support if you need more credits.") }}
                 </p>
 
                 <div class="grid gap-4 sm:grid-cols-3 mt-8 max-w-3xl mx-auto">
@@ -128,11 +128,9 @@
                                 <p class="text-lg font-medium mt-2">€{{ pack.price }}</p>
 
                                 {% if can_topup %}
-                                    <form method="post" action="{{ url_for('billing.checkout') }}" class="w-full mt-2">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <input type="hidden" name="product_key" value="{{ pack.product_key }}">
-                                        <button class="btn btn-primary btn-sm w-full" type="submit">{{ _("Buy") }}</button>
-                                    </form>
+                                    <button class="btn btn-disabled btn-sm w-full mt-2" type="button" disabled>
+                                        {{ _("Not available right now") }}
+                                    </button>
                                 {% endif %}
                             </div>
                         </div>
@@ -183,7 +181,7 @@
                             <input name="ai-credits-faq" type="radio" aria-label="open/close" />
                             <div class="collapse-title text-lg font-medium">{{ _("What happens when my included credits run out?") }}</div>
                             <div class="collapse-content">
-                                <p class="text-base">{{ _("AppSumo users can buy a one-time top-up pack anytime. Pro subscribers get their quota renewed on the next billing cycle and can track consumption in the dashboard.") }}</p>
+                                <p class="text-base">{{ _("AppSumo users can normally buy a one-time top-up pack anytime (purchasing is temporarily unavailable — contact support). Pro subscribers get their quota renewed on their plan's next cycle and can track consumption in the dashboard.") }}</p>
                             </div>
                         </div>
                         <div class="collapse-arrow border-base-content/10 collapse border">

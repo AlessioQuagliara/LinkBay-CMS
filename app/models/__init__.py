@@ -8,6 +8,7 @@ from app.models.gsc_daily import GscSiteDaily
 from app.models.gsc_page_monthly import GscPageMonthly
 from app.models.monitored_site import MonitoredSite
 from app.models.page_alert import PageAlert
+from app.models.password_reset_token import PasswordResetToken
 from app.models.resource_usage_log import ResourceUsageLog
 from app.models.user import User
 
@@ -23,6 +24,7 @@ __all__ = [
     "AiPageAnalysis",
     "AiCreditTransaction",
     "EmailOtp",
+    "PasswordResetToken",
     "AppSumoCode",
     "AuditPresentation",
 ]

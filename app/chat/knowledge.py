@@ -23,25 +23,24 @@ LinkBayCMS ha 3 modelli commerciali:
    automaticamente a un piano Pro ricorrente: serve contattare il supporto
    per una migrazione controllata.
 
-2) PRO MENSILE (abbonamento ricorrente, Lemon Squeezy) — €79/mese:
-   100 siti collegati, fino a circa 250.000 pagine monitorate, refresh dati
-   giornaliero, export PDF/CSV illimitati, white label incluso, quota AI
-   inclusa (100 crediti al mese), coda con priorità alta, supporto
+2) PRO (pagamento manuale via Revolut Business, link di pagamento — non è un
+   abbonamento ricorrente automatico): tre durate, 79,90€ per 1 mese, 209,90€
+   per 3 mesi (circa il 13% di sconto), 790,00€ per 12 mesi (circa il 17% di
+   sconto). 100 siti collegati, fino a circa 250.000 pagine monitorate,
+   refresh dati giornaliero, export PDF/CSV illimitati, white label incluso,
+   quota AI inclusa (100 crediti al mese), coda con priorità alta, supporto
    prioritario. Prova gratuita di 13 giorni, nessuna carta di credito
-   richiesta. Cancellabile in ogni momento (l'accesso resta attivo fino a
-   fine periodo già pagato).
-
-3) PRO ANNUALE (abbonamento ricorrente, Lemon Squeezy) — €790/anno
-   (equivalente a circa €65,83/mese, risparmio di €158/anno, circa il 17%
-   rispetto al mensile): stessi identici limiti tecnici del Pro Mensile,
-   cambia solo la fatturazione (una volta l'anno invece che ogni mese).
-   Stessa prova gratuita di 13 giorni.
+   richiesta. Il cliente paga sul link Revolut e riceve accesso dopo verifica
+   manuale del pagamento da parte del team (di norma entro un giorno
+   lavorativo) — non è un rinnovo automatico: alla scadenza va ripagato lo
+   stesso link per continuare.
 
 CREDITI AI EXTRA (solo per chi ha un piano AppSumo, non per Pro — il piano
 Pro include già la sua quota mensile): pacchetti one-time "AI Starter" (50
 crediti, €7), "AI Growth" (150 crediti, €15) o "AI Scale" (500 crediti,
-€39), acquistabili in qualsiasi momento dopo la registrazione, non scadono
-mai.
+€39). L'acquisto è temporaneamente sospeso — chi ha bisogno di crediti extra
+prima che torni disponibile deve contattare il supporto. I crediti già
+posseduti non scadono mai.
 
 COME FUNZIONA IL PRODOTTO: ci si collega in sola lettura al proprio account
 Google Search Console (nessuna modifica al sito, nessun codice da

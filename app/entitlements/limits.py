@@ -62,16 +62,41 @@ PLAN_LIMITS: dict[str, PlanLimits] = {
         ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=75, ai_credit_topups_allowed=True,
         white_label=True, concurrent_scans=3, api_rate_per_min=120, queue_priority="high",
     ),
-    # Pro Mensile — €79/mese, Lemon Squeezy.
+    # Pro Mensile — legacy Lemon Squeezy, dismesso dal flusso commerciale
+    # (vedi app/billing/revolut_manual_activation.py). Voce mantenuta per gli
+    # utenti già su questo plan_type: stessi limiti tecnici di sempre, solo
+    # non più assegnabile a un nuovo utente.
     "subscription_monthly": PlanLimits(
-        name="Pro Monthly",
+        name="Pro Monthly (legacy)",
         site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
         ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
         white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
     ),
-    # Pro Annuale — €790/anno (~16.7% di sconto vs mensile), stessi limiti tecnici del mensile.
+    # Pro Annuale — legacy Lemon Squeezy, stessa nota di subscription_monthly.
     "subscription_annual": PlanLimits(
-        name="Pro Annual",
+        name="Pro Annual (legacy)",
+        site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
+        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
+        white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
+    ),
+    # Pro via Revolut (link di pagamento manuale, attivazione da Flask-Admin —
+    # vedi app/billing/revolut_manual_activation.py). Stessi limiti tecnici
+    # del Pro storico: cambia solo come si paga e si attiva, non cosa si
+    # ottiene. Tre durate diverse, nessuna differenza di limiti tra loro.
+    "revolut_1m": PlanLimits(
+        name="Pro — 1 Month (Revolut)",
+        site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
+        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
+        white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
+    ),
+    "revolut_3m": PlanLimits(
+        name="Pro — 3 Months (Revolut)",
+        site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
+        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
+        white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
+    ),
+    "revolut_12m": PlanLimits(
+        name="Pro — 12 Months (Revolut)",
         site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
         ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
         white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
@@ -111,14 +136,37 @@ AI_CREDIT_ACTION_COSTS = {
     "multi_site_report": 25,    # report AI multi-sito/agency (20-30 crediti)
 }
 
-# Prezzi/etichette dei piani ricorrenti e one-time, per la UI (pricing landing,
-# pagina upgrade, redeem). Fonte unica anche per queste stringhe, invece di
-# hardcoderle in più template.
+# Prezzi/etichette dei piani, per la UI (pricing landing, pagina upgrade,
+# redeem). Fonte unica anche per queste stringhe, invece di hardcoderle in
+# più template.
 APPSUMO_TIER_PRICES = {
     "appsumo_tier1": 79,
     "appsumo_tier2": 149,
     "appsumo_tier3": 239,
 }
+# Legacy Lemon Squeezy — non più in vendita, mantenuti solo per il testo
+# "Pro — attivo/legacy" mostrato agli utenti già su questi plan_type
+# (vedi app/templates/billing/subscription.html).
 PRO_MONTHLY_PRICE = 79
 PRO_ANNUAL_PRICE = 790
 TRIAL_DAYS = 13
+
+# Piani Pro attivabili via Revolut (link di pagamento manuale — vedi
+# app/billing/revolut_manual_activation.py). Prezzo in euro come mostrato
+# nella pagina /billing/upgrade; durata in giorni per il calcolo scadenza è
+# in REVOLUT_PLAN_DAYS dentro il service, non qui (questo dizionario è solo
+# per la UI, non guida alcuna logica di attivazione).
+REVOLUT_PLAN_PRICES = {
+    "revolut_1m": 79.90,
+    "revolut_3m": 209.90,
+    "revolut_12m": 790.00,
+}
+# Etichette commerciali "risparmi ~X%" mostrate come badge sulla card,
+# calcolate a mano una volta sola rispetto al costo mensile equivalente
+# (79.90 x 3 = 239.70, x 12 = 958.80) — non ricalcolate a runtime per
+# evitare arrotondamenti diversi da quanto comunicato commercialmente.
+REVOLUT_PLAN_SAVINGS_LABEL = {
+    "revolut_1m": None,
+    "revolut_3m": "~13%",
+    "revolut_12m": "~17%",
+}

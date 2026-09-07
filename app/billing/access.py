@@ -1,7 +1,8 @@
 """Gate di accesso centralizzato: un solo before_request per tutta l'app,
 invece di un decoratore su ogni singola route. Blocca chi ha finito il trial
-di 14 giorni e non ha un abbonamento Lemon Squeezy attivo (vedi User.has_active_access
-in app/models/user.py), reindirizzandolo alla pagina di upgrade."""
+di 13 giorni e non ha un piano Pro attivo (Revolut manuale, o legacy Lemon
+Squeezy — vedi User.has_active_access in app/models/user.py), reindirizzandolo
+alla pagina di upgrade."""
 from flask import redirect, request, url_for
 from flask_limiter.util import get_remote_address
 from flask_login import current_user

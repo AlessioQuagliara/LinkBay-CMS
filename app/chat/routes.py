@@ -3,9 +3,8 @@ su piani/prezzi/funzionalità usando DeepSeek + app/chat/knowledge.py.
 
 Endpoint pubblico e non autenticato: niente sessione utile a un CSRF token
 di sessione, e nessuna azione con effetti collaterali sui dati (solo lettura
-+ una chiamata AI) — esente da CSRF di proposito, non per svista, come il
-webhook Lemon Squeezy ma per un motivo diverso (qui: assenza di stato da
-proteggere, non chiamata esterna firmata).
++ una chiamata AI) — esente da CSRF di proposito, non per svista (assenza di
+stato da proteggere, non una chiamata esterna firmata).
 """
 from flask import Blueprint, current_app, jsonify, request
 

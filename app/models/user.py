@@ -48,17 +48,55 @@ class User(db.Model, UserMixin):
     # periodo di grazia fino a grace_period_ends_at prima del blocco netto —
     # vedi has_active_access.
     subscription_status = db.Column(db.String(20), nullable=False, default="trialing")
+
+    # Legacy Lemon Squeezy (dismesso dal flusso commerciale — vedi
+    # app/billing/revolut_manual_activation.py per il flusso attuale).
+    # Colonne mantenute nullable e silenti per non perdere l'audit storico di
+    # chi ha pagato via Lemon Squeezy; nessun codice le scrive più.
     ls_customer_id = db.Column(db.String(255))
     ls_subscription_id = db.Column(db.String(255))
+
+    # Scadenza dell'abbonamento — unica per tutti i piani "active" a termine
+    # (oggi solo Revolut manuale). NULL = nessuna scadenza nota, che copre sia
+    # i piani lifetime/legacy sia un utente non ancora attivato: vedi
+    # has_active_access, che in quel caso non blocca (comportamento
+    # preesistente per gli abbonamenti Lemon Squeezy legacy, mai spento qui).
+    subscription_expires_at = db.Column(db.DateTime(timezone=True), nullable=True)
+
+    # Provenienza dell'ultima attivazione: "revolut_manual" | "appsumo" |
+    # "legacy_lemonsqueezy". Solo informativo/audit — NON è letto da
+    # has_active_access (quello resta guidato da subscription_status +
+    # subscription_expires_at). Mai backfillato per gli utenti storici: resta
+    # NULL finché non ricevono una prima attivazione tracciata da qui.
+    subscription_source = db.Column(db.String(30), nullable=True)
+
+    # Audit minimo dell'ultima attivazione manuale Revolut (vedi
+    # app/billing/revolut_manual_activation.py). activated_by è nullable: un
+    # utente non ancora attivato manualmente non ha né data né admin.
+    subscription_activated_at = db.Column(db.DateTime(timezone=True), nullable=True)
+    subscription_activated_by_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+
+    # Riferimento pagamento Revolut (facoltativo, inserito a mano
+    # dall'admin) — univoco quando valorizzato: usato per rendere idempotente
+    # una doppia sottomissione dello stesso pagamento (vedi
+    # revolut_manual_activation.activate_revolut_subscription). Non è uno
+    # storico completo: una riattivazione successiva sovrascrive il valore
+    # precedente, vedi il modulo del service per il compromesso accettato.
+    subscription_activation_reference = db.Column(db.String(255), nullable=True, unique=True)
+
+    subscription_activated_by = db.relationship("User", remote_side=[id])
 
     # Piano/tier per i limiti tecnici (app/entitlements/) — ORTOGONALE a
     # subscription_status: quest'ultimo risponde "ha accesso ora?" (gate
     # binario usato da app/billing/access.py, invariato), plan_type risponde
     # "quali limiti si applicano?". Valori: "trial" | "subscription_monthly"
-    # | "subscription_annual" | "appsumo_tier1" | "appsumo_tier2" |
-    # "appsumo_tier3". NULL per utenti non ancora migrati — vedi
-    # `flask backfill-plan-type` e app/entitlements/service.py::get_plan_limits
-    # (fallback sicuro a "trial" se NULL).
+    # | "subscription_annual" (legacy Lemon Squeezy, non più assegnabili a
+    # utenti nuovi) | "revolut_1m" | "revolut_3m" | "revolut_12m" (vedi
+    # app/billing/revolut_manual_activation.py) | "appsumo_tier1" |
+    # "appsumo_tier2" | "appsumo_tier3". NULL per utenti non ancora migrati —
+    # vedi `flask backfill-plan-type` e
+    # app/entitlements/service.py::get_plan_limits (fallback sicuro a "trial"
+    # se NULL).
     plan_type = db.Column(db.String(30), nullable=True)
     billing_interval = db.Column(db.String(10), nullable=True)  # "monthly" | "annual" | None
 
@@ -109,8 +147,22 @@ class User(db.Model, UserMixin):
 
     @property
     def has_active_access(self):
-        if self.subscription_status in ("active", "lifetime"):
+        # "lifetime" (AppSumo) non scade mai — invariato, nessuna dipendenza
+        # da subscription_expires_at.
+        if self.subscription_status == "lifetime":
             return True
+        if self.subscription_status == "active":
+            # subscription_expires_at guida la scadenza dei piani a termine
+            # (oggi solo Revolut manuale, vedi
+            # app/billing/revolut_manual_activation.py). NULL copre gli
+            # abbonamenti "active" legacy Lemon Squeezy, mai spenti da questa
+            # migrazione: restano attivi finché non li tocca un admin, invece
+            # di essere bloccati di colpo per l'assenza di un dato che non
+            # avevano mai avuto.
+            expires_at = self._aware(self.subscription_expires_at)
+            if expires_at is None:
+                return True
+            return datetime.now(timezone.utc) < expires_at
         if self.subscription_status == "trialing" and self.trial_ends_at:
             return datetime.now(timezone.utc) < self._aware(self.trial_ends_at)
         if self.subscription_status == "past_due" and self.grace_period_ends_at:

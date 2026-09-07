@@ -5,7 +5,8 @@ from flask_babel import gettext as _
 from flask_login import current_user, login_required, login_user, logout_user
 
 from app.auth import otp as otp_service
-from app.auth.forms import LoginForm, OtpForm, RegisterForm
+from app.auth import password_reset as password_reset_service
+from app.auth.forms import ForgotPasswordForm, LoginForm, OtpForm, RegisterForm, ResetPasswordForm
 from app.entitlements.limits import TRIAL_DAYS
 from app.extensions import db
 from app.models import User
@@ -80,6 +81,53 @@ def login():
         flash(_("Incorrect email or password."), "error")
 
     return render_template("auth/login.html", form=form)
+
+
+@auth_bp.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    if current_user.is_authenticated:
+        return redirect(url_for("dashboard.overview"))
+
+    form = ForgotPasswordForm()
+    if form.validate_on_submit():
+        email = form.email.data.lower().strip()
+        user = User.query.filter_by(email=email).first()
+
+        sent, token = (False, None)
+        if user:
+            sent, token = password_reset_service.request_reset(user)
+
+        # Messaggio sempre identico, esista o meno l'account: non deve
+        # trapelare quali email sono registrate.
+        flash(
+            _("If an account exists for that email, we've sent a password reset link."),
+            "success",
+        )
+        if token and not sent and password_reset_service.dev_fallback_enabled():
+            link = url_for("auth.reset_password", token=token, _external=True)
+            flash(_("Dev mode (email not configured): %(link)s", link=link), "info")
+        return redirect(url_for("auth.login"))
+
+    return render_template("auth/forgot_password.html", form=form)
+
+
+@auth_bp.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for("dashboard.overview"))
+
+    record = password_reset_service.find_valid_token(token)
+    if record is None:
+        flash(_("This password reset link is invalid or has expired."), "error")
+        return redirect(url_for("auth.forgot_password"))
+
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        password_reset_service.consume(record, form.password.data)
+        flash(_("Your password has been reset. You can now sign in."), "success")
+        return redirect(url_for("auth.login"))
+
+    return render_template("auth/reset_password.html", form=form, token=token)
 
 
 @auth_bp.route("/verify", methods=["GET", "POST"])

@@ -70,19 +70,20 @@ class Config:
     OTP_MAX_ATTEMPTS = int(os.environ.get("OTP_MAX_ATTEMPTS", "5"))
     OTP_RESEND_COOLDOWN = int(os.environ.get("OTP_RESEND_COOLDOWN", "60"))
 
-    # Lemon Squeezy — piani Pro (mensile/annuale) + pacchetti crediti AI dopo
-    # il trial di 14 giorni (vedi app/billing/). Ogni prodotto/variante va
-    # creato a mano nella dashboard Lemon Squeezy (vedi piano multi-tier) — il
-    # suo variant ID va qui. LEMONSQUEEZY_VARIANT_ID (singolare) resta come
-    # fallback deprecato per "pro_monthly" finché non si migra del tutto a
-    # LEMONSQUEEZY_VARIANT_PRO_MONTHLY, per non causare un'interruzione a
-    # metà deploy — vedi app/billing/products.py.
-    LEMONSQUEEZY_API_KEY = os.environ.get("LEMONSQUEEZY_API_KEY")
-    LEMONSQUEEZY_STORE_ID = os.environ.get("LEMONSQUEEZY_STORE_ID")
-    LEMONSQUEEZY_WEBHOOK_SECRET = os.environ.get("LEMONSQUEEZY_WEBHOOK_SECRET")
-    LEMONSQUEEZY_VARIANT_ID = os.environ.get("LEMONSQUEEZY_VARIANT_ID")  # deprecato, vedi sopra
-    LEMONSQUEEZY_VARIANT_PRO_MONTHLY = os.environ.get("LEMONSQUEEZY_VARIANT_PRO_MONTHLY")
-    LEMONSQUEEZY_VARIANT_PRO_ANNUAL = os.environ.get("LEMONSQUEEZY_VARIANT_PRO_ANNUAL")
-    LEMONSQUEEZY_VARIANT_CREDITS_50 = os.environ.get("LEMONSQUEEZY_VARIANT_CREDITS_50")
-    LEMONSQUEEZY_VARIANT_CREDITS_150 = os.environ.get("LEMONSQUEEZY_VARIANT_CREDITS_150")
-    LEMONSQUEEZY_VARIANT_CREDITS_500 = os.environ.get("LEMONSQUEEZY_VARIANT_CREDITS_500")
+    # Recupero password via email (link, non codice). Valido
+    # PASSWORD_RESET_TTL_SECONDS, un nuovo invio non è richiedibile prima di
+    # PASSWORD_RESET_RESEND_COOLDOWN secondi (vedi app/auth/password_reset.py).
+    PASSWORD_RESET_TTL_SECONDS = int(os.environ.get("PASSWORD_RESET_TTL_SECONDS", "3600"))
+    PASSWORD_RESET_RESEND_COOLDOWN = int(os.environ.get("PASSWORD_RESET_RESEND_COOLDOWN", "60"))
+
+    # Revolut Business — link di pagamento manuali per i piani Pro (1/3/12
+    # mesi), dopo il trial di 13 giorni (vedi app/billing/). Nessuna API,
+    # nessun webhook: il cliente paga su un link statico creato a mano nella
+    # dashboard Revolut Business, Revolut notifica il pagamento via email e un
+    # admin attiva/estende il piano da Flask-Admin (vedi
+    # app/billing/revolut_manual_activation.py). Se un link non è
+    # configurato, la relativa CTA in /billing/upgrade si disabilita da sola
+    # invece di puntare a un placeholder.
+    REVOLUT_PAYMENT_LINK_1M = os.environ.get("REVOLUT_PAYMENT_LINK_1M")
+    REVOLUT_PAYMENT_LINK_3M = os.environ.get("REVOLUT_PAYMENT_LINK_3M")
+    REVOLUT_PAYMENT_LINK_12M = os.environ.get("REVOLUT_PAYMENT_LINK_12M")

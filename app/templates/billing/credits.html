@@ -12,6 +12,11 @@
   </p>
 </div>
 
+<div class="alert alert-info max-w-3xl mb-4">
+  <span class="iconify size-4" data-icon="lucide:info"></span>
+  {{ _("Buying extra credit packs is temporarily unavailable. Contact support if you need more credits before it's back.") }}
+</div>
+
 <div class="grid gap-4 sm:grid-cols-3 max-w-3xl">
   {% for pack in packs %}
     <div class="card card-border bg-base-100 shadow-xs">
@@ -20,13 +25,9 @@
         <p class="text-2xl font-semibold">{{ "{:,}".format(pack.amount) }}</p>
         <p class="text-sm text-base-content/60">{{ _("credits") }}</p>
         <p class="text-lg font-medium mt-2">€{{ pack.price }}</p>
-        <form method="post" action="{{ url_for('billing.checkout') }}" class="w-full mt-2">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <input type="hidden" name="product_key" value="{{ pack.product_key }}">
-          <button class="btn btn-primary btn-sm w-full" type="submit">
-            {{ _("Buy") }}
-          </button>
-        </form>
+        <button class="btn btn-disabled btn-sm w-full mt-2" type="button" disabled>
+          {{ _("Not available right now") }}
+        </button>
       </div>
     </div>
   {% endfor %}
