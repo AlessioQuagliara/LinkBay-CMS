@@ -3,9 +3,12 @@ esterna, non sincrona in request) e serve la presentazione reveal.js.
 Isolamento: ogni lettura filtra sempre su user_id, un 404 generico (mai 403)
 se l'id non esiste o appartiene a un altro utente, per non confermarne
 l'esistenza."""
+import json
+
 from flask import Blueprint, Response, abort, jsonify, render_template, request
 from flask_login import current_user, login_required
 
+from app.audits.charts import render_chart_sections
 from app.audits.render import parse_markdown, slides_to_html
 from app.entitlements.limits import AI_CREDIT_ACTION_COSTS
 from app.entitlements.service import check_ai_credits
@@ -83,8 +86,26 @@ def _get_owned_presentation(presentation_id: int) -> AuditPresentation:
 
 def _render_presentation(presentation: AuditPresentation) -> str:
     slides = parse_markdown(presentation.markdown)
+
+    # I grafici (vedi app/audits/charts.py) si inseriscono subito dopo la
+    # slide del titolo, prima delle slide di dettaglio per pagina — mai
+    # ricalcolati qui: solo il dict già salvato al momento della generazione
+    # (None per le presentazioni create prima di questa colonna, gestito con
+    # un fallback pulito da render_chart_sections, non un'eccezione).
+    try:
+        chart_data = json.loads(presentation.chart_data) if presentation.chart_data else None
+    except (TypeError, ValueError):
+        chart_data = None
+
+    title_slides, rest_slides = slides[:1], slides[1:]
+    slides_html = "\n".join([
+        slides_to_html(title_slides),
+        render_chart_sections(chart_data),
+        slides_to_html(rest_slides),
+    ])
+
     return render_template(
-        "audits/present.html", presentation=presentation, slides_html=slides_to_html(slides),
+        "audits/present.html", presentation=presentation, slides_html=slides_html,
     )
 
 

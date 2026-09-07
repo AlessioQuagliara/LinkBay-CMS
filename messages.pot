@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-09-07 18:58+0200\n"
+"POT-Creation-Date: 2026-09-07 19:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -94,25 +94,23 @@ msgstr ""
 msgid "You've been logged out."
 msgstr ""
 
-#: app/billing/routes.py:52
-msgid ""
-"Your plan already includes a generous monthly AI quota — extra credit "
-"packs aren't needed."
+#: app/billing/routes.py:55
+msgid "Your plan doesn't use AI credits."
 msgstr ""
 
-#: app/billing/routes.py:65
+#: app/billing/routes.py:80
 msgid "Invalid code."
 msgstr ""
 
-#: app/billing/routes.py:67
+#: app/billing/routes.py:82
 msgid "This code has already been used."
 msgstr ""
 
-#: app/billing/routes.py:73
+#: app/billing/routes.py:88
 msgid "This code isn't ready yet. Please contact support."
 msgstr ""
 
-#: app/billing/routes.py:82
+#: app/billing/routes.py:97
 msgid "Code redeemed: your account is now lifetime."
 msgstr ""
 
@@ -264,16 +262,12 @@ msgstr ""
 #: app/templates/dashboard/layout.html:93
 #: app/templates/landing/ai_credits.html:53
 #: app/templates/landing/partials/footer.html:31
+#: app/templates/partials/ai_credits_card.html:11
 msgid "AI Credits"
 msgstr ""
 
 #: app/templates/billing/credits.html:8
 msgid "Extra AI suggestions on top of your plan. Credits never expire."
-msgstr ""
-
-#: app/templates/billing/credits.html:11
-#, python-format
-msgid "Current balance: %(balance)s credits"
 msgstr ""
 
 #: app/templates/billing/credits.html:17
@@ -285,6 +279,7 @@ msgstr ""
 #: app/templates/billing/credits.html:27
 #: app/templates/landing/ai_credits.html:102
 #: app/templates/landing/ai_credits.html:127
+#: app/templates/partials/ai_credits_card.html:32
 msgid "credits"
 msgstr ""
 
@@ -298,7 +293,80 @@ msgstr ""
 msgid "Payment link not configured yet"
 msgstr ""
 
-#: app/templates/billing/credits.html:50
+#: app/templates/billing/credits.html:51
+msgid "Usage history"
+msgstr ""
+
+#: app/templates/billing/credits.html:52
+msgid "Your most recent credit activity, newest first."
+msgstr ""
+
+#: app/templates/billing/credits.html:62
+msgid "Date"
+msgstr ""
+
+#: app/templates/billing/credits.html:63
+msgid "Event"
+msgstr ""
+
+#: app/templates/billing/credits.html:64 app/templates/dashboard/audits.html:17
+msgid "Site"
+msgstr ""
+
+#: app/templates/billing/credits.html:65
+msgid "Change"
+msgstr ""
+
+#: app/templates/billing/credits.html:66
+msgid "Balance"
+msgstr ""
+
+#: app/templates/billing/credits.html:75
+msgid "Monthly plan credit"
+msgstr ""
+
+#: app/templates/billing/credits.html:77
+msgid "Top-up purchase"
+msgstr ""
+
+#: app/templates/billing/credits.html:79
+msgid "AI page analysis"
+msgstr ""
+
+#: app/templates/billing/credits.html:81
+msgid "Audit presentation"
+msgstr ""
+
+#: app/templates/billing/credits.html:83
+msgid "AI credits used"
+msgstr ""
+
+#: app/templates/billing/credits.html:85
+msgid "Credit adjustment"
+msgstr ""
+
+#: app/templates/billing/credits.html:87
+msgid "Refund / correction"
+msgstr ""
+
+#: app/templates/billing/credits.html:110
+msgid "Previous"
+msgstr ""
+
+#: app/templates/billing/credits.html:113
+#, python-format
+msgid "Page %(page)s of %(pages)s"
+msgstr ""
+
+#: app/templates/billing/credits.html:119
+msgid "Next"
+msgstr ""
+
+#: app/templates/billing/credits.html:125
+msgid "No AI credit activity yet."
+msgstr ""
+
+#: app/templates/billing/credits.html:131
 msgid "Back to subscription"
 msgstr ""
 
@@ -402,6 +470,7 @@ msgstr ""
 
 #: app/templates/billing/subscription.html:76
 #: app/templates/billing/subscription.html:112
+#: app/templates/partials/ai_credits_card.html:27
 msgid "View plans"
 msgstr ""
 
@@ -424,6 +493,7 @@ msgstr ""
 
 #: app/templates/billing/subscription.html:99
 #: app/templates/billing/upgrade.html:57 app/templates/dashboard/layout.html:28
+#: app/templates/partials/ai_credits_card.html:46
 msgid "Upgrade to Pro"
 msgstr ""
 
@@ -508,10 +578,6 @@ msgstr ""
 msgid ""
 "Turn a site's declining pages into a browsable slide deck you can share —"
 " generated from your own data, saved with a date."
-msgstr ""
-
-#: app/templates/dashboard/audits.html:17
-msgid "Site"
 msgstr ""
 
 #: app/templates/dashboard/audits.html:26
@@ -622,7 +688,7 @@ msgstr ""
 
 #: app/templates/dashboard/declining.html:27
 #: app/templates/dashboard/insights.html:30
-#: app/templates/dashboard/overview.html:45
+#: app/templates/dashboard/overview.html:47
 msgid "Loading sites…"
 msgstr ""
 
@@ -665,7 +731,7 @@ msgstr ""
 
 #: app/templates/dashboard/declining.html:71
 #: app/templates/dashboard/insights.html:89
-#: app/templates/dashboard/overview.html:89
+#: app/templates/dashboard/overview.html:91
 #: app/templates/dashboard/sites.html:33
 msgid "Something went wrong loading your data."
 msgstr ""
@@ -680,19 +746,19 @@ msgstr ""
 
 #: app/templates/dashboard/declining.html:89
 #: app/templates/dashboard/insights.html:95
-#: app/templates/dashboard/overview.html:95
+#: app/templates/dashboard/overview.html:97
 msgid "No sites monitored yet"
 msgstr ""
 
 #: app/templates/dashboard/declining.html:91
 #: app/templates/dashboard/insights.html:97
-#: app/templates/dashboard/overview.html:97
+#: app/templates/dashboard/overview.html:99
 msgid "Add a Search Console property to start monitoring it."
 msgstr ""
 
 #: app/templates/dashboard/declining.html:95
 #: app/templates/dashboard/insights.html:101
-#: app/templates/dashboard/overview.html:101
+#: app/templates/dashboard/overview.html:103
 msgid "Add a site"
 msgstr ""
 
@@ -842,49 +908,49 @@ msgstr ""
 msgid "Terms"
 msgstr ""
 
-#: app/templates/dashboard/overview.html:25
+#: app/templates/dashboard/overview.html:27
 #: app/templates/dashboard/sites.html:17
 msgid "Connect Google"
 msgstr ""
 
-#: app/templates/dashboard/overview.html:27
+#: app/templates/dashboard/overview.html:29
 #: app/templates/dashboard/sites.html:19
 msgid ""
 "To use the service, connect the Google account that owns the websites you"
 " want to monitor."
 msgstr ""
 
-#: app/templates/dashboard/overview.html:32
+#: app/templates/dashboard/overview.html:34
 #: app/templates/dashboard/sites.html:24
 msgid "Connect"
 msgstr ""
 
-#: app/templates/dashboard/overview.html:50
+#: app/templates/dashboard/overview.html:52
 msgid "Full insights"
 msgstr ""
 
-#: app/templates/dashboard/overview.html:117
+#: app/templates/dashboard/overview.html:119
 msgid "Monitored pages"
 msgstr ""
 
-#: app/templates/dashboard/overview.html:124
+#: app/templates/dashboard/overview.html:126
 #, python-format
 msgid "Your plan monitors up to %(limit)s pages."
 msgstr ""
 
-#: app/templates/dashboard/overview.html:125
+#: app/templates/dashboard/overview.html:127
 msgid "Upgrade for more"
 msgstr ""
 
-#: app/templates/dashboard/overview.html:132
+#: app/templates/dashboard/overview.html:134
 msgid "Your site"
 msgstr ""
 
-#: app/templates/dashboard/overview.html:138
+#: app/templates/dashboard/overview.html:140
 msgid "Site preview"
 msgstr ""
 
-#: app/templates/dashboard/overview.html:143
+#: app/templates/dashboard/overview.html:145
 msgid "Some sites block being embedded — if the preview stays blank, that's why."
 msgstr ""
 
@@ -1651,6 +1717,75 @@ msgstr ""
 
 #: app/templates/landing/partials/topbar.html:45
 msgid "Sign In"
+msgstr ""
+
+#: app/templates/partials/ai_credits_card.html:15
+msgid "View usage history"
+msgstr ""
+
+#: app/templates/partials/ai_credits_card.html:23
+msgid ""
+"Your plan is not active, so AI features (analysis, recovery plans, audit "
+"presentations) aren't available right now."
+msgstr ""
+
+#: app/templates/partials/ai_credits_card.html:35
+#, python-format
+msgid ""
+"Your trial doesn't include monthly AI credits — AI analysis is available "
+"once every %(num)s day. Upgrade to Pro for included monthly credits."
+msgid_plural ""
+"Your trial doesn't include monthly AI credits — AI analysis is available "
+"once every %(num)s days. Upgrade to Pro for included monthly credits."
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/partials/ai_credits_card.html:41
+msgid ""
+"Your trial doesn't include monthly AI credits. Upgrade to Pro for "
+"included monthly credits."
+msgstr ""
+
+#: app/templates/partials/ai_credits_card.html:51
+#, python-format
+msgid "%(num)s credit available"
+msgid_plural "%(num)s credits available"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/partials/ai_credits_card.html:54
+#, python-format
+msgid "Plan: %(plan)s"
+msgstr ""
+
+#: app/templates/partials/ai_credits_card.html:56
+#, python-format
+msgid "Included monthly quota: %(num)s"
+msgstr ""
+
+#: app/templates/partials/ai_credits_card.html:58
+#, python-format
+msgid "Used this month: %(num)s"
+msgstr ""
+
+#: app/templates/partials/ai_credits_card.html:60
+#, python-format
+msgid "Purchased top-ups: %(num)s"
+msgstr ""
+
+#: app/templates/partials/ai_credits_card.html:65
+#, python-format
+msgid "Next monthly credit: %(date)s"
+msgstr ""
+
+#: app/templates/partials/ai_credits_card.html:69
+msgid ""
+"Credits are spent when you use AI features, like page analysis, recovery "
+"plans, reports or presentations."
+msgstr ""
+
+#: app/templates/partials/ai_credits_card.html:75
+msgid "Buy AI credits"
 msgstr ""
 
 #: app/templates/partials/usage_widget.html:19

@@ -17,6 +17,14 @@ class AuditPresentation(db.Model):
     site_url = db.Column(db.String(500), nullable=False)
     title = db.Column(db.String(255), nullable=False)
     markdown = db.Column(db.Text, nullable=False)
+
+    # Dati dei grafici (vedi app/audits/charts.py), serializzati come JSON in
+    # un campo di testo — così le presentazioni restano riproducibili
+    # esattamente come generate, anche se il rule engine o lo storico GSC
+    # cambiano dopo. NULL per le presentazioni generate prima di questa
+    # colonna: il rendering mostra un fallback, non ricalcola né rigenera.
+    chart_data = db.Column(db.Text, nullable=True)
+
     created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True)
 
     user = db.relationship("User")

@@ -60,12 +60,18 @@ def grant_credits(
     return entry
 
 
-def consume_credits(user: User, amount: int, site_url: str | None = None) -> AiCreditTransaction | None:
+def consume_credits(
+    user: User, amount: int, site_url: str | None = None, action: str | None = None
+) -> AiCreditTransaction | None:
     """Consuma `amount` crediti. Ritorna None (nessun effetto collaterale) se
     il saldo non basta — il chiamante deve aver già verificato la
     disponibilità con app/entitlements/service.py::check_ai_credits prima di
     arrivare qui; questa è una difesa in profondità, non il controllo
-    primario."""
+    primario.
+
+    `action` è solo per l'etichetta leggibile nello storico crediti (vedi
+    app/models/ai_credit_transaction.py) — non cambia in alcun modo la
+    quantità scalata."""
     if amount <= 0:
         raise ValueError("consume_credits richiede un importo positivo.")
     if user.ai_credit_balance < amount:
@@ -75,6 +81,7 @@ def consume_credits(user: User, amount: int, site_url: str | None = None) -> AiC
     entry = AiCreditTransaction(
         user_id=user.id,
         type="consume",
+        action=action,
         amount=-amount,
         balance_after=user.ai_credit_balance,
         site_url=site_url,

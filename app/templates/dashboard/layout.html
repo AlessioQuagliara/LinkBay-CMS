@@ -86,10 +86,10 @@
             {{ _("Subscription") }}
           </a>
         </li>
-        {% if ai_credit_topups_allowed %}
+        {% if ai_credit_ledger_visible %}
         <li>
           <a class="{{ 'menu-active' if request.endpoint == 'billing.credits' }}" href="{{ url_for('billing.credits') }}">
-            <span class="iconify size-4" data-icon="lucide:sparkles"></span>
+            <span class="iconify size-4 text-primary" data-icon="lucide:sparkles"></span>
             {{ _("AI Credits") }}
           </a>
         </li>

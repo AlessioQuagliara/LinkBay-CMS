@@ -55,6 +55,44 @@
       .audit-title-slide h1 { color: var(--brand-primary); }
       .audit-meta { color: #6b7280; font-size: 0.55em; margin-top: 0.3em; }
 
+      /* Grafici (vedi app/audits/charts.py) — stessa palette brand, nessuna
+         dipendenza esterna: SVG e HTML inline, autosufficienti anche
+         nell'HTML scaricato (Fase 4 del piano). */
+      .chart-slide h2 { border-bottom: none !important; }
+      .chart-meta { font-size: 0.45em; color: #6b7280; margin: -0.4em 0 0.8em; }
+      .chart-fallback { font-size: 0.6em; color: #6b7280; font-style: italic; }
+      .chart-svg { width: 100%; height: auto; max-height: 46vh; }
+      .chart-axis-label { font-size: 13px; fill: #6b7280; font-family: inherit; }
+      .chart-legend { display: flex; gap: 1.2em; margin-top: 0.4em; font-size: 0.42em; color: #6b7280; }
+      .chart-legend-item { display: inline-flex; align-items: center; gap: 0.4em; }
+      .chart-swatch { display: inline-block; width: 0.8em; height: 0.8em; border-radius: 999px; }
+      .chart-callout { font-size: 0.55em; font-weight: 600; margin-top: 0.6em; }
+      .chart-delta-up { color: #16a34a; }
+      .chart-delta-down { color: var(--brand-primary); }
+
+      .bar-chart { display: flex; flex-direction: column; gap: 0.6em; margin-top: 0.6em; }
+      .bar-row { display: grid; grid-template-columns: minmax(0, 26%) 1fr auto; align-items: center; gap: 0.8em; }
+      .bar-label {
+        font-size: 0.45em; color: var(--brand-dark); overflow: hidden;
+        text-overflow: ellipsis; white-space: nowrap;
+      }
+      .bar-track { background: #eceef1; border-radius: 999px; height: 0.9em; overflow: hidden; }
+      .bar-fill { display: block; height: 100%; background: var(--brand-primary); border-radius: 999px; }
+      .bar-value { font-size: 0.42em; color: #6b7280; white-space: nowrap; text-align: right; min-width: 4.5em; }
+
+      .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1em; margin-top: 1em; }
+      .kpi-card {
+        display: flex; flex-direction: column; gap: 0.2em; padding: 0.9em 1em;
+        border: 1px solid #e7e7ea; border-radius: 0.75em; background: #fafafa;
+      }
+      .kpi-value { font-size: 1.3em; font-weight: 700; color: var(--brand-primary); }
+      .kpi-label { font-size: 0.4em; color: #6b7280; }
+      @media (max-width: 700px) {
+        .kpi-grid { grid-template-columns: 1fr; }
+        .bar-row { grid-template-columns: 1fr; row-gap: 0.2em; }
+        .bar-value { text-align: left; }
+      }
+
       /* Branding persistente: onda + logo fissi in basso, sopra le slide ma
          sotto i controlli di reveal.js (z-index 1-30 a seconda del plugin) —
          pointer-events:none così non intercetta i click/swipe di navigazione. */

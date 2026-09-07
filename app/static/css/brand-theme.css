@@ -1,6 +1,11 @@
-/* Tema daisyUI per la dashboard, scoped via [data-theme="linkbay"] su <html>
-   (impostato solo da dashboard/layout.html, la landing resta invariata).
-   Palette: bianco/nero + brand #FF5758. Vedi app/templates/dashboard/. */
+/* Tema daisyUI del brand, scoped via [data-theme="linkbay"] su <html> —
+   fonte unica della palette per TUTTO il prodotto (dashboard, billing,
+   landing, AI credits). Prima di questo file era caricato solo da
+   dashboard/layout.html; la landing girava sul tema di default della CDN
+   daisyUI (blu/viola, mai brandizzato) — vedi app/templates/landing/partials/
+   head-assets.html e i tre <html data-theme="linkbay"> in landing/index.html,
+   landing/ai_credits.html, landing/legal_base.html.
+   Palette: bianco/nero + brand #FF5758 (rosso). */
 [data-theme="linkbay"] {
   color-scheme: light;
 

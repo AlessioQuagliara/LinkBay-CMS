@@ -1,7 +1,12 @@
 from flask import Blueprint, render_template
 from flask_login import current_user, login_required
 
-from app.entitlements.service import get_plan_limits, get_usage_summary, levels_from_usage
+from app.entitlements.service import (
+    get_ai_credit_overview,
+    get_plan_limits,
+    get_usage_summary,
+    levels_from_usage,
+)
 
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 
@@ -22,6 +27,7 @@ def overview():
         usage=usage,
         usage_levels=usage_levels,
         plan_name=get_plan_limits(current_user).name,
+        ai_credits=get_ai_credit_overview(current_user),
     )
 
 

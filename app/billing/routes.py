@@ -17,11 +17,13 @@ from flask_babel import gettext as _
 from flask_login import current_user, login_required
 
 from app.billing.revolut_products import ai_topup_packages, revolut_pro_plans
-from app.entitlements.service import get_plan_limits
+from app.entitlements.service import get_ai_credit_overview, get_plan_limits
 from app.extensions import db
-from app.models import AppSumoCode
+from app.models import AiCreditTransaction, AppSumoCode
 
 billing_bp = Blueprint("billing", __name__, url_prefix="/billing")
+
+CREDITS_PAGE_SIZE = 20
 
 
 @billing_bp.route("/upgrade")
@@ -44,15 +46,28 @@ def subscription():
 @billing_bp.route("/credits")
 @login_required
 def credits():
-    # Pacchetti one-time riservati ai piani AppSumo (la scheda tecnica li
-    # esclude esplicitamente per Pro: la quota mensile inclusa è già
-    # generosa) — un utente Pro che arriva qui viene rimandato al suo piano
-    # invece di vedere un carrello che non può usare.
-    if not get_plan_limits(current_user).ai_credit_topups_allowed:
-        flash(_("Your plan already includes a generous monthly AI quota — extra credit packs aren't needed."), "info")
+    # Piani ai_mode != "credit" (oggi solo trial, cooldown-based) non hanno
+    # alcun ledger da mostrare: via diretta invece di una pagina vuota. I
+    # pacchetti di acquisto restano riservati agli AppSumo (vedi
+    # ai_credit_topups_allowed nel template) — un piano Pro/Revolut arriva
+    # comunque qui per vedere saldo/storico, solo senza le card di acquisto.
+    if get_plan_limits(current_user).ai_mode != "credit":
+        flash(_("Your plan doesn't use AI credits."), "info")
         return redirect(url_for("billing.subscription"))
 
-    return render_template("billing/credits.html", packs=ai_topup_packages())
+    page = request.args.get("page", 1, type=int)
+    transactions = (
+        AiCreditTransaction.query.filter_by(user_id=current_user.id)
+        .order_by(AiCreditTransaction.created_at.desc())
+        .paginate(page=page, per_page=CREDITS_PAGE_SIZE, error_out=False)
+    )
+
+    return render_template(
+        "billing/credits.html",
+        packs=ai_topup_packages(),
+        ai_credits=get_ai_credit_overview(current_user),
+        transactions=transactions,
+    )
 
 
 @billing_bp.route("/redeem", methods=["GET", "POST"])

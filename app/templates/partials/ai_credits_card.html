@@ -1,0 +1,81 @@
+{# Card compatta "Crediti AI" per la dashboard overview — dati calcolati
+   server-side da app/entitlements/service.py::get_ai_credit_overview
+   (variabile `ai_credits`, un AiCreditOverview). Nessun calcolo lato client:
+   il saldo mostrato è sempre user.ai_credit_balance al momento della
+   request. #}
+<div class="card card-border bg-base-100 shadow-xs mb-6">
+  <div class="card-body gap-3 py-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="iconify text-primary size-5" data-icon="lucide:sparkles"></span>
+        <span class="font-medium">{{ _("AI Credits") }}</span>
+      </div>
+      {% if ai_credits.has_active_access and ai_credits.ai_mode == "credit" %}
+      <a class="link link-hover text-xs text-base-content/50" href="{{ url_for('billing.credits') }}">
+        {{ _("View usage history") }}
+      </a>
+      {% endif %}
+    </div>
+
+    {% if not ai_credits.has_active_access %}
+      {# Piano scaduto/inattivo: nessuna promessa di funzioni AI a pagamento. #}
+      <p class="text-sm text-base-content/70">
+        {{ _("Your plan is not active, so AI features (analysis, recovery plans, audit presentations) aren't available right now.") }}
+      </p>
+      <div class="card-actions">
+        <a class="btn btn-primary btn-sm" href="{{ url_for('billing.upgrade') }}">
+          {{ _("View plans") }}
+        </a>
+      </div>
+    {% elif ai_credits.ai_mode == "cooldown" %}
+      {# Trial: nessun saldo a crediti, il freno è il cooldown fra un run e l'altro. #}
+      <p class="text-2xl font-semibold">{{ ai_credits.balance }} <span class="text-sm font-normal text-base-content/60">{{ _("credits") }}</span></p>
+      <p class="text-sm text-base-content/70">
+        {% if ai_credits.cooldown_days %}
+          {{ ngettext(
+            "Your trial doesn't include monthly AI credits — AI analysis is available once every %(num)s day. Upgrade to Pro for included monthly credits.",
+            "Your trial doesn't include monthly AI credits — AI analysis is available once every %(num)s days. Upgrade to Pro for included monthly credits.",
+            ai_credits.cooldown_days
+          ) }}
+        {% else %}
+          {{ _("Your trial doesn't include monthly AI credits. Upgrade to Pro for included monthly credits.") }}
+        {% endif %}
+      </p>
+      <div class="card-actions">
+        <a class="btn btn-primary btn-sm" href="{{ url_for('billing.upgrade') }}">
+          {{ _("Upgrade to Pro") }}
+        </a>
+      </div>
+    {% else %}
+      <p class="text-2xl font-semibold">
+        {{ ngettext("%(num)s credit available", "%(num)s credits available", ai_credits.balance) }}
+      </p>
+      <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm text-base-content/70">
+        <span>{{ _("Plan: %(plan)s", plan=ai_credits.plan_name) }}</span>
+        {% if ai_credits.monthly_quota > 0 %}
+          <span>{{ _("Included monthly quota: %(num)s", num=ai_credits.monthly_quota) }}</span>
+        {% endif %}
+        <span>{{ _("Used this month: %(num)s", num=ai_credits.consumed_this_month) }}</span>
+        {% if ai_credits.purchased_total > 0 %}
+          <span>{{ _("Purchased top-ups: %(num)s", num=ai_credits.purchased_total) }}</span>
+        {% endif %}
+      </div>
+      {% if ai_credits.next_monthly_grant_at %}
+        <p class="text-xs text-base-content/50">
+          {{ _("Next monthly credit: %(date)s", date=ai_credits.next_monthly_grant_at.strftime("%d %b %Y")) }}
+        </p>
+      {% endif %}
+      <p class="text-xs text-base-content/50">
+        {{ _("Credits are spent when you use AI features, like page analysis, recovery plans, reports or presentations.") }}
+      </p>
+      {% if ai_credits.topups_allowed %}
+      <div class="card-actions">
+        <a class="btn btn-primary btn-sm" href="{{ url_for('billing.credits') }}">
+          <span class="iconify size-4" data-icon="lucide:sparkles"></span>
+          {{ _("Buy AI credits") }}
+        </a>
+      </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>

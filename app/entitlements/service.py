@@ -13,7 +13,7 @@ from werkzeug.routing import BuildError
 
 from app.entitlements.limits import DEFAULT_PLAN_TYPE, PLAN_LIMITS, PlanLimits
 from app.extensions import db
-from app.models import GscPageMonthly, MonitoredSite, ResourceUsageLog
+from app.models import AiCreditTransaction, GscPageMonthly, MonitoredSite, ResourceUsageLog
 
 Level = Literal["ok", "warn_80", "warn_95", "blocked"]
 
@@ -222,3 +222,84 @@ def record_usage(
     db.session.add(entry)
     db.session.commit()
     return entry
+
+
+# --- Crediti AI: overview per la dashboard (app/dashboard/routes.py) -------
+
+# Schedulazione reale del cron che accredita la quota mensile — deve
+# combaciare con la riga "0 6 1 * *  flask grant-monthly-ai-credits" in
+# ./crontab. Non letta dal file a runtime (fragile/inutile per un singolo
+# orario fisso): se cambia lì, va aggiornata anche qui.
+MONTHLY_GRANT_DAY = 1
+MONTHLY_GRANT_HOUR_UTC = 6
+
+
+def _next_monthly_grant_at(now: datetime) -> datetime:
+    """Prossima occorrenza (>= ora) del cron mensile crediti, come vera data
+    calcolabile — mai una stima o un placeholder."""
+    candidate = now.replace(day=MONTHLY_GRANT_DAY, hour=MONTHLY_GRANT_HOUR_UTC, minute=0, second=0, microsecond=0)
+    if candidate <= now:
+        year = candidate.year + (1 if candidate.month == 12 else 0)
+        month = 1 if candidate.month == 12 else candidate.month + 1
+        candidate = candidate.replace(year=year, month=month)
+    return candidate
+
+
+@dataclass(frozen=True)
+class AiCreditOverview:
+    balance: int
+    plan_name: str
+    ai_mode: str  # "credit" | "cooldown" (vedi PlanLimits.ai_mode)
+    monthly_quota: int  # 0 se il piano non ne prevede una
+    cooldown_days: int | None  # solo per ai_mode == "cooldown" (es. trial)
+    topups_allowed: bool
+    has_active_access: bool
+    next_monthly_grant_at: datetime | None  # None se non applicabile
+    consumed_this_month: int  # sempre >= 0 (somma dei "consume", valore assoluto)
+    purchased_total: int  # somma storica dei "grant_purchase" (top-up), qualunque source
+
+
+def get_ai_credit_overview(user) -> AiCreditOverview:
+    """Fonte unica per la card "Crediti AI" della dashboard
+    (app/templates/dashboard/overview.html) e per l'header della pagina
+    /billing/credits — tutto calcolato server-side dal ledger reale
+    (AiCreditTransaction) e dal piano (PLAN_LIMITS), mai da un valore inviato
+    dal client."""
+    limits = get_plan_limits(user)
+
+    next_grant = None
+    if limits.ai_mode == "credit" and limits.ai_credit_grant > 0 and user.has_active_access:
+        next_grant = _next_monthly_grant_at(datetime.now(timezone.utc))
+
+    now = datetime.now(timezone.utc)
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    consumed_this_month = (
+        db.session.query(db.func.coalesce(db.func.sum(AiCreditTransaction.amount), 0))
+        .filter(
+            AiCreditTransaction.user_id == user.id,
+            AiCreditTransaction.type == "consume",
+            AiCreditTransaction.created_at >= month_start,
+        )
+        .scalar()
+    )
+    purchased_total = (
+        db.session.query(db.func.coalesce(db.func.sum(AiCreditTransaction.amount), 0))
+        .filter(
+            AiCreditTransaction.user_id == user.id,
+            AiCreditTransaction.type == "grant_purchase",
+        )
+        .scalar()
+    )
+
+    return AiCreditOverview(
+        balance=user.ai_credit_balance,
+        plan_name=limits.name,
+        ai_mode=limits.ai_mode,
+        monthly_quota=limits.ai_credit_grant,
+        cooldown_days=limits.ai_cooldown_days,
+        topups_allowed=limits.ai_credit_topups_allowed,
+        has_active_access=user.has_active_access,
+        next_monthly_grant_at=next_grant,
+        consumed_this_month=abs(consumed_this_month),  # "consume" è negativo nel ledger
+        purchased_total=purchased_total,
+    )

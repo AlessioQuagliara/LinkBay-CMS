@@ -7,43 +7,124 @@
   <p class="text-base-content/60 mt-1">
     {{ _("Extra AI suggestions on top of your plan. Credits never expire.") }}
   </p>
-  <p class="text-sm text-base-content/60 mt-1">
-    {{ _("Current balance: %(balance)s credits", balance=current_user.ai_credit_balance) }}
-  </p>
 </div>
 
-<div class="alert alert-info max-w-3xl mb-4">
-  <span class="iconify size-4" data-icon="lucide:info"></span>
-  {{ _("Payment is handled entirely by Revolut. Credits are added manually after we verify your payment — not instantly at checkout.") }}
-</div>
+{% include "partials/ai_credits_card.html" %}
 
-<div class="grid gap-4 sm:grid-cols-3 max-w-3xl">
-  {% for pack in packs %}
-    <div class="card card-border bg-base-100 shadow-xs">
-      <div class="card-body items-center text-center gap-2">
-        <span class="iconify text-primary size-6" data-icon="lucide:sparkles"></span>
-        <h3 class="font-semibold">{{ pack.label }}</h3>
-        <p class="text-2xl font-semibold">{{ "{:,}".format(pack.credits) }}</p>
-        <p class="text-sm text-base-content/60">{{ _("credits") }}</p>
-        <p class="text-lg font-medium mt-2">€{{ pack.price }}</p>
-        {% if pack.link %}
-          <a
-            class="btn btn-primary btn-sm w-full mt-2"
-            href="{{ pack.link }}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <span class="iconify size-4" data-icon="lucide:external-link"></span>
-            {{ _("Pay with Revolut") }}
-          </a>
-        {% else %}
-          <button class="btn btn-disabled btn-sm w-full mt-2" type="button" disabled>
-            {{ _("Payment link not configured yet") }}
-          </button>
-        {% endif %}
+{% if ai_credits.topups_allowed %}
+  <div class="alert alert-info max-w-3xl mb-4">
+    <span class="iconify size-4" data-icon="lucide:info"></span>
+    {{ _("Payment is handled entirely by Revolut. Credits are added manually after we verify your payment — not instantly at checkout.") }}
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-3 max-w-3xl mb-8">
+    {% for pack in packs %}
+      <div class="card card-border bg-base-100 shadow-xs">
+        <div class="card-body items-center text-center gap-2">
+          <span class="iconify text-primary size-6" data-icon="lucide:sparkles"></span>
+          <h3 class="font-semibold">{{ pack.label }}</h3>
+          <p class="text-2xl font-semibold">{{ "{:,}".format(pack.credits) }}</p>
+          <p class="text-sm text-base-content/60">{{ _("credits") }}</p>
+          <p class="text-lg font-medium mt-2">€{{ pack.price }}</p>
+          {% if pack.link %}
+            <a
+              class="btn btn-primary btn-sm w-full mt-2"
+              href="{{ pack.link }}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span class="iconify size-4" data-icon="lucide:external-link"></span>
+              {{ _("Pay with Revolut") }}
+            </a>
+          {% else %}
+            <button class="btn btn-disabled btn-sm w-full mt-2" type="button" disabled>
+              {{ _("Payment link not configured yet") }}
+            </button>
+          {% endif %}
+        </div>
       </div>
-    </div>
-  {% endfor %}
+    {% endfor %}
+  </div>
+{% endif %}
+
+<div class="mb-3">
+  <h2 class="text-lg font-semibold">{{ _("Usage history") }}</h2>
+  <p class="text-base-content/60 text-sm mt-1">{{ _("Your most recent credit activity, newest first.") }}</p>
+</div>
+
+<div class="card card-border bg-base-100 shadow-xs max-w-4xl">
+  <div class="card-body p-0">
+    {% if transactions.items %}
+      <div class="overflow-x-auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>{{ _("Date") }}</th>
+              <th>{{ _("Event") }}</th>
+              <th>{{ _("Site") }}</th>
+              <th class="text-right">{{ _("Change") }}</th>
+              <th class="text-right">{{ _("Balance") }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for tx in transactions.items %}
+              <tr>
+                <td class="whitespace-nowrap text-sm text-base-content/70">{{ tx.created_at.strftime("%d %b %Y") }}</td>
+                <td class="text-sm">
+                  {% if tx.type == "grant_monthly_quota" %}
+                    {{ _("Monthly plan credit") }}
+                  {% elif tx.type == "grant_purchase" %}
+                    {{ _("Top-up purchase") }}
+                  {% elif tx.type == "consume" and tx.action == "ai_analysis" %}
+                    {{ _("AI page analysis") }}
+                  {% elif tx.type == "consume" and tx.action == "audit_presentation" %}
+                    {{ _("Audit presentation") }}
+                  {% elif tx.type == "consume" %}
+                    {{ _("AI credits used") }}
+                  {% elif tx.type == "adjustment" and tx.amount >= 0 %}
+                    {{ _("Credit adjustment") }}
+                  {% elif tx.type == "adjustment" %}
+                    {{ _("Refund / correction") }}
+                  {% else %}
+                    {{ tx.type }}
+                  {% endif %}
+                </td>
+                <td class="text-sm text-base-content/60 truncate max-w-48">{{ tx.site_url or "—" }}</td>
+                <td class="text-right font-medium {{ 'text-success' if tx.amount >= 0 else 'text-error' }}">
+                  {{ "+" if tx.amount >= 0 }}{{ tx.amount }}
+                </td>
+                <td class="text-right text-base-content/70">{{ tx.balance_after }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% if transactions.pages > 1 %}
+        <div class="flex items-center justify-between gap-2 p-4 border-t border-base-300">
+          <a
+            class="btn btn-sm btn-outline {{ 'btn-disabled' if not transactions.has_prev }}"
+            href="{{ url_for('billing.credits', page=transactions.prev_num) if transactions.has_prev else '#' }}"
+          >
+            <span class="iconify size-4" data-icon="lucide:chevron-left"></span>
+            {{ _("Previous") }}
+          </a>
+          <span class="text-xs text-base-content/50">
+            {{ _("Page %(page)s of %(pages)s", page=transactions.page, pages=transactions.pages) }}
+          </span>
+          <a
+            class="btn btn-sm btn-outline {{ 'btn-disabled' if not transactions.has_next }}"
+            href="{{ url_for('billing.credits', page=transactions.next_num) if transactions.has_next else '#' }}"
+          >
+            {{ _("Next") }}
+            <span class="iconify size-4" data-icon="lucide:chevron-right"></span>
+          </a>
+        </div>
+      {% endif %}
+    {% else %}
+      <p class="text-sm text-base-content/60 p-4">{{ _("No AI credit activity yet.") }}</p>
+    {% endif %}
+  </div>
 </div>
 
 <p class="text-sm text-base-content/50 mt-6 max-w-xl">

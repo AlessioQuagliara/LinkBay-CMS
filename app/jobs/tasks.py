@@ -96,7 +96,7 @@ def run_ai_analysis_job(user_id: int, site_url: str) -> dict:
         if user:
             limits = get_plan_limits(user)
             if limits.ai_mode == "credit":
-                consume_credits(user, AI_CREDIT_COST_PER_RUN, site_url=site_url)
+                consume_credits(user, AI_CREDIT_COST_PER_RUN, site_url=site_url, action="ai_analysis")
             record_usage(user, "ai_analysis", site_url=site_url, credits_consumed=AI_CREDIT_COST_PER_RUN if limits.ai_mode == "credit" else None)
 
         return {"ok": True}
@@ -133,7 +133,7 @@ def run_audit_presentation_job(user_id: int, site_url: str) -> dict:
         if user:
             limits = get_plan_limits(user)
             if limits.ai_mode == "credit":
-                consume_credits(user, cost, site_url=site_url)
+                consume_credits(user, cost, site_url=site_url, action="audit_presentation")
             record_usage(
                 user, "audit_presentation", site_url=site_url,
                 credits_consumed=cost if limits.ai_mode == "credit" else None,

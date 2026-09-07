@@ -12,6 +12,11 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" />
 <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+{# Tema brand (bianco/nero + rosso #FF5758), stessa fonte unica della
+   dashboard — senza questo la pagina gira sul tema di default della CDN
+   daisyUI (blu/viola, non brandizzato). Richiede <html data-theme="linkbay">
+   sul documento che include questo partial. #}
+<link href="{{ url_for('static', filename='css/brand-theme.css') }}" rel="stylesheet" type="text/css" />
 <script src="https://cdn.jsdelivr.net/npm/card3d@2.6.5/dist/card3d.min.js"></script>
 <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
 

@@ -5,9 +5,11 @@ JSON (titolo + bullet). Il markdown reveal.js finale è assemblato in modo
 deterministico in Python da quel JSON — l'AI non scrive mai il markdown
 grezzo, così i separatori di slide e la struttura sono sempre corretti e i
 numeri restano esattamente quelli osservati."""
+import json
 from datetime import date, datetime, timezone
 
 from app.ai.deepseek import chat_json
+from app.audits.charts import compute_chart_data
 from app.extensions import db
 from app.models import AuditPresentation, PageAlert
 
@@ -112,8 +114,16 @@ def build_presentation(user_id: int, site_url: str) -> AuditPresentation:
 
     markdown = _assemble_markdown(title, site_url, slides)
 
+    # Grafici: SOLO dati deterministici (stessi `alerts` già interrogati
+    # sopra + storico GscSiteDaily), mai l'output AI — vedi
+    # app/audits/charts.py. Salvato come JSON testuale così la presentazione
+    # resta riproducibile esattamente come generata (vedi
+    # AuditPresentation.chart_data).
+    chart_data = compute_chart_data(user_id, site_url, alerts)
+
     presentation = AuditPresentation(
         user_id=user_id, site_url=site_url, title=title, markdown=markdown,
+        chart_data=json.dumps(chart_data),
         created_at=datetime.now(timezone.utc),
     )
     db.session.add(presentation)

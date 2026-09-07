@@ -40,20 +40,31 @@ def _register_error_handlers(app):
 
 def _register_context_processors(app):
     @app.context_processor
-    def inject_ai_credit_topups_allowed():
+    def inject_ai_credit_flags():
         # dashboard/layout.html è condiviso da più blueprint (dashboard,
         # billing): un context processor globale invece che scoped a un
         # singolo blueprint, così il link "AI Credits" in sidebar compare per
         # ogni pagina che estende quel layout, non solo per le route di
         # dashboard_bp. Nessuna query aggiuntiva: get_plan_limits legge da
         # PLAN_LIMITS, non dal DB.
+        #
+        # Due flag distinti: "ai_credit_topups_allowed" governa la CTA di
+        # acquisto (solo AppSumo, business rule invariata), mentre
+        # "ai_credit_ledger_visible" governa la visibilità del link stesso —
+        # più ampio: qualunque piano ai_mode=="credit" (AppSumo + Pro/Revolut)
+        # ha un saldo/storico da vedere in /billing/credits, anche se non può
+        # comprare top-up. Il trial (ai_mode=="cooldown") non ha un ledger.
         from flask_login import current_user
 
         if not current_user.is_authenticated:
-            return {"ai_credit_topups_allowed": False}
+            return {"ai_credit_topups_allowed": False, "ai_credit_ledger_visible": False}
         from app.entitlements.service import get_plan_limits
 
-        return {"ai_credit_topups_allowed": get_plan_limits(current_user).ai_credit_topups_allowed}
+        limits = get_plan_limits(current_user)
+        return {
+            "ai_credit_topups_allowed": limits.ai_credit_topups_allowed,
+            "ai_credit_ledger_visible": limits.ai_mode == "credit",
+        }
 
 
 def _register_extensions(app):
@@ -715,3 +726,20 @@ def _ensure_columns(db):
                     "ON ai_credit_transactions (payment_reference)"
                 )
             )
+    # action (vedi app/entitlements/ai_credits.py::consume_credits e
+    # app/models/ai_credit_transaction.py) — etichetta leggibile dello
+    # storico crediti, popolata solo dai due punti reali che consumano
+    # crediti (app/jobs/tasks.py).
+    if has_column("ai_credit_transactions", "id") and not has_column("ai_credit_transactions", "action"):
+        with db.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE ai_credit_transactions ADD COLUMN action VARCHAR(30)"))
+
+    # audit_presentations.chart_data (vedi app/audits/charts.py) — JSON
+    # serializzato come testo (stessa scelta di app/models/ai_credit_transaction.py
+    # per admin_note ecc.: TEXT è portabile su Postgres e SQLite senza
+    # ambiguità di tipo, la (de)serializzazione resta applicativa). NULL per
+    # ogni presentazione generata prima di questa colonna — il rendering
+    # mostra un fallback, non rigenera né consuma crediti.
+    if has_column("audit_presentations", "id") and not has_column("audit_presentations", "chart_data"):
+        with db.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE audit_presentations ADD COLUMN chart_data TEXT"))

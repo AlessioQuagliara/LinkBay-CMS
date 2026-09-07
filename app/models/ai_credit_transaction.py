@@ -23,6 +23,15 @@ class AiCreditTransaction(db.Model):
     amount = db.Column(db.Integer, nullable=False)
     balance_after = db.Column(db.Integer, nullable=False)
 
+    # Azione AI che ha consumato i crediti — solo per type == "consume":
+    # "ai_analysis" | "audit_presentation" (gli unici due punti che oggi
+    # chiamano consume_credits, vedi app/jobs/tasks.py). NULL per le righe
+    # precedenti a questa colonna e per ogni altro type: non un'etichetta
+    # inventata, riflette esattamente cosa il codice sa davvero al momento
+    # del consumo (vedi app/entitlements/service.py::get_ai_credit_overview
+    # e la tabella storico in app/templates/billing/credits.html).
+    action = db.Column(db.String(30), nullable=True)
+
     # Legacy Lemon Squeezy (integrazione dismessa — vedi
     # app/billing/revolut_ai_topup.py per il flusso attuale). Valorizzato solo
     # per le vecchie transazioni "grant_purchase"/"adjustment"; nessun codice
