@@ -52,3 +52,43 @@ def send_revolut_subscription_activated_email(user, *, plan, expires_at):
     if dashboard_link:
         text_lines += ["", f"Go to your dashboard: {dashboard_link}"]
     return send_email(user.email, subject, html, text="\n".join(text_lines))
+
+
+def send_revolut_ai_topup_activated_email(user, *, product_key, credits_added, balance_after):
+    """Invia l'email "i tuoi crediti AI sono stati accreditati" dopo un
+    top-up Revolut andato a buon fine (vedi
+    app/billing/revolut_ai_topup.py::credit_revolut_ai_topup). Stesse regole
+    di send_revolut_subscription_activated_email: chiamata solo dopo commit,
+    non solleva mai.
+
+    Contenuto minimale e volutamente SENZA: prezzo pagato, riferimento
+    pagamento, nota amministrativa, ID interni, o qualunque menzione di
+    Lemon Squeezy — solo cosa è cambiato per il cliente."""
+    from app.billing.revolut_products import AI_TOPUP_CATALOG
+
+    entry = AI_TOPUP_CATALOG.get(product_key, {})
+    label = entry.get("label", "AI credits")
+
+    try:
+        credits_link = url_for("billing.credits", _external=True)
+    except Exception:  # noqa: BLE001 — non deve mai bloccare l'invio dell'email
+        credits_link = None
+
+    subject = "Your LinkBayCMS AI credits are ready"
+    html = render_template(
+        "emails/revolut_ai_topup_activated.html",
+        name=user.name,
+        label=label,
+        credits_added=credits_added,
+        balance_after=balance_after,
+        credits_link=credits_link,
+    )
+    text_lines = [
+        f"Hi {user.name},",
+        "",
+        f"Thanks for your payment — {credits_added} AI credits ({label}) have been added to your account.",
+        f"New balance: {balance_after} credits. Purchased credits never expire.",
+    ]
+    if credits_link:
+        text_lines += ["", f"View your balance: {credits_link}"]
+    return send_email(user.email, subject, html, text="\n".join(text_lines))

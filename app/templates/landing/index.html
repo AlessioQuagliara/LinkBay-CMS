@@ -254,58 +254,48 @@
         <section class="py-8 lg:py-20" id="pricing">
             <div class="container">
                 <div class="text-center">
-                    <h2 class="text-3xl font-semibold sm:text-4xl">{{ _("Simple pricing, monthly or annual.") }}</h2>
+                    <h2 class="text-3xl font-semibold sm:text-4xl">{{ _("Simple pricing, no surprises.") }}</h2>
                     <p class="text-base-content/80 mt-2 sm:text-lg">
                         {{ _("Try it free for 13 days, no credit card required.") }}
                     </p>
                 </div>
 
-                <div class="mt-8 flex justify-center">
-                    <div class="join">
-                        <button type="button" class="btn join-item" data-pricing-toggle="monthly">{{ _("Monthly") }}</button>
-                        <button type="button" class="btn join-item" data-pricing-toggle="annual">
-                            {{ _("Annual") }}
-                            <span class="badge badge-primary badge-sm ms-1">{{ _("Save ~17%%") }}</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="mt-6 lg:max-w-md lg:mx-auto" data-pricing-card>
-                    <div class="card border-primary border p-3">
-                        <div class="bg-primary/10 rounded-box p-6">
-                            <div class="flex justify-between">
-                                <h3 class="text-error text-xl font-semibold">{{ _("Pro") }}</h3>
-                                <div class="badge badge-primary badge-sm">{{ _("13-day free trial") }}</div>
+                <div class="mt-8 grid gap-4 sm:grid-cols-3 lg:max-w-3xl lg:mx-auto">
+                    {% for plan in revolut_plans %}
+                        <div class="card border p-3 {{ 'border-primary' if plan.savings_label else 'card-border' }}">
+                            <div class="{{ 'bg-primary/10' if plan.savings_label else 'bg-base-200' }} rounded-box p-6 text-center">
+                                {% if plan.savings_label %}
+                                    <div class="badge badge-primary badge-sm mb-2">{{ _("Save about %(pct)s", pct=plan.savings_label) }}</div>
+                                {% endif %}
+                                <h3 class="text-error text-xl font-semibold">{{ plan.label }}</h3>
+                                <p class="mt-2 text-4xl font-semibold tracking-tight">€{{ "%.2f"|format(plan.price) }}</p>
                             </div>
-                            <p class="mt-4 flex items-baseline">
-                                <span class="text-5xl font-semibold tracking-tight" data-pricing-amount data-monthly="€79" data-annual="€790">€79</span>
-                                <span class="ml-1 text-xl font-medium" data-pricing-period data-monthly="{{ _('/month') }}" data-annual="{{ _('/year') }}">{{ _("/month") }}</span>
-                            </p>
-                            <p class="mt-2" data-pricing-note
-                               data-monthly="{{ _("No credit card to start. Cancel anytime once you're on the paid plan.") }}"
-                               data-annual="{{ _('Billed once a year — %(price)s/month equivalent. Save €158/year (about 17%%).', price='€65.83') }}">
-                                {{ _("No credit card to start. Cancel anytime once you're on the paid plan.") }}
-                            </p>
+                            <div class="p-6">
+                                <a href="{{ url_for('auth.register') }}">
+                                    <button class="btn btn-primary btn-block">
+                                        {{ _("Start your free trial") }}
+                                    </button>
+                                </a>
+                            </div>
                         </div>
-                        <div class="p-6">
-                            <ul class="list-inside list-disc space-y-3" role="list">
-                                <li><span class="ms-3">{{ _("Declining pages, prioritized automatically") }}</span></li>
-                                <li><span class="ms-3">{{ _("AI suggestions on the pages losing traffic") }}</span></li>
-                                <li><span class="ms-3">{{ _("Full history from the day you connect your site") }}</span></li>
-                            </ul>
-                        </div>
-                        <a href="{{ url_for('auth.register') }}">
-                            <button class="btn btn-primary btn-block mt-auto">
-                                {{ _("Start your free trial") }}
-                            </button>
-                        </a>
-                    </div>
+                    {% endfor %}
                 </div>
 
-                <p class="text-base-content/60 text-center text-sm mt-6">
+                <ul class="list-inside list-disc space-y-2 mt-8 max-w-md mx-auto text-base-content/80" role="list">
+                    <li>{{ _("Declining pages, prioritized automatically") }}</li>
+                    <li>{{ _("AI suggestions on the pages losing traffic") }}</li>
+                    <li>{{ _("Full history from the day you connect your site") }}</li>
+                </ul>
+
+                <p class="text-base-content/60 text-center text-sm mt-6 max-w-lg mx-auto">
+                    <span class="iconify size-4 align-text-bottom" data-icon="lucide:shield-check"></span>
+                    {{ _("Payment is handled entirely by Revolut. After we verify it, access is activated manually — no automatic renewal, no card on file.") }}
+                </p>
+
+                <p class="text-base-content/60 text-center text-sm mt-4">
                     {{ _("Got an AppSumo code?") }}
                     <a class="link link-hover" href="{{ url_for('billing.redeem') }}">{{ _("Redeem it here") }}</a>.
-                    {{ _("Curious how AI credits work?") }}
+                    {{ _("Need extra AI credits?") }}
                     <a class="link link-hover" href="{{ url_for('main.ai_credits') }}">{{ _("See AI Credits") }}</a>.
                 </p>
             </div>

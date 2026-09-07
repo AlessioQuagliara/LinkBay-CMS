@@ -678,3 +678,40 @@ def _ensure_columns(db):
     if has_column("page_alerts", "id") and not has_column("page_alerts", "checked_60d_at"):
         with db.engine.begin() as conn:
             conn.execute(text("ALTER TABLE page_alerts ADD COLUMN checked_60d_at TIMESTAMPTZ"))
+
+    # ai_credit_transactions: accredito manuale top-up Revolut (vedi
+    # app/billing/revolut_ai_topup.py e app/models/ai_credit_transaction.py).
+    # ls_order_id/site_url restano dove sono, invariate, per l'audit storico
+    # Lemon Squeezy.
+    if has_column("ai_credit_transactions", "id") and not has_column("ai_credit_transactions", "balance_before"):
+        with db.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE ai_credit_transactions ADD COLUMN balance_before INTEGER"))
+    if has_column("ai_credit_transactions", "id") and not has_column("ai_credit_transactions", "product_key"):
+        with db.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE ai_credit_transactions ADD COLUMN product_key VARCHAR(50)"))
+    if has_column("ai_credit_transactions", "id") and not has_column("ai_credit_transactions", "payment_source"):
+        with db.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE ai_credit_transactions ADD COLUMN payment_source VARCHAR(30)"))
+    if has_column("ai_credit_transactions", "id") and not has_column("ai_credit_transactions", "approved_by_user_id"):
+        with db.engine.begin() as conn:
+            conn.execute(
+                text(
+                    "ALTER TABLE ai_credit_transactions ADD COLUMN approved_by_user_id INTEGER "
+                    "REFERENCES users(id)"
+                )
+            )
+    if has_column("ai_credit_transactions", "id") and not has_column("ai_credit_transactions", "admin_note"):
+        with db.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE ai_credit_transactions ADD COLUMN admin_note TEXT"))
+    if has_column("ai_credit_transactions", "id") and not has_column("ai_credit_transactions", "payment_reference"):
+        with db.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE ai_credit_transactions ADD COLUMN payment_reference VARCHAR(255)"))
+            # UNIQUE standard (non parziale): più righe storiche senza
+            # riferimento (NULL) convivono senza violare il vincolo — stessa
+            # nota di ix_users_subscription_activation_reference sopra.
+            conn.execute(
+                text(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS ix_ai_credit_transactions_payment_reference "
+                    "ON ai_credit_transactions (payment_reference)"
+                )
+            )

@@ -38,9 +38,9 @@ LinkBayCMS ha 3 modelli commerciali:
 CREDITI AI EXTRA (solo per chi ha un piano AppSumo, non per Pro — il piano
 Pro include già la sua quota mensile): pacchetti one-time "AI Starter" (50
 crediti, €7), "AI Growth" (150 crediti, €15) o "AI Scale" (500 crediti,
-€39). L'acquisto è temporaneamente sospeso — chi ha bisogno di crediti extra
-prima che torni disponibile deve contattare il supporto. I crediti già
-posseduti non scadono mai.
+€39), pagati anch'essi su un link Revolut e accreditati manualmente dal
+team dopo la verifica del pagamento (stesso principio dei piani Pro, non è
+un accredito istantaneo al checkout). I crediti non scadono mai.
 
 COME FUNZIONA IL PRODOTTO: ci si collega in sola lettura al proprio account
 Google Search Console (nessuna modifica al sito, nessun codice da

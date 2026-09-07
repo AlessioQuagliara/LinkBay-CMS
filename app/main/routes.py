@@ -29,7 +29,13 @@ def _public_base():
 
 @main_bp.route("/")
 def index():
-    return render_template("landing/index.html")
+    from app.billing.revolut_products import ai_topup_packages, revolut_pro_plans
+
+    return render_template(
+        "landing/index.html",
+        revolut_plans=revolut_pro_plans(),
+        ai_topup_packs=ai_topup_packages(),
+    )
 
 
 @main_bp.route("/lang/<code>")
@@ -93,15 +99,12 @@ def cookie_policy():
 @main_bp.route("/ai-credits")
 def ai_credits():
     """Landing standalone sui crediti AI (separata dalla pricing del piano
-    Pro — vedi #pricing in landing/index.html). Tutti i numeri vengono da
-    app/entitlements/limits.py, unica fonte di verità: nessun prezzo/costo
-    hardcoded qui o nel template."""
-    from app.entitlements.limits import AI_CREDIT_ACTION_COSTS, AI_CREDIT_PACK_LABELS, AI_CREDIT_PACKS
-
-    packs = [
-        {"product_key": f"credits_{amount}", "amount": amount, "price": price, "label": AI_CREDIT_PACK_LABELS[amount]}
-        for amount, price in sorted(AI_CREDIT_PACKS.items())
-    ]
+    Pro — vedi #pricing in landing/index.html). Pacchetti/prezzi vengono da
+    app/billing/revolut_products.py::ai_topup_packages(), unica fonte di
+    verità (a sua volta letta da app/entitlements/limits.py per i numeri):
+    nessun prezzo/costo hardcoded qui o nel template."""
+    from app.billing.revolut_products import ai_topup_packages
+    from app.entitlements.limits import AI_CREDIT_ACTION_COSTS
 
     # CTA condizionale: riusa get_plan_limits invece di ricontrollare
     # plan_type a mano (stessa fonte di verità di billing/routes.py::credits
@@ -118,7 +121,7 @@ def ai_credits():
         "landing/ai_credits.html",
         page_title="AI Credits",
         page_description="How AI credits work in LinkBayCMS: cost per action, one-time top-up packs, and how they relate to your plan.",
-        packs=packs,
+        packs=ai_topup_packages(),
         action_costs=AI_CREDIT_ACTION_COSTS,
         can_topup=can_topup,
     )

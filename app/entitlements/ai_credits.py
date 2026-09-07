@@ -22,21 +22,37 @@ def grant_credits(
     type: str,
     ls_order_id: str | None = None,
     site_url: str | None = None,
+    product_key: str | None = None,
+    payment_reference: str | None = None,
+    payment_source: str | None = None,
+    approved_by_user_id: int | None = None,
+    admin_note: str | None = None,
 ) -> AiCreditTransaction:
     """Accredita `amount` crediti (deve essere positivo — usa `adjustment`
     con importo negativo per uno storno, non questa funzione). Aggiorna il
-    saldo denormalizzato su User nella stessa transazione DB del ledger."""
+    saldo denormalizzato su User nella stessa transazione DB del ledger.
+
+    Gli ultimi cinque parametri sono usati solo dal top-up manuale Revolut
+    (vedi app/billing/revolut_ai_topup.py) — restano None per gli altri
+    chiamanti (quota mensile, storico Lemon Squeezy)."""
     if amount <= 0:
         raise ValueError("grant_credits richiede un importo positivo (usa adjustment per gli storni).")
 
+    balance_before = user.ai_credit_balance
     user.ai_credit_balance += amount
     entry = AiCreditTransaction(
         user_id=user.id,
         type=type,
         amount=amount,
+        balance_before=balance_before,
         balance_after=user.ai_credit_balance,
         ls_order_id=ls_order_id,
         site_url=site_url,
+        product_key=product_key,
+        payment_reference=payment_reference,
+        payment_source=payment_source,
+        approved_by_user_id=approved_by_user_id,
+        admin_note=admin_note,
         created_at=datetime.now(timezone.utc),
     )
     db.session.add(entry)

@@ -1,0 +1,83 @@
+{% extends 'admin/master.html' %}
+{% block body %}
+<div class="card">
+  <div class="card-body">
+    <h4 class="card-title">Credit AI top-up (Revolut)</h4>
+    <p class="text-muted">
+      {{ user.name }} &mdash; {{ user.email }}
+    </p>
+    <p class="text-muted" style="max-width: 480px;">
+      One-time AI credit purchase — this does <strong>not</strong> change the plan,
+      status or expiry of {{ user.name }}'s subscription.
+    </p>
+
+    <table class="table table-sm" style="max-width: 480px;">
+      <tr>
+        <th>Current AI credit balance</th>
+        <td>{{ current_balance }} credits</td>
+      </tr>
+    </table>
+
+    <p class="text-muted" style="max-width: 480px;">
+      Only the package can be selected below — credits and price always come from
+      the server-side catalog, never from a value this form could submit.
+    </p>
+    <table class="table table-sm" style="max-width: 480px;">
+      <thead>
+        <tr><th>Package</th><th>Credits</th><th>Price</th><th>Balance if selected</th></tr>
+      </thead>
+      <tbody>
+        {% for key, entry in catalog.items() %}
+        <tr>
+          <td>{{ entry.label }}</td>
+          <td>+{{ entry.credits }}</td>
+          <td>€{{ entry.price }}</td>
+          <td>{{ current_balance + entry.credits }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <form method="post" id="ai-topup-form" style="max-width: 480px;">
+      {{ form.hidden_tag() }}
+
+      <div class="form-group">
+        {{ form.product_key.label }}
+        {{ form.product_key(class="form-control") }}
+      </div>
+
+      <div class="form-group">
+        {{ form.payment_reference.label }}
+        {{ form.payment_reference(class="form-control", placeholder="Revolut reference from the payment email") }}
+        <small class="form-text text-muted">
+          Required. If the same reference is submitted again for this user, the action is a
+          no-op (no second credit, no second email) — protects against an accidental double
+          submit. The same reference can never be reused between a subscription activation and
+          an AI top-up, or between two different accounts.
+        </small>
+      </div>
+
+      <div class="form-group">
+        {{ form.note.label }}
+        {{ form.note(class="form-control", rows=3) }}
+      </div>
+
+      <div class="form-check" style="margin-bottom: 1rem;">
+        <input class="form-check-input" type="checkbox" id="confirm-topup" required>
+        <label class="form-check-label" for="confirm-topup">
+          I've verified the Revolut payment notification email and confirm this top-up.
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="ai-topup-submit">Credit top-up</button>
+      <a href="{{ url_for('user.edit_view', id=user.id) }}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+
+<script {{ admin_csp_nonce_attribute }}>
+  document.getElementById("ai-topup-form").addEventListener("submit", function () {
+    document.getElementById("ai-topup-submit").disabled = true;
+  });
+</script>
+{% endblock %}

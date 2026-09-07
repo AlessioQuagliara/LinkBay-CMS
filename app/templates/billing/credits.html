@@ -14,7 +14,7 @@
 
 <div class="alert alert-info max-w-3xl mb-4">
   <span class="iconify size-4" data-icon="lucide:info"></span>
-  {{ _("Buying extra credit packs is temporarily unavailable. Contact support if you need more credits before it's back.") }}
+  {{ _("Payment is handled entirely by Revolut. Credits are added manually after we verify your payment — not instantly at checkout.") }}
 </div>
 
 <div class="grid gap-4 sm:grid-cols-3 max-w-3xl">
@@ -22,12 +22,25 @@
     <div class="card card-border bg-base-100 shadow-xs">
       <div class="card-body items-center text-center gap-2">
         <span class="iconify text-primary size-6" data-icon="lucide:sparkles"></span>
-        <p class="text-2xl font-semibold">{{ "{:,}".format(pack.amount) }}</p>
+        <h3 class="font-semibold">{{ pack.label }}</h3>
+        <p class="text-2xl font-semibold">{{ "{:,}".format(pack.credits) }}</p>
         <p class="text-sm text-base-content/60">{{ _("credits") }}</p>
         <p class="text-lg font-medium mt-2">€{{ pack.price }}</p>
-        <button class="btn btn-disabled btn-sm w-full mt-2" type="button" disabled>
-          {{ _("Not available right now") }}
-        </button>
+        {% if pack.link %}
+          <a
+            class="btn btn-primary btn-sm w-full mt-2"
+            href="{{ pack.link }}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="iconify size-4" data-icon="lucide:external-link"></span>
+            {{ _("Pay with Revolut") }}
+          </a>
+        {% else %}
+          <button class="btn btn-disabled btn-sm w-full mt-2" type="button" disabled>
+            {{ _("Payment link not configured yet") }}
+          </button>
+        {% endif %}
       </div>
     </div>
   {% endfor %}

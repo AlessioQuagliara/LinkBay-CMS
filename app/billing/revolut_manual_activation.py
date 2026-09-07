@@ -12,6 +12,7 @@ from datetime import datetime, timedelta, timezone
 
 from flask import current_app
 
+from app.billing.payment_references import is_reference_used_for_ai_topup
 from app.emails.revolut import send_revolut_subscription_activated_email
 from app.extensions import db
 from app.models import User
@@ -107,6 +108,13 @@ def activate_revolut_subscription(*, user, plan, admin, payment_reference=None, 
         if conflict:
             raise RevolutActivationError(
                 "This payment reference is already linked to a different account."
+            )
+        # Un riferimento già usato per un top-up crediti AI non può sbloccare
+        # anche un abbonamento — sono due pagamenti diversi per definizione,
+        # anche se fosse lo stesso utente (vedi app/billing/payment_references.py).
+        if is_reference_used_for_ai_topup(payment_reference):
+            raise RevolutActivationError(
+                "This payment reference is already linked to an AI credit top-up."
             )
 
     now = datetime.now(timezone.utc)

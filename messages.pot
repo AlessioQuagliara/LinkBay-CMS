@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-09-01 00:14+0200\n"
+"POT-Creation-Date: 2026-09-07 18:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,94 +16,6 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
-
-#: app/__init__.py:71
-msgid "Please sign in to continue."
-msgstr ""
-
-#: app/errors.py:17
-msgid "The request couldn't be understood. Check the address and try again."
-msgstr ""
-
-#: app/errors.py:18
-msgid "You need to sign in to view this page."
-msgstr ""
-
-#: app/errors.py:19
-msgid "You don't have access to this page."
-msgstr ""
-
-#: app/errors.py:20
-msgid "The page you're looking for doesn't exist or has moved."
-msgstr ""
-
-#: app/errors.py:21
-msgid "That action isn't allowed on this page."
-msgstr ""
-
-#: app/errors.py:22
-msgid "Too many requests. Please slow down and try again shortly."
-msgstr ""
-
-#: app/errors.py:23
-msgid "Something went wrong on our side. We've been notified — please try again."
-msgstr ""
-
-#: app/errors.py:24
-msgid "An upstream service didn't respond. Please try again in a moment."
-msgstr ""
-
-#: app/errors.py:25
-msgid "The service is temporarily unavailable. Please try again shortly."
-msgstr ""
-
-#: app/auth/forms.py:8 app/settings/forms.py:8
-#: app/templates/landing/partials/footer.html:55
-msgid "Name"
-msgstr ""
-
-#: app/auth/forms.py:9 app/auth/forms.py:21
-#: app/templates/settings/index.html:32
-msgid "Email"
-msgstr ""
-
-#: app/auth/forms.py:11 app/auth/forms.py:22
-msgid "Password"
-msgstr ""
-
-#: app/auth/forms.py:11 app/settings/forms.py:26
-msgid "Minimum 8 characters."
-msgstr ""
-
-#: app/auth/forms.py:14
-msgid "Confirm password"
-msgstr ""
-
-#: app/auth/forms.py:15 app/settings/forms.py:30
-msgid "Passwords do not match."
-msgstr ""
-
-#: app/auth/forms.py:17 app/templates/auth/register.html:10
-msgid "Create account"
-msgstr ""
-
-#: app/auth/forms.py:23 app/templates/auth/login.html:2
-#: app/templates/auth/login.html:10 app/templates/auth/register.html:55
-#: app/templates/landing/partials/footer.html:39
-msgid "Sign in"
-msgstr ""
-
-#: app/auth/forms.py:28
-msgid "Code"
-msgstr ""
-
-#: app/auth/forms.py:31
-msgid "Enter the 6-digit code."
-msgstr ""
-
-#: app/auth/forms.py:34
-msgid "Verify"
-msgstr ""
 
 #: app/auth/otp.py:100
 msgid "No active code. Request a new one."
@@ -122,90 +34,85 @@ msgstr ""
 msgid "Incorrect code. %(left)s attempt(s) left."
 msgstr ""
 
-#: app/auth/routes.py:37
+#: app/auth/routes.py:38
 msgid "We've emailed you a 6-digit verification code."
 msgstr ""
 
-#: app/auth/routes.py:40
+#: app/auth/routes.py:41
 #, python-format
 msgid "Dev mode (email not configured): your code is %(code)s."
 msgstr ""
 
-#: app/auth/routes.py:42
+#: app/auth/routes.py:43
 msgid "We couldn't send the email right now. Please try again."
 msgstr ""
 
-#: app/auth/routes.py:54
+#: app/auth/routes.py:55
 msgid "There is already an account with this email address."
 msgstr ""
 
-#: app/auth/routes.py:80
+#: app/auth/routes.py:81
 msgid "Incorrect email or password."
 msgstr ""
 
-#: app/auth/routes.py:93
+#: app/auth/routes.py:103
+msgid "If an account exists for that email, we've sent a password reset link."
+msgstr ""
+
+#: app/auth/routes.py:108
+#, python-format
+msgid "Dev mode (email not configured): %(link)s"
+msgstr ""
+
+#: app/auth/routes.py:121
+msgid "This password reset link is invalid or has expired."
+msgstr ""
+
+#: app/auth/routes.py:127
+msgid "Your password has been reset. You can now sign in."
+msgstr ""
+
+#: app/auth/routes.py:141
 msgid "Start by signing in."
 msgstr ""
 
-#: app/auth/routes.py:103
+#: app/auth/routes.py:151
 msgid "Something went wrong. Please sign in again."
 msgstr ""
 
-#: app/auth/routes.py:110 app/templates/dashboard/overview.html:13
+#: app/auth/routes.py:158 app/templates/dashboard/overview.html:13
 #, python-format
 msgid "Welcome, %(name)s."
 msgstr ""
 
-#: app/auth/routes.py:133
+#: app/auth/routes.py:181
 #, python-format
 msgid "Please wait %(seconds)ss before requesting a new code."
 msgstr ""
 
-#: app/auth/routes.py:162
+#: app/auth/routes.py:210
 msgid "You've been logged out."
 msgstr ""
 
-#: app/billing/routes.py:33 app/billing/routes.py:35
-msgid "€79/month"
-msgstr ""
-
-#: app/billing/routes.py:34
-msgid "€790/year"
-msgstr ""
-
-#: app/billing/routes.py:69 app/billing/routes.py:101
+#: app/billing/routes.py:52
 msgid ""
 "Your plan already includes a generous monthly AI quota — extra credit "
 "packs aren't needed."
 msgstr ""
 
-#: app/billing/routes.py:88 app/billing/routes.py:108
-msgid "We couldn't start checkout. Please try again shortly."
-msgstr ""
-
-#: app/billing/routes.py:98
-msgid ""
-"AppSumo lifetime accounts can't switch to a monthly/annual plan directly."
-" Contact support to migrate your account."
-msgstr ""
-
-#: app/billing/routes.py:128
-msgid "We couldn't open subscription management. Please try again shortly."
-msgstr ""
-
-#: app/billing/routes.py:140
+#: app/billing/routes.py:65
 msgid "Invalid code."
 msgstr ""
 
-#: app/billing/routes.py:142
+#: app/billing/routes.py:67
 msgid "This code has already been used."
 msgstr ""
 
-#: app/billing/routes.py:148
+#: app/billing/routes.py:73
 msgid "This code isn't ready yet. Please contact support."
 msgstr ""
 
-#: app/billing/routes.py:155
+#: app/billing/routes.py:82
 msgid "Code redeemed: your account is now lifetime."
 msgstr ""
 
@@ -239,38 +146,6 @@ msgstr ""
 msgid "Google Search Console disconnected."
 msgstr ""
 
-#: app/settings/forms.py:9
-msgid "Language"
-msgstr ""
-
-#: app/settings/forms.py:10 app/settings/forms.py:15 app/settings/forms.py:20
-msgid "Save changes"
-msgstr ""
-
-#: app/settings/forms.py:14
-msgid "Weekly email with my top declining pages"
-msgstr ""
-
-#: app/settings/forms.py:19
-msgid "Hide LinkBayCMS branding from PDF/CSV exports"
-msgstr ""
-
-#: app/settings/forms.py:24
-msgid "Current password"
-msgstr ""
-
-#: app/settings/forms.py:26
-msgid "New password"
-msgstr ""
-
-#: app/settings/forms.py:29
-msgid "Confirm new password"
-msgstr ""
-
-#: app/settings/forms.py:32 app/templates/settings/index.html:76
-msgid "Change password"
-msgstr ""
-
 #: app/settings/routes.py:31 app/settings/routes.py:37
 #: app/settings/routes.py:56
 msgid "Settings saved."
@@ -284,25 +159,61 @@ msgstr ""
 msgid "Password changed."
 msgstr ""
 
-#: app/templates/auth/login.html:37
+#: app/templates/auth/forgot_password.html:2
+msgid "Forgot password"
+msgstr ""
+
+#: app/templates/auth/forgot_password.html:10 app/templates/auth/login.html:32
+msgid "Forgot password?"
+msgstr ""
+
+#: app/templates/auth/forgot_password.html:12
+msgid "Enter your email and we'll send you a link to reset it."
+msgstr ""
+
+#: app/templates/auth/forgot_password.html:31
+msgid "Back to sign in"
+msgstr ""
+
+#: app/templates/auth/login.html:2 app/templates/auth/login.html:10
+#: app/templates/auth/register.html:55
+#: app/templates/landing/partials/footer.html:39
+msgid "Sign in"
+msgstr ""
+
+#: app/templates/auth/login.html:40
 msgid "Don't have an account?"
 msgstr ""
 
-#: app/templates/auth/login.html:37 app/templates/auth/register.html:2
+#: app/templates/auth/login.html:40 app/templates/auth/register.html:2
 #: app/templates/landing/partials/footer.html:38
 msgid "Sign up"
 msgstr ""
 
+#: app/templates/auth/register.html:10
+msgid "Create account"
+msgstr ""
+
 #: app/templates/auth/register.html:37
+#: app/templates/auth/reset_password.html:19
 msgid "Minimum 8 characters"
 msgstr ""
 
 #: app/templates/auth/register.html:46
+#: app/templates/auth/reset_password.html:28
 msgid "Repeat password"
 msgstr ""
 
 #: app/templates/auth/register.html:55
 msgid "Already have an account?"
+msgstr ""
+
+#: app/templates/auth/reset_password.html:2
+msgid "Reset password"
+msgstr ""
+
+#: app/templates/auth/reset_password.html:10
+msgid "Choose a new password"
 msgstr ""
 
 #: app/templates/auth/verify.html:2
@@ -365,18 +276,29 @@ msgstr ""
 msgid "Current balance: %(balance)s credits"
 msgstr ""
 
-#: app/templates/billing/credits.html:21
+#: app/templates/billing/credits.html:17
+msgid ""
+"Payment is handled entirely by Revolut. Credits are added manually after "
+"we verify your payment — not instantly at checkout."
+msgstr ""
+
+#: app/templates/billing/credits.html:27
 #: app/templates/landing/ai_credits.html:102
 #: app/templates/landing/ai_credits.html:127
 msgid "credits"
 msgstr ""
 
-#: app/templates/billing/credits.html:27
-#: app/templates/landing/ai_credits.html:134
-msgid "Buy"
+#: app/templates/billing/credits.html:37 app/templates/billing/upgrade.html:81
+#: app/templates/landing/ai_credits.html:139
+msgid "Pay with Revolut"
 msgstr ""
 
-#: app/templates/billing/credits.html:36
+#: app/templates/billing/credits.html:41 app/templates/billing/upgrade.html:85
+#: app/templates/landing/ai_credits.html:143
+msgid "Payment link not configured yet"
+msgstr ""
+
+#: app/templates/billing/credits.html:50
 msgid "Back to subscription"
 msgstr ""
 
@@ -437,100 +359,91 @@ msgid "Activated with an AppSumo code — nothing to manage."
 msgstr ""
 
 #: app/templates/billing/subscription.html:30
-#, python-format
-msgid "AI credits: %(balance)s — buy more"
-msgstr ""
-
 #: app/templates/billing/subscription.html:35
-#: app/templates/billing/subscription.html:54
+#: app/templates/billing/subscription.html:56
 #, python-format
 msgid "AI credits: %(balance)s"
 msgstr ""
 
 #: app/templates/billing/subscription.html:43
-msgid "Pro — active"
+#, python-format
+msgid "Pro — %(plan)s"
 msgstr ""
 
-#: app/templates/billing/subscription.html:50
-#: app/templates/billing/upgrade.html:33
-msgid "Manage subscription"
+#: app/templates/billing/subscription.html:46
+#: app/templates/billing/upgrade.html:36
+#, python-format
+msgid "Valid until %(date)s."
+msgstr ""
+
+#: app/templates/billing/subscription.html:49
+msgid "No expiry on record."
+msgstr ""
+
+#: app/templates/billing/subscription.html:60
+msgid ""
+"To renew or change your plan, pick a new duration from the upgrade page —"
+" your admin will confirm the payment and extend your access."
 msgstr ""
 
 #: app/templates/billing/subscription.html:61
-msgid "Payment failed"
+msgid "Go to plans"
 msgstr ""
 
-#: app/templates/billing/subscription.html:63
+#: app/templates/billing/subscription.html:67
+msgid "Payment issue on your previous plan"
+msgstr ""
+
+#: app/templates/billing/subscription.html:69
 msgid ""
-"We couldn't process your last payment. Update your payment method within "
-"the grace period to keep access."
+"Your access is in a grace period. Contact us or renew your plan to keep "
+"access."
 msgstr ""
 
-#: app/templates/billing/subscription.html:70
-msgid "Update payment method"
+#: app/templates/billing/subscription.html:76
+#: app/templates/billing/subscription.html:112
+msgid "View plans"
 msgstr ""
 
-#: app/templates/billing/subscription.html:80
+#: app/templates/billing/subscription.html:86
 msgid "Free trial — 1 day left"
 msgstr ""
 
-#: app/templates/billing/subscription.html:82
+#: app/templates/billing/subscription.html:88
 #, python-format
 msgid "Free trial — %(days)s days left"
 msgstr ""
 
-#: app/templates/billing/subscription.html:86
+#: app/templates/billing/subscription.html:92
 msgid "Free trial ended"
 msgstr ""
 
-#: app/templates/billing/subscription.html:88
+#: app/templates/billing/subscription.html:94
 msgid "No credit card on file."
 msgstr ""
 
-#: app/templates/billing/subscription.html:93
-#, python-format
-msgid "Upgrade to Pro — %(price)s"
-msgstr ""
-
-#: app/templates/billing/subscription.html:100
-msgid "No active subscription"
-msgstr ""
-
-#: app/templates/billing/subscription.html:101
-msgid "Your subscription was canceled."
+#: app/templates/billing/subscription.html:99
+#: app/templates/billing/upgrade.html:57 app/templates/dashboard/layout.html:28
+msgid "Upgrade to Pro"
 msgstr ""
 
 #: app/templates/billing/subscription.html:106
-#, python-format
-msgid "Resubscribe — %(price)s"
+msgid "No active subscription"
 msgstr ""
 
-#: app/templates/billing/subscription.html:114
-#: app/templates/billing/upgrade.html:89
-#: app/templates/landing/ai_credits.html:149
+#: app/templates/billing/subscription.html:107
+msgid "Your plan has expired or was canceled."
+msgstr ""
+
+#: app/templates/billing/subscription.html:120
+#: app/templates/billing/upgrade.html:99
+#: app/templates/landing/ai_credits.html:159
 msgid "Have an AppSumo code?"
 msgstr ""
 
-#: app/templates/billing/subscription.html:115
-#: app/templates/landing/index.html:307
+#: app/templates/billing/subscription.html:121
+#: app/templates/landing/index.html:297
 msgid "Redeem it here"
-msgstr ""
-
-#: app/templates/billing/success.html:2
-msgid "Subscription activated"
-msgstr ""
-
-#: app/templates/billing/success.html:9
-msgid "Payment received"
-msgstr ""
-
-#: app/templates/billing/success.html:11
-msgid "We're activating your Pro subscription — this usually takes a few seconds."
-msgstr ""
-
-#: app/templates/billing/success.html:14
-#: app/templates/landing/ai_credits.html:156
-msgid "Go to dashboard"
 msgstr ""
 
 #: app/templates/billing/upgrade.html:2
@@ -542,62 +455,48 @@ msgid "Your account is lifetime"
 msgstr ""
 
 #: app/templates/billing/upgrade.html:23
-msgid "Buy AI credits"
+#: app/templates/partials/usage_widget.html:43
+msgid "AI credits"
 msgstr ""
 
-#: app/templates/billing/upgrade.html:26 app/templates/billing/upgrade.html:35
+#: app/templates/billing/upgrade.html:26 app/templates/billing/upgrade.html:40
 msgid "Back to dashboard"
 msgstr ""
 
-#: app/templates/billing/upgrade.html:29
-msgid "Your Pro subscription is active"
+#: app/templates/billing/upgrade.html:33
+msgid "Your Pro plan is active"
 msgstr ""
 
-#: app/templates/billing/upgrade.html:30
-msgid "You can manage or cancel it anytime."
+#: app/templates/billing/upgrade.html:39
+msgid "View subscription details"
 msgstr ""
 
-#: app/templates/billing/upgrade.html:40
+#: app/templates/billing/upgrade.html:49
 #, python-format
 msgid "%(num)s day left in your trial"
 msgid_plural "%(num)s days left in your trial"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/billing/upgrade.html:45
+#: app/templates/billing/upgrade.html:54
 msgid "Trial ended"
 msgstr ""
 
-#: app/templates/billing/upgrade.html:49 app/templates/dashboard/layout.html:28
-msgid "Upgrade to Pro"
-msgstr ""
-
-#: app/templates/billing/upgrade.html:51
+#: app/templates/billing/upgrade.html:59
 msgid ""
 "Keep monitoring declining pages and getting AI suggestions, without "
 "interruption."
 msgstr ""
 
-#: app/templates/billing/upgrade.html:57
-msgid "Unlimited Insights and Declining Pages"
-msgstr ""
-
-#: app/templates/billing/upgrade.html:61
-msgid "AI suggestions on declining pages"
-msgstr ""
-
-#: app/templates/billing/upgrade.html:65 app/templates/landing/index.html:294
-msgid "Full history from the day you connect your site"
-msgstr ""
-
-#: app/templates/billing/upgrade.html:75
+#: app/templates/billing/upgrade.html:68 app/templates/landing/index.html:268
 #, python-format
-msgid "Monthly — %(price)s"
+msgid "Save about %(pct)s"
 msgstr ""
 
-#: app/templates/billing/upgrade.html:83
-#, python-format
-msgid "Annual — %(price)s"
+#: app/templates/billing/upgrade.html:95
+msgid ""
+"Payment is handled entirely by Revolut. After we verify it, your access "
+"is activated manually — usually within one business day."
 msgstr ""
 
 #: app/templates/dashboard/audits.html:2 app/templates/dashboard/audits.html:7
@@ -1130,76 +1029,82 @@ msgstr ""
 
 #: app/templates/landing/ai_credits.html:117
 msgid ""
-"One-time purchase via Lemon Squeezy, available for AppSumo workspaces. "
-"Credits are added to your balance immediately after checkout."
+"One-time top-up packs for AppSumo workspaces, paid via Revolut. After we "
+"verify your payment, credits are added to your balance manually — not "
+"instantly at checkout."
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:145
+#: app/templates/landing/ai_credits.html:155
 msgid "Credit packs are available to AppSumo workspaces after signup."
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:148
+#: app/templates/landing/ai_credits.html:158
 #: app/templates/landing/index.html:29
 msgid "Get started free"
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:153
+#: app/templates/landing/ai_credits.html:163
 msgid ""
 "Your plan already includes a monthly AI credit quota — no need to buy a "
 "pack. Track your usage from the dashboard."
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:165
-#: app/templates/landing/index.html:317
+#: app/templates/landing/ai_credits.html:166
+msgid "Go to dashboard"
+msgstr ""
+
+#: app/templates/landing/ai_credits.html:175
+#: app/templates/landing/index.html:307
 #: app/templates/landing/partials/footer.html:20
 msgid "FAQs"
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:170
+#: app/templates/landing/ai_credits.html:180
 msgid "Do credits expire?"
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:172
+#: app/templates/landing/ai_credits.html:182
 msgid "No — purchased credits never expire."
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:177
+#: app/templates/landing/ai_credits.html:187
 msgid "Does AI replace the data analysis?"
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:179
+#: app/templates/landing/ai_credits.html:189
 msgid ""
 "No. The AI interprets and suggests actions on data already gathered by "
 "LinkBayCMS and Google Search Console — it doesn't invent metrics or "
 "guarantee results."
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:184
+#: app/templates/landing/ai_credits.html:194
 msgid "What happens when my included credits run out?"
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:186
+#: app/templates/landing/ai_credits.html:196
 msgid ""
-"AppSumo users can buy a one-time top-up pack anytime. Pro subscribers get"
-" their quota renewed on the next billing cycle and can track consumption "
+"AppSumo users can buy a one-time top-up pack anytime, paid via Revolut "
+"and credited manually after we verify the payment. Pro subscribers get "
+"their quota renewed on their plan's next cycle and can track consumption "
 "in the dashboard."
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:191
+#: app/templates/landing/ai_credits.html:201
 msgid "Can I use credits to raise my site/page/scan limits?"
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:193
+#: app/templates/landing/ai_credits.html:203
 msgid ""
 "No — AI credits never change the infrastructure limits of your plan "
 "(sites, pages, scan frequency)."
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:198
+#: app/templates/landing/ai_credits.html:208
 msgid "How is consumption calculated?"
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:200
+#: app/templates/landing/ai_credits.html:210
 msgid "The credit cost of an AI action is always shown before you run it."
 msgstr ""
 
@@ -1385,86 +1290,56 @@ msgid ""
 msgstr ""
 
 #: app/templates/landing/index.html:257
-msgid "Simple pricing, monthly or annual."
+msgid "Simple pricing, no surprises."
 msgstr ""
 
 #: app/templates/landing/index.html:259
 msgid "Try it free for 13 days, no credit card required."
 msgstr ""
 
-#: app/templates/landing/index.html:265
-msgid "Monthly"
-msgstr ""
-
-#: app/templates/landing/index.html:267
-msgid "Annual"
-msgstr ""
-
-#: app/templates/landing/index.html:268
-#, python-format
-msgid "Save ~17%%"
-msgstr ""
-
-#: app/templates/landing/index.html:277
-msgid "Pro"
-msgstr ""
-
-#: app/templates/landing/index.html:278
-msgid "13-day free trial"
-msgstr ""
-
-#: app/templates/landing/index.html:282
-msgid "/month"
-msgstr ""
-
-#: app/templates/landing/index.html:282
-msgid "/year"
-msgstr ""
-
-#: app/templates/landing/index.html:285 app/templates/landing/index.html:287
-msgid "No credit card to start. Cancel anytime once you're on the paid plan."
-msgstr ""
-
-#: app/templates/landing/index.html:286
-#, python-format
-msgid ""
-"Billed once a year — %(price)s/month equivalent. Save €158/year (about "
-"17%%)."
-msgstr ""
-
-#: app/templates/landing/index.html:292
-msgid "Declining pages, prioritized automatically"
-msgstr ""
-
-#: app/templates/landing/index.html:293
-msgid "AI suggestions on the pages losing traffic"
-msgstr ""
-
-#: app/templates/landing/index.html:299
+#: app/templates/landing/index.html:276
 msgid "Start your free trial"
 msgstr ""
 
-#: app/templates/landing/index.html:306
+#: app/templates/landing/index.html:285
+msgid "Declining pages, prioritized automatically"
+msgstr ""
+
+#: app/templates/landing/index.html:286
+msgid "AI suggestions on the pages losing traffic"
+msgstr ""
+
+#: app/templates/landing/index.html:287
+msgid "Full history from the day you connect your site"
+msgstr ""
+
+#: app/templates/landing/index.html:292
+msgid ""
+"Payment is handled entirely by Revolut. After we verify it, access is "
+"activated manually — no automatic renewal, no card on file."
+msgstr ""
+
+#: app/templates/landing/index.html:296
 msgid "Got an AppSumo code?"
 msgstr ""
 
-#: app/templates/landing/index.html:308
-msgid "Curious how AI credits work?"
+#: app/templates/landing/index.html:298
+msgid "Need extra AI credits?"
 msgstr ""
 
-#: app/templates/landing/index.html:309
+#: app/templates/landing/index.html:299
 msgid "See AI Credits"
 msgstr ""
 
-#: app/templates/landing/index.html:319
+#: app/templates/landing/index.html:309
 msgid "The questions every SEO asks in the first two minutes of a demo."
 msgstr ""
 
-#: app/templates/landing/index.html:332
+#: app/templates/landing/index.html:322
 msgid "How is this different from Google Search Console?"
 msgstr ""
 
-#: app/templates/landing/index.html:336
+#: app/templates/landing/index.html:326
 msgid ""
 "Search Console gives you the data — thousands of rows and no particular "
 "order. LinkBayCMS gives you the five things to fix Monday morning, ranked"
@@ -1472,11 +1347,11 @@ msgid ""
 "another archive; it's a shortlist."
 msgstr ""
 
-#: app/templates/landing/index.html:343
+#: app/templates/landing/index.html:333
 msgid "How do you know a page is really declining, and not just noisy?"
 msgstr ""
 
-#: app/templates/landing/index.html:347
+#: app/templates/landing/index.html:337
 #, python-format
 msgid ""
 "A page only makes the list if it clears a minimum relevance threshold, "
@@ -1487,22 +1362,22 @@ msgid ""
 " shipped an update and your whole site moved.\""
 msgstr ""
 
-#: app/templates/landing/index.html:354
+#: app/templates/landing/index.html:344
 msgid "Do I need to install anything on my site?"
 msgstr ""
 
-#: app/templates/landing/index.html:358
+#: app/templates/landing/index.html:348
 msgid ""
 "No. LinkBayCMS is not a CMS and doesn't touch your site — it reads your "
 "existing Google Search Console data with read-only access. Nothing to "
 "embed, no plugin, no code changes."
 msgstr ""
 
-#: app/templates/landing/index.html:365
+#: app/templates/landing/index.html:355
 msgid "Is this built for e-commerce or SaaS marketing sites too?"
 msgstr ""
 
-#: app/templates/landing/index.html:369
+#: app/templates/landing/index.html:359
 msgid ""
 "Not really — it's built specifically for publishers and editorial sites "
 "with 500 to 20,000 indexed pages and at least 20,000 organic clicks a "
@@ -1512,11 +1387,11 @@ msgid ""
 "have you churn in month two."
 msgstr ""
 
-#: app/templates/landing/index.html:376
+#: app/templates/landing/index.html:366
 msgid "Is my Search Console data safe?"
 msgstr ""
 
-#: app/templates/landing/index.html:380
+#: app/templates/landing/index.html:370
 msgid ""
 "We connect via Google's standard read-only access — we can see your "
 "performance data, we can't change anything on your property. We never "
@@ -1700,6 +1575,10 @@ msgid ""
 "declining — no strings attached."
 msgstr ""
 
+#: app/templates/landing/partials/footer.html:55
+msgid "Name"
+msgstr ""
+
 #: app/templates/landing/partials/footer.html:60
 msgid "Your name"
 msgstr ""
@@ -1778,10 +1657,6 @@ msgstr ""
 msgid "Manage plan"
 msgstr ""
 
-#: app/templates/partials/usage_widget.html:43
-msgid "AI credits"
-msgstr ""
-
 #: app/templates/partials/usage_widget.html:50
 msgid "Exports this month"
 msgstr ""
@@ -1794,11 +1669,19 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
+#: app/templates/settings/index.html:32
+msgid "Email"
+msgstr ""
+
 #: app/templates/settings/index.html:42
 msgid "Notifications"
 msgstr ""
 
 #: app/templates/settings/index.html:59
 msgid "White label"
+msgstr ""
+
+#: app/templates/settings/index.html:76
+msgid "Change password"
 msgstr ""
 

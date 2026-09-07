@@ -87,3 +87,13 @@ class Config:
     REVOLUT_PAYMENT_LINK_1M = os.environ.get("REVOLUT_PAYMENT_LINK_1M")
     REVOLUT_PAYMENT_LINK_3M = os.environ.get("REVOLUT_PAYMENT_LINK_3M")
     REVOLUT_PAYMENT_LINK_12M = os.environ.get("REVOLUT_PAYMENT_LINK_12M")
+
+    # Revolut Business — link di pagamento manuali per i pacchetti crediti AI
+    # (vendita una tantum, riservata ai piani AppSumo — vedi
+    # app/entitlements/service.py::get_plan_limits().ai_credit_topups_allowed).
+    # Nome della env var = numero di crediti del pacchetto (vedi
+    # app/billing/revolut_products.py::AI_TOPUP_CATALOG), non l'etichetta
+    # commerciale — resta stabile anche se cambia il naming marketing.
+    REVOLUT_AI_TOPUP_LINK_50 = os.environ.get("REVOLUT_AI_TOPUP_LINK_50")
+    REVOLUT_AI_TOPUP_LINK_150 = os.environ.get("REVOLUT_AI_TOPUP_LINK_150")
+    REVOLUT_AI_TOPUP_LINK_500 = os.environ.get("REVOLUT_AI_TOPUP_LINK_500")

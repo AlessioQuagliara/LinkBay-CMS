@@ -52,6 +52,10 @@ class TestConfig(Config):
     REVOLUT_PAYMENT_LINK_1M = "https://pay.revolut.com/test-1m"
     REVOLUT_PAYMENT_LINK_3M = "https://pay.revolut.com/test-3m"
     REVOLUT_PAYMENT_LINK_12M = "https://pay.revolut.com/test-12m"
+    # Idem per i pacchetti crediti AI (vedi tests/test_revolut_ai_topup.py).
+    REVOLUT_AI_TOPUP_LINK_50 = "https://pay.revolut.com/test-topup-50"
+    REVOLUT_AI_TOPUP_LINK_150 = "https://pay.revolut.com/test-topup-150"
+    REVOLUT_AI_TOPUP_LINK_500 = "https://pay.revolut.com/test-topup-500"
 
 
 @pytest.fixture(scope="session")

@@ -41,12 +41,14 @@ class User(db.Model, UserMixin):
     # attivo, app/billing/access.py blocca l'accesso alla app.
     trial_ends_at = db.Column(db.DateTime(timezone=True))
     # "trialing" | "active" | "past_due" | "canceled" | "lifetime".
-    # "active"/"past_due"/"canceled" sono aggiornati dai webhook Lemon
-    # Squeezy (app/billing/routes.py). "lifetime" è impostato una tantum al
-    # riscatto di un codice AppSumo (app/models/appsumo_code.py) e non scade
-    # mai. "past_due" (pagamento fallito, subscription_payment_failed) dà un
-    # periodo di grazia fino a grace_period_ends_at prima del blocco netto —
-    # vedi has_active_access.
+    # "active" è impostato dall'attivazione manuale Revolut (vedi
+    # app/billing/revolut_manual_activation.py — scadenza in
+    # subscription_expires_at, non più webhook-driven). "lifetime" è
+    # impostato una tantum al riscatto di un codice AppSumo (vedi
+    # app/models/appsumo_code.py) e non scade mai. "past_due"/"canceled" sono
+    # stati legacy Lemon Squeezy: nessun codice nuovo li assegna più (il
+    # webhook che li scriveva è stato rimosso), ma restano gestiti da
+    # has_active_access per non rompere gli utenti che li avevano già.
     subscription_status = db.Column(db.String(20), nullable=False, default="trialing")
 
     # Legacy Lemon Squeezy (dismesso dal flusso commerciale — vedi

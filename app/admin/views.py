@@ -5,13 +5,16 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from markupsafe import Markup
 from wtforms import SelectField, StringField, TextAreaField
-from wtforms.validators import Length, Optional
+from wtforms.validators import DataRequired, Length, Optional
 
+from app.billing.revolut_ai_topup import RevolutAiTopupError, credit_revolut_ai_topup
 from app.billing.revolut_manual_activation import (
     REVOLUT_PLAN_DAYS,
     RevolutActivationError,
     activate_revolut_subscription,
 )
+from app.billing.revolut_products import AI_TOPUP_CATALOG
+from app.entitlements.service import get_plan_limits
 from app.extensions import AdminAuthMixin, db
 from app.models import User
 
@@ -33,6 +36,20 @@ def _format_revolut_action(view, context, model, name):
     ).format(url=url_for("revolut-activation.activate", user_id=model.id))
 
 
+def _format_ai_topup_action(view, context, model, name):
+    """Colonna virtuale gemella di _format_revolut_action, per il secondo
+    flusso Revolut (top-up crediti AI — vendita una tantum, non tocca il
+    piano). Visibile solo per gli utenti eleggibili (stessa regola di
+    /billing/credits: get_plan_limits(user).ai_credit_topups_allowed, oggi
+    solo i tier AppSumo) — un link che fallirebbe sempre non serve a
+    nessuno."""
+    if not get_plan_limits(model).ai_credit_topups_allowed:
+        return Markup('<span class="text-muted">Not eligible</span>')
+    return Markup(
+        '<a class="btn btn-xs btn-outline-primary" href="{url}">Credit AI top-up</a>'
+    ).format(url=url_for("revolut-ai-topup.credit", user_id=model.id))
+
+
 class UserAdminView(SecureModelView):
     # Niente "Create" qui: User.password_hash è NOT NULL e questo form non
     # raccoglie una password, quindi un insert fallirebbe sempre con un
@@ -43,36 +60,46 @@ class UserAdminView(SecureModelView):
     column_list = (
         "id", "name", "email", "is_admin", "plan_type", "subscription_status",
         "subscription_expires_at", "subscription_source",
-        "ai_credit_balance", "heavy_user_flag", "created_at", "revolut_action",
+        "ai_credit_balance", "heavy_user_flag", "created_at",
+        "revolut_action", "ai_topup_action",
     )
     # appsumo_migration_unlocked e white_label_enabled sono editabili solo da
     # qui (nessun bottone self-service nell'app) — vedi
-    # app/billing/routes.py::redeem(). L'attivazione Revolut NON è nella form
-    # (vedi colonna virtuale "revolut_action" sotto): serve un calcolo
-    # server-side della nuova scadenza che una semplice form CRUD non fa,
-    # quindi vive nella sua view dedicata (RevolutActivationView).
-    # heavy_user_flag NON è nella form: è calcolato dal job settimanale
-    # flask flag-heavy-users, non va corretto a mano (si autocorregge al
-    # giro successivo).
+    # app/billing/routes.py::redeem(). Le due azioni Revolut (attivazione
+    # abbonamento, top-up crediti AI) NON sono nella form (vedi colonne
+    # virtuali "revolut_action"/"ai_topup_action" sotto): richiedono un
+    # calcolo/validazione server-side che una form CRUD generica non fa,
+    # quindi vivono in view dedicate (RevolutActivationView,
+    # RevolutAiTopupView). heavy_user_flag NON è nella form: è calcolato dal
+    # job settimanale flask flag-heavy-users, non va corretto a mano (si
+    # autocorregge al giro successivo).
     form_columns = ("name", "email", "is_admin", "plan_type", "appsumo_migration_unlocked", "white_label_enabled")
     column_searchable_list = ("name", "email")
     column_filters = ("plan_type", "subscription_status", "subscription_source", "heavy_user_flag")
     column_default_sort = ("created_at", True)
-    column_formatters = {"revolut_action": _format_revolut_action}
+    column_formatters = {
+        "revolut_action": _format_revolut_action,
+        "ai_topup_action": _format_ai_topup_action,
+    }
 
 
 class AiCreditTransactionAdminView(SecureModelView):
     """Sola lettura: il ledger crediti si scrive solo tramite
-    app/entitlements/ai_credits.py (consumo AI, job mensile — l'acquisto
-    one-time via Lemon Squeezy è stato rimosso, vedi
-    app/templates/billing/credits.html) — mai a mano, altrimenti
-    balance_after perde di significato."""
+    app/entitlements/ai_credits.py (consumo AI, job mensile, top-up manuale
+    Revolut — vedi app/billing/revolut_ai_topup.py) — mai a mano, altrimenti
+    balance_after perde di significato. ls_order_id resta per l'audit storico
+    Lemon Squeezy; payment_reference/payment_source coprono il flusso Revolut
+    attuale — le due coppie di colonne non si sovrappongono mai sulla stessa
+    riga."""
     can_create = False
     can_edit = False
     can_delete = False
-    column_list = ("id", "user", "type", "amount", "balance_after", "ls_order_id", "site_url", "created_at")
-    column_searchable_list = ("ls_order_id",)
-    column_filters = ("type",)
+    column_list = (
+        "id", "user", "type", "product_key", "amount", "balance_before", "balance_after",
+        "payment_reference", "payment_source", "approved_by", "ls_order_id", "site_url", "created_at",
+    )
+    column_searchable_list = ("ls_order_id", "payment_reference")
+    column_filters = ("type", "payment_source", "product_key")
     column_default_sort = ("created_at", True)
 
 
@@ -202,4 +229,93 @@ class RevolutActivationView(AdminAuthMixin, BaseView):
             plan_days=REVOLUT_PLAN_DAYS,
             current_expiry=current_expiry,
             previews=previews,
+        )
+
+
+class RevolutAiTopupForm(FlaskForm):
+    """Form server-side per "Accredita top-up AI Revolut" (vedi
+    app/billing/revolut_ai_topup.py). Il client sceglie solo il pacchetto
+    (chiave whitelistata) — quantità e prezzo restano sola-lettura nel
+    template, ricavati dal catalogo server-side, mai inviati come valore
+    fidato dal form."""
+
+    product_key = SelectField(
+        "AI credit package",
+        choices=[
+            (key, f"{entry['label']} — {entry['credits']} credits (€{entry['price']})")
+            for key, entry in AI_TOPUP_CATALOG.items()
+        ],
+        validators=[],
+    )
+    payment_reference = StringField(
+        "Revolut payment reference",
+        validators=[DataRequired(), Length(max=255)],
+    )
+    note = TextAreaField("Admin note (optional)", validators=[Optional(), Length(max=1000)])
+
+
+class RevolutAiTopupView(AdminAuthMixin, BaseView):
+    """View Flask-Admin dedicata per il secondo flusso Revolut: accredito di
+    un pacchetto crediti AI (vendita una tantum, MAI un'attivazione/estensione
+    di abbonamento — vedi app/billing/revolut_ai_topup.py). Stessa struttura
+    di RevolutActivationView, azione distinta."""
+
+    def is_visible(self):
+        # Raggiungibile solo dal link nella riga utente (UserAdminView).
+        return False
+
+    @expose("/")
+    def index(self):
+        return redirect(url_for("user.index_view"))
+
+    @expose("/<int:user_id>", methods=("GET", "POST"))
+    def credit(self, user_id):
+        # Difesa in profondità, stessa nota di RevolutActivationView.activate.
+        if not (current_user.is_authenticated and current_user.is_admin):
+            abort(403)
+
+        user = db.session.get(User, user_id)
+        if user is None:
+            abort(404)
+
+        if not get_plan_limits(user).ai_credit_topups_allowed:
+            flash(f"{user.email}'s plan is not eligible for AI credit top-ups.", "error")
+            return redirect(url_for("user.index_view"))
+
+        form = RevolutAiTopupForm()
+
+        if form.validate_on_submit():
+            try:
+                result = credit_revolut_ai_topup(
+                    user=user,
+                    product_key=form.product_key.data,
+                    payment_reference=form.payment_reference.data,
+                    admin=current_user,
+                    note=form.note.data,
+                )
+            except RevolutAiTopupError as exc:
+                flash(str(exc), "error")
+                return redirect(url_for("revolut-ai-topup.credit", user_id=user.id))
+
+            if result.already_processed:
+                flash(
+                    f"This payment reference was already processed for {user.email} — "
+                    f"no changes made (current balance: {result.balance_after} credits).",
+                    "info",
+                )
+            else:
+                flash(
+                    f"AI credit top-up applied for {user.email}: +{result.credits_added} credits "
+                    f"(new balance: {result.balance_after})"
+                    + ("" if result.email_sent else " (confirmation email not sent — see logs)."),
+                    "success",
+                )
+            return redirect(url_for("user.edit_view", id=user.id))
+
+        return self.render(
+            "admin/revolut_ai_topup.html",
+            user=user,
+            form=form,
+            catalog=AI_TOPUP_CATALOG,
+            current_balance=user.ai_credit_balance,
         )
