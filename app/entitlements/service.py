@@ -42,6 +42,42 @@ def _is_appsumo(user) -> bool:
     return bool(user.plan_type) and user.plan_type.startswith("appsumo")
 
 
+def _aware(dt):
+    if dt is not None and dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
+
+
+def has_active_entitlement(user) -> bool:
+    """Fonte autorevole "questo utente ha accesso ORA?" — supersede
+    User.has_active_access (lasciato invariato per non rompere i suoi
+    consumer/test diretti già esistenti) per i soli utenti Paddle, dove il
+    quirk legacy "subscription_expires_at NULL = accesso illimitato" (corretto
+    per gli abbonamenti Lemon Squeezy mai spenti da quella migrazione) sarebbe
+    un bug: per Paddle, NULL significa "mai sincronizzato da un webhook",
+    quindi NON deve concedere accesso.
+
+    Ogni altro caso (lifetime AppSumo, Revolut manuale, legacy Lemon Squeezy,
+    trial) delega interamente a User.has_active_access — nessuna logica
+    duplicata, solo il ramo Paddle è diverso. Vedi app/billing/access.py e
+    `flask grant-monthly-ai-credits` per i due punti che devono usare questa
+    funzione invece della property diretta."""
+    if user.subscription_status == "lifetime":
+        return True
+    if user.subscription_source != "paddle":
+        return user.has_active_access
+
+    # Paddle: solo questi tre stati concedono accesso, e SOLO fino alla
+    # scadenza nota — mai un webhook mancante che estende l'accesso
+    # all'infinito (vedi docs/paddle-billing.md, "fallback di scadenza").
+    if user.subscription_status not in ("active", "trialing", "past_due"):
+        return False
+    expires_at = _aware(user.subscription_expires_at)
+    if expires_at is None:
+        return False
+    return datetime.now(timezone.utc) < expires_at
+
+
 @dataclass(frozen=True)
 class UsageSummary:
     sites_used: int
@@ -268,7 +304,7 @@ def get_ai_credit_overview(user) -> AiCreditOverview:
     limits = get_plan_limits(user)
 
     next_grant = None
-    if limits.ai_mode == "credit" and limits.ai_credit_grant > 0 and user.has_active_access:
+    if limits.ai_mode == "credit" and limits.ai_credit_grant > 0 and has_active_entitlement(user):
         next_grant = _next_monthly_grant_at(datetime.now(timezone.utc))
 
     now = datetime.now(timezone.utc)
@@ -298,7 +334,7 @@ def get_ai_credit_overview(user) -> AiCreditOverview:
         monthly_quota=limits.ai_credit_grant,
         cooldown_days=limits.ai_cooldown_days,
         topups_allowed=limits.ai_credit_topups_allowed,
-        has_active_access=user.has_active_access,
+        has_active_access=has_active_entitlement(user),
         next_monthly_grant_at=next_grant,
         consumed_this_month=abs(consumed_this_month),  # "consume" è negativo nel ledger
         purchased_total=purchased_total,

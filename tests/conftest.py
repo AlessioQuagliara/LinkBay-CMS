@@ -57,6 +57,25 @@ class TestConfig(Config):
     REVOLUT_AI_TOPUP_LINK_150 = "https://pay.revolut.com/test-topup-150"
     REVOLUT_AI_TOPUP_LINK_500 = "https://pay.revolut.com/test-topup-500"
 
+    # Paddle Billing — credenziali/price ID fittizi, mai usati per una vera
+    # chiamata di rete: ogni test che arriva fino all'API monkeypatcha
+    # requests.request (vedi tests/test_paddle_checkout.py e
+    # tests/test_paddle_webhooks.py). Bastano perché il codice applicativo
+    # non tratta questi valori come segreti da validare, solo da inoltrare.
+    PADDLE_ENVIRONMENT = "sandbox"
+    PADDLE_API_KEY = "test-paddle-api-key"
+    PADDLE_WEBHOOK_SECRET = "test-paddle-webhook-secret"
+    PADDLE_CLIENT_TOKEN = "test-paddle-client-token"
+    PADDLE_SANDBOX_PRICE_ID_1M = "pri_test_1m"
+    PADDLE_SANDBOX_PRICE_ID_3M = "pri_test_3m"
+    PADDLE_SANDBOX_PRICE_ID_12M = "pri_test_12m"
+    PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_STARTER = "pri_test_topup_starter"
+    PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_GROWTH = "pri_test_topup_growth"
+    PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_SCALE = "pri_test_topup_scale"
+    # Production intenzionalmente NON configurato nei test — nessun test deve
+    # mai risolvere un price_id production per errore (vedi
+    # tests/test_paddle_config.py).
+
 
 @pytest.fixture(scope="session")
 def app():

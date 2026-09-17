@@ -97,3 +97,55 @@ class Config:
     REVOLUT_AI_TOPUP_LINK_50 = os.environ.get("REVOLUT_AI_TOPUP_LINK_50")
     REVOLUT_AI_TOPUP_LINK_150 = os.environ.get("REVOLUT_AI_TOPUP_LINK_150")
     REVOLUT_AI_TOPUP_LINK_500 = os.environ.get("REVOLUT_AI_TOPUP_LINK_500")
+
+    # Paddle Billing — provider principale per abbonamenti Pro (checkout
+    # server-driven, webhook firmati) e pacchetti crediti AI one-time. Vedi
+    # app/billing/paddle_client.py per la scelta sandbox/production e
+    # docs/paddle-billing.md per l'architettura completa. Revolut/AppSumo
+    # restano attivi come canali legacy/manuali (vedi sopra), non sostituiti.
+    #
+    # "sandbox" (default) o "production" — l'UNICA leva che decide sia il
+    # base URL API (sandbox-api.paddle.com vs api.paddle.com) sia quale set
+    # di price ID viene risolto (_SANDBOX_* vs _PRODUCTION_* sotto). Nessuna
+    # altra condizione nel codice (host, DEBUG, ecc.) deve mai influenzare
+    # questa scelta.
+    PADDLE_ENVIRONMENT = os.environ.get("PADDLE_ENVIRONMENT", "sandbox")
+    # API key server-side (Paddle Dashboard > Developer Tools > Authentication).
+    # MAI esposta al frontend, nei template, nei log o nei messaggi di errore
+    # — solo letta da app/billing/paddle_client.py per l'header Authorization.
+    PADDLE_API_KEY = os.environ.get("PADDLE_API_KEY")
+    # Secret del webhook Paddle (Dashboard > Developer Tools > Notifications >
+    # endpoint > "Signing secret"), usato SOLO per verificare l'header
+    # Paddle-Signature sul raw body — mai per autenticare richieste in uscita.
+    PADDLE_WEBHOOK_SECRET = os.environ.get("PADDLE_WEBHOOK_SECRET")
+    # Client-side token (Dashboard > Developer Tools > Authentication > Client-
+    # side tokens) — l'unico valore Paddle sicuro da esporre nel browser. Non
+    # usato dal flusso di checkout attuale (hosted checkout: il backend crea
+    # la transazione e reindirizza a transaction.checkout.url, niente
+    # Paddle.js/overlay) — riservato per un futuro overlay checkout, vedi
+    # docs/paddle-billing.md.
+    PADDLE_CLIENT_TOKEN = os.environ.get("PADDLE_CLIENT_TOKEN")
+    # URL di ritorno dopo il pagamento. Se non impostata, si usa la pagina
+    # interna billing.paddle_pending (polling su /billing/status finché il
+    # webhook non conferma) — vedi app/billing/paddle_routes.py.
+    PADDLE_SUCCESS_URL = os.environ.get("PADDLE_SUCCESS_URL")
+    PADDLE_DEFAULT_CURRENCY = os.environ.get("PADDLE_DEFAULT_CURRENCY", "EUR")
+
+    # Price ID Paddle per i tre piani Pro (stessa durata/prezzo di
+    # REVOLUT_PLAN_PRICES in app/entitlements/limits.py — vedi
+    # app/billing/paddle_products.py) e per i tre pacchetti crediti AI
+    # (stessi numeri di AI_CREDIT_PACKS). Due set separati, MAI mescolati:
+    # quale set viene letto dipende solo da PADDLE_ENVIRONMENT sopra.
+    PADDLE_SANDBOX_PRICE_ID_1M = os.environ.get("PADDLE_SANDBOX_PRICE_ID_1M")
+    PADDLE_SANDBOX_PRICE_ID_3M = os.environ.get("PADDLE_SANDBOX_PRICE_ID_3M")
+    PADDLE_SANDBOX_PRICE_ID_12M = os.environ.get("PADDLE_SANDBOX_PRICE_ID_12M")
+    PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_STARTER = os.environ.get("PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_STARTER")
+    PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_GROWTH = os.environ.get("PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_GROWTH")
+    PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_SCALE = os.environ.get("PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_SCALE")
+
+    PADDLE_PRODUCTION_PRICE_ID_1M = os.environ.get("PADDLE_PRODUCTION_PRICE_ID_1M")
+    PADDLE_PRODUCTION_PRICE_ID_3M = os.environ.get("PADDLE_PRODUCTION_PRICE_ID_3M")
+    PADDLE_PRODUCTION_PRICE_ID_12M = os.environ.get("PADDLE_PRODUCTION_PRICE_ID_12M")
+    PADDLE_PRODUCTION_PRICE_ID_AI_TOPUP_STARTER = os.environ.get("PADDLE_PRODUCTION_PRICE_ID_AI_TOPUP_STARTER")
+    PADDLE_PRODUCTION_PRICE_ID_AI_TOPUP_GROWTH = os.environ.get("PADDLE_PRODUCTION_PRICE_ID_AI_TOPUP_GROWTH")
+    PADDLE_PRODUCTION_PRICE_ID_AI_TOPUP_SCALE = os.environ.get("PADDLE_PRODUCTION_PRICE_ID_AI_TOPUP_SCALE")

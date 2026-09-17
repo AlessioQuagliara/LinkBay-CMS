@@ -110,6 +110,7 @@ def _register_blueprints(app):
     from app.gsc.gsc import gsc_bp
     from app.main.routes import main_bp
     from app.settings.routes import settings_bp
+    from app.webhooks.routes import webhooks_bp
 
     # Rate limit per piano (vedi app/billing/access.py) — va applicato prima
     # della registrazione sull'app, idioma standard dei limiti a livello di
@@ -127,6 +128,7 @@ def _register_blueprints(app):
     app.register_blueprint(exports_bp)
     app.register_blueprint(chat_bp)
     app.register_blueprint(audits_bp)
+    app.register_blueprint(webhooks_bp)
 
 
 def _register_access_gate(app):
@@ -385,7 +387,7 @@ def _register_cli(app):
     @app.cli.command("grant-monthly-ai-credits")
     def grant_monthly_ai_credits_cmd():
         """Accredita la quota AI mensile a ogni piano ai_mode=="credit" con
-        una quota da accreditare (AppSumo + Pro/Revolut).
+        una quota da accreditare (AppSumo + Pro/Revolut/Paddle).
 
         Prima della rimozione di Lemon Squeezy, i piani Pro (subscription_monthly/
         annual) ricevevano la quota da un webhook (subscription_payment_success,
@@ -395,16 +397,23 @@ def _register_cli(app):
         quindi da qui in poi TUTTI i piani a crediti passano da questo comando
         mensile, non solo AppSumo — altrimenti gli utenti Pro (Revolut o
         Lemon Squeezy legacy ancora attivo) smetterebbero silenziosamente di
-        ricevere la quota inclusa nel piano.
+        ricevere la quota inclusa nel piano. Vale anche per gli utenti Paddle
+        (paddle_1m/3m/12m): pur avendo un ciclo di fatturazione ricorrente
+        reale, la quota crediti resta assegnata da questo comando mensile
+        fisso, non dal timing esatto del loro rinnovo — stessa scelta già
+        fatta per Revolut, non una nuova eccezione.
 
-        Salta chi non ha accesso attivo in questo momento (has_active_access) —
-        un piano Revolut scaduto non ancora sistemato da un admin non deve
-        continuare ad accumulare crediti. Idempotente per mese: non
+        Salta chi non ha accesso attivo in questo momento
+        (has_active_entitlement — vedi app/entitlements/service.py) — un
+        piano Revolut scaduto non ancora sistemato da un admin, o un
+        abbonamento Paddle il cui webhook di scadenza non è ancora arrivato,
+        non deve continuare ad accumulare crediti. Idempotente per mese: non
         doppio-accredita se rilanciato più volte nello stesso mese."""
         from datetime import datetime, timezone
 
         from app.entitlements.ai_credits import grant_credits
         from app.entitlements.limits import PLAN_LIMITS
+        from app.entitlements.service import has_active_entitlement
         from app.models import AiCreditTransaction, User
 
         now = datetime.now(timezone.utc)
@@ -415,7 +424,7 @@ def _register_cli(app):
             if limits.ai_mode != "credit" or limits.ai_credit_grant <= 0:
                 continue
             for user in User.query.filter_by(plan_type=plan_type).all():
-                if not user.has_active_access:
+                if not has_active_entitlement(user):
                     continue
                 already_this_month = (
                     AiCreditTransaction.query.filter(
@@ -473,6 +482,73 @@ def _register_cli(app):
         elif summary.get("audit_presentation_error"):
             print(f"Audit presentation non generata ({summary['audit_presentation_error']}) "
                   "— riprova più tardi dal bottone Genera in /dashboard/audits.")
+
+    @app.cli.command("paddle-sync-catalog")
+    @click.option(
+        "--environment", type=click.Choice(["sandbox", "production"]), required=True,
+        help="Quale set di credenziali/price ID usare (vedi PADDLE_ENVIRONMENT in config.py).",
+    )
+    @click.option("--currency", default="EUR", show_default=True)
+    @click.option(
+        "--dry-run", is_flag=True, default=False,
+        help="Non chiama l'API Paddle: stampa solo quali env var andrebbero valorizzate.",
+    )
+    def paddle_sync_catalog_cmd(environment, currency, dry_run):
+        """Crea/recupera in Paddle un prodotto+price per ogni piano Pro e
+        pacchetto crediti AI del catalogo whitelist (vedi
+        app/billing/paddle_products.py) — idempotente, rilanciabile senza
+        duplicare nulla (riusa un prodotto/price già esistente con lo stesso
+        nome/importo). Stampa gli ID risultanti E il nome della env var in
+        cui vanno incollati in .env — non li scrive mai lì da solo (vedi
+        docs/paddle-billing.md, "Setup catalogo")."""
+        from app.billing.paddle_catalog_sync import sync_catalog
+
+        entries = sync_catalog(environment=environment, currency=currency, dry_run=dry_run)
+        print(f"Catalogo Paddle ({environment}, dry_run={dry_run}):")
+        for e in entries:
+            marker = "creato" if e.created_price else ("prodotto nuovo" if e.created_product else "già esistente")
+            print(f"  [{e.kind}] {e.internal_key}: {e.product_name}")
+            print(f"      product_id={e.product_id}  price_id={e.price_id}  ({marker})")
+            print(f"      -> imposta {e.price_env_var}={e.price_id} in .env")
+
+    @app.cli.command("paddle-reconcile")
+    @click.option(
+        "--environment", type=click.Choice(["sandbox", "production"]), required=True,
+        help="Riconcilia solo gli utenti Paddle di questo environment — mai mescolato con l'altro.",
+    )
+    @click.option(
+        "--apply", "apply_changes", is_flag=True, default=False,
+        help="Senza questo flag gira in dry-run: legge lo stato remoto e mostra le differenze, ma non scrive nulla.",
+    )
+    @click.option("--user-id", type=int, default=None, help="Limita la riconciliazione a un solo utente (per id).")
+    def paddle_reconcile_cmd(environment, apply_changes, user_id):
+        """Fallback operativo per webhook Paddle persi o stato locale
+        incoerente (vedi Fase 6): rilegge da Paddle lo stato di ogni
+        subscription collegata a un utente locale e lo riapplica con la
+        stessa logica del webhook (app/billing/paddle_subscriptions.py).
+        Tocca SOLO utenti subscription_source == "paddle" nell'environment
+        indicato — mai un utente Revolut/AppSumo/legacy, mai l'altro
+        environment. Dry-run di default: passa --apply per scrivere
+        davvero."""
+        from app.billing.paddle_reconciliation import reconcile_paddle_users
+
+        report = reconcile_paddle_users(environment=environment, dry_run=not apply_changes, user_id=user_id)
+        print(
+            f"Riconciliazione Paddle ({report.environment}, "
+            f"{'DRY-RUN — nessuna scrittura' if report.dry_run else 'APPLICATA'}): "
+            f"{report.checked} utenti controllati, {report.changed} con differenze."
+        )
+        for row in report.rows:
+            if row.outcome == "api_error":
+                print(f"  - user {row.user_id} ({row.email}): errore API Paddle — {row.reason}")
+                continue
+            changed = row.before_status != row.after_status or row.before_expires_at != row.after_expires_at
+            marker = "MODIFICATO" if changed else "invariato"
+            print(
+                f"  - user {row.user_id} ({row.email}) sub={row.paddle_subscription_id}: "
+                f"{row.before_status}/{row.before_expires_at} -> {row.after_status}/{row.after_expires_at} "
+                f"[{marker}, outcome={row.outcome}]"
+            )
 
 
 def _ensure_tables(app):
@@ -743,3 +819,48 @@ def _ensure_columns(db):
     if has_column("audit_presentations", "id") and not has_column("audit_presentations", "chart_data"):
         with db.engine.begin() as conn:
             conn.execute(text("ALTER TABLE audit_presentations ADD COLUMN chart_data TEXT"))
+
+    # users: integrazione Paddle Billing (vedi app/billing/paddle_client.py,
+    # app/billing/paddle_subscriptions.py, docs/paddle-billing.md). Le
+    # tabelle nuove (paddle_webhook_events, paddle_transactions) sono create
+    # da db.create_all() sopra, non serve _ensure_columns per quelle — solo
+    # per le colonne aggiunte a una tabella `users` già esistente.
+    if has_column("users", "id") and not has_column("users", "paddle_customer_id"):
+        with db.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE users ADD COLUMN paddle_customer_id VARCHAR(255)"))
+            conn.execute(
+                text("CREATE INDEX IF NOT EXISTS ix_users_paddle_customer_id ON users (paddle_customer_id)")
+            )
+    if has_column("users", "id") and not has_column("users", "paddle_subscription_id"):
+        with db.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE users ADD COLUMN paddle_subscription_id VARCHAR(255)"))
+            # UNIQUE standard (non parziale): stessa nota di
+            # ix_users_subscription_activation_reference sopra — più utenti
+            # senza subscription Paddle (NULL) convivono senza violare il
+            # vincolo, su Postgres e SQLite.
+            conn.execute(
+                text(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS ix_users_paddle_subscription_id "
+                    "ON users (paddle_subscription_id)"
+                )
+            )
+    if has_column("users", "id") and not has_column("users", "paddle_price_id"):
+        with db.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE users ADD COLUMN paddle_price_id VARCHAR(255)"))
+    if has_column("users", "id") and not has_column("users", "paddle_environment"):
+        with db.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE users ADD COLUMN paddle_environment VARCHAR(10)"))
+    if has_column("users", "id") and not has_column("users", "current_period_ends_at"):
+        with db.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE users ADD COLUMN current_period_ends_at TIMESTAMPTZ"))
+    if has_column("users", "id") and not has_column("users", "cancel_at_period_end"):
+        default = "false" if dialect == "postgresql" else "0"
+        with db.engine.begin() as conn:
+            conn.execute(
+                text(
+                    f"ALTER TABLE users ADD COLUMN cancel_at_period_end BOOLEAN NOT NULL DEFAULT {default}"
+                )
+            )
+    if has_column("users", "id") and not has_column("users", "last_paddle_sync_at"):
+        with db.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE users ADD COLUMN last_paddle_sync_at TIMESTAMPTZ"))

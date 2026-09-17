@@ -101,6 +101,30 @@ PLAN_LIMITS: dict[str, PlanLimits] = {
         ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
         white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
     ),
+    # Pro via Paddle Billing (checkout server-driven, abbonamento RICORRENTE
+    # — a differenza dei piani Revolut sopra, Paddle rinnova da solo a ogni
+    # ciclo; vedi app/billing/paddle_subscriptions.py). Stessi identici
+    # limiti tecnici dei tre piani Revolut equivalenti: è lo stesso piano
+    # Pro, cambia solo processore e meccanica di rinnovo — non un tier
+    # diverso, vedi app/billing/paddle_products.py.
+    "paddle_1m": PlanLimits(
+        name="Pro — Monthly (Paddle)",
+        site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
+        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
+        white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
+    ),
+    "paddle_3m": PlanLimits(
+        name="Pro — Quarterly (Paddle)",
+        site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
+        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
+        white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
+    ),
+    "paddle_12m": PlanLimits(
+        name="Pro — Annual (Paddle)",
+        site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
+        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
+        white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
+    ),
 }
 
 DEFAULT_PLAN_TYPE = "trial"

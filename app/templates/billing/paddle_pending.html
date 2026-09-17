@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Payment processing") }}{% endblock %}
+{% block html_attrs %} data-theme="linkbay"{% endblock %}
+{% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-base-200 flex items-center justify-center px-4">
+  <div class="card card-border bg-base-100 shadow-xs w-full max-w-md">
+    <div class="card-body items-center text-center gap-4">
+      <span class="loading loading-spinner loading-lg text-primary" id="paddle-pending-spinner"></span>
+      <span class="iconify text-success size-8 hidden" id="paddle-pending-success" data-icon="lucide:circle-check-big"></span>
+      <h1 class="text-xl font-semibold" id="paddle-pending-title">{{ _("Confirming your payment…") }}</h1>
+      <p class="text-base-content/60" id="paddle-pending-message">
+        {{ _("This usually takes a few seconds. Don't close this page.") }}
+      </p>
+      <a class="link link-hover text-sm" href="{{ url_for('billing.subscription') }}">
+        {{ _("Go to subscription page") }}
+      </a>
+    </div>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+<script src="{{ url_for('static', filename='js/paddle-checkout.js') }}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    window.PaddleCheckout.pollStatus({
+      statusUrl: "{{ url_for('billing.paddle_status') }}",
+      subscriptionUrl: "{{ url_for('billing.subscription') }}",
+      spinnerEl: document.getElementById("paddle-pending-spinner"),
+      successEl: document.getElementById("paddle-pending-success"),
+      titleEl: document.getElementById("paddle-pending-title"),
+      messageEl: document.getElementById("paddle-pending-message"),
+    });
+  });
+</script>
+{% endblock %}

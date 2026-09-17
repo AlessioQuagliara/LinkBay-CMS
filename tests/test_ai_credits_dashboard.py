@@ -225,6 +225,12 @@ def test_buy_cta_disabled_when_link_not_configured(client, app, db_session, make
     monkeypatch.setitem(app.config, "REVOLUT_AI_TOPUP_LINK_50", None)
     monkeypatch.setitem(app.config, "REVOLUT_AI_TOPUP_LINK_150", None)
     monkeypatch.setitem(app.config, "REVOLUT_AI_TOPUP_LINK_500", None)
+    # La CTA "non configurato" compare solo se NESSUno dei due processori è
+    # disponibile — disabilitiamo anche Paddle (vedi
+    # tests/test_paddle_checkout.py per il caso "solo Paddle disponibile").
+    monkeypatch.setitem(app.config, "PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_STARTER", None)
+    monkeypatch.setitem(app.config, "PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_GROWTH", None)
+    monkeypatch.setitem(app.config, "PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_SCALE", None)
 
     res = client.get("/billing/credits")
     body = res.get_data(as_text=True)

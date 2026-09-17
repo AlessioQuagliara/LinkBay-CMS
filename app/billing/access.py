@@ -1,8 +1,8 @@
 """Gate di accesso centralizzato: un solo before_request per tutta l'app,
 invece di un decoratore su ogni singola route. Blocca chi ha finito il trial
-di 13 giorni e non ha un piano Pro attivo (Revolut manuale, o legacy Lemon
-Squeezy — vedi User.has_active_access in app/models/user.py), reindirizzandolo
-alla pagina di upgrade."""
+di 13 giorni e non ha un piano Pro attivo (Paddle, Revolut manuale, o legacy
+Lemon Squeezy — vedi app/entitlements/service.py::has_active_entitlement),
+reindirizzandolo alla pagina di upgrade."""
 from flask import redirect, request, url_for
 from flask_limiter.util import get_remote_address
 from flask_login import current_user
@@ -23,7 +23,9 @@ def init_access_gate(app):
             return None
         if request.blueprint not in GATED_BLUEPRINTS:
             return None
-        if current_user.has_active_access:
+        from app.entitlements.service import has_active_entitlement
+
+        if has_active_entitlement(current_user):
             return None
         return redirect(url_for("billing.upgrade"))
 

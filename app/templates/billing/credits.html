@@ -1,5 +1,6 @@
 {% extends "dashboard/layout.html" %}
 {% block title %}{{ _("AI Credits") }}{% endblock %}
+{% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
 {% block dashboard_content %}
 
 <div class="mb-6">
@@ -14,7 +15,7 @@
 {% if ai_credits.topups_allowed %}
   <div class="alert alert-info max-w-3xl mb-4">
     <span class="iconify size-4" data-icon="lucide:info"></span>
-    {{ _("Payment is handled entirely by Revolut. Credits are added manually after we verify your payment — not instantly at checkout.") }}
+    {{ _("Pay with card for an instant top-up, or with Revolut — credits are added manually after we verify your payment.") }}
   </div>
 
   <div class="grid gap-4 sm:grid-cols-3 max-w-3xl mb-8">
@@ -26,9 +27,23 @@
           <p class="text-2xl font-semibold">{{ "{:,}".format(pack.credits) }}</p>
           <p class="text-sm text-base-content/60">{{ _("credits") }}</p>
           <p class="text-lg font-medium mt-2">€{{ pack.price }}</p>
+
+          {% if pack.paddle.price_id %}
+            <button
+              type="button"
+              class="btn btn-primary btn-sm w-full mt-2"
+              data-paddle-checkout-credits
+              data-credit-package="{{ pack.paddle.product_key }}"
+              data-loading-text="{{ _('Redirecting…') }}"
+            >
+              <span class="iconify size-4" data-icon="lucide:credit-card"></span>
+              {{ _("Pay with card") }}
+            </button>
+          {% endif %}
+
           {% if pack.link %}
             <a
-              class="btn btn-primary btn-sm w-full mt-2"
+              class="btn {{ 'btn-outline' if pack.paddle.price_id else 'btn-primary' }} btn-sm w-full mt-2"
               href="{{ pack.link }}"
               target="_blank"
               rel="noopener noreferrer"
@@ -36,7 +51,7 @@
               <span class="iconify size-4" data-icon="lucide:external-link"></span>
               {{ _("Pay with Revolut") }}
             </a>
-          {% else %}
+          {% elif not pack.paddle.price_id %}
             <button class="btn btn-disabled btn-sm w-full mt-2" type="button" disabled>
               {{ _("Payment link not configured yet") }}
             </button>
@@ -130,4 +145,13 @@
 <p class="text-sm text-base-content/50 mt-6 max-w-xl">
   <a class="link link-hover" href="{{ url_for('billing.subscription') }}">{{ _("Back to subscription") }}</a>
 </p>
+<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+<script src="{{ url_for('static', filename='js/paddle-checkout.js') }}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    window.PaddleCheckout.bindCreditButtons(
+      "[data-paddle-checkout-credits]", "{{ url_for('billing.paddle_checkout_credits') }}"
+    );
+  });
+</script>
 {% endblock %}

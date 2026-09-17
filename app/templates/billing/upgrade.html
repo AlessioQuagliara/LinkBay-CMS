@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}{{ _("Upgrade") }}{% endblock %}
 {% block html_attrs %} data-theme="linkbay"{% endblock %}
+{% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
 {% block content %}
 <div class="min-h-screen bg-base-200 flex flex-col">
   <header class="flex items-center justify-between px-6 py-4">
@@ -70,9 +71,22 @@
                 <h3 class="text-lg font-semibold">{{ plan.label }}</h3>
                 <p class="text-3xl font-semibold">€{{ "%.2f"|format(plan.price) }}</p>
 
+                {% if plan.paddle.price_id %}
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-sm w-full mt-2"
+                    data-paddle-checkout-subscription
+                    data-plan="{{ plan.paddle.plan }}"
+                    data-loading-text="{{ _('Redirecting…') }}"
+                  >
+                    <span class="iconify size-4" data-icon="lucide:credit-card"></span>
+                    {{ _("Pay with card") }}
+                  </button>
+                {% endif %}
+
                 {% if plan.link %}
                   <a
-                    class="btn btn-primary btn-sm w-full mt-2"
+                    class="btn {{ 'btn-outline' if plan.paddle.price_id else 'btn-primary' }} btn-sm w-full mt-2"
                     href="{{ plan.link }}"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -80,7 +94,7 @@
                     <span class="iconify size-4" data-icon="lucide:external-link"></span>
                     {{ _("Pay with Revolut") }}
                   </a>
-                {% else %}
+                {% elif not plan.paddle.price_id %}
                   <button class="btn btn-disabled btn-sm w-full mt-2" type="button" disabled>
                     {{ _("Payment link not configured yet") }}
                   </button>
@@ -92,7 +106,7 @@
 
         <p class="text-sm text-base-content/60 text-center mt-6 max-w-lg mx-auto">
           <span class="iconify size-4 align-text-bottom" data-icon="lucide:shield-check"></span>
-          {{ _("Payment is handled entirely by Revolut. After we verify it, your access is activated manually — usually within one business day.") }}
+          {{ _("Pay with card for instant activation, or with Revolut — verified and activated manually, usually within one business day.") }}
         </p>
 
         <p class="text-base-content/60 text-center text-sm mt-4">
@@ -102,4 +116,13 @@
     {% endif %}
   </main>
 </div>
+<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+<script src="{{ url_for('static', filename='js/paddle-checkout.js') }}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    window.PaddleCheckout.bindSubscriptionButtons(
+      "[data-paddle-checkout-subscription]", "{{ url_for('billing.paddle_checkout_subscription') }}"
+    );
+  });
+</script>
 {% endblock %}

@@ -16,6 +16,7 @@ from flask import Blueprint, current_app, flash, redirect, render_template, requ
 from flask_babel import gettext as _
 from flask_login import current_user, login_required
 
+from app.billing.paddle_products import paddle_credit_packages, paddle_pro_plans
 from app.billing.revolut_products import ai_topup_packages, revolut_pro_plans
 from app.entitlements.service import get_ai_credit_overview, get_plan_limits
 from app.extensions import db
@@ -29,7 +30,16 @@ CREDITS_PAGE_SIZE = 20
 @billing_bp.route("/upgrade")
 @login_required
 def upgrade():
-    return render_template("billing/upgrade.html", plans=revolut_pro_plans())
+    # Stessa durata (1/3/12 mesi), due processori — costruiamo un'unica
+    # lista di card con entrambe le opzioni di pagamento invece di far
+    # ricostruire l'abbinamento al template. Entrambe le funzioni sorgente
+    # iterano lo stesso ordine di durata (1m, 3m, 12m), quindi lo zip
+    # allinea correttamente per indice senza bisogno di una chiave comune.
+    plans = [
+        {**revolut_plan, "paddle": paddle_plan}
+        for revolut_plan, paddle_plan in zip(revolut_pro_plans(), paddle_pro_plans())
+    ]
+    return render_template("billing/upgrade.html", plans=plans)
 
 
 @billing_bp.route("/subscription")
@@ -62,9 +72,16 @@ def credits():
         .paginate(page=page, per_page=CREDITS_PAGE_SIZE, error_out=False)
     )
 
+    # Stesso abbinamento per indice di upgrade() sopra: stesso ordine
+    # (starter, growth, scale) in entrambe le funzioni sorgente.
+    packs = [
+        {**revolut_pack, "paddle": paddle_pack}
+        for revolut_pack, paddle_pack in zip(ai_topup_packages(), paddle_credit_packages())
+    ]
+
     return render_template(
         "billing/credits.html",
-        packs=ai_topup_packages(),
+        packs=packs,
         ai_credits=get_ai_credit_overview(current_user),
         transactions=transactions,
     )
@@ -97,3 +114,12 @@ def redeem():
             flash(_("Code redeemed: your account is now lifetime."), "success")
             return redirect(url_for("dashboard.overview"))
     return render_template("billing/redeem.html")
+
+
+# Import in fondo al modulo (non in cima): app/billing/paddle_routes.py importa
+# `billing_bp` da QUESTO stesso modulo per aggiungere le route di checkout
+# Paddle allo stesso blueprint — un import in cima creerebbe un ciclo
+# (paddle_routes non sarebbe ancora eseguibile prima che billing_bp esista).
+# Side-effect import: registra le route via i decoratori @billing_bp.route,
+# non serve altro dal modulo.
+from app.billing import paddle_routes  # noqa: E402,F401
