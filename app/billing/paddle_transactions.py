@@ -1,8 +1,7 @@
 """Applica gli eventi webhook `transaction.*` di Paddle — crea/aggiorna la
 riga di audit in PaddleTransaction e, SOLO per gli acquisti di crediti AI,
-accredita il ledger reale (app/entitlements/ai_credits.py::grant_credits,
-la stessa funzione già usata dal top-up manuale Revolut — vedi
-app/billing/revolut_ai_topup.py). Per gli abbonamenti, `transaction.completed`
+accredita il ledger reale (app/entitlements/ai_credits.py::grant_credits).
+Per gli abbonamenti, `transaction.completed`
 resta solo audit: l'accesso è concesso dagli eventi `subscription.*` (vedi
 app/billing/paddle_subscriptions.py), mai da qui — un `transaction.completed`
 può arrivare per il primo pagamento di un abbonamento, ma seguirlo per
@@ -59,10 +58,8 @@ def apply_transaction_completed(
     row = _get_or_create_row(transaction_id=transaction_id, environment=environment)
 
     # Difesa in profondità, oltre all'idempotenza a livello di event_id in
-    # PaddleWebhookEvent (vedi app/webhooks/routes.py): stesso pattern già
-    # in uso per Revolut (payment_reference UNIQUE + controllo esplicito in
-    # app/billing/revolut_ai_topup.py) — se questa riga è già "completed",
-    # non rifare mai l'accredito.
+    # PaddleWebhookEvent (vedi app/webhooks/routes.py) — se questa riga è
+    # già "completed", non rifare mai l'accredito.
     if row.status == "completed":
         return TransactionApplyResult(
             outcome="already_completed", user_id=row.user_id, credits_granted=row.credits_granted

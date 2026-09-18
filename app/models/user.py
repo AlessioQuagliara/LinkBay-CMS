@@ -41,12 +41,11 @@ class User(db.Model, UserMixin):
     # attivo, app/billing/access.py blocca l'accesso alla app.
     trial_ends_at = db.Column(db.DateTime(timezone=True))
     # "trialing" | "active" | "past_due" | "paused" | "canceled" | "lifetime".
-    # "active" è impostato dall'attivazione manuale Revolut (vedi
-    # app/billing/revolut_manual_activation.py — scadenza in
-    # subscription_expires_at) oppure dal webhook Paddle
+    # "active" è impostato dal webhook Paddle
     # `subscription.activated`/`subscription.updated` per subscription_source
-    # == "paddle" (vedi app/billing/paddle_subscriptions.py — quello è di
-    # nuovo webhook-driven, a differenza del flusso Revolut). "lifetime" è
+    # == "paddle" (vedi app/billing/paddle_subscriptions.py — scadenza in
+    # subscription_expires_at), o storicamente dall'attivazione manuale
+    # Revolut (canale dismesso, nessun codice la scrive più). "lifetime" è
     # impostato una tantum al riscatto di un codice AppSumo (vedi
     # app/models/appsumo_code.py) e non scade mai. "paused" è impostato dal
     # webhook Paddle `subscription.paused`. "past_due"/"canceled" sono sia
@@ -58,15 +57,15 @@ class User(db.Model, UserMixin):
     subscription_status = db.Column(db.String(20), nullable=False, default="trialing")
 
     # Legacy Lemon Squeezy (dismesso dal flusso commerciale — vedi
-    # app/billing/revolut_manual_activation.py per il flusso attuale).
-    # Colonne mantenute nullable e silenti per non perdere l'audit storico di
-    # chi ha pagato via Lemon Squeezy; nessun codice le scrive più.
+    # app/billing/paddle_products.py per il flusso attuale). Colonne
+    # mantenute nullable e silenti per non perdere l'audit storico di chi ha
+    # pagato via Lemon Squeezy; nessun codice le scrive più.
     ls_customer_id = db.Column(db.String(255))
     ls_subscription_id = db.Column(db.String(255))
 
     # Scadenza dell'abbonamento — unica per tutti i piani "active"/"past_due"/
-    # "paused" a termine, sia Revolut manuale sia Paddle. Per Paddle è lo
-    # specchio di subscription.current_billing_period.ends_at, riscritto a
+    # "paused" a termine, sia legacy Revolut manuale sia Paddle. Per Paddle è
+    # lo specchio di subscription.current_billing_period.ends_at, riscritto a
     # ogni webhook subscription.* (vedi app/billing/paddle_subscriptions.py)
     # ed è il fallback locale usato quando Paddle non è raggiungibile (vedi
     # app/entitlements/service.py::has_active_entitlement). NULL = nessuna
@@ -78,8 +77,9 @@ class User(db.Model, UserMixin):
     # NULL lì significa "mai sincronizzato", non "nessun limite").
     subscription_expires_at = db.Column(db.DateTime(timezone=True), nullable=True)
 
-    # Provenienza dell'ultima attivazione: "revolut_manual" | "appsumo" |
-    # "paddle" | "legacy_lemonsqueezy". NON solo informativo/audit come prima
+    # Provenienza dell'ultima attivazione: "appsumo" | "paddle" |
+    # "legacy_lemonsqueezy" | "revolut_manual" (canale dismesso, valore
+    # storico). NON solo informativo/audit come prima
     # di Paddle: has_active_entitlement lo usa per decidere quale semantica
     # di scadenza applicare (vedi sopra) — has_active_access (il property
     # legacy, invariato) resta invece guidato solo da subscription_status +
@@ -88,18 +88,17 @@ class User(db.Model, UserMixin):
     # una prima attivazione tracciata da qui.
     subscription_source = db.Column(db.String(30), nullable=True)
 
-    # Audit minimo dell'ultima attivazione manuale Revolut (vedi
-    # app/billing/revolut_manual_activation.py). activated_by è nullable: un
-    # utente non ancora attivato manualmente non ha né data né admin.
+    # Audit minimo dell'ultima attivazione manuale Revolut — canale dismesso,
+    # colonne mantenute solo per l'audit storico di chi fu attivato così.
+    # activated_by è nullable: un utente mai attivato manualmente non ha né
+    # data né admin.
     subscription_activated_at = db.Column(db.DateTime(timezone=True), nullable=True)
     subscription_activated_by_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
 
-    # Riferimento pagamento Revolut (facoltativo, inserito a mano
-    # dall'admin) — univoco quando valorizzato: usato per rendere idempotente
-    # una doppia sottomissione dello stesso pagamento (vedi
-    # revolut_manual_activation.activate_revolut_subscription). Non è uno
-    # storico completo: una riattivazione successiva sovrascrive il valore
-    # precedente, vedi il modulo del service per il compromesso accettato.
+    # Riferimento pagamento del vecchio flusso Revolut manuale (canale
+    # dismesso) — univoco quando valorizzato, manteneva idempotente una
+    # doppia sottomissione dello stesso pagamento. Colonna mantenuta solo per
+    # l'audit storico; nessun codice la scrive più.
     subscription_activation_reference = db.Column(db.String(255), nullable=True, unique=True)
 
     subscription_activated_by = db.relationship("User", remote_side=[id])
@@ -154,11 +153,11 @@ class User(db.Model, UserMixin):
     # binario usato da app/billing/access.py, invariato), plan_type risponde
     # "quali limiti si applicano?". Valori: "trial" | "subscription_monthly"
     # | "subscription_annual" (legacy Lemon Squeezy, non più assegnabili a
-    # utenti nuovi) | "revolut_1m" | "revolut_3m" | "revolut_12m" (vedi
-    # app/billing/revolut_manual_activation.py) | "paddle_1m" | "paddle_3m" |
-    # "paddle_12m" (stessi limiti/prezzi dei tre piani Revolut equivalenti,
-    # vedi app/billing/paddle_products.py — cambia solo il processore e la
-    # semantica di rinnovo) | "appsumo_tier1" | "appsumo_tier2" |
+    # utenti nuovi) | "revolut_1m" | "revolut_3m" | "revolut_12m" (legacy,
+    # canale Revolut dismesso, non più assegnabili a utenti nuovi) |
+    # "paddle_1m" | "paddle_3m" | "paddle_12m" (stessi limiti/prezzi dei tre
+    # piani legacy equivalenti, vedi app/billing/paddle_products.py) |
+    # "appsumo_tier1" | "appsumo_tier2" |
     # "appsumo_tier3". NULL per utenti non ancora migrati —
     # vedi `flask backfill-plan-type` e
     # app/entitlements/service.py::get_plan_limits (fallback sicuro a "trial"
@@ -168,9 +167,8 @@ class User(db.Model, UserMixin):
 
     # Periodo di grazia dopo un pagamento fallito — legacy Lemon Squeezy: era
     # scritto da un webhook subscription_payment_failed rimosso insieme al
-    # resto dell'integrazione (vedi app/billing/revolut_manual_activation.py,
-    # che lo azzera a ogni attivazione manuale). Nessun codice nuovo lo
-    # scrive più: Paddle non ha un equivalente qui — un `subscription.
+    # resto dell'integrazione. Nessun codice nuovo lo scrive più: Paddle non
+    # ha un equivalente qui — un `subscription.
     # past_due` Paddle NON estende l'accesso oltre subscription_expires_at
     # (nessuna policy di grace period definita per Paddle, vedi
     # app/billing/paddle_subscriptions.py e docs/paddle-billing.md). Resta
@@ -227,12 +225,11 @@ class User(db.Model, UserMixin):
             return True
         if self.subscription_status == "active":
             # subscription_expires_at guida la scadenza dei piani a termine
-            # (oggi solo Revolut manuale, vedi
-            # app/billing/revolut_manual_activation.py). NULL copre gli
-            # abbonamenti "active" legacy Lemon Squeezy, mai spenti da questa
-            # migrazione: restano attivi finché non li tocca un admin, invece
-            # di essere bloccati di colpo per l'assenza di un dato che non
-            # avevano mai avuto.
+            # (oggi solo utenti storici del canale Revolut dismesso). NULL
+            # copre gli abbonamenti "active" legacy Lemon Squeezy, mai spenti
+            # da questa migrazione: restano attivi finché non li tocca un
+            # admin, invece di essere bloccati di colpo per l'assenza di un
+            # dato che non avevano mai avuto.
             expires_at = self._aware(self.subscription_expires_at)
             if expires_at is None:
                 return True

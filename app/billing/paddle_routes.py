@@ -1,6 +1,6 @@
 """Checkout server-driven per Paddle Billing — estende `billing_bp` (import
 in fondo a app/billing/routes.py) invece di un blueprint separato, stesso
-url_prefix "/billing" delle route Revolut/AppSumo già esistenti lì.
+url_prefix "/billing" delle route AppSumo già esistenti lì.
 
 Ogni route qui costruisce la transazione Paddle SOLO da una whitelist
 server-side (app/billing/paddle_products.py) — il client sceglie al massimo

@@ -29,12 +29,12 @@ def _public_base():
 
 @main_bp.route("/")
 def index():
-    from app.billing.revolut_products import ai_topup_packages, revolut_pro_plans
+    from app.billing.paddle_products import paddle_credit_packages, paddle_pro_plans
 
     return render_template(
         "landing/index.html",
-        revolut_plans=revolut_pro_plans(),
-        ai_topup_packs=ai_topup_packages(),
+        plans=paddle_pro_plans(),
+        ai_topup_packs=paddle_credit_packages(),
     )
 
 
@@ -100,10 +100,10 @@ def cookie_policy():
 def ai_credits():
     """Landing standalone sui crediti AI (separata dalla pricing del piano
     Pro — vedi #pricing in landing/index.html). Pacchetti/prezzi vengono da
-    app/billing/revolut_products.py::ai_topup_packages(), unica fonte di
+    app/billing/paddle_products.py::paddle_credit_packages(), unica fonte di
     verità (a sua volta letta da app/entitlements/limits.py per i numeri):
     nessun prezzo/costo hardcoded qui o nel template."""
-    from app.billing.revolut_products import ai_topup_packages
+    from app.billing.paddle_products import paddle_credit_packages
     from app.entitlements.limits import AI_CREDIT_ACTION_COSTS
 
     # CTA condizionale: riusa get_plan_limits invece di ricontrollare
@@ -121,7 +121,7 @@ def ai_credits():
         "landing/ai_credits.html",
         page_title="AI Credits",
         page_description="How AI credits work in LinkBayCMS: cost per action, one-time top-up packs, and how they relate to your plan.",
-        packs=ai_topup_packages(),
+        packs=paddle_credit_packages(),
         action_costs=AI_CREDIT_ACTION_COSTS,
         can_topup=can_topup,
     )

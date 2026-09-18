@@ -32,8 +32,8 @@ def grant_credits(
     con importo negativo per uno storno, non questa funzione). Aggiorna il
     saldo denormalizzato su User nella stessa transazione DB del ledger.
 
-    Gli ultimi cinque parametri sono usati solo dal top-up manuale Revolut
-    (vedi app/billing/revolut_ai_topup.py) — restano None per gli altri
+    Gli ultimi cinque parametri sono usati solo dai top-up a pagamento (vedi
+    app/billing/paddle_transactions.py) — restano None per gli altri
     chiamanti (quota mensile, storico Lemon Squeezy)."""
     if amount <= 0:
         raise ValueError("grant_credits richiede un importo positivo (usa adjustment per gli storni).")

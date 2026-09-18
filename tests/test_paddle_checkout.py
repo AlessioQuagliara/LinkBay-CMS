@@ -85,9 +85,8 @@ def test_checkout_credits_rejects_unknown_package(client, db_session, make_user)
 
 
 def test_checkout_credits_rejects_ineligible_plan(client, db_session, make_user):
-    # Pro (Revolut o Paddle) non è eleggibile ai top-up — stessa regola già
-    # in vigore per Revolut (get_plan_limits(user).ai_credit_topups_allowed).
-    user = make_user(plan_type="revolut_1m", subscription_status="active")
+    # Pro non è eleggibile ai top-up (get_plan_limits(user).ai_credit_topups_allowed).
+    user = make_user(plan_type="paddle_1m", subscription_status="active")
     _login(client, user)
     res = client.post("/billing/checkout/credits", data={"credit_package": "ai_topup_starter"})
     assert res.status_code == 403

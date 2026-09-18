@@ -69,18 +69,17 @@ def test_start_free_trial_cta_uses_brand_primary_class():
     assert "btn-primary" in surrounding
 
 
-def test_revolut_plan_cards_use_brand_primary_cta():
+def test_pro_plan_cards_use_brand_primary_cta():
     for path in (TEMPLATES / "billing" / "upgrade.html", TEMPLATES / "landing" / "index.html"):
         html = path.read_text()
         assert "btn-primary" in html
-        assert "Pay with Revolut" in html or "btn-primary" in html
 
 
 def test_ai_credits_pages_use_brand_primary_icons_and_cta():
     for path in (TEMPLATES / "billing" / "credits.html", TEMPLATES / "landing" / "ai_credits.html"):
         html = path.read_text()
         assert "text-primary" in html  # icone sparkles brandizzate
-        assert "btn-primary" in html  # CTA "Pay with Revolut"
+        assert "btn-primary" in html  # CTA "Pay with card"
 
 
 # --- rendering effettivo (non solo grep statico) ----------------------------

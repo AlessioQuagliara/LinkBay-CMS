@@ -12,7 +12,10 @@ def test_appsumo_lifetime_always_entitled(db_session, make_user):
     assert has_active_entitlement(user) is True
 
 
-def test_revolut_active_before_expiry_entitled(db_session, make_user):
+def test_legacy_revolut_active_before_expiry_entitled(db_session, make_user):
+    # Canale Revolut manuale dismesso (nessun codice nuovo lo attiva più),
+    # ma gli utenti già attivati così devono restare entitled fino alla
+    # scadenza nota — nessuna migrazione ha toccato questi record.
     user = make_user(
         plan_type="revolut_1m", subscription_status="active",
         subscription_expires_at=datetime.now(timezone.utc) + timedelta(days=1),
@@ -20,7 +23,7 @@ def test_revolut_active_before_expiry_entitled(db_session, make_user):
     assert has_active_entitlement(user) is True
 
 
-def test_revolut_active_after_expiry_not_entitled(db_session, make_user):
+def test_legacy_revolut_active_after_expiry_not_entitled(db_session, make_user):
     user = make_user(
         plan_type="revolut_1m", subscription_status="active",
         subscription_expires_at=datetime.now(timezone.utc) - timedelta(hours=1),

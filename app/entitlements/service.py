@@ -57,8 +57,8 @@ def has_active_entitlement(user) -> bool:
     un bug: per Paddle, NULL significa "mai sincronizzato da un webhook",
     quindi NON deve concedere accesso.
 
-    Ogni altro caso (lifetime AppSumo, Revolut manuale, legacy Lemon Squeezy,
-    trial) delega interamente a User.has_active_access — nessuna logica
+    Ogni altro caso (lifetime AppSumo, legacy Revolut/Lemon Squeezy, trial)
+    delega interamente a User.has_active_access — nessuna logica
     duplicata, solo il ramo Paddle è diverso. Vedi app/billing/access.py e
     `flask grant-monthly-ai-credits` per i due punti che devono usare questa
     funzione invece della property diretta."""

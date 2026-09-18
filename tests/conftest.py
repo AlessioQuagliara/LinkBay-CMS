@@ -46,16 +46,6 @@ class TestConfig(Config):
     # app/auth/otp.py, resend_configured in app/emails/__init__.py, ecc.).
     RESEND_API = None
     DEEPSEEK_API = None
-    # Link Revolut di test — non reali, solo per verificare che le CTA in
-    # /billing/upgrade si abilitino quando configurati (vedi
-    # tests/test_revolut_activation.py per il caso "non configurato").
-    REVOLUT_PAYMENT_LINK_1M = "https://pay.revolut.com/test-1m"
-    REVOLUT_PAYMENT_LINK_3M = "https://pay.revolut.com/test-3m"
-    REVOLUT_PAYMENT_LINK_12M = "https://pay.revolut.com/test-12m"
-    # Idem per i pacchetti crediti AI (vedi tests/test_revolut_ai_topup.py).
-    REVOLUT_AI_TOPUP_LINK_50 = "https://pay.revolut.com/test-topup-50"
-    REVOLUT_AI_TOPUP_LINK_150 = "https://pay.revolut.com/test-topup-150"
-    REVOLUT_AI_TOPUP_LINK_500 = "https://pay.revolut.com/test-topup-500"
 
     # Paddle Billing — credenziali/price ID fittizi, mai usati per una vera
     # chiamata di rete: ogni test che arriva fino all'API monkeypatcha

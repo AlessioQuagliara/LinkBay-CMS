@@ -261,7 +261,7 @@
                 </div>
 
                 <div class="mt-8 grid gap-4 sm:grid-cols-3 lg:max-w-3xl lg:mx-auto">
-                    {% for plan in revolut_plans %}
+                    {% for plan in plans %}
                         <div class="card border p-3 {{ 'border-primary' if plan.savings_label else 'card-border' }}">
                             <div class="{{ 'bg-primary/10' if plan.savings_label else 'bg-base-200' }} rounded-box p-6 text-center">
                                 {% if plan.savings_label %}
@@ -289,7 +289,7 @@
 
                 <p class="text-base-content/60 text-center text-sm mt-6 max-w-lg mx-auto">
                     <span class="iconify size-4 align-text-bottom" data-icon="lucide:shield-check"></span>
-                    {{ _("Payment is handled entirely by Revolut. After we verify it, access is activated manually — no automatic renewal, no card on file.") }}
+                    {{ _("Secure checkout by Paddle. Cancel anytime from your subscription page.") }}
                 </p>
 
                 <p class="text-base-content/60 text-center text-sm mt-4">

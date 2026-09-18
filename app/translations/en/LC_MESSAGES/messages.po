@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-09-07 19:28+0200\n"
+"POT-Creation-Date: 2026-09-17 12:05+0200\n"
 "PO-Revision-Date: 2026-08-30 15:01+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -95,23 +95,23 @@ msgstr "Please wait %(seconds)ss before requesting a new code."
 msgid "You've been logged out."
 msgstr "You've been logged out."
 
-#: app/billing/routes.py:55
+#: app/billing/routes.py:47
 msgid "Your plan doesn't use AI credits."
 msgstr ""
 
-#: app/billing/routes.py:80
+#: app/billing/routes.py:72
 msgid "Invalid code."
 msgstr "Invalid code."
 
-#: app/billing/routes.py:82
+#: app/billing/routes.py:74
 msgid "This code has already been used."
 msgstr "This code has already been used."
 
-#: app/billing/routes.py:88
+#: app/billing/routes.py:80
 msgid "This code isn't ready yet. Please contact support."
 msgstr "This code isn't ready yet. Please contact support."
 
-#: app/billing/routes.py:97
+#: app/billing/routes.py:89
 msgid "Code redeemed: your account is now lifetime."
 msgstr "Code redeemed: your account is now lifetime."
 
@@ -266,7 +266,7 @@ msgstr "Resend in {s}s"
 msgid "Use a different account"
 msgstr "Use a different account"
 
-#: app/templates/billing/credits.html:2 app/templates/billing/credits.html:6
+#: app/templates/billing/credits.html:2 app/templates/billing/credits.html:7
 #: app/templates/dashboard/layout.html:93
 #: app/templates/landing/ai_credits.html:53
 #: app/templates/landing/partials/footer.html:31
@@ -274,119 +274,140 @@ msgstr "Use a different account"
 msgid "AI Credits"
 msgstr "AI Credits"
 
-#: app/templates/billing/credits.html:8
+#: app/templates/billing/credits.html:9
 msgid "Extra AI suggestions on top of your plan. Credits never expire."
 msgstr "Extra AI suggestions on top of your plan. Credits never expire."
 
-#: app/templates/billing/credits.html:17
-msgid ""
-"Payment is handled entirely by Revolut. Credits are added manually after "
-"we verify your payment — not instantly at checkout."
+#: app/templates/billing/credits.html:18
+msgid "Pay with card for an instant top-up."
 msgstr ""
 
-#: app/templates/billing/credits.html:27
+#: app/templates/billing/credits.html:28
 #: app/templates/landing/ai_credits.html:102
 #: app/templates/landing/ai_credits.html:127
 #: app/templates/partials/ai_credits_card.html:32
 msgid "credits"
 msgstr "credits"
 
-#: app/templates/billing/credits.html:37 app/templates/billing/upgrade.html:81
-#: app/templates/landing/ai_credits.html:139
-msgid "Pay with Revolut"
+#: app/templates/billing/credits.html:37 app/templates/billing/upgrade.html:80
+#, fuzzy
+msgid "Redirecting…"
+msgstr "Pricing"
+
+#: app/templates/billing/credits.html:40 app/templates/billing/upgrade.html:83
+#: app/templates/landing/ai_credits.html:134
+msgid "Pay with card"
 msgstr ""
 
-#: app/templates/billing/credits.html:41 app/templates/billing/upgrade.html:85
-#: app/templates/landing/ai_credits.html:143
+#: app/templates/billing/credits.html:44 app/templates/billing/upgrade.html:87
+#: app/templates/landing/ai_credits.html:138
 msgid "Payment link not configured yet"
 msgstr ""
 
-#: app/templates/billing/credits.html:51
+#: app/templates/billing/credits.html:54
 msgid "Usage history"
 msgstr ""
 
-#: app/templates/billing/credits.html:52
+#: app/templates/billing/credits.html:55
 msgid "Your most recent credit activity, newest first."
 msgstr ""
 
-#: app/templates/billing/credits.html:62
+#: app/templates/billing/credits.html:65
 msgid "Date"
 msgstr ""
 
-#: app/templates/billing/credits.html:63
+#: app/templates/billing/credits.html:66
 msgid "Event"
 msgstr ""
 
-#: app/templates/billing/credits.html:64 app/templates/dashboard/audits.html:17
+#: app/templates/billing/credits.html:67 app/templates/dashboard/audits.html:17
 #, fuzzy
 msgid "Site"
 msgstr "Sites"
 
-#: app/templates/billing/credits.html:65
+#: app/templates/billing/credits.html:68
 #, fuzzy
 msgid "Change"
 msgstr "Page"
 
-#: app/templates/billing/credits.html:66
+#: app/templates/billing/credits.html:69
 msgid "Balance"
 msgstr ""
 
-#: app/templates/billing/credits.html:75
+#: app/templates/billing/credits.html:78
 msgid "Monthly plan credit"
 msgstr ""
 
-#: app/templates/billing/credits.html:77
+#: app/templates/billing/credits.html:80
 msgid "Top-up purchase"
 msgstr ""
 
-#: app/templates/billing/credits.html:79
+#: app/templates/billing/credits.html:82
 msgid "AI page analysis"
 msgstr ""
 
-#: app/templates/billing/credits.html:81
+#: app/templates/billing/credits.html:84
 #, fuzzy
 msgid "Audit presentation"
 msgstr "AI suggestions"
 
-#: app/templates/billing/credits.html:83
+#: app/templates/billing/credits.html:86
 #, fuzzy
 msgid "AI credits used"
 msgstr "AI credits"
 
-#: app/templates/billing/credits.html:85
+#: app/templates/billing/credits.html:88
 msgid "Credit adjustment"
 msgstr ""
 
-#: app/templates/billing/credits.html:87
+#: app/templates/billing/credits.html:90
 msgid "Refund / correction"
 msgstr ""
 
-#: app/templates/billing/credits.html:110
+#: app/templates/billing/credits.html:113
 msgid "Previous"
 msgstr ""
 
-#: app/templates/billing/credits.html:113
+#: app/templates/billing/credits.html:116
 #, python-format
 msgid "Page %(page)s of %(pages)s"
 msgstr ""
 
-#: app/templates/billing/credits.html:119
+#: app/templates/billing/credits.html:122
 msgid "Next"
 msgstr ""
 
-#: app/templates/billing/credits.html:125
+#: app/templates/billing/credits.html:128
 msgid "No AI credit activity yet."
 msgstr ""
 
-#: app/templates/billing/credits.html:131
+#: app/templates/billing/credits.html:134
 msgid "Back to subscription"
+msgstr "Back to subscription"
+
+#: app/templates/billing/paddle_pending.html:2
+msgid "Payment processing"
+msgstr ""
+
+#: app/templates/billing/paddle_pending.html:11
+#, fuzzy
+msgid "Confirming your payment…"
+msgstr "Confirm your email"
+
+#: app/templates/billing/paddle_pending.html:13
+msgid "This usually takes a few seconds. Don't close this page."
+msgstr ""
+
+#: app/templates/billing/paddle_pending.html:16
+#, fuzzy
+msgid "Go to subscription page"
 msgstr "Back to subscription"
 
 #: app/templates/billing/redeem.html:2
 msgid "Redeem AppSumo code"
 msgstr "Redeem AppSumo code"
 
-#: app/templates/billing/redeem.html:10 app/templates/billing/upgrade.html:10
+#: app/templates/billing/redeem.html:10 app/templates/billing/upgrade.html:11
 #: app/templates/dashboard/layout.html:154
 msgid "Logout"
 msgstr "Logout"
@@ -436,7 +457,7 @@ msgid "Lifetime"
 msgstr "Lifetime"
 
 #: app/templates/billing/subscription.html:23
-#: app/templates/billing/upgrade.html:19
+#: app/templates/billing/upgrade.html:20
 msgid "Activated with an AppSumo code — nothing to manage."
 msgstr "Activated with an AppSumo code — nothing to manage."
 
@@ -453,7 +474,7 @@ msgid "Pro — %(plan)s"
 msgstr ""
 
 #: app/templates/billing/subscription.html:46
-#: app/templates/billing/upgrade.html:36
+#: app/templates/billing/upgrade.html:37
 #, fuzzy, python-format
 msgid "Valid until %(date)s."
 msgstr "Last updated: %(date)s"
@@ -508,7 +529,7 @@ msgid "No credit card on file."
 msgstr "No credit card on file."
 
 #: app/templates/billing/subscription.html:99
-#: app/templates/billing/upgrade.html:57 app/templates/dashboard/layout.html:28
+#: app/templates/billing/upgrade.html:58 app/templates/dashboard/layout.html:28
 #: app/templates/partials/ai_credits_card.html:46
 msgid "Upgrade to Pro"
 msgstr "Upgrade to Pro"
@@ -523,8 +544,8 @@ msgid "Your plan has expired or was canceled."
 msgstr "Your subscription was canceled."
 
 #: app/templates/billing/subscription.html:120
-#: app/templates/billing/upgrade.html:99
-#: app/templates/landing/ai_credits.html:159
+#: app/templates/billing/upgrade.html:101
+#: app/templates/landing/ai_credits.html:154
 msgid "Have an AppSumo code?"
 msgstr "Have an AppSumo code?"
 
@@ -537,41 +558,41 @@ msgstr "Redeem it here"
 msgid "Upgrade"
 msgstr "Upgrade"
 
-#: app/templates/billing/upgrade.html:18
+#: app/templates/billing/upgrade.html:19
 msgid "Your account is lifetime"
 msgstr "Your account is lifetime"
 
-#: app/templates/billing/upgrade.html:23
+#: app/templates/billing/upgrade.html:24
 #: app/templates/partials/usage_widget.html:43
 msgid "AI credits"
 msgstr "AI credits"
 
-#: app/templates/billing/upgrade.html:26 app/templates/billing/upgrade.html:40
+#: app/templates/billing/upgrade.html:27 app/templates/billing/upgrade.html:41
 msgid "Back to dashboard"
 msgstr "Back to dashboard"
 
-#: app/templates/billing/upgrade.html:33
+#: app/templates/billing/upgrade.html:34
 #, fuzzy
 msgid "Your Pro plan is active"
 msgstr "Your Pro subscription is active"
 
-#: app/templates/billing/upgrade.html:39
+#: app/templates/billing/upgrade.html:40
 #, fuzzy
 msgid "View subscription details"
 msgstr "Subscription"
 
-#: app/templates/billing/upgrade.html:49
+#: app/templates/billing/upgrade.html:50
 #, python-format
 msgid "%(num)s day left in your trial"
 msgid_plural "%(num)s days left in your trial"
 msgstr[0] "%(num)s day left in your trial"
 msgstr[1] "%(num)s days left in your trial"
 
-#: app/templates/billing/upgrade.html:54
+#: app/templates/billing/upgrade.html:55
 msgid "Trial ended"
 msgstr "Trial ended"
 
-#: app/templates/billing/upgrade.html:59
+#: app/templates/billing/upgrade.html:60
 msgid ""
 "Keep monitoring declining pages and getting AI suggestions, without "
 "interruption."
@@ -579,15 +600,13 @@ msgstr ""
 "Keep monitoring declining pages and getting AI suggestions, without "
 "interruption."
 
-#: app/templates/billing/upgrade.html:68 app/templates/landing/index.html:268
+#: app/templates/billing/upgrade.html:69 app/templates/landing/index.html:268
 #, python-format
 msgid "Save about %(pct)s"
 msgstr ""
 
-#: app/templates/billing/upgrade.html:95
-msgid ""
-"Payment is handled entirely by Revolut. After we verify it, your access "
-"is activated manually — usually within one business day."
+#: app/templates/billing/upgrade.html:97
+msgid "Pay with card for instant activation."
 msgstr ""
 
 #: app/templates/dashboard/audits.html:2 app/templates/dashboard/audits.html:7
@@ -1134,21 +1153,20 @@ msgstr ""
 
 #: app/templates/landing/ai_credits.html:117
 msgid ""
-"One-time top-up packs for AppSumo workspaces, paid via Revolut. After we "
-"verify your payment, credits are added to your balance manually — not "
-"instantly at checkout."
+"One-time top-up packs for AppSumo workspaces, paid by card via Paddle. "
+"Credits are added to your balance instantly at checkout."
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:155
+#: app/templates/landing/ai_credits.html:150
 msgid "Credit packs are available to AppSumo workspaces after signup."
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:158
+#: app/templates/landing/ai_credits.html:153
 #: app/templates/landing/index.html:29
 msgid "Get started free"
 msgstr "Get started free"
 
-#: app/templates/landing/ai_credits.html:163
+#: app/templates/landing/ai_credits.html:158
 #, fuzzy
 msgid ""
 "Your plan already includes a monthly AI credit quota — no need to buy a "
@@ -1157,62 +1175,62 @@ msgstr ""
 "Your plan already includes a generous monthly AI quota — extra credit "
 "packs aren't needed."
 
-#: app/templates/landing/ai_credits.html:166
+#: app/templates/landing/ai_credits.html:161
 msgid "Go to dashboard"
 msgstr "Go to dashboard"
 
-#: app/templates/landing/ai_credits.html:175
+#: app/templates/landing/ai_credits.html:170
 #: app/templates/landing/index.html:307
 #: app/templates/landing/partials/footer.html:20
 msgid "FAQs"
 msgstr "FAQs"
 
-#: app/templates/landing/ai_credits.html:180
+#: app/templates/landing/ai_credits.html:175
 msgid "Do credits expire?"
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:182
+#: app/templates/landing/ai_credits.html:177
 msgid "No — purchased credits never expire."
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:187
+#: app/templates/landing/ai_credits.html:182
 msgid "Does AI replace the data analysis?"
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:189
+#: app/templates/landing/ai_credits.html:184
 msgid ""
 "No. The AI interprets and suggests actions on data already gathered by "
 "LinkBayCMS and Google Search Console — it doesn't invent metrics or "
 "guarantee results."
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:194
+#: app/templates/landing/ai_credits.html:189
 msgid "What happens when my included credits run out?"
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:196
+#: app/templates/landing/ai_credits.html:191
 msgid ""
-"AppSumo users can buy a one-time top-up pack anytime, paid via Revolut "
-"and credited manually after we verify the payment. Pro subscribers get "
-"their quota renewed on their plan's next cycle and can track consumption "
-"in the dashboard."
+"AppSumo users can buy a one-time top-up pack anytime, paid by card via "
+"Paddle and credited instantly at checkout. Pro subscribers get their "
+"quota renewed on their plan's next cycle and can track consumption in the"
+" dashboard."
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:201
+#: app/templates/landing/ai_credits.html:196
 msgid "Can I use credits to raise my site/page/scan limits?"
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:203
+#: app/templates/landing/ai_credits.html:198
 msgid ""
 "No — AI credits never change the infrastructure limits of your plan "
 "(sites, pages, scan frequency)."
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:208
+#: app/templates/landing/ai_credits.html:203
 msgid "How is consumption calculated?"
 msgstr ""
 
-#: app/templates/landing/ai_credits.html:210
+#: app/templates/landing/ai_credits.html:205
 msgid "The credit cost of an AI action is always shown before you run it."
 msgstr ""
 
@@ -1448,9 +1466,7 @@ msgid "Full history from the day you connect your site"
 msgstr "Full history from the day you connect your site"
 
 #: app/templates/landing/index.html:292
-msgid ""
-"Payment is handled entirely by Revolut. After we verify it, access is "
-"activated manually — no automatic renewal, no card on file."
+msgid "Secure checkout by Paddle. Cancel anytime from your subscription page."
 msgstr ""
 
 #: app/templates/landing/index.html:296
@@ -2189,4 +2205,46 @@ msgstr "Change password"
 
 #~ msgid "Current balance: %(balance)s credits"
 #~ msgstr "Current balance: %(balance)s credits"
+
+#~ msgid ""
+#~ "Payment is handled entirely by Revolut."
+#~ " Credits are added manually after we"
+#~ " verify your payment — not instantly"
+#~ " at checkout."
+#~ msgstr ""
+
+#~ msgid "Pay with Revolut"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Payment is handled entirely by Revolut."
+#~ " After we verify it, your access "
+#~ "is activated manually — usually within"
+#~ " one business day."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "One-time top-up packs for AppSumo"
+#~ " workspaces, paid via Revolut. After "
+#~ "we verify your payment, credits are "
+#~ "added to your balance manually — "
+#~ "not instantly at checkout."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "AppSumo users can buy a one-time"
+#~ " top-up pack anytime, paid via "
+#~ "Revolut and credited manually after we"
+#~ " verify the payment. Pro subscribers "
+#~ "get their quota renewed on their "
+#~ "plan's next cycle and can track "
+#~ "consumption in the dashboard."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Payment is handled entirely by Revolut."
+#~ " After we verify it, access is "
+#~ "activated manually — no automatic "
+#~ "renewal, no card on file."
+#~ msgstr ""
 

@@ -1,6 +1,7 @@
 """Riconciliazione admin (app/billing/paddle_reconciliation.py) — fallback
 per webhook persi: dry-run non scrive nulla, apply scrive, tocca solo
-l'environment richiesto e mai utenti Revolut/AppSumo/legacy."""
+l'environment richiesto e mai utenti AppSumo/legacy (incluso il canale
+Revolut dismesso)."""
 from datetime import datetime, timedelta, timezone
 
 import pytest

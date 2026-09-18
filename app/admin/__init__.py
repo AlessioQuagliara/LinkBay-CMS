@@ -3,8 +3,6 @@ from app.admin.views import (
     PaddleTransactionAdminView,
     PaddleWebhookEventAdminView,
     ResourceUsageLogAdminView,
-    RevolutActivationView,
-    RevolutAiTopupView,
     UserAdminView,
 )
 from app.extensions import admin, db
@@ -18,13 +16,3 @@ def init_admin():
     admin.add_view(ResourceUsageLogAdminView(ResourceUsageLog, db, name="Usage Log"))
     admin.add_view(PaddleWebhookEventAdminView(PaddleWebhookEvent, db, name="Paddle Webhook Events"))
     admin.add_view(PaddleTransactionAdminView(PaddleTransaction, db, name="Paddle Transactions"))
-    # Non-CRUD, nascoste dal menu (is_visible() -> False), raggiungibili solo
-    # dai link nella riga utente (vedi UserAdminView.column_formatters):
-    # "Attiva abbonamento Revolut" (piano Pro a termine) e "Accredita top-up
-    # AI Revolut" (vendita una tantum, ledger crediti — mai il piano).
-    admin.add_view(
-        RevolutActivationView(name="Revolut Activation", endpoint="revolut-activation")
-    )
-    admin.add_view(
-        RevolutAiTopupView(name="Revolut AI Top-up", endpoint="revolut-ai-topup")
-    )

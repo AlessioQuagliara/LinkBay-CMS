@@ -24,7 +24,7 @@ window.PaddleCheckout = (function () {
       const res = await window.Common.postForm(url, params);
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        alert(data.message || "This payment option isn't available right now.");
+        window.Common.showToast(data.message || "This payment option isn't available right now.", "error");
         setBusy(button, false);
         return;
       }
@@ -32,10 +32,10 @@ window.PaddleCheckout = (function () {
         window.location.href = data.checkout_url;
         return;
       }
-      alert("Unexpected response — please try again.");
+      window.Common.showToast("Unexpected response — please try again.", "error");
       setBusy(button, false);
     } catch (e) {
-      alert("Network error — please try again.");
+      window.Common.showToast("Network error — please try again.", "error");
       setBusy(button, false);
     }
   }

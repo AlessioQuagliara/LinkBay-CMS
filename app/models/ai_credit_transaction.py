@@ -33,37 +33,36 @@ class AiCreditTransaction(db.Model):
     action = db.Column(db.String(30), nullable=True)
 
     # Legacy Lemon Squeezy (integrazione dismessa — vedi
-    # app/billing/revolut_ai_topup.py per il flusso attuale). Valorizzato solo
+    # app/billing/paddle_products.py per il flusso attuale). Valorizzato solo
     # per le vecchie transazioni "grant_purchase"/"adjustment"; nessun codice
     # nuovo lo scrive più, mantenuto nullable e silenzioso per l'audit
-    # storico (mai riusato per il nuovo flusso Revolut, vedi payment_source).
+    # storico (mai riusato dai flussi successivi, vedi payment_source).
     ls_order_id = db.Column(db.String(255), nullable=True, index=True)
     site_url = db.Column(db.String(500), nullable=True)
 
-    # --- Top-up manuale Revolut (vedi app/billing/revolut_ai_topup.py) -----
+    # --- Top-up a pagamento (Paddle, e storicamente Revolut manuale) -------
 
     # Saldo prima dell'accredito — solo per le transazioni "grant_purchase"
-    # via Revolut: balance_after da solo non distingue "quanto è cambiato" a
+    # a pagamento: balance_after da solo non distingue "quanto è cambiato" a
     # colpo d'occhio nell'audit. Non retroattivo sullo storico Lemon Squeezy
     # (resta NULL lì, ricostruibile comunque da amount/balance_after in
     # sequenza se mai servisse).
     balance_before = db.Column(db.Integer, nullable=True)
 
     # Chiave stabile del pacchetto (vedi
-    # app/billing/revolut_products.py::AI_TOPUP_CATALOG) — distinta dal
+    # app/billing/paddle_products.py::PADDLE_CREDIT_PACKAGES) — distinta dal
     # vecchio "credits_<amount>" di Lemon Squeezy, mai riusata per non
     # confondere i due flussi in report/audit.
     product_key = db.Column(db.String(50), nullable=True)
 
-    # Riferimento pagamento Revolut inserito dall'admin — univoco fra TUTTI i
-    # top-up (qualunque utente): è il perno dell'idempotenza (vedi
-    # app/billing/revolut_ai_topup.py::credit_revolut_ai_topup). Condivide lo
-    # spazio dei nomi con users.subscription_activation_reference tramite
-    # app/billing/payment_references.py — un riferimento non può sbloccare
-    # sia un abbonamento sia un top-up.
+    # Riferimento pagamento (paddle_transaction_id per Paddle, o storicamente
+    # il riferimento inserito a mano dall'admin per il canale Revolut
+    # dismesso) — univoco fra TUTTI i top-up (qualunque utente): è il perno
+    # dell'idempotenza (vedi app/billing/paddle_transactions.py).
     payment_reference = db.Column(db.String(255), nullable=True, unique=True)
-    # "revolut_manual" | "legacy_lemonsqueezy" (mai backfillato sullo storico:
-    # resta NULL per le righe precedenti a questa migrazione).
+    # "paddle" | "revolut_manual" (canale dismesso, valore storico) |
+    # "legacy_lemonsqueezy" (mai backfillato sullo storico: resta NULL per le
+    # righe precedenti a questa migrazione).
     payment_source = db.Column(db.String(30), nullable=True)
 
     approved_by_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)

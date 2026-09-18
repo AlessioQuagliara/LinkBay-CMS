@@ -62,10 +62,9 @@ PLAN_LIMITS: dict[str, PlanLimits] = {
         ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=75, ai_credit_topups_allowed=True,
         white_label=True, concurrent_scans=3, api_rate_per_min=120, queue_priority="high",
     ),
-    # Pro Mensile — legacy Lemon Squeezy, dismesso dal flusso commerciale
-    # (vedi app/billing/revolut_manual_activation.py). Voce mantenuta per gli
-    # utenti già su questo plan_type: stessi limiti tecnici di sempre, solo
-    # non più assegnabile a un nuovo utente.
+    # Pro Mensile — legacy Lemon Squeezy, dismesso dal flusso commerciale.
+    # Voce mantenuta per gli utenti già su questo plan_type: stessi limiti
+    # tecnici di sempre, solo non più assegnabile a un nuovo utente.
     "subscription_monthly": PlanLimits(
         name="Pro Monthly (legacy)",
         site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
@@ -79,10 +78,10 @@ PLAN_LIMITS: dict[str, PlanLimits] = {
         ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
         white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
     ),
-    # Pro via Revolut (link di pagamento manuale, attivazione da Flask-Admin —
-    # vedi app/billing/revolut_manual_activation.py). Stessi limiti tecnici
-    # del Pro storico: cambia solo come si paga e si attiva, non cosa si
-    # ottiene. Tre durate diverse, nessuna differenza di limiti tra loro.
+    # Pro via Revolut — legacy, canale di pagamento dismesso (l'attivazione
+    # manuale da Flask-Admin non esiste più). Voce mantenuta SOLO per gli
+    # utenti già attivati su questo plan_type prima della dismissione: stessi
+    # limiti tecnici di sempre, non più assegnabile a un nuovo utente.
     "revolut_1m": PlanLimits(
         name="Pro — 1 Month (Revolut)",
         site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
@@ -101,12 +100,12 @@ PLAN_LIMITS: dict[str, PlanLimits] = {
         ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
         white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
     ),
-    # Pro via Paddle Billing (checkout server-driven, abbonamento RICORRENTE
-    # — a differenza dei piani Revolut sopra, Paddle rinnova da solo a ogni
-    # ciclo; vedi app/billing/paddle_subscriptions.py). Stessi identici
-    # limiti tecnici dei tre piani Revolut equivalenti: è lo stesso piano
-    # Pro, cambia solo processore e meccanica di rinnovo — non un tier
-    # diverso, vedi app/billing/paddle_products.py.
+    # Pro via Paddle Billing (checkout server-driven, abbonamento RICORRENTE:
+    # Paddle rinnova da solo a ogni ciclo; vedi
+    # app/billing/paddle_subscriptions.py). Stessi identici limiti tecnici
+    # dei tre piani legacy "revolut_*" sopra: è lo stesso piano Pro, cambia
+    # solo processore e meccanica di rinnovo — vedi
+    # app/billing/paddle_products.py.
     "paddle_1m": PlanLimits(
         name="Pro — Monthly (Paddle)",
         site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
@@ -174,23 +173,3 @@ APPSUMO_TIER_PRICES = {
 PRO_MONTHLY_PRICE = 79
 PRO_ANNUAL_PRICE = 790
 TRIAL_DAYS = 13
-
-# Piani Pro attivabili via Revolut (link di pagamento manuale — vedi
-# app/billing/revolut_manual_activation.py). Prezzo in euro come mostrato
-# nella pagina /billing/upgrade; durata in giorni per il calcolo scadenza è
-# in REVOLUT_PLAN_DAYS dentro il service, non qui (questo dizionario è solo
-# per la UI, non guida alcuna logica di attivazione).
-REVOLUT_PLAN_PRICES = {
-    "revolut_1m": 79.90,
-    "revolut_3m": 209.90,
-    "revolut_12m": 790.00,
-}
-# Etichette commerciali "risparmi ~X%" mostrate come badge sulla card,
-# calcolate a mano una volta sola rispetto al costo mensile equivalente
-# (79.90 x 3 = 239.70, x 12 = 958.80) — non ricalcolate a runtime per
-# evitare arrotondamenti diversi da quanto comunicato commercialmente.
-REVOLUT_PLAN_SAVINGS_LABEL = {
-    "revolut_1m": None,
-    "revolut_3m": "~13%",
-    "revolut_12m": "~17%",
-}

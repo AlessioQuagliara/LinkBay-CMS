@@ -23,24 +23,21 @@ LinkBayCMS ha 3 modelli commerciali:
    automaticamente a un piano Pro ricorrente: serve contattare il supporto
    per una migrazione controllata.
 
-2) PRO (pagamento manuale via Revolut Business, link di pagamento — non è un
-   abbonamento ricorrente automatico): tre durate, 79,90€ per 1 mese, 209,90€
-   per 3 mesi (circa il 13% di sconto), 790,00€ per 12 mesi (circa il 17% di
-   sconto). 100 siti collegati, fino a circa 250.000 pagine monitorate,
-   refresh dati giornaliero, export PDF/CSV illimitati, white label incluso,
-   quota AI inclusa (100 crediti al mese), coda con priorità alta, supporto
-   prioritario. Prova gratuita di 13 giorni, nessuna carta di credito
-   richiesta. Il cliente paga sul link Revolut e riceve accesso dopo verifica
-   manuale del pagamento da parte del team (di norma entro un giorno
-   lavorativo) — non è un rinnovo automatico: alla scadenza va ripagato lo
-   stesso link per continuare.
+2) PRO (abbonamento ricorrente, checkout con carta gestito da Paddle):
+   tre durate, 79,90€ per 1 mese, 209,90€ per 3 mesi (circa il 13% di
+   sconto), 790,00€ per 12 mesi (circa il 17% di sconto). 100 siti collegati,
+   fino a circa 250.000 pagine monitorate, refresh dati giornaliero, export
+   PDF/CSV illimitati, white label incluso, quota AI inclusa (100 crediti al
+   mese), coda con priorità alta, supporto prioritario. Prova gratuita di 13
+   giorni, nessuna carta di credito richiesta. L'attivazione è istantanea al
+   checkout e l'abbonamento si rinnova da solo a ogni scadenza del ciclo
+   (1/3/12 mesi), finché non viene cancellato.
 
 CREDITI AI EXTRA (solo per chi ha un piano AppSumo, non per Pro — il piano
 Pro include già la sua quota mensile): pacchetti one-time "AI Starter" (50
-crediti, €7), "AI Growth" (150 crediti, €15) o "AI Scale" (500 crediti,
-€39), pagati anch'essi su un link Revolut e accreditati manualmente dal
-team dopo la verifica del pagamento (stesso principio dei piani Pro, non è
-un accredito istantaneo al checkout). I crediti non scadono mai.
+crediti, €7), "AI Growth" (150 crediti, €15) o "AI Scale" (500 crediti, €39),
+pagati con carta via Paddle e accreditati istantaneamente al checkout. I
+crediti non scadono mai.
 
 COME FUNZIONA IL PRODOTTO: ci si collega in sola lettura al proprio account
 Google Search Console (nessuna modifica al sito, nessun codice da

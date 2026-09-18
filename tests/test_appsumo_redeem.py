@@ -1,12 +1,12 @@
 """Riscatto codici AppSumo multi-tier (app/billing/routes.py::redeem) —
-invariato dalla rimozione di Lemon Squeezy (vedi
-app/billing/revolut_manual_activation.py).
+invariato dalla rimozione di Lemon Squeezy.
 
 Nota: i test sulla migrazione controllata AppSumo->abbonamento
 (appsumo_migration_unlocked bloccava un POST a /billing/checkout verso Lemon
 Squeezy) sono stati rimossi insieme alla route stessa — /billing/checkout non
-esiste più: il piano Pro si paga su un link Revolut statico, non più su un
-checkout interno da gatekeepare. Il flag appsumo_migration_unlocked resta sul
+esiste più: il piano Pro si paga oggi via Paddle Billing (checkout
+server-driven, vedi app/billing/paddle_routes.py), non più su un checkout
+interno da gatekeepare. Il flag appsumo_migration_unlocked resta sul
 modello/Flask-Admin ma non ha oggi alcun consumer applicativo (vedi
 app/models/user.py)."""
 from app.extensions import db

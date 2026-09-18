@@ -1,7 +1,7 @@
 """Gate di accesso centralizzato: un solo before_request per tutta l'app,
 invece di un decoratore su ogni singola route. Blocca chi ha finito il trial
-di 13 giorni e non ha un piano Pro attivo (Paddle, Revolut manuale, o legacy
-Lemon Squeezy — vedi app/entitlements/service.py::has_active_entitlement),
+di 13 giorni e non ha un piano Pro attivo (Paddle, o legacy Revolut/Lemon
+Squeezy — vedi app/entitlements/service.py::has_active_entitlement),
 reindirizzandolo alla pagina di upgrade."""
 from flask import redirect, request, url_for
 from flask_limiter.util import get_remote_address

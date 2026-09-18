@@ -7,9 +7,9 @@ nessuna logica di sincronizzazione duplicata, quindi nessun rischio che
 riconciliazione e webhook divergano su cosa significa "un evento valido".
 
 Tocca SOLO utenti con subscription_source == "paddle" e paddle_environment
-== l'environment richiesto — mai un utente Revolut/AppSumo/legacy (Fase 7:
-"non modifica automaticamente record legacy"), e mai un utente Paddle
-dell'altro environment (mai mescolare sandbox e production)."""
+== l'environment richiesto — mai un utente AppSumo/legacy (Fase 7: "non
+modifica automaticamente record legacy"), e mai un utente Paddle dell'altro
+environment (mai mescolare sandbox e production)."""
 from __future__ import annotations
 
 from dataclasses import dataclass, field

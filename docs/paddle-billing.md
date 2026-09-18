@@ -1,11 +1,13 @@
 # Paddle Billing — architettura, setup, operazioni
 
-Integrazione Paddle Billing come provider **principale** per gli abbonamenti
-Pro e i pacchetti crediti AI, in **parallelo** ai canali legacy/manuali
-(Revolut Business, AppSumo) — non li sostituisce, non li rimuove. Questo
-documento copre architettura, setup, eventi gestiti, test, go-live,
-rollback, riconciliazione e le policy sui casi limite (cancellazioni,
-mancati pagamenti, rimborsi).
+Integrazione Paddle Billing come provider **unico** per gli abbonamenti Pro
+correnti e i pacchetti crediti AI, in parallelo al canale lifetime AppSumo
+(non sostituito). Il vecchio canale Revolut Business (link di pagamento
+manuali) è stato dismesso: i campi che scriveva restano in DB solo per
+l'audit storico degli utenti già attivati così (vedi §12). Questo documento
+copre architettura, setup, eventi gestiti, test, go-live, rollback,
+riconciliazione e le policy sui casi limite (cancellazioni, mancati
+pagamenti, rimborsi).
 
 ## 1. Architettura del flusso
 
@@ -38,7 +40,7 @@ POST /webhooks/paddle   (app/webhooks/routes.py)
     - subscription.* -> app/billing/paddle_subscriptions.py
         aggiorna User (subscription_status, plan_type, subscription_expires_at, ...)
     - transaction.completed (ai_credits) -> app/billing/paddle_transactions.py
-        grant_credits() — STESSA funzione già usata dal top-up manuale Revolut
+        grant_credits() — stessa funzione condivisa con la quota mensile
     - UNA sola fonte di verità per l'accesso: SOLO il webhook scrive User.
       Il checkout non concede mai nulla, la pagina di ritorno non "vede" mai
       un pagamento riuscito prima del webhook.
@@ -92,35 +94,34 @@ Nessuna modifica al codice applicativo è richiesta per questo passaggio.
 
 ## 4. Catalogo e mappatura interna
 
-I piani Pro venduti oggi via Revolut (1/3/12 mesi, prezzi in
-`app/entitlements/limits.py::REVOLUT_PLAN_PRICES`) diventano su Paddle
-**abbonamenti ricorrenti** con lo stesso prezzo per ciclo di fatturazione:
+I tre piani Pro (prezzi in
+`app/billing/paddle_products.py::PADDLE_PLAN_PRICES`) sono **abbonamenti
+ricorrenti**, uno per ciclo di fatturazione:
 
-| Chiave interna | Ciclo Paddle | Prezzo/ciclo | Equivalente Revolut |
-|---|---|---|---|
-| `paddle_1m` | ogni 1 mese | €79.90 | `revolut_1m` (identici limiti tecnici) |
-| `paddle_3m` | ogni 3 mesi | €209.90 | `revolut_3m` |
-| `paddle_12m` | ogni 1 anno | €790.00 | `revolut_12m` |
+| Chiave interna | Ciclo Paddle | Prezzo/ciclo |
+|---|---|---|
+| `paddle_1m` | ogni 1 mese | €79.90 |
+| `paddle_3m` | ogni 3 mesi | €209.90 |
+| `paddle_12m` | ogni 1 anno | €790.00 |
 
-**Nota di business importante**: a differenza dei piani Revolut (pagamento
-una tantum per un periodo fisso, nessun rinnovo automatico), un abbonamento
-Paddle **si rinnova da solo** a ogni ciclo finché non viene cancellato. È lo
-stesso prodotto Pro, ma la semantica commerciale cambia (addebito
-ricorrente vs "paghi e basta per N mesi") — comunicalo chiaramente in UI/
-email se non l'hai già fatto altrove, non è coperto da questo lavoro.
+Stessi identici limiti tecnici dei tre piani legacy `revolut_1m/3m/12m`
+(canale dismesso, vedi §12) — è lo stesso prodotto Pro, cambia solo il
+processore. A differenza di quel vecchio flusso (pagamento una tantum per un
+periodo fisso, nessun rinnovo automatico), un abbonamento Paddle **si
+rinnova da solo** a ogni ciclo finché non viene cancellato.
 
-Pacchetti crediti AI (`app/entitlements/limits.py::AI_CREDIT_PACKS`): stessa
-identica offerta di Revolut, venduta come transazione one-time.
+Pacchetti crediti AI (`app/entitlements/limits.py::AI_CREDIT_PACKS`):
+venduti come transazione one-time.
 
 Tutta la mappatura vive in `app/billing/paddle_products.py` — whitelist
 server-side, mai un price_id/piano inventato o accettato dal client.
 
 ### Setup catalogo (sandbox)
 
-Il MCP Paddle configurato in questo ambiente non si è connesso
-(`paddle-sandbox`: 401 "Server rejected the configured Authorization
-header") al momento di questa integrazione — non è stato usato per creare
-risorse. Usa invece il comando idempotente:
+Il server MCP `paddle-sandbox` è utilizzabile per creare/ispezionare
+prodotti e price direttamente (usato per popolare il catalogo iniziale il
+17/09/2026). In alternativa, o per rilanciare il sync in autonomia, usa il
+comando idempotente:
 
 ```
 flask paddle-sync-catalog --environment sandbox
@@ -171,11 +172,10 @@ Developer Tools → Notifications → **+ New destination**.
 
 **Idempotenza**: `event_id` è UNIQUE in `paddle_webhook_events` — un replay
 Paddle (stesso evento consegnato più volte) ritorna `200 {"status":
-"duplicate"}` senza rieseguire nulla. Per i crediti AI c'è una seconda
-difesa indipendente: `AiCreditTransaction.payment_reference` è UNIQUE
-(stesso meccanismo già in uso per Revolut), quindi anche due *event_id
-diversi* che puntassero allo stesso `transaction_id` Paddle non
-accrediterebbero due volte.
+"duplicate"}` senza rieseguire nulla. Per i crediti AI c'è una seconda difesa
+indipendente: `AiCreditTransaction.payment_reference` è UNIQUE, quindi anche
+due *event_id diversi* che puntassero allo stesso `transaction_id` Paddle
+non accrediterebbero due volte.
 
 **Fuori ordine**: ogni evento `subscription.*` porta un `occurred_at`. Se
 arriva un evento con `occurred_at` più vecchio dell'ultimo già applicato per
@@ -249,10 +249,10 @@ possibile e vanno confermati/affinati da chi decide il prodotto:
 - **Refund/chargeback**: NON gestiti automaticamente (nessun evento
   `adjustment.*`/webhook di refund sottoscritto). Un rimborso Paddle non
   revoca oggi né l'accesso né i crediti AI accreditati — non esisteva una
-  policy di claw-back documentata da cui partire (a differenza del flusso
-  Revolut, dove `adjust_credits()` supporta uno storno manuale). Se serve,
-  va aggiunto un handler per l'evento di refund Paddle con una policy
-  esplicita, non inventata qui.
+  policy di claw-back documentata da cui partire, anche se
+  `adjust_credits()` in app/entitlements resta disponibile per uno storno
+  manuale da admin. Se serve, va aggiunto un handler per l'evento di refund
+  Paddle con una policy esplicita, non inventata qui.
 - **Grace period per crediti AI insufficienti dopo downgrade**: non
   applicabile, i crediti non scadono mai (comportamento invariato).
 
@@ -262,16 +262,15 @@ Paddle è additivo: disabilitarlo non richiede rimuovere codice.
 
 - **Rollback immediato (nascondere le CTA)**: svuota tutti i
   `PADDLE_*_PRICE_ID_*` per l'environment attivo — le card "Pay with card"
-  spariscono da `/billing/upgrade` e `/billing/credits` (stessa logica delle
-  CTA Revolut disabilitate quando un link non è configurato), Revolut/AppSumo
-  restano intatti.
+  spariscono da `/billing/upgrade` e `/billing/credits` (bottone disabilitato
+  invece di un price_id vuoto), AppSumo resta intatto.
 - **Rollback completo**: rimuovi l'endpoint webhook dal Dashboard Paddle
   (Paddle smette di consegnare eventi) e svuota `PADDLE_API_KEY` — ogni
   chiamata di checkout fallirà con `503 not_configured` invece di un errore
   silenzioso.
-- Nessun utente Revolut/AppSumo/legacy viene mai toccato da questi rollback:
-  i loro campi (`subscription_source` diverso da `"paddle"`) non sono letti
-  da nessun codice Paddle.
+- Nessun utente AppSumo/legacy viene mai toccato da questi rollback: i loro
+  campi (`subscription_source` diverso da `"paddle"`) non sono letti da
+  nessun codice Paddle.
 
 ## 11. Riconciliazione (webhook persi o stato incoerente)
 
@@ -286,18 +285,24 @@ locale (`subscription_source == "paddle"`, stesso `paddle_environment`
 richiesto) e lo riapplica con la **stessa** funzione usata dal webhook
 (`apply_subscription_event`) — nessuna logica duplicata. Stampa un report
 prima/dopo per ogni utente controllato. Non tocca mai utenti
-Revolut/AppSumo/legacy, né l'altro environment.
+AppSumo/legacy, né l'altro environment.
 
 ## 12. Utenti legacy Revolut/AppSumo
 
-Nessuna migrazione automatica. Un utente Revolut manuale o AppSumo lifetime
+Il canale Revolut Business (link di pagamento manuali, attivazione da
+Flask-Admin) è stato dismesso: il codice che lo implementava
+(`app/billing/revolut_*.py`, le view admin dedicate, i template) non esiste
+più. Gli utenti già attivati così restano com'erano — i campi che quel flusso
+scriveva (`plan_type` in `revolut_1m/3m/12m`, `subscription_activated_at`,
+`subscription_activation_reference`, ecc.) restano in DB solo per l'audit
+storico, e `PLAN_LIMITS`/`has_active_access` continuano a riconoscerli senza
+bisogno di alcuna migrazione: un utente Revolut manuale o AppSumo lifetime
 continua esattamente come prima finché non effettua volontariamente un
 acquisto Paddle (a quel punto `subscription_source` diventa `"paddle"` per
 quell'utente). `app/billing/paddle_subscriptions.py::apply_subscription_event`
 protegge esplicitamente gli account `subscription_status == "lifetime"`: un
 evento Paddle non può mai declassare un account AppSumo, qualunque cosa
-dica il payload (stessa regola già in vigore per l'attivazione manuale
-Revolut).
+dica il payload.
 
 Associazione manuale (recupero di un `custom_data` perso, o migrazione
 concordata col cliente): campi `paddle_customer_id`/`paddle_subscription_id`

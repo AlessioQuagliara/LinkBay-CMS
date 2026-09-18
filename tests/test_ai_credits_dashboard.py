@@ -4,9 +4,8 @@ app/entitlements/service.py::get_ai_credit_overview) e storico
 calcolati SOLO server-side dal ledger reale, mai da input del client.
 
 Convenzione: un solo login per test, mai un GET anonimo intercalato con
-session_transaction nello stesso test (vedi tests/test_revolut_ai_topup.py
-per la spiegazione — è un artefatto del test client di Werkzeug, non
-dell'app)."""
+session_transaction nello stesso test — è un artefatto del test client di
+Werkzeug, non dell'app."""
 from datetime import datetime, timedelta, timezone
 
 from app.entitlements.service import get_ai_credit_overview
@@ -50,7 +49,7 @@ def test_overview_next_grant_only_when_active_and_credit_mode(db_session, make_u
     assert get_ai_credit_overview(active).next_monthly_grant_at is not None
 
     expired = make_user(
-        plan_type="revolut_1m", subscription_status="active", email="b@example.com",
+        plan_type="paddle_1m", subscription_status="active", email="b@example.com",
         subscription_expires_at=datetime.now(timezone.utc) - timedelta(days=1),
     )
     assert get_ai_credit_overview(expired).has_active_access is False
@@ -74,7 +73,7 @@ def test_overview_purchased_total_from_ledger(db_session, make_user):
     user = make_user(plan_type="appsumo_tier1", subscription_status="lifetime", ai_credit_balance=150)
     db_session.add(AiCreditTransaction(
         user_id=user.id, type="grant_purchase", amount=150, balance_before=0, balance_after=150,
-        payment_source="revolut_manual", product_key="ai_topup_growth",
+        payment_source="paddle", product_key="ai_topup_growth",
     ))
     db_session.commit()
 
@@ -110,7 +109,7 @@ def test_credits_page_shows_upgrade_message_for_inactive_plan(client, db_session
     # /billing/credits resta sempre raggiungibile: è lì che si vede
     # davvero il ramo "piano non attivo" della card.
     user = make_user(
-        plan_type="revolut_1m", subscription_status="active",
+        plan_type="paddle_1m", subscription_status="active",
         subscription_expires_at=datetime.now(timezone.utc) - timedelta(days=2),
     )
     _login(client, user)
@@ -172,7 +171,7 @@ def test_credits_page_hides_sensitive_admin_data(client, db_session, make_user):
     admin = make_user(plan_type="trial", is_admin=True, email="secretadmin@example.com")
     db_session.add(AiCreditTransaction(
         user_id=user.id, type="grant_purchase", amount=150, balance_before=0, balance_after=150,
-        payment_source="revolut_manual", product_key="ai_topup_growth",
+        payment_source="paddle", product_key="ai_topup_growth",
         payment_reference="REV-SECRET-REF-12345", admin_note="Called customer, verified via phone.",
         approved_by_user_id=admin.id, ls_order_id="ls_legacy_999",
     ))
@@ -195,39 +194,31 @@ def test_credits_page_trial_user_redirected_no_ledger(client, db_session, make_u
     assert res.status_code == 302
 
 
-# --- CTA acquisto: eleggibilità + link configurato/assente ------------------
+# --- CTA acquisto: eleggibilità + price_id configurato/assente -------------
 
 
 def test_buy_cta_shown_for_eligible_appsumo_user(client, app, db_session, make_user, monkeypatch):
     user = make_user(plan_type="appsumo_tier1", subscription_status="lifetime")
     _login(client, user)
-    monkeypatch.setitem(app.config, "REVOLUT_AI_TOPUP_LINK_50", "https://pay.revolut.com/test-topup-50")
+    monkeypatch.setitem(app.config, "PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_STARTER", "pri_test_starter")
 
     res = client.get("/billing/credits")
     body = res.get_data(as_text=True)
-    assert "Pay with Revolut" in body
-    assert "https://pay.revolut.com/test-topup-50" in body
-    assert 'target="_blank"' in body
-    assert 'rel="noopener noreferrer"' in body
+    assert "Pay with card" in body
+    assert 'data-credit-package="ai_topup_starter"' in body
 
 
 def test_buy_cta_hidden_for_ineligible_pro_user(client, db_session, make_user):
-    user = make_user(plan_type="revolut_1m", subscription_status="active")
+    user = make_user(plan_type="paddle_1m", subscription_status="active")
     _login(client, user)
     res = client.get("/billing/credits")
     body = res.get_data(as_text=True)
-    assert "Pay with Revolut" not in body
+    assert "data-credit-package=" not in body
 
 
-def test_buy_cta_disabled_when_link_not_configured(client, app, db_session, make_user, monkeypatch):
+def test_buy_cta_disabled_when_price_not_configured(client, app, db_session, make_user, monkeypatch):
     user = make_user(plan_type="appsumo_tier1", subscription_status="lifetime")
     _login(client, user)
-    monkeypatch.setitem(app.config, "REVOLUT_AI_TOPUP_LINK_50", None)
-    monkeypatch.setitem(app.config, "REVOLUT_AI_TOPUP_LINK_150", None)
-    monkeypatch.setitem(app.config, "REVOLUT_AI_TOPUP_LINK_500", None)
-    # La CTA "non configurato" compare solo se NESSUno dei due processori è
-    # disponibile — disabilitiamo anche Paddle (vedi
-    # tests/test_paddle_checkout.py per il caso "solo Paddle disponibile").
     monkeypatch.setitem(app.config, "PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_STARTER", None)
     monkeypatch.setitem(app.config, "PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_GROWTH", None)
     monkeypatch.setitem(app.config, "PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_SCALE", None)
@@ -235,4 +226,4 @@ def test_buy_cta_disabled_when_link_not_configured(client, app, db_session, make
     res = client.get("/billing/credits")
     body = res.get_data(as_text=True)
     assert "Payment link not configured yet" in body
-    assert "Pay with Revolut" not in body
+    assert "data-credit-package=" not in body

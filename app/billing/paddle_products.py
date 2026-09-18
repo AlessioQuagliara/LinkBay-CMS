@@ -1,30 +1,25 @@
-"""Catalogo whitelist server-side per Paddle Billing — stesso spirito di
-app/billing/revolut_products.py: fonte unica per i checkout route
-(app/billing/paddle_routes.py), il webhook (app/webhooks/routes.py, per
-risalire dal price_id al piano/pacchetto interno) e lo script di sync
-catalogo (app/billing/paddle_catalog_sync.py). Nessun price_id, importo o
-piano è mai inventato qui: i numeri vengono SEMPRE da
-app/entitlements/limits.py (REVOLUT_PLAN_PRICES, AI_CREDIT_PACKS), la stessa
-fonte già usata dal flusso Revolut — Paddle vende esattamente lo stesso
-prodotto, solo con un processore di pagamento diverso.
+"""Catalogo whitelist server-side per Paddle Billing — fonte unica per i
+checkout route (app/billing/paddle_routes.py), il webhook
+(app/webhooks/routes.py, per risalire dal price_id al piano/pacchetto
+interno) e lo script di sync catalogo (app/billing/paddle_catalog_sync.py).
+Nessun price_id o price_id è mai inventato qui: i price_id vengono sempre da
+.env (popolati da `flask paddle-sync-catalog`), gli importi/etichette sono
+definiti qui sotto e in app/entitlements/limits.py (AI_CREDIT_PACKS).
 
 Due cataloghi distinti, stessa forma:
 - PADDLE_SUBSCRIPTION_PLANS: abbonamento RICORRENTE (Paddle rinnova da solo
-  a ogni ciclo — diverso dal piano Revolut a termine, che non si rinnova mai
-  da solo). Stesso prezzo/durata del ciclo di REVOLUT_PLAN_PRICES: un piano
-  "3 mesi" diventa un abbonamento fatturato ogni 3 mesi (non tre fatture
-  mensili), un piano "12 mesi" un abbonamento fatturato annualmente. Stessi
-  limiti tecnici del corrispondente piano Revolut (vedi
+  a ogni ciclo). Un piano "3 mesi" è un abbonamento fatturato ogni 3 mesi
+  (non tre fatture mensili), un piano "12 mesi" un abbonamento fatturato
+  annualmente. Stessi limiti tecnici per ogni durata (vedi
   app/entitlements/limits.py::PLAN_LIMITS) — è lo stesso piano Pro, cambia
-  solo come si paga e si rinnova.
+  solo la durata del ciclo di fatturazione.
 - PADDLE_CREDIT_PACKAGES: vendita one-time, stessa chiave/crediti/prezzo di
-  app/billing/revolut_products.py::AI_TOPUP_CATALOG (product_key condiviso
-  di proposito: lo stesso pacchetto ha lo stesso nome interno qualunque sia
-  il processore, così il ledger AiCreditTransaction.product_key resta
-  leggibile senza doversi chiedere quale flusso l'ha creato)."""
+  app/entitlements/limits.py::AI_CREDIT_PACKS (product_key stabile: il
+  ledger AiCreditTransaction.product_key resta leggibile nel tempo anche se
+  cambiano etichette commerciali)."""
 from flask import current_app
 
-from app.entitlements.limits import AI_CREDIT_PACK_LABELS, AI_CREDIT_PACKS, REVOLUT_PLAN_PRICES
+from app.entitlements.limits import AI_CREDIT_PACK_LABELS, AI_CREDIT_PACKS
 
 # --- Piani Pro (abbonamento ricorrente) -------------------------------------
 
@@ -41,12 +36,22 @@ PADDLE_PLAN_LABELS = {
     "paddle_3m": "3 months",
     "paddle_12m": "12 months",
 }
-# Stessa fonte prezzo di REVOLUT_PLAN_PRICES — un piano Paddle "paddle_Xm" e
-# il suo equivalente Revolut "revolut_Xm" costano sempre lo stesso.
-PADDLE_PLAN_PRICE_SOURCE = {
-    "paddle_1m": "revolut_1m",
-    "paddle_3m": "revolut_3m",
-    "paddle_12m": "revolut_12m",
+# Prezzo in euro mostrato in /billing/upgrade e nella landing #pricing; non
+# guida alcuna logica di attivazione (quella vive nel webhook Paddle, vedi
+# app/billing/paddle_subscriptions.py).
+PADDLE_PLAN_PRICES = {
+    "paddle_1m": 79.90,
+    "paddle_3m": 209.90,
+    "paddle_12m": 790.00,
+}
+# Etichette commerciali "risparmi ~X%" mostrate come badge sulla card,
+# calcolate a mano una volta sola rispetto al costo mensile equivalente
+# (79.90 x 3 = 239.70, x 12 = 958.80) — non ricalcolate a runtime per
+# evitare arrotondamenti diversi da quanto comunicato commercialmente.
+PADDLE_PLAN_SAVINGS_LABEL = {
+    "paddle_1m": None,
+    "paddle_3m": "~13%",
+    "paddle_12m": "~17%",
 }
 # Env var che contiene il price_id sandbox per ciascun piano (vedi config.py).
 PADDLE_PLAN_SANDBOX_ENV = {
@@ -63,7 +68,8 @@ PADDLE_PLAN_PRODUCTION_ENV = {
 PADDLE_SUBSCRIPTION_PLANS = {
     key: {
         "label": PADDLE_PLAN_LABELS[key],
-        "price": REVOLUT_PLAN_PRICES[PADDLE_PLAN_PRICE_SOURCE[key]],
+        "price": PADDLE_PLAN_PRICES[key],
+        "savings_label": PADDLE_PLAN_SAVINGS_LABEL[key],
         "billing_cycle": PADDLE_PLAN_BILLING_CYCLE[key],
         "sandbox_env": PADDLE_PLAN_SANDBOX_ENV[key],
         "production_env": PADDLE_PLAN_PRODUCTION_ENV[key],
@@ -141,13 +147,13 @@ def reverse_lookup_credit_package(price_id: str) -> str | None:
 
 
 def paddle_pro_plans() -> list[dict]:
-    """Le card mostrate in /billing/upgrade accanto a quelle Revolut — stessa
-    forma di revolut_products.py::revolut_pro_plans()."""
+    """Le card mostrate in /billing/upgrade e nella landing #pricing."""
     return [
         {
             "plan": key,
             "label": entry["label"],
             "price": entry["price"],
+            "savings_label": entry["savings_label"],
             "price_id": resolve_price_id(PADDLE_SUBSCRIPTION_PLANS, key),
         }
         for key, entry in PADDLE_SUBSCRIPTION_PLANS.items()

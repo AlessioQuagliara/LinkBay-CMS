@@ -110,10 +110,8 @@ def apply_subscription_event(
     if user is None:
         return SubscriptionApplyResult(outcome="ignored_no_user", reason="local_user_id non risolvibile")
 
-    # Stessa regola già in vigore per Revolut manuale (vedi
-    # app/billing/revolut_manual_activation.py): un account AppSumo lifetime
-    # non viene mai declassato/sovrascritto da un altro flusso di pagamento,
-    # qualunque cosa dica l'evento in arrivo.
+    # Un account AppSumo lifetime non viene mai declassato/sovrascritto da un
+    # altro flusso di pagamento, qualunque cosa dica l'evento in arrivo.
     if user.subscription_status == "lifetime":
         return SubscriptionApplyResult(
             outcome="ignored_lifetime_protected",

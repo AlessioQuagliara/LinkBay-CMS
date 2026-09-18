@@ -1,14 +1,6 @@
-"""Route billing: pagina di upgrade (piani Pro via Revolut, link di
-pagamento manuali), stato abbonamento, pacchetti crediti AI (idem, vendita
-una tantum) e riscatto codici AppSumo (lifetime, multi-tier — invariato).
-
-Nessun pagamento passa più da qui: ogni CTA in /billing/upgrade e
-/billing/credits è un link statico verso un Revolut Business Payment Link
-(catalogo in app/billing/revolut_products.py), aperto in una nuova scheda.
-Nessun checkout interno, nessun webhook: dopo la notifica di pagamento via
-email, un admin attiva/estende il piano o accredita il top-up da Flask-Admin
-(vedi app/billing/revolut_manual_activation.py e
-app/billing/revolut_ai_topup.py).
+"""Route billing: pagina di upgrade (piani Pro via Paddle, checkout
+server-driven), stato abbonamento, pacchetti crediti AI (idem, vendita una
+tantum) e riscatto codici AppSumo (lifetime, multi-tier — invariato).
 
 Restano sempre raggiungibili (vedi app/billing/access.py: "billing" non è tra
 i blueprint gated) — è la via d'uscita per chi ha finito il trial."""
@@ -17,7 +9,6 @@ from flask_babel import gettext as _
 from flask_login import current_user, login_required
 
 from app.billing.paddle_products import paddle_credit_packages, paddle_pro_plans
-from app.billing.revolut_products import ai_topup_packages, revolut_pro_plans
 from app.entitlements.service import get_ai_credit_overview, get_plan_limits
 from app.extensions import db
 from app.models import AiCreditTransaction, AppSumoCode
@@ -30,16 +21,7 @@ CREDITS_PAGE_SIZE = 20
 @billing_bp.route("/upgrade")
 @login_required
 def upgrade():
-    # Stessa durata (1/3/12 mesi), due processori — costruiamo un'unica
-    # lista di card con entrambe le opzioni di pagamento invece di far
-    # ricostruire l'abbinamento al template. Entrambe le funzioni sorgente
-    # iterano lo stesso ordine di durata (1m, 3m, 12m), quindi lo zip
-    # allinea correttamente per indice senza bisogno di una chiave comune.
-    plans = [
-        {**revolut_plan, "paddle": paddle_plan}
-        for revolut_plan, paddle_plan in zip(revolut_pro_plans(), paddle_pro_plans())
-    ]
-    return render_template("billing/upgrade.html", plans=plans)
+    return render_template("billing/upgrade.html", plans=paddle_pro_plans())
 
 
 @billing_bp.route("/subscription")
@@ -59,8 +41,8 @@ def credits():
     # Piani ai_mode != "credit" (oggi solo trial, cooldown-based) non hanno
     # alcun ledger da mostrare: via diretta invece di una pagina vuota. I
     # pacchetti di acquisto restano riservati agli AppSumo (vedi
-    # ai_credit_topups_allowed nel template) — un piano Pro/Revolut arriva
-    # comunque qui per vedere saldo/storico, solo senza le card di acquisto.
+    # ai_credit_topups_allowed nel template) — un piano Pro arriva comunque
+    # qui per vedere saldo/storico, solo senza le card di acquisto.
     if get_plan_limits(current_user).ai_mode != "credit":
         flash(_("Your plan doesn't use AI credits."), "info")
         return redirect(url_for("billing.subscription"))
@@ -72,16 +54,9 @@ def credits():
         .paginate(page=page, per_page=CREDITS_PAGE_SIZE, error_out=False)
     )
 
-    # Stesso abbinamento per indice di upgrade() sopra: stesso ordine
-    # (starter, growth, scale) in entrambe le funzioni sorgente.
-    packs = [
-        {**revolut_pack, "paddle": paddle_pack}
-        for revolut_pack, paddle_pack in zip(ai_topup_packages(), paddle_credit_packages())
-    ]
-
     return render_template(
         "billing/credits.html",
-        packs=packs,
+        packs=paddle_credit_packages(),
         ai_credits=get_ai_credit_overview(current_user),
         transactions=transactions,
     )

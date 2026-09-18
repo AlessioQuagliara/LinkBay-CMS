@@ -1,14 +1,15 @@
 from datetime import datetime, timedelta, timezone
 
-from flask import Blueprint, flash, redirect, render_template, session, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, session, url_for
 from flask_babel import gettext as _
 from flask_login import current_user, login_required, login_user, logout_user
 
+from app.auth import captcha as captcha_service
 from app.auth import otp as otp_service
 from app.auth import password_reset as password_reset_service
 from app.auth.forms import ForgotPasswordForm, LoginForm, OtpForm, RegisterForm, ResetPasswordForm
 from app.entitlements.limits import TRIAL_DAYS
-from app.extensions import db
+from app.extensions import db, limiter
 from app.models import User
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
@@ -44,26 +45,33 @@ def _flash_code_status(sent, code):
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
+@limiter.limit("5 per minute;20 per hour")
 def register():
     if current_user.is_authenticated:
         return redirect(url_for("dashboard.overview"))
 
     form = RegisterForm()
     if form.validate_on_submit():
-        email = form.email.data.lower().strip()
-        if User.query.filter_by(email=email).first():
-            flash(_("There is already an account with this email address."), "error")
+        token = request.form.get(captcha_service.FIELD_NAME)
+        if not captcha_service.verify(token, request.remote_addr):
+            flash(_("We couldn't verify you're not a robot. Please try again."), "error")
         else:
-            user = User(name=form.name.data.strip(), email=email)
-            user.set_password(form.password.data)
-            user.trial_ends_at = datetime.now(timezone.utc) + timedelta(days=TRIAL_DAYS)
-            user.plan_type = "trial"
-            db.session.add(user)
-            db.session.commit()
-            # Niente login immediato: prima l'utente conferma l'email con l'OTP.
-            return _start_otp_flow(user, otp_service.PURPOSE_REGISTER)
+            email = form.email.data.lower().strip()
+            if User.query.filter_by(email=email).first():
+                flash(_("There is already an account with this email address."), "error")
+            else:
+                user = User(name=form.name.data.strip(), email=email)
+                user.set_password(form.password.data)
+                user.trial_ends_at = datetime.now(timezone.utc) + timedelta(days=TRIAL_DAYS)
+                user.plan_type = "trial"
+                db.session.add(user)
+                db.session.commit()
+                # Niente login immediato: prima l'utente conferma l'email con l'OTP.
+                return _start_otp_flow(user, otp_service.PURPOSE_REGISTER)
 
-    return render_template("auth/register.html", form=form)
+    return render_template(
+        "auth/register.html", form=form, turnstile_site_key=current_app.config.get("TURNSTILE_SITE_KEY")
+    )
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])

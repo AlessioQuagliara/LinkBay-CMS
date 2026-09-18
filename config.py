@@ -26,6 +26,12 @@ class Config:
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
 
+    # Cloudflare Turnstile — verifica anti-bot sul form di registrazione (vedi
+    # app/auth/captcha.py). Chiavi da dash.cloudflare.com/?to=/:account/turnstile.
+    # Se assenti, il widget non compare e la verifica è saltata (dev/staging).
+    TURNSTILE_SITE_KEY = os.environ.get("TURNSTILE_SITE_KEY")
+    TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY")
+
     # Google Search Console (OAuth2) — vedi app/gsc/.
     GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
     GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
@@ -76,33 +82,11 @@ class Config:
     PASSWORD_RESET_TTL_SECONDS = int(os.environ.get("PASSWORD_RESET_TTL_SECONDS", "3600"))
     PASSWORD_RESET_RESEND_COOLDOWN = int(os.environ.get("PASSWORD_RESET_RESEND_COOLDOWN", "60"))
 
-    # Revolut Business — link di pagamento manuali per i piani Pro (1/3/12
-    # mesi), dopo il trial di 13 giorni (vedi app/billing/). Nessuna API,
-    # nessun webhook: il cliente paga su un link statico creato a mano nella
-    # dashboard Revolut Business, Revolut notifica il pagamento via email e un
-    # admin attiva/estende il piano da Flask-Admin (vedi
-    # app/billing/revolut_manual_activation.py). Se un link non è
-    # configurato, la relativa CTA in /billing/upgrade si disabilita da sola
-    # invece di puntare a un placeholder.
-    REVOLUT_PAYMENT_LINK_1M = os.environ.get("REVOLUT_PAYMENT_LINK_1M")
-    REVOLUT_PAYMENT_LINK_3M = os.environ.get("REVOLUT_PAYMENT_LINK_3M")
-    REVOLUT_PAYMENT_LINK_12M = os.environ.get("REVOLUT_PAYMENT_LINK_12M")
-
-    # Revolut Business — link di pagamento manuali per i pacchetti crediti AI
-    # (vendita una tantum, riservata ai piani AppSumo — vedi
-    # app/entitlements/service.py::get_plan_limits().ai_credit_topups_allowed).
-    # Nome della env var = numero di crediti del pacchetto (vedi
-    # app/billing/revolut_products.py::AI_TOPUP_CATALOG), non l'etichetta
-    # commerciale — resta stabile anche se cambia il naming marketing.
-    REVOLUT_AI_TOPUP_LINK_50 = os.environ.get("REVOLUT_AI_TOPUP_LINK_50")
-    REVOLUT_AI_TOPUP_LINK_150 = os.environ.get("REVOLUT_AI_TOPUP_LINK_150")
-    REVOLUT_AI_TOPUP_LINK_500 = os.environ.get("REVOLUT_AI_TOPUP_LINK_500")
-
     # Paddle Billing — provider principale per abbonamenti Pro (checkout
     # server-driven, webhook firmati) e pacchetti crediti AI one-time. Vedi
     # app/billing/paddle_client.py per la scelta sandbox/production e
-    # docs/paddle-billing.md per l'architettura completa. Revolut/AppSumo
-    # restano attivi come canali legacy/manuali (vedi sopra), non sostituiti.
+    # docs/paddle-billing.md per l'architettura completa. AppSumo resta
+    # attivo come canale lifetime separato (vedi app/billing/routes.py::redeem).
     #
     # "sandbox" (default) o "production" — l'UNICA leva che decide sia il
     # base URL API (sandbox-api.paddle.com vs api.paddle.com) sia quale set
@@ -131,8 +115,7 @@ class Config:
     PADDLE_SUCCESS_URL = os.environ.get("PADDLE_SUCCESS_URL")
     PADDLE_DEFAULT_CURRENCY = os.environ.get("PADDLE_DEFAULT_CURRENCY", "EUR")
 
-    # Price ID Paddle per i tre piani Pro (stessa durata/prezzo di
-    # REVOLUT_PLAN_PRICES in app/entitlements/limits.py — vedi
+    # Price ID Paddle per i tre piani Pro (vedi PADDLE_PLAN_PRICES in
     # app/billing/paddle_products.py) e per i tre pacchetti crediti AI
     # (stessi numeri di AI_CREDIT_PACKS). Due set separati, MAI mescolati:
     # quale set viene letto dipende solo da PADDLE_ENVIRONMENT sopra.

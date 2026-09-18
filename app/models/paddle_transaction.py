@@ -7,18 +7,16 @@ class PaddleTransaction(db.Model):
     """Ledger di riconciliazione locale per ogni transazione Paddle, creata
     lato server al momento del checkout (status "pending") e chiusa dal
     webhook `transaction.completed`/`transaction.payment_failed` (vedi
-    app/billing/paddle_transactions.py). `paddle_transaction_id` è UNIQUE:
-    stesso ruolo di `payment_reference` nel flusso Revolut manuale
-    (app/billing/payment_references.py) — impedisce un doppio accredito se
-    lo stesso evento arriva più volte.
+    app/billing/paddle_transactions.py). `paddle_transaction_id` è UNIQUE —
+    impedisce un doppio accredito se lo stesso evento arriva più volte.
 
     Per gli acquisti di crediti AI, questa tabella è un audit trail
     *aggiuntivo*: l'accredito vero passa comunque da
     app/entitlements/ai_credits.py::grant_credits, che scrive anche in
     AiCreditTransaction (payment_source="paddle", payment_reference=
     paddle_transaction_id) — stessa fonte di verità già usata dalla UI
-    (/billing/credits) e dagli stessi test del flusso Revolut, non
-    duplicata. Per gli abbonamenti, l'accesso è invece guidato dagli eventi
+    (/billing/credits), non duplicata. Per gli abbonamenti, l'accesso è
+    invece guidato dagli eventi
     `subscription.*` (vedi app/models/user.py) — qui la riga resta solo
     audit/correlazione, non un secondo punto di scrittura dell'entitlement."""
 
