@@ -14,9 +14,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
-from app.billing.paddle_products import reverse_lookup_plan
+from app.billing.paddle_products import PADDLE_SUBSCRIPTION_PLANS, reverse_lookup
 from app.extensions import db
 from app.models import User
+from app.utils import aware
 
 # Stati Paddle accettati: stesso vocabolario di subscription_status locale.
 PADDLE_STATUSES = {"active", "trialing", "past_due", "paused", "canceled"}
@@ -40,6 +41,17 @@ def _parse_dt(value: str | None) -> datetime | None:
         return None
 
 
+def user_from_custom_data(data: dict) -> User | None:
+    """Utente da custom_data.local_user_id (impostato da noi al checkout)."""
+    local_user_id = (data.get("custom_data") or {}).get("local_user_id")
+    if local_user_id is None:
+        return None
+    try:
+        return db.session.get(User, int(local_user_id))
+    except (TypeError, ValueError):
+        return None
+
+
 def _resolve_user(data: dict) -> User | None:
     """Risolve l'utente locale nell'ordine di affidabilità decrescente:
     1) custom_data.local_user_id (impostato da noi alla creazione del
@@ -56,15 +68,9 @@ def _resolve_user(data: dict) -> User | None:
     Non crea mai un utente: se nessuna delle tre risoluzioni trova una riga
     esistente, l'evento è "ignored_no_user" — riconciliabile a mano da un
     admin (vedi app/billing/paddle_reconciliation.py e Fase 7)."""
-    custom_data = data.get("custom_data") or {}
-    local_user_id = custom_data.get("local_user_id")
-    if local_user_id is not None:
-        try:
-            user = db.session.get(User, int(local_user_id))
-        except (TypeError, ValueError):
-            user = None
-        if user is not None:
-            return user
+    user = user_from_custom_data(data)
+    if user is not None:
+        return user
 
     subscription_id = data.get("id")
     if subscription_id:
@@ -90,10 +96,7 @@ def _is_stale(user: User, event_occurred_at: datetime | None) -> bool:
     mai considerato stale: si applica per difetto."""
     if event_occurred_at is None or user.last_paddle_sync_at is None:
         return False
-    last_sync = user.last_paddle_sync_at
-    if last_sync.tzinfo is None:
-        last_sync = last_sync.replace(tzinfo=timezone.utc)
-    return event_occurred_at <= last_sync
+    return event_occurred_at <= aware(user.last_paddle_sync_at)
 
 
 def apply_subscription_event(
@@ -131,7 +134,7 @@ def apply_subscription_event(
     price_id = None
     if items:
         price_id = (items[0].get("price") or {}).get("id")
-    internal_plan_key = reverse_lookup_plan(price_id) if price_id else None
+    internal_plan_key = reverse_lookup(PADDLE_SUBSCRIPTION_PLANS, price_id) if price_id else None
 
     now = datetime.now(timezone.utc)
 

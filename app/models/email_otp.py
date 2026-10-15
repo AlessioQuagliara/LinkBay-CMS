@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.extensions import db
+from app.utils import aware
 
 
 class EmailOtp(db.Model):
@@ -36,16 +37,9 @@ class EmailOtp(db.Model):
     def check_code(self, code):
         return check_password_hash(self.code_hash, code)
 
-    def _aware(self, dt):
-        # I timestamp letti da SQLite tornano naive: li normalizziamo a UTC per
-        # poterli confrontare con datetime.now(timezone.utc). Su Postgres sono
-        # già timezone-aware e questa resta una no-op.
-        if dt is not None and dt.tzinfo is None:
-            return dt.replace(tzinfo=timezone.utc)
-        return dt
 
     def is_expired(self):
-        return datetime.now(timezone.utc) > self._aware(self.expires_at)
+        return datetime.now(timezone.utc) > aware(self.expires_at)
 
     @property
     def consumed(self):

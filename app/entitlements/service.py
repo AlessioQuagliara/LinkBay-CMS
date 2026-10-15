@@ -13,6 +13,7 @@ from flask import url_for
 from app.entitlements.limits import DEFAULT_PLAN_TYPE, PLAN_LIMITS, PlanLimits
 from app.extensions import db
 from app.models import AiCreditTransaction, GscPageMonthly, MonitoredSite, ResourceUsageLog
+from app.utils import aware
 
 Level = Literal["ok", "warn_80", "warn_95", "blocked"]
 
@@ -24,12 +25,6 @@ def get_plan_limits(user) -> PlanLimits:
     per errore."""
     plan_type = getattr(user, "plan_type", None)
     return PLAN_LIMITS.get(plan_type, PLAN_LIMITS[DEFAULT_PLAN_TYPE])
-
-
-def _aware(dt):
-    if dt is not None and dt.tzinfo is None:
-        return dt.replace(tzinfo=timezone.utc)
-    return dt
 
 
 def has_active_entitlement(user) -> bool:
@@ -56,7 +51,7 @@ def has_active_entitlement(user) -> bool:
     # all'infinito (vedi docs/paddle-billing.md, "fallback di scadenza").
     if user.subscription_status not in ("active", "trialing", "past_due"):
         return False
-    expires_at = _aware(user.subscription_expires_at)
+    expires_at = aware(user.subscription_expires_at)
     if expires_at is None:
         return False
     return datetime.now(timezone.utc) < expires_at

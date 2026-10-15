@@ -21,6 +21,7 @@ from flask import current_app, render_template, url_for
 from app.emails import send_email
 from app.extensions import db
 from app.models import PasswordResetToken
+from app.utils import aware
 
 def _now():
     return datetime.now(timezone.utc)
@@ -35,10 +36,7 @@ def _can_request(user_id):
     )
     if latest is None:
         return True
-    created = latest.created_at
-    if created.tzinfo is None:
-        created = created.replace(tzinfo=timezone.utc)
-    return (_now() - created).total_seconds() >= cooldown
+    return (_now() - aware(latest.created_at)).total_seconds() >= cooldown
 
 
 def request_reset(user):

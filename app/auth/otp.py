@@ -20,6 +20,7 @@ from flask_babel import gettext as _
 from app.emails import resend_configured, send_email
 from app.extensions import db
 from app.models import EmailOtp
+from app.utils import aware
 
 PURPOSE_LOGIN = "login"
 PURPOSE_REGISTER = "register"
@@ -45,10 +46,7 @@ def can_resend(user_id, purpose):
     )
     if latest is None:
         return True, 0
-    created = latest.created_at
-    if created.tzinfo is None:
-        created = created.replace(tzinfo=timezone.utc)
-    elapsed = (_now() - created).total_seconds()
+    elapsed = (_now() - aware(latest.created_at)).total_seconds()
     remaining = int(cooldown - elapsed)
     return remaining <= 0, max(remaining, 0)
 

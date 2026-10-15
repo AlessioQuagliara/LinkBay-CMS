@@ -4,6 +4,7 @@ from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.extensions import db
+from app.utils import aware
 
 
 class User(db.Model, UserMixin):
@@ -201,14 +202,6 @@ class User(db.Model, UserMixin):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def _aware(self, dt):
-        # I timestamp letti da SQLite tornano naive: li normalizziamo a UTC per
-        # poterli confrontare con datetime.now(timezone.utc). Su Postgres sono
-        # già timezone-aware e questa resta una no-op. Stesso pattern di
-        # EmailOtp._aware (app/models/email_otp.py).
-        if dt is not None and dt.tzinfo is None:
-            return dt.replace(tzinfo=timezone.utc)
-        return dt
 
     @property
     def has_active_access(self):
@@ -223,21 +216,21 @@ class User(db.Model, UserMixin):
             # da questa migrazione: restano attivi finché non li tocca un
             # admin, invece di essere bloccati di colpo per l'assenza di un
             # dato che non avevano mai avuto.
-            expires_at = self._aware(self.subscription_expires_at)
+            expires_at = aware(self.subscription_expires_at)
             if expires_at is None:
                 return True
             return datetime.now(timezone.utc) < expires_at
         if self.subscription_status == "trialing" and self.trial_ends_at:
-            return datetime.now(timezone.utc) < self._aware(self.trial_ends_at)
+            return datetime.now(timezone.utc) < aware(self.trial_ends_at)
         if self.subscription_status == "past_due" and self.grace_period_ends_at:
-            return datetime.now(timezone.utc) < self._aware(self.grace_period_ends_at)
+            return datetime.now(timezone.utc) < aware(self.grace_period_ends_at)
         return False
 
     @property
     def trial_days_left(self):
         if self.subscription_status != "trialing" or not self.trial_ends_at:
             return 0
-        delta = self._aware(self.trial_ends_at) - datetime.now(timezone.utc)
+        delta = aware(self.trial_ends_at) - datetime.now(timezone.utc)
         return max(0, delta.days + (1 if delta.seconds else 0))
 
     def __repr__(self):

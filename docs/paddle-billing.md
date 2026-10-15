@@ -93,7 +93,7 @@ Nessuna modifica al codice applicativo è richiesta per questo passaggio.
 ## 4. Catalogo e mappatura interna
 
 I tre piani Pro (prezzi in
-`app/billing/paddle_products.py::PADDLE_PLAN_PRICES`) sono **abbonamenti
+`app/billing/paddle_products.py::PADDLE_SUBSCRIPTION_PLANS`) sono **abbonamenti
 ricorrenti**, uno per ciclo di fatturazione:
 
 | Chiave interna | Ciclo Paddle | Prezzo/ciclo |

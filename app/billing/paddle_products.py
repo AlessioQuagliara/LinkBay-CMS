@@ -21,97 +21,51 @@ from flask import current_app
 
 from app.entitlements.limits import AI_CREDIT_PACK_LABELS, AI_CREDIT_PACKS
 
-# --- Piani Pro (abbonamento ricorrente) -------------------------------------
-
-# Chiave interna -> (durata del ciclo di fatturazione Paddle, giorni
-# equivalenti per PLAN_LIMITS/subscription_expires_at di fallback). billing_cycle
-# usa lo stesso vocabolario dell'API Paddle (interval: day|week|month|year).
-PADDLE_PLAN_BILLING_CYCLE = {
-    "paddle_1m": {"interval": "month", "frequency": 1},
-    "paddle_3m": {"interval": "month", "frequency": 3},
-    "paddle_12m": {"interval": "year", "frequency": 1},
-}
-PADDLE_PLAN_LABELS = {
-    "paddle_1m": "1 month",
-    "paddle_3m": "3 months",
-    "paddle_12m": "12 months",
-}
-# Prezzo in euro mostrato in /billing/upgrade e nella landing #pricing; non
-# guida alcuna logica di attivazione (quella vive nel webhook Paddle, vedi
-# app/billing/paddle_subscriptions.py).
-PADDLE_PLAN_PRICES = {
-    "paddle_1m": 79.90,
-    "paddle_3m": 209.90,
-    "paddle_12m": 790.00,
-}
-# Etichette commerciali "risparmi ~X%" mostrate come badge sulla card,
-# calcolate a mano una volta sola rispetto al costo mensile equivalente
-# (79.90 x 3 = 239.70, x 12 = 958.80) — non ricalcolate a runtime per
-# evitare arrotondamenti diversi da quanto comunicato commercialmente.
-PADDLE_PLAN_SAVINGS_LABEL = {
-    "paddle_1m": None,
-    "paddle_3m": "~13%",
-    "paddle_12m": "~17%",
-}
-# Env var che contiene il price_id sandbox per ciascun piano (vedi config.py).
-PADDLE_PLAN_SANDBOX_ENV = {
-    "paddle_1m": "PADDLE_SANDBOX_PRICE_ID_1M",
-    "paddle_3m": "PADDLE_SANDBOX_PRICE_ID_3M",
-    "paddle_12m": "PADDLE_SANDBOX_PRICE_ID_12M",
-}
-PADDLE_PLAN_PRODUCTION_ENV = {
-    "paddle_1m": "PADDLE_PRODUCTION_PRICE_ID_1M",
-    "paddle_3m": "PADDLE_PRODUCTION_PRICE_ID_3M",
-    "paddle_12m": "PADDLE_PRODUCTION_PRICE_ID_12M",
-}
-
+# Piani Pro (abbonamento ricorrente). billing_cycle usa il vocabolario
+# dell'API Paddle (interval: day|week|month|year). "price" è il prezzo in euro
+# mostrato in /billing/upgrade e nella landing #pricing: non guida alcuna
+# logica di attivazione (quella vive nel webhook). "savings_label" è calcolato
+# a mano rispetto al mensile (79.90 x 3 = 239.70, x 12 = 958.80) per non
+# divergere da quanto comunicato commercialmente.
 PADDLE_SUBSCRIPTION_PLANS = {
-    key: {
-        "label": PADDLE_PLAN_LABELS[key],
-        "price": PADDLE_PLAN_PRICES[key],
-        "savings_label": PADDLE_PLAN_SAVINGS_LABEL[key],
-        "billing_cycle": PADDLE_PLAN_BILLING_CYCLE[key],
-        "sandbox_env": PADDLE_PLAN_SANDBOX_ENV[key],
-        "production_env": PADDLE_PLAN_PRODUCTION_ENV[key],
-    }
-    for key in PADDLE_PLAN_BILLING_CYCLE
+    "paddle_1m": {
+        "label": "1 month", "price": 79.90, "savings_label": None,
+        "billing_cycle": {"interval": "month", "frequency": 1},
+        "sandbox_env": "PADDLE_SANDBOX_PRICE_ID_1M", "production_env": "PADDLE_PRODUCTION_PRICE_ID_1M",
+    },
+    "paddle_3m": {
+        "label": "3 months", "price": 209.90, "savings_label": "~13%",
+        "billing_cycle": {"interval": "month", "frequency": 3},
+        "sandbox_env": "PADDLE_SANDBOX_PRICE_ID_3M", "production_env": "PADDLE_PRODUCTION_PRICE_ID_3M",
+    },
+    "paddle_12m": {
+        "label": "12 months", "price": 790.00, "savings_label": "~17%",
+        "billing_cycle": {"interval": "year", "frequency": 1},
+        "sandbox_env": "PADDLE_SANDBOX_PRICE_ID_12M", "production_env": "PADDLE_PRODUCTION_PRICE_ID_12M",
+    },
 }
 
-# --- Pacchetti crediti AI (one-time) ----------------------------------------
 
-# Stessi crediti di app/entitlements/limits.py::AI_CREDIT_PACKS.
-PADDLE_CREDIT_PACKAGE_CREDITS = {
-    "ai_topup_starter": 50,
-    "ai_topup_growth": 150,
-    "ai_topup_scale": 500,
-}
-PADDLE_CREDIT_SANDBOX_ENV = {
-    "ai_topup_starter": "PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_STARTER",
-    "ai_topup_growth": "PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_GROWTH",
-    "ai_topup_scale": "PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_SCALE",
-}
-PADDLE_CREDIT_PRODUCTION_ENV = {
-    "ai_topup_starter": "PADDLE_PRODUCTION_PRICE_ID_AI_TOPUP_STARTER",
-    "ai_topup_growth": "PADDLE_PRODUCTION_PRICE_ID_AI_TOPUP_GROWTH",
-    "ai_topup_scale": "PADDLE_PRODUCTION_PRICE_ID_AI_TOPUP_SCALE",
-}
-
-PADDLE_CREDIT_PACKAGES = {
-    key: {
+def _credit_package(credits: int, env_suffix: str) -> dict:
+    return {
         "label": AI_CREDIT_PACK_LABELS[credits],
         "credits": credits,
         "price": AI_CREDIT_PACKS[credits],
-        "sandbox_env": PADDLE_CREDIT_SANDBOX_ENV[key],
-        "production_env": PADDLE_CREDIT_PRODUCTION_ENV[key],
+        "sandbox_env": f"PADDLE_SANDBOX_PRICE_ID_AI_TOPUP_{env_suffix}",
+        "production_env": f"PADDLE_PRODUCTION_PRICE_ID_AI_TOPUP_{env_suffix}",
     }
-    for key, credits in PADDLE_CREDIT_PACKAGE_CREDITS.items()
+
+
+# Pacchetti crediti AI one-time: stessi crediti/prezzi di AI_CREDIT_PACKS.
+PADDLE_CREDIT_PACKAGES = {
+    "ai_topup_starter": _credit_package(50, "STARTER"),
+    "ai_topup_growth": _credit_package(150, "GROWTH"),
+    "ai_topup_scale": _credit_package(500, "SCALE"),
 }
 
 
-def _env_key_for(entry: dict) -> str:
-    from app.billing.paddle_client import get_environment
-
-    return entry["production_env"] if get_environment() == "production" else entry["sandbox_env"]
+def env_var_for(entry: dict, environment: str) -> str:
+    return entry["production_env"] if environment == "production" else entry["sandbox_env"]
 
 
 def resolve_price_id(catalog: dict, key: str) -> str | None:
@@ -122,25 +76,18 @@ def resolve_price_id(catalog: dict, key: str) -> str | None:
     entry = catalog.get(key)
     if entry is None:
         return None
-    return current_app.config.get(_env_key_for(entry)) or None
+    from app.billing.paddle_client import get_environment
+
+    return current_app.config.get(env_var_for(entry, get_environment())) or None
 
 
-def reverse_lookup_plan(price_id: str) -> str | None:
+def reverse_lookup(catalog: dict, price_id: str) -> str | None:
     """Dato un price_id Paddle (dai dati di un webhook, quindi già
-    autenticato dalla firma), risale alla chiave interna del piano — o None
+    autenticato dalla firma), risale alla chiave interna del catalogo — o None
     se non corrisponde a nessun price_id whitelistato nell'environment
-    corrente (es. un price creato a mano nel dashboard Paddle e mai
-    registrato qui). Non solleva mai: un price_id sconosciuto è un caso
-    legittimo da gestire senza crash (vedi app/billing/paddle_subscriptions.py)."""
-    for key in PADDLE_SUBSCRIPTION_PLANS:
-        if resolve_price_id(PADDLE_SUBSCRIPTION_PLANS, key) == price_id:
-            return key
-    return None
-
-
-def reverse_lookup_credit_package(price_id: str) -> str | None:
-    for key in PADDLE_CREDIT_PACKAGES:
-        if resolve_price_id(PADDLE_CREDIT_PACKAGES, key) == price_id:
+    corrente. Non solleva mai: un price_id sconosciuto è un caso legittimo."""
+    for key in catalog:
+        if resolve_price_id(catalog, key) == price_id:
             return key
     return None
 

@@ -19,7 +19,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from app.billing.paddle_client import _request
-from app.billing.paddle_products import PADDLE_CREDIT_PACKAGES, PADDLE_SUBSCRIPTION_PLANS
+from app.billing.paddle_products import PADDLE_CREDIT_PACKAGES, PADDLE_SUBSCRIPTION_PLANS, env_var_for
 
 PRODUCT_NAME_PREFIX = "LinkBay CMS"
 
@@ -99,6 +99,16 @@ def _find_matching_price(prices: list[dict], *, unit_price_amount: str, currency
     return None
 
 
+def _catalogs():
+    """(kind, catalogo, nome prodotto, descrizione prodotto) per i due cataloghi."""
+    return [
+        ("subscription", PADDLE_SUBSCRIPTION_PLANS, _subscription_product_name,
+         lambda e: f"LinkBay CMS Pro subscription — billed every {e['billing_cycle']['frequency']} {e['billing_cycle']['interval']}(s)."),
+        ("ai_credits", PADDLE_CREDIT_PACKAGES, _credit_product_name,
+         lambda e: f"One-time purchase of {e['credits']} LinkBay CMS AI credits."),
+    ]
+
+
 def sync_catalog(*, environment: str, currency: str = "EUR", dry_run: bool = False) -> list[CatalogSyncEntry]:
     """Crea/recupera in Paddle (per l'`environment` dato — MAI production da
     qui senza che il chiamante lo scelga esplicitamente, vedi il comando CLI)
@@ -108,24 +118,15 @@ def sync_catalog(*, environment: str, currency: str = "EUR", dry_run: bool = Fal
     from flask import current_app
 
     if dry_run:
-        entries = []
-        for key, entry in PADDLE_SUBSCRIPTION_PLANS.items():
-            entries.append(
-                CatalogSyncEntry(
-                    internal_key=key, kind="subscription", product_name=_subscription_product_name(key),
-                    product_id="(dry-run)", price_id="(dry-run)", price_env_var=entry["sandbox_env"] if environment == "sandbox" else entry["production_env"],
-                    created_product=False, created_price=False,
-                )
+        return [
+            CatalogSyncEntry(
+                internal_key=key, kind=kind, product_name=name_for(key),
+                product_id="(dry-run)", price_id="(dry-run)", price_env_var=env_var_for(entry, environment),
+                created_product=False, created_price=False,
             )
-        for key, entry in PADDLE_CREDIT_PACKAGES.items():
-            entries.append(
-                CatalogSyncEntry(
-                    internal_key=key, kind="ai_credits", product_name=_credit_product_name(key),
-                    product_id="(dry-run)", price_id="(dry-run)", price_env_var=entry["sandbox_env"] if environment == "sandbox" else entry["production_env"],
-                    created_product=False, created_price=False,
-                )
-            )
-        return entries
+            for kind, catalog, name_for, _ in _catalogs()
+            for key, entry in catalog.items()
+        ]
 
     # PADDLE_ENVIRONMENT decide l'endpoint (vedi app/billing/paddle_client.py)
     # — sovrascriviamo temporaneamente la config per la durata dello script,
@@ -137,69 +138,37 @@ def sync_catalog(*, environment: str, currency: str = "EUR", dry_run: bool = Fal
         products_cache = _list_all_products()
         results: list[CatalogSyncEntry] = []
 
-        for key, entry in PADDLE_SUBSCRIPTION_PLANS.items():
-            name = _subscription_product_name(key)
-            product, created_product = _get_or_create_product(
-                products_cache, name=name, description=f"LinkBay CMS Pro subscription — billed every {entry['billing_cycle']['frequency']} {entry['billing_cycle']['interval']}(s)."
-            )
-            prices = _list_prices_for_product(product["id"])
-            amount_minor = str(int(round(entry["price"] * 100)))
-            billing_cycle = entry["billing_cycle"]
-            price = _find_matching_price(prices, unit_price_amount=amount_minor, currency=currency, billing_cycle=billing_cycle)
-            created_price = False
-            if price is None:
-                created = _request(
-                    "POST", "/prices",
-                    json={
-                        "product_id": product["id"],
-                        "description": f"{name} — {currency} {entry['price']:.2f}",
-                        "unit_price": {"amount": amount_minor, "currency_code": currency},
-                        "billing_cycle": billing_cycle,
-                        "quantity": {"minimum": 1, "maximum": 1},
-                    },
+        for kind, catalog, name_for, description_for in _catalogs():
+            for key, entry in catalog.items():
+                name = name_for(key)
+                product, created_product = _get_or_create_product(
+                    products_cache, name=name, description=description_for(entry)
                 )
-                price = created.get("data") or created
-                created_price = True
-
-            env_var = entry["sandbox_env"] if environment == "sandbox" else entry["production_env"]
-            results.append(
-                CatalogSyncEntry(
-                    internal_key=key, kind="subscription", product_name=name,
-                    product_id=product["id"], price_id=price["id"], price_env_var=env_var,
-                    created_product=created_product, created_price=created_price,
-                )
-            )
-
-        for key, entry in PADDLE_CREDIT_PACKAGES.items():
-            name = _credit_product_name(key)
-            product, created_product = _get_or_create_product(
-                products_cache, name=name, description=f"One-time purchase of {entry['credits']} LinkBay CMS AI credits."
-            )
-            prices = _list_prices_for_product(product["id"])
-            amount_minor = str(int(round(entry["price"] * 100)))
-            price = _find_matching_price(prices, unit_price_amount=amount_minor, currency=currency, billing_cycle=None)
-            created_price = False
-            if price is None:
-                created = _request(
-                    "POST", "/prices",
-                    json={
+                prices = _list_prices_for_product(product["id"])
+                amount_minor = str(int(round(entry["price"] * 100)))
+                billing_cycle = entry.get("billing_cycle")
+                price = _find_matching_price(prices, unit_price_amount=amount_minor, currency=currency, billing_cycle=billing_cycle)
+                created_price = False
+                if price is None:
+                    body = {
                         "product_id": product["id"],
                         "description": f"{name} — {currency} {entry['price']:.2f}",
                         "unit_price": {"amount": amount_minor, "currency_code": currency},
                         "quantity": {"minimum": 1, "maximum": 1},
-                    },
-                )
-                price = created.get("data") or created
-                created_price = True
+                    }
+                    if billing_cycle:
+                        body["billing_cycle"] = billing_cycle
+                    created = _request("POST", "/prices", json=body)
+                    price = created.get("data") or created
+                    created_price = True
 
-            env_var = entry["sandbox_env"] if environment == "sandbox" else entry["production_env"]
-            results.append(
-                CatalogSyncEntry(
-                    internal_key=key, kind="ai_credits", product_name=name,
-                    product_id=product["id"], price_id=price["id"], price_env_var=env_var,
-                    created_product=created_product, created_price=created_price,
+                results.append(
+                    CatalogSyncEntry(
+                        internal_key=key, kind=kind, product_name=name,
+                        product_id=product["id"], price_id=price["id"], price_env_var=env_var_for(entry, environment),
+                        created_product=created_product, created_price=created_price,
+                    )
                 )
-            )
 
         return results
     finally:

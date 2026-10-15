@@ -12,14 +12,9 @@ from flask import current_app
 
 from app.extensions import db
 from app.models import GscPageMonthly, PageAlert
+from app.utils import aware
 
 RECOVERY_THRESHOLD = 0.8  # click recenti >= 80% del picco pre-calo = recuperata
-
-
-def _aware(dt):
-    if dt is not None and dt.tzinfo is None:
-        return dt.replace(tzinfo=timezone.utc)
-    return dt
 
 
 def _latest_clicks(user_id, site_url, page_url):
@@ -47,7 +42,7 @@ def check_due_alerts() -> dict:
     checked = recovered = errors = 0
     for alert in alerts:
         try:
-            days_since_done = (now - _aware(alert.done_at)).days
+            days_since_done = (now - aware(alert.done_at)).days
             evaluated = False
 
             if days_since_done >= 30 and alert.checked_30d_at is None:

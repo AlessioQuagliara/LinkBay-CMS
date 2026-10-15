@@ -12,11 +12,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
-from app.billing.paddle_products import PADDLE_CREDIT_PACKAGES, reverse_lookup_credit_package
+from app.billing.paddle_products import PADDLE_CREDIT_PACKAGES, reverse_lookup
+from app.billing.paddle_subscriptions import user_from_custom_data
 from app.entitlements.ai_credits import grant_credits
 from app.entitlements.service import get_plan_limits
 from app.extensions import db
-from app.models import PaddleTransaction, User
+from app.models import PaddleTransaction
 
 
 @dataclass(frozen=True)
@@ -25,17 +26,6 @@ class TransactionApplyResult:
     reason: str | None = None
     user_id: int | None = None
     credits_granted: int | None = None
-
-
-def _resolve_user(data: dict) -> User | None:
-    custom_data = data.get("custom_data") or {}
-    local_user_id = custom_data.get("local_user_id")
-    if local_user_id is None:
-        return None
-    try:
-        return db.session.get(User, int(local_user_id))
-    except (TypeError, ValueError):
-        return None
 
 
 def _get_or_create_row(*, transaction_id: str, environment: str) -> PaddleTransaction:
@@ -85,7 +75,7 @@ def apply_transaction_completed(
     row.correlation_id = custom_data.get("correlation_id")
     row.completing_event_id = completing_event_id
 
-    user = _resolve_user(data)
+    user = user_from_custom_data(data)
     if user is not None:
         row.user_id = user.id
 
@@ -104,7 +94,7 @@ def apply_transaction_completed(
             db.session.add(row)
             return TransactionApplyResult(outcome="ignored_no_user", reason="local_user_id non risolvibile")
 
-        package_key = internal_plan_key or (reverse_lookup_credit_package(price_id) if price_id else None)
+        package_key = internal_plan_key or (reverse_lookup(PADDLE_CREDIT_PACKAGES, price_id) if price_id else None)
         entry = PADDLE_CREDIT_PACKAGES.get(package_key) if package_key else None
         if entry is None:
             row.status = "ignored"
@@ -158,7 +148,7 @@ def apply_transaction_payment_failed(*, data: dict, environment: str, completing
         # avvenuto: solo audit.
         return TransactionApplyResult(outcome="already_completed", user_id=row.user_id)
 
-    user = _resolve_user(data)
+    user = user_from_custom_data(data)
     if user is not None:
         row.user_id = user.id
     row.status = "failed"

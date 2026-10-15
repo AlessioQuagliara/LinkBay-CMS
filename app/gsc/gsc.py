@@ -35,14 +35,8 @@ from app.gsc.sites import (
 from app.jobs.concurrency import acquire_scan_slot
 from app.jobs.queue import get_queue, queue_name_for_user
 from app.jobs.tasks import run_gsc_scan_job
+from app.utils import aware
 
-
-def _aware(dt):
-    # Stesso pattern di User._aware: SQLite (test) torna datetime naive, li
-    # normalizziamo a UTC per poterli confrontare con datetime.now(timezone.utc).
-    if dt is not None and dt.tzinfo is None:
-        return dt.replace(tzinfo=timezone.utc)
-    return dt
 
 gsc_bp = Blueprint("gsc", __name__, url_prefix="/gsc")
 
@@ -284,7 +278,7 @@ def _maybe_queue_background_scan(user, site_url) -> bool:
     ripetuto ad ogni apertura della pagina indipendentemente dal piano."""
     row = get_monitored_site_row(user.id, site_url)
     limits = get_plan_limits(user)
-    last_synced = _aware(row.last_synced_at) if row else None
+    last_synced = aware(row.last_synced_at) if row else None
     stale = last_synced is None or (
         datetime.now(timezone.utc) - last_synced >= timedelta(days=limits.refresh_days)
     )

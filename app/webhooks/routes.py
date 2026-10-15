@@ -23,7 +23,7 @@ from datetime import datetime, timezone
 from flask import Blueprint, current_app, jsonify, request
 
 from app.billing.paddle_client import get_environment, verify_webhook_signature
-from app.billing.paddle_subscriptions import apply_subscription_event
+from app.billing.paddle_subscriptions import _parse_dt, apply_subscription_event
 from app.billing.paddle_transactions import apply_transaction_completed, apply_transaction_payment_failed
 from app.extensions import csrf, db
 from app.models import PaddleWebhookEvent
@@ -44,15 +44,6 @@ SUBSCRIPTION_EVENT_TYPES = {
     "subscription.resumed",
     "subscription.canceled",
 }
-
-
-def _parse_occurred_at(value):
-    if not value:
-        return None
-    try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
-        return None
 
 
 @webhooks_bp.route("/paddle", methods=["POST"])
@@ -81,7 +72,7 @@ def paddle_webhook():
     event_id = payload.get("event_id")
     event_type = payload.get("event_type")
     data = payload.get("data") or {}
-    occurred_at = _parse_occurred_at(payload.get("occurred_at"))
+    occurred_at = _parse_dt(payload.get("occurred_at"))
 
     if not event_id or not event_type:
         current_app.logger.warning("Webhook Paddle: payload firmato ma senza event_id/event_type.")

@@ -2,6 +2,7 @@ import hashlib
 from datetime import datetime, timezone
 
 from app.extensions import db
+from app.utils import aware
 
 
 class PasswordResetToken(db.Model):
@@ -35,12 +36,6 @@ class PasswordResetToken(db.Model):
     def hash_token(token):
         return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
-    def _aware(self, dt):
-        # Stesso pattern di EmailOtp._aware: su SQLite i timestamp tornano
-        # naive, li normalizziamo a UTC per poterli confrontare.
-        if dt is not None and dt.tzinfo is None:
-            return dt.replace(tzinfo=timezone.utc)
-        return dt
 
     def is_expired(self):
-        return datetime.now(timezone.utc) > self._aware(self.expires_at)
+        return datetime.now(timezone.utc) > aware(self.expires_at)

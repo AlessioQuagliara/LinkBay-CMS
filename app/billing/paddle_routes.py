@@ -23,6 +23,7 @@ from app.billing.paddle_client import (
     get_environment,
 )
 from app.billing.paddle_products import PADDLE_CREDIT_PACKAGES, PADDLE_SUBSCRIPTION_PLANS, resolve_price_id
+from app.billing.paddle_reconciliation import _iso
 from app.billing.routes import billing_bp
 from app.entitlements.service import get_plan_limits, has_active_entitlement
 from app.extensions import db
@@ -44,6 +45,58 @@ def _param(name: str) -> str | None:
 
 def _success_url() -> str:
     return current_app.config.get("PADDLE_SUCCESS_URL") or url_for("billing.paddle_pending", _external=True)
+
+
+def _start_checkout(purchase_type: str, key: str, price_id: str):
+    """Crea la transazione Paddle hosted-checkout e la riga PaddleTransaction
+    "pending". Chi chiama ha già validato `key` contro la whitelist."""
+    correlation_id = secrets.token_urlsafe(16)
+    custom_data = {
+        "local_user_id": current_user.id,
+        "purchase_type": purchase_type,
+        "internal_plan_key": key,
+        "correlation_id": correlation_id,
+        "environment": get_environment(),
+    }
+
+    try:
+        response = create_transaction(
+            items=[{"price_id": price_id, "quantity": 1}],
+            custom_data=custom_data,
+            customer_email=current_user.email,
+            success_url=_success_url(),
+        )
+    except PaddleConfigError:
+        current_app.logger.error("Checkout Paddle non disponibile: configurazione mancante.")
+        return jsonify(error="not_configured"), 503
+    except PaddleAPIError:
+        current_app.logger.exception(
+            "Creazione transazione Paddle (%s) fallita per user %s.", purchase_type, current_user.id
+        )
+        return jsonify(error="paddle_unavailable"), 502
+
+    tx_data = response.get("data") or response
+    transaction_id = tx_data.get("id")
+    checkout_url = (tx_data.get("checkout") or {}).get("url")
+    if not transaction_id or not checkout_url:
+        current_app.logger.error("Risposta Paddle senza transaction id/checkout url per user %s.", current_user.id)
+        return jsonify(error="paddle_unavailable"), 502
+
+    db.session.add(
+        PaddleTransaction(
+            environment=get_environment(),
+            paddle_transaction_id=transaction_id,
+            user_id=current_user.id,
+            purchase_type=purchase_type,
+            internal_plan_key=key,
+            paddle_price_id=price_id,
+            correlation_id=correlation_id,
+            status="pending",
+        )
+    )
+    db.session.commit()
+
+    return jsonify(checkout_url=checkout_url, transaction_id=transaction_id), 201
 
 
 @billing_bp.route("/checkout/subscription", methods=["POST"])
@@ -70,51 +123,7 @@ def paddle_checkout_subscription():
     if not price_id:
         return jsonify(error="not_configured", message="This plan isn't available yet."), 503
 
-    correlation_id = secrets.token_urlsafe(16)
-    custom_data = {
-        "local_user_id": current_user.id,
-        "purchase_type": "subscription",
-        "internal_plan_key": plan,
-        "correlation_id": correlation_id,
-        "environment": get_environment(),
-    }
-
-    try:
-        response = create_transaction(
-            items=[{"price_id": price_id, "quantity": 1}],
-            custom_data=custom_data,
-            customer_email=current_user.email,
-            success_url=_success_url(),
-        )
-    except PaddleConfigError:
-        current_app.logger.error("Checkout Paddle non disponibile: configurazione mancante.")
-        return jsonify(error="not_configured"), 503
-    except PaddleAPIError:
-        current_app.logger.exception("Creazione transazione Paddle (subscription) fallita per user %s.", current_user.id)
-        return jsonify(error="paddle_unavailable"), 502
-
-    tx_data = response.get("data") or response
-    transaction_id = tx_data.get("id")
-    checkout_url = (tx_data.get("checkout") or {}).get("url")
-    if not transaction_id or not checkout_url:
-        current_app.logger.error("Risposta Paddle senza transaction id/checkout url per user %s.", current_user.id)
-        return jsonify(error="paddle_unavailable"), 502
-
-    db.session.add(
-        PaddleTransaction(
-            environment=get_environment(),
-            paddle_transaction_id=transaction_id,
-            user_id=current_user.id,
-            purchase_type="subscription",
-            internal_plan_key=plan,
-            paddle_price_id=price_id,
-            correlation_id=correlation_id,
-            status="pending",
-        )
-    )
-    db.session.commit()
-
-    return jsonify(checkout_url=checkout_url, transaction_id=transaction_id), 201
+    return _start_checkout("subscription", plan, price_id)
 
 
 @billing_bp.route("/checkout/credits", methods=["POST"])
@@ -131,51 +140,7 @@ def paddle_checkout_credits():
     if not price_id:
         return jsonify(error="not_configured", message="This package isn't available yet."), 503
 
-    correlation_id = secrets.token_urlsafe(16)
-    custom_data = {
-        "local_user_id": current_user.id,
-        "purchase_type": "ai_credits",
-        "internal_plan_key": credit_package,
-        "correlation_id": correlation_id,
-        "environment": get_environment(),
-    }
-
-    try:
-        response = create_transaction(
-            items=[{"price_id": price_id, "quantity": 1}],
-            custom_data=custom_data,
-            customer_email=current_user.email,
-            success_url=_success_url(),
-        )
-    except PaddleConfigError:
-        current_app.logger.error("Checkout Paddle non disponibile: configurazione mancante.")
-        return jsonify(error="not_configured"), 503
-    except PaddleAPIError:
-        current_app.logger.exception("Creazione transazione Paddle (credits) fallita per user %s.", current_user.id)
-        return jsonify(error="paddle_unavailable"), 502
-
-    tx_data = response.get("data") or response
-    transaction_id = tx_data.get("id")
-    checkout_url = (tx_data.get("checkout") or {}).get("url")
-    if not transaction_id or not checkout_url:
-        current_app.logger.error("Risposta Paddle senza transaction id/checkout url per user %s.", current_user.id)
-        return jsonify(error="paddle_unavailable"), 502
-
-    db.session.add(
-        PaddleTransaction(
-            environment=get_environment(),
-            paddle_transaction_id=transaction_id,
-            user_id=current_user.id,
-            purchase_type="ai_credits",
-            internal_plan_key=credit_package,
-            paddle_price_id=price_id,
-            correlation_id=correlation_id,
-            status="pending",
-        )
-    )
-    db.session.commit()
-
-    return jsonify(checkout_url=checkout_url, transaction_id=transaction_id), 201
+    return _start_checkout("ai_credits", credit_package, price_id)
 
 
 @billing_bp.route("/status")
@@ -187,10 +152,6 @@ def paddle_status():
     non ha applicato lo stato, invece di fidarsi del ritorno client-side dal
     checkout."""
     user = current_user
-
-    def _iso(dt):
-        return dt.isoformat() if dt else None
-
     return jsonify(
         subscription_status=user.subscription_status,
         plan_type=user.plan_type,

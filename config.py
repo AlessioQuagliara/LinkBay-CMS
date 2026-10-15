@@ -107,7 +107,7 @@ class Config:
     # webhook non conferma) — vedi app/billing/paddle_routes.py.
     PADDLE_SUCCESS_URL = os.environ.get("PADDLE_SUCCESS_URL")
 
-    # Price ID Paddle per i tre piani Pro (vedi PADDLE_PLAN_PRICES in
+    # Price ID Paddle per i tre piani Pro (vedi PADDLE_SUBSCRIPTION_PLANS in
     # app/billing/paddle_products.py) e per i tre pacchetti crediti AI
     # (stessi numeri di AI_CREDIT_PACKS). Due set separati, MAI mescolati:
     # quale set viene letto dipende solo da PADDLE_ENVIRONMENT sopra.
