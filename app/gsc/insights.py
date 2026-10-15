@@ -8,6 +8,16 @@ app/gsc/gsc.py, che resta responsabile solo di OAuth e delle route.
 from datetime import date, timedelta
 
 
+def _periods(days):
+    """(start, end, prev_start, prev_end): ultimi `days` giorni e i `days`
+    precedenti. Search Console ha ~2-3 giorni di ritardo: la finestra chiude a
+    ieri per non confrontare periodi con dati ancora incompleti."""
+    end = date.today() - timedelta(days=1)
+    start = end - timedelta(days=days - 1)
+    prev_end = start - timedelta(days=1)
+    prev_start = prev_end - timedelta(days=days - 1)
+    return start, end, prev_start, prev_end
+
 
 def _query(service, site_url, start, end, dimensions, row_limit=1000, dimension_filter_groups=None):
     body = {
@@ -60,13 +70,7 @@ def _health_stars(clicks_delta_pct):
 
 
 def build_insights(service, site_url, days):
-    today = date.today()
-    # Search Console ha ~2-3 giorni di ritardo: chiudiamo la finestra a ieri
-    # per non confrontare periodi con dati ancora incompleti.
-    end = today - timedelta(days=1)
-    start = end - timedelta(days=days - 1)
-    prev_end = start - timedelta(days=1)
-    prev_start = prev_end - timedelta(days=days - 1)
+    start, end, prev_start, prev_end = _periods(days)
 
     cur = _totals(_query(service, site_url, start, end, []))
     prev = _totals(_query(service, site_url, prev_start, prev_end, []))
@@ -119,13 +123,7 @@ def page_query_losses(service, site_url, page_url, days=90):
     gli ultimi `days` giorni con i `days` precedenti. Filtrata a una sola
     pagina via dimensionFilterGroups, quindi economica anche su siti
     grandi: si chiama solo per le pagine già segnalate come in calo."""
-    today = date.today()
-    # Stessa finestra "chiusa a ieri" di build_insights: SC ha ~2-3 giorni di
-    # ritardo, evitiamo di confrontare periodi con dati incompleti.
-    end = today - timedelta(days=1)
-    start = end - timedelta(days=days - 1)
-    prev_end = start - timedelta(days=1)
-    prev_start = prev_end - timedelta(days=days - 1)
+    start, end, prev_start, prev_end = _periods(days)
 
     # Filtro a una sola pagina: la query per-query resta economica anche su
     # siti grandi perché l'API restringe subito il dataset a questa URL.

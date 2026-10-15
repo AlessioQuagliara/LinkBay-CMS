@@ -41,16 +41,7 @@ class NoDataError(Exception):
 
 
 def _top_alerts(user_id: int, site_url: str) -> list[PageAlert]:
-    return (
-        PageAlert.query.filter(
-            PageAlert.user_id == user_id,
-            PageAlert.site_url == site_url,
-            PageAlert.status.in_(("new", "acknowledged")),
-        )
-        .order_by(PageAlert.priority_score.desc())
-        .limit(MAX_PAGES)
-        .all()
-    )
+    return PageAlert.active(user_id, site_url).order_by(PageAlert.priority_score.desc()).limit(MAX_PAGES).all()
 
 
 def _compact_alerts(alerts: list[PageAlert]) -> list[dict]:

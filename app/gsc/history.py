@@ -13,21 +13,12 @@ I totali/delta dell'overview restano calcolati live in app/gsc/insights.py
 from datetime import date, timedelta
 
 from app.extensions import db
+from app.gsc.insights import _query
 from app.models import GscSiteDaily
 
 BACKFILL_DAYS = 480  # prima connessione: prendi più storico possibile
 FRESH_DAYS = 5       # sync successivi: rinfresca la coda recente non ancora consolidata
 MAX_ROWS = 25000     # limite righe API (dimensions=["date"] resta ben sotto)
-
-
-def _query_daily(service, site_url, start, end):
-    body = {
-        "startDate": start.isoformat(),
-        "endDate": end.isoformat(),
-        "dimensions": ["date"],
-        "rowLimit": MAX_ROWS,
-    }
-    return service.searchanalytics().query(siteUrl=site_url, body=body).execute().get("rows", [])
 
 
 def sync_site_daily(service, user_id, site_url, days):
@@ -42,7 +33,7 @@ def sync_site_daily(service, user_id, site_url, days):
     window = BACKFILL_DAYS if not has_history else days + FRESH_DAYS
     start = end - timedelta(days=window - 1)
 
-    rows = _query_daily(service, site_url, start, end)
+    rows = _query(service, site_url, start, end, ["date"], row_limit=MAX_ROWS)
 
     # Carica i giorni già presenti nel range per decidere update vs insert.
     existing = {

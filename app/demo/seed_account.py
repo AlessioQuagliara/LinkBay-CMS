@@ -21,6 +21,7 @@ import zlib
 from datetime import date, datetime, timedelta, timezone
 
 from app.extensions import db
+from app.gsc.page_history import _months_back
 from app.models import (
     AuditPresentation,
     GscConnection,
@@ -73,27 +74,6 @@ SITES = [
         ],
     },
 ]
-
-
-def _closed_months(n=MONTHS_OF_HISTORY):
-    """n mesi chiusi più recenti, dal più vecchio al più recente. Mai il mese
-    corrente (ancora incompleto) — stessa convenzione di
-    app.rules.service._window_start."""
-    anchor = date.today().replace(day=1)
-    y, m = anchor.year, anchor.month
-    m -= 1
-    if m == 0:
-        y -= 1
-        m = 12
-    months = []
-    for _ in range(n):
-        months.append(date(y, m, 1))
-        m -= 1
-        if m == 0:
-            y -= 1
-            m = 12
-    months.reverse()
-    return months
 
 
 def _month_days(d: date) -> int:
@@ -309,7 +289,7 @@ def seed_demo_account(email: str, password: str, name: str = "Alessio Demo") -> 
     _seed_fake_gsc_connection(user.id)
 
     summary = {"user_id": user.id, "email": user.email, "sites": []}
-    months = _closed_months()
+    months = _months_back(MONTHS_OF_HISTORY + 1)[:-1]  # solo mesi chiusi, mai quello corrente
 
     for site in SITES:
         site_url = site["site_url"]

@@ -111,20 +111,9 @@ def compute_chart_data(user_id: int, site_url: str, alerts: list[PageAlert]) -> 
     status new/acknowledged e limitata a MAX_PAGES) — non ri-querata qui, gli
     stessi identici alert usati per le slide di testo alimentano anche i
     grafici delle pagine/priorità."""
-    total_alerts = PageAlert.query.filter(
-        PageAlert.user_id == user_id,
-        PageAlert.site_url == site_url,
-        PageAlert.status.in_(("new", "acknowledged")),
-    ).count()
-    total_click_loss = (
-        db.session.query(db.func.coalesce(db.func.sum(PageAlert.click_loss_abs), 0))
-        .filter(
-            PageAlert.user_id == user_id,
-            PageAlert.site_url == site_url,
-            PageAlert.status.in_(("new", "acknowledged")),
-        )
-        .scalar()
-    )
+    active = PageAlert.active(user_id, site_url)
+    total_alerts = active.count()
+    total_click_loss = active.with_entities(db.func.coalesce(db.func.sum(PageAlert.click_loss_abs), 0)).scalar()
     high_priority_count = sum(1 for a in alerts if (a.priority_score or 0) >= HIGH_PRIORITY_THRESHOLD)
 
     return {

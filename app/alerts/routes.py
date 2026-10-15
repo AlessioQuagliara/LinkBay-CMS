@@ -70,7 +70,7 @@ def api_trend():
         return jsonify({"error": "missing_page"}), 400
 
     series = get_page_series(current_user.id, site, page, months=6)
-    return jsonify({"series": series})
+    return jsonify({"series": [dict(r, month=r["month"].isoformat()) for r in series]})
 
 
 @alerts_bp.route("/api/query-losses")

@@ -10,15 +10,7 @@ from datetime import datetime, timezone
 
 from flask import render_template
 
-from app.models import PageAlert
-
-
-def _rows_for(user_id: int, site_url: str):
-    return (
-        PageAlert.query.filter_by(user_id=user_id, site_url=site_url)
-        .order_by(PageAlert.priority_score.desc())
-        .all()
-    )
+from app.exports.csv_export import _rows_for
 
 
 def build_declining_pages_pdf(user, site_url: str, white_label: bool) -> bytes:

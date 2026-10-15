@@ -60,5 +60,12 @@ class PageAlert(db.Model):
         onupdate=lambda: datetime.now(timezone.utc),
     )
 
+    @classmethod
+    def active(cls, user_id, site_url):
+        """Alert ancora aperti (new/acknowledged) per un sito."""
+        return cls.query.filter(
+            cls.user_id == user_id, cls.site_url == site_url, cls.status.in_(("new", "acknowledged"))
+        )
+
     def __repr__(self):
         return f"<PageAlert {self.site_url} {self.url} {self.window_end} prio={self.priority_score}>"

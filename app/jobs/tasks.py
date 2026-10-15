@@ -41,6 +41,23 @@ def run_gsc_scan_job(user_id: int, site_url: str) -> None:
             release_scan_slot(user_id)
 
 
+def _charge(user_id: int, site_url: str, action: str, cost: int) -> None:
+    """Dopo una run AI riuscita: scala i crediti (solo piani a crediti) e
+    registra l'uso. I piani a cooldown non toccano il ledger."""
+    from app.entitlements.ai_credits import consume_credits
+    from app.entitlements.service import get_plan_limits, record_usage
+    from app.extensions import db
+    from app.models import User
+
+    user = db.session.get(User, user_id)
+    if not user:
+        return
+    credit_mode = get_plan_limits(user).ai_mode == "credit"
+    if credit_mode:
+        consume_credits(user, cost, site_url=site_url, action=action)
+    record_usage(user, action, site_url=site_url, credits_consumed=cost if credit_mode else None)
+
+
 def run_ai_analysis_job(user_id: int, site_url: str) -> dict:
     """Stessa logica che prima girava sincrona dentro POST /ai/analyze (vedi
     app/ai/routes.py): se il sito ha già alert attivi, analizza quelli
@@ -56,22 +73,12 @@ def run_ai_analysis_job(user_id: int, site_url: str) -> dict:
     with app.app_context():
         from app.ai.deepseek import DeepSeekError
         from app.ai.service import AI_CREDIT_COST_PER_RUN, analyze_declining, analyze_site
-        from app.entitlements.ai_credits import consume_credits
-        from app.entitlements.service import get_plan_limits, record_usage
-        from app.extensions import db
         from app.gsc.gsc import get_user_gsc_service
         from app.gsc.insights import build_insights
         from app.gsc.repository import credentials_to_dict, save_gsc_credentials
-        from app.models import PageAlert, User
+        from app.models import PageAlert
 
-        has_alerts = (
-            PageAlert.query.filter(
-                PageAlert.user_id == user_id,
-                PageAlert.site_url == site_url,
-                PageAlert.status.in_(("new", "acknowledged")),
-            ).first()
-            is not None
-        )
+        has_alerts = PageAlert.active(user_id, site_url).first() is not None
 
         try:
             if has_alerts:
@@ -92,12 +99,7 @@ def run_ai_analysis_job(user_id: int, site_url: str) -> dict:
         # Consumo crediti solo a run riuscita, solo per i piani a crediti
         # (Pro/AppSumo Tier 3) — i piani a cooldown non toccano il ledger,
         # il loro freno resta AiAnalyzerConfig.last_run_at (invariato).
-        user = db.session.get(User, user_id)
-        if user:
-            limits = get_plan_limits(user)
-            if limits.ai_mode == "credit":
-                consume_credits(user, AI_CREDIT_COST_PER_RUN, site_url=site_url, action="ai_analysis")
-            record_usage(user, "ai_analysis", site_url=site_url, credits_consumed=AI_CREDIT_COST_PER_RUN if limits.ai_mode == "credit" else None)
+        _charge(user_id, site_url, "ai_analysis", AI_CREDIT_COST_PER_RUN)
 
         return {"ok": True}
 
@@ -112,11 +114,7 @@ def run_audit_presentation_job(user_id: int, site_url: str) -> dict:
     with app.app_context():
         from app.ai.deepseek import DeepSeekError
         from app.audits.service import NoDataError, build_presentation
-        from app.entitlements.ai_credits import consume_credits
         from app.entitlements.limits import AI_CREDIT_ACTION_COSTS
-        from app.entitlements.service import get_plan_limits, record_usage
-        from app.extensions import db
-        from app.models import User
 
         try:
             presentation = build_presentation(user_id, site_url)
@@ -128,15 +126,6 @@ def run_audit_presentation_job(user_id: int, site_url: str) -> dict:
             app.logger.exception("Audit presentation job failed for %s (user %s)", site_url, user_id)
             return {"ok": False, "error": "query_failed"}
 
-        cost = AI_CREDIT_ACTION_COSTS["audit_presentation"]
-        user = db.session.get(User, user_id)
-        if user:
-            limits = get_plan_limits(user)
-            if limits.ai_mode == "credit":
-                consume_credits(user, cost, site_url=site_url, action="audit_presentation")
-            record_usage(
-                user, "audit_presentation", site_url=site_url,
-                credits_consumed=cost if limits.ai_mode == "credit" else None,
-            )
+        _charge(user_id, site_url, "audit_presentation", AI_CREDIT_ACTION_COSTS["audit_presentation"])
 
         return {"ok": True, "presentation_id": presentation.id}

@@ -7,12 +7,9 @@ from app.entitlements.limits import PlanLimits
 from app.entitlements.service import check_export_limit, get_plan_limits, record_usage
 from app.exports.csv_export import build_declining_pages_csv
 from app.exports.pdf_export import build_declining_pages_pdf
+from app.utils import safe_filename
 
 exports_bp = Blueprint("exports", __name__, url_prefix="/exports")
-
-
-def _safe_filename(site_url: str) -> str:
-    return "".join(c if c.isalnum() else "-" for c in site_url).strip("-") or "site"
 
 
 @exports_bp.route("/declining.csv")
@@ -27,7 +24,7 @@ def declining_csv():
         return jsonify({"error": "export_limit_reached", "message": check.message, "upsell": check.upsell}), 403
 
     record_usage(current_user, "export_csv", site_url=site_url)
-    filename = f"declining-pages-{_safe_filename(site_url)}.csv"
+    filename = f"declining-pages-{safe_filename(site_url)}.csv"
     return Response(
         stream_with_context(build_declining_pages_csv(current_user.id, site_url)),
         mimetype="text/csv",
@@ -61,7 +58,7 @@ def declining_pdf():
         return jsonify({"error": "export_failed"}), 502
 
     record_usage(current_user, "export_pdf", site_url=site_url)
-    filename = f"declining-pages-{_safe_filename(site_url)}.pdf"
+    filename = f"declining-pages-{safe_filename(site_url)}.pdf"
     return Response(
         pdf_bytes,
         mimetype="application/pdf",

@@ -12,45 +12,10 @@ from flask import current_app
 from sqlalchemy import extract, func
 
 from app.extensions import db
+from app.gsc.page_history import _months_back, get_page_series
 from app.models import GscPageMonthly, GscSiteDaily, MonitoredSite, PageAlert
 from app.rules.engine import evaluate_site
 from app.rules.types import PageSeries, SiteSeries
-
-
-def _window_start(months: int) -> date:
-    """Primo giorno del mese `months-1` mesi fa (limite inferiore della
-    finestra di storico da leggere)."""
-    anchor = date.today().replace(day=1)
-    y, m = anchor.year, anchor.month
-    for _ in range(months - 1):
-        m -= 1
-        if m == 0:
-            y -= 1
-            m = 12
-    return date(y, m, 1)
-
-
-def _build_page_series(user_id: int, site_url: str, page_url: str, months: int = 16) -> PageSeries:
-    """Legge da GscPageMonthly e costruisce il dataclass PageSeries (mese come
-    date, ordine cronologico crescente)."""
-    rows = (
-        GscPageMonthly.query.filter_by(user_id=user_id, site_url=site_url, page_url=page_url)
-        .order_by(GscPageMonthly.month.desc())
-        .limit(months)
-        .all()
-    )
-    rows.reverse()  # da desc+limit (ultimi N) a cronologico crescente
-    monthly = [
-        {
-            "month": r.month,
-            "clicks": r.clicks,
-            "impressions": r.impressions,
-            "ctr": r.ctr,
-            "position": r.position,
-        }
-        for r in rows
-    ]
-    return PageSeries(url=page_url, monthly=monthly)
 
 
 def _build_site_series(user_id: int, site_url: str, months: int = 16) -> SiteSeries:
@@ -61,7 +26,7 @@ def _build_site_series(user_id: int, site_url: str, months: int = 16) -> SiteSer
     (SUM di clicks/impressions, media pesata per impression di ctr/position).
     `extract` è portabile tra PostgreSQL e SQLite.
     """
-    cutoff = _window_start(months)
+    cutoff = _months_back(months)[0]
     y = extract("year", GscSiteDaily.date)
     m = extract("month", GscSiteDaily.date)
 
@@ -116,7 +81,7 @@ def run_for_site(user_id: int, site_url: str) -> list:
         return []
 
     site_series = _build_site_series(user_id, site_url)
-    pages = [_build_page_series(user_id, site_url, p) for p in page_urls]
+    pages = [PageSeries(url=p, monthly=get_page_series(user_id, site_url, p, months=16)) for p in page_urls]
     candidates = evaluate_site(pages, site_series)
 
     # window_end: l'ultimo mese chiuso presente nello storico per pagina.

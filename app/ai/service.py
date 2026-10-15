@@ -194,16 +194,7 @@ def analyze_declining(user_id, site_url):
     delta 28gg. Salva in AiPageAnalysis e rispetta lo stesso cooldown settimanale
     di analyze_site (nessun secondo cooldown parallelo).
     Solleva DeepSeekError se la chiamata fallisce o non è configurata."""
-    alerts = (
-        PageAlert.query.filter(
-            PageAlert.user_id == user_id,
-            PageAlert.site_url == site_url,
-            PageAlert.status.in_(("new", "acknowledged")),
-        )
-        .order_by(PageAlert.priority_score.desc())
-        .limit(MAX_PAGES)
-        .all()
-    )
+    alerts = PageAlert.active(user_id, site_url).order_by(PageAlert.priority_score.desc()).limit(MAX_PAGES).all()
     compact = _compact_alerts(alerts)
     known_urls = {a["url"] for a in compact}
 

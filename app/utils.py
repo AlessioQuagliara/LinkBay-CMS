@@ -7,3 +7,7 @@ def aware(dt):
     if dt is not None and dt.tzinfo is None:
         return dt.replace(tzinfo=timezone.utc)
     return dt
+
+
+def safe_filename(site_url: str) -> str:
+    return "".join(c if c.isalnum() else "-" for c in site_url).strip("-") or "site"

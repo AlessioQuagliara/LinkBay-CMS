@@ -137,7 +137,8 @@ def sync_page_monthly(service, user_id, site_url):
 
 def get_page_series(user_id, site_url, page_url, months=6):
     """Trend degli ultimi `months` mesi di una pagina, in ordine cronologico
-    crescente (per il grafico a 6 mesi in dashboard)."""
+    crescente (mese come `date`). Usato dalla sparkline in dashboard e dal
+    rule engine (app/rules/service.py)."""
     rows = (
         GscPageMonthly.query.filter(
             GscPageMonthly.user_id == user_id,
@@ -151,7 +152,7 @@ def get_page_series(user_id, site_url, page_url, months=6):
     rows.reverse()  # da desc+limit (ultimi N) a cronologico crescente
     return [
         {
-            "month": r.month.isoformat(),
+            "month": r.month,
             "clicks": r.clicks,
             "impressions": r.impressions,
             "ctr": r.ctr,

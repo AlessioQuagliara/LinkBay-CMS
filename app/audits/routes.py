@@ -16,14 +16,11 @@ from app.gsc.sites import list_monitored_sites
 from app.jobs.queue import get_queue, job_status_payload, queue_name_for_user
 from app.jobs.tasks import run_audit_presentation_job
 from app.models import AuditPresentation
+from app.utils import safe_filename
 
 audits_bp = Blueprint("audits", __name__, url_prefix="/dashboard/audits")
 
 AUDIT_PRESENTATION_COST = AI_CREDIT_ACTION_COSTS["audit_presentation"]
-
-
-def _safe_filename(site_url: str) -> str:
-    return "".join(c if c.isalnum() else "-" for c in site_url).strip("-") or "site"
 
 
 @audits_bp.route("/")
@@ -121,7 +118,7 @@ def view(presentation_id):
 def download(presentation_id):
     presentation = _get_owned_presentation(presentation_id)
     html = _render_presentation(presentation)
-    filename = f"audit-{_safe_filename(presentation.site_url)}-{presentation.created_at.date().isoformat()}.html"
+    filename = f"audit-{safe_filename(presentation.site_url)}-{presentation.created_at.date().isoformat()}.html"
     return Response(
         html, mimetype="text/html",
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
