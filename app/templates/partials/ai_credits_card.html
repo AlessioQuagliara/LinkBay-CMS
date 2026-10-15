@@ -11,7 +11,7 @@
         <span class="font-medium">{{ _("AI Credits") }}</span>
       </div>
       {% if ai_credits.has_active_access and ai_credits.ai_mode == "credit" %}
-      <a class="link link-hover text-xs text-base-content/50" href="{{ url_for('billing.credits') }}">
+      <a class="link link-hover text-xs text-base-content/60" href="{{ url_for('billing.credits') }}">
         {{ _("View usage history") }}
       </a>
       {% endif %}
@@ -61,11 +61,11 @@
         {% endif %}
       </div>
       {% if ai_credits.next_monthly_grant_at %}
-        <p class="text-xs text-base-content/50">
+        <p class="text-xs text-base-content/60">
           {{ _("Next monthly credit: %(date)s", date=ai_credits.next_monthly_grant_at.strftime("%d %b %Y")) }}
         </p>
       {% endif %}
-      <p class="text-xs text-base-content/50">
+      <p class="text-xs text-base-content/60">
         {{ _("Credits are spent when you use AI features, like page analysis, recovery plans, reports or presentations.") }}
       </p>
       {% if ai_credits.topups_allowed %}

@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block title %}{{ _("Payment processing") }}{% endblock %}
-{% block html_attrs %} data-theme="linkbay"{% endblock %}
 {% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
 {% block content %}
 <div class="min-h-screen bg-base-200 flex items-center justify-center px-4">

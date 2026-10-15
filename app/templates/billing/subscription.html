@@ -1,11 +1,9 @@
 {% extends "dashboard/layout.html" %}
 {% block title %}{{ _("Subscription") }}{% endblock %}
 {% block dashboard_content %}
+{% from "partials/ui.html" import page_header %}
 
-<div class="mb-6">
-  <h1 class="text-2xl font-semibold">{{ _("Subscription") }}</h1>
-  <p class="text-base-content/60 mt-1">{{ _("Your plan and billing status.") }}</p>
-</div>
+{{ page_header(_("Subscription"), _("Your plan and billing status.")) }}
 
 <div class="card card-border bg-base-100 shadow-xs max-w-xl">
   <div class="card-body gap-4">
@@ -56,7 +54,7 @@
           {{ _("AI credits: %(balance)s", balance=current_user.ai_credit_balance) }}
         </span>
       </div>
-      <p class="text-xs text-base-content/50">
+      <p class="text-xs text-base-content/60">
         {{ _("To renew or change your plan, pick a new duration from the upgrade page — your admin will confirm the payment and extend your access.") }}
         <a class="link link-hover" href="{{ url_for('billing.upgrade') }}">{{ _("Go to plans") }}</a>
       </p>
@@ -116,7 +114,7 @@
   </div>
 </div>
 
-<p class="text-sm text-base-content/50 mt-4 max-w-xl">
+<p class="text-sm text-base-content/60 mt-4 max-w-xl">
   {{ _("Have an AppSumo code?") }}
   <a class="link link-hover" href="{{ url_for('billing.redeem') }}">{{ _("Redeem it here") }}</a>.
 </p>

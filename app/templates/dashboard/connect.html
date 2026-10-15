@@ -1,12 +1,9 @@
 {% extends "dashboard/layout.html" %}
 {% block title %}{{ _("Connect Search Console") }}{% endblock %}
 {% block dashboard_content %}
-<div class="mb-6">
-  <h1 class="text-2xl font-semibold">{{ _("Connect Google Search Console") }}</h1>
-  <p class="text-base-content/60 mt-1">
-    {{ _("Read-only access. We can see your performance data — we can't change anything on your site.") }}
-  </p>
-</div>
+{% from "partials/ui.html" import page_header %}
+
+{{ page_header(_("Connect Google Search Console"), _("Read-only access. We can see your performance data — we can't change anything on your site.")) }}
 
 {% if connection %}
   <div class="card card-border bg-base-100 shadow-xs">
@@ -20,14 +17,14 @@
       </div>
 
       <div class="card-actions justify-end mt-6">
-        <a class="btn btn-ghost btn-sm" href="{{ url_for('dashboard.sites') }}">
-          <span class="iconify size-4" data-icon="lucide:list"></span>
-          {{ _("View sites") }}
-        </a>
         <form method="post" action="{{ url_for('gsc.disconnect') }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button class="btn btn-outline btn-error btn-sm" type="submit">{{ _("Disconnect") }}</button>
+          <button class="btn btn-ghost btn-sm text-error" type="submit">{{ _("Disconnect") }}</button>
         </form>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('dashboard.sites') }}">
+          {{ _("Next: choose sites") }}
+          <span class="iconify size-4" data-icon="lucide:arrow-right"></span>
+        </a>
       </div>
     </div>
   </div>
@@ -43,7 +40,7 @@
         <span class="iconify size-4" data-icon="lucide:link"></span>
         {{ _("Connect Search Console") }}
       </a>
-      <p class="text-xs text-base-content/50 mt-4 max-w-sm">
+      <p class="text-xs text-base-content/60 mt-4 max-w-sm">
         {{ _("We only request read-only access to your Search Console performance data, used solely to generate the insights shown in this app. See our") }}
         <a class="link link-hover" href="{{ url_for('main.privacy_policy') }}" target="_blank" rel="noopener">{{ _("Privacy Policy") }}</a>
         {{ _("for details, and revoke access anytime from your") }}

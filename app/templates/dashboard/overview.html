@@ -7,36 +7,16 @@
    genera solo se compaiono nel markup). #}
 <div class="hidden text-success text-warning text-error bg-success bg-warning bg-error"></div>
 
-<div class="mb-6 flex flex-wrap items-end justify-between gap-4">
-  <div>
-    <h1 class="text-2xl font-semibold">{{ _("Overview") }}</h1>
-    <p class="text-base-content/60 mt-1">{{ _("Welcome, %(name)s.", name=current_user.name) }}</p>
-  </div>
-</div>
+{% from "partials/ui.html" import page_header %}
+{{ page_header(_("Overview"), _("Welcome, %(name)s.", name=current_user.name)) }}
+
+{% include "partials/onboarding_steps.html" %}
 
 {% include "partials/ai_credits_card.html" %}
 
+{# Senza connessione la checklist sopra è già l'unico invito all'azione. #}
 {% if connection %}
   {% include "partials/usage_widget.html" %}
-{% endif %}
-
-{% if not connection %}
-  {# Nessun account collegato: unico caso in cui mostriamo il connettore. #}
-  <div class="card card-border bg-base-100 max-w-md shadow-xs">
-    <div class="card-body">
-      <h2 class="card-title">{{ _("Connect Google") }}</h2>
-      <p class="text-base-content/70">
-        {{ _("To use the service, connect the Google account that owns the websites you want to monitor.") }}
-      </p>
-      <div class="justify-end card-actions mt-2">
-        <a class="btn btn-primary" href="{{ url_for('dashboard.connect') }}">
-          <span class="iconify size-4" data-icon="lucide:unplug"></span>
-          {{ _("Connect") }}
-        </a>
-      </div>
-    </div>
-  </div>
-{% else %}
 
   <div class="mb-5 flex flex-wrap items-end justify-between gap-4">
     <label class="form-control w-full max-w-xs">
@@ -107,7 +87,7 @@
 
   {# Stato: dati #}
   <div id="state-data" class="hidden">
-    <p class="text-base-content/50 text-sm mb-3" id="range-label"></p>
+    <p class="text-base-content/60 text-sm mb-3" id="range-label"></p>
 
     {# KPI rapidi del sito #}
     <div class="stats stats-vertical sm:stats-horizontal border border-base-300 shadow-xs w-full mb-6" id="overview-stats"></div>
@@ -117,11 +97,11 @@
       <div>
         <div class="mb-3 flex items-center justify-between">
           <h2 class="font-semibold">{{ _("Monitored pages") }}</h2>
-          <span class="text-xs text-base-content/50" id="pages-note"></span>
+          <span class="text-xs text-base-content/60" id="pages-note"></span>
         </div>
         <div class="flex flex-col gap-3" id="pages-list"></div>
         {% if usage.pages_limit >= 0 %}
-        <p class="text-xs text-base-content/40 mt-3">
+        <p class="text-xs text-base-content/60 mt-3">
           <span class="iconify size-3.5 align-[-2px]" data-icon="lucide:lock"></span>
           {{ _("Your plan monitors up to %(limit)s pages.", limit=usage.pages_limit) }}
           <a class="link link-hover" href="{{ url_for('billing.upgrade') }}">{{ _("Upgrade for more") }}</a>
@@ -141,7 +121,7 @@
                     sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
           </div>
         </div>
-        <p class="text-xs text-base-content/40 mt-2">
+        <p class="text-xs text-base-content/60 mt-2">
           {{ _("Some sites block being embedded — if the preview stays blank, that's why.") }}
         </p>
       </div>

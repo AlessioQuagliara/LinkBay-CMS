@@ -1,6 +1,6 @@
 {# Selettore lingua compatto (EN / IT) per pagine fuori dalla dashboard, dove
    non c'è la pagina Settings a disposizione (es. login/register/verify). #}
-<p class="text-center text-xs text-base-content/40 mt-4">
+<p class="text-center text-xs text-base-content/60 mt-4">
   {% for code in supported_locales %}
     {%- if not loop.first %} · {% endif -%}
     {% if get_locale() == code %}

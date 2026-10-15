@@ -6,8 +6,37 @@
    head-assets.html e i tre <html data-theme="linkbay"> in landing/index.html,
    landing/ai_credits.html, landing/legal_base.html.
    Palette: bianco/nero + brand #FF5758 (rosso). */
+/* Font UI: Dubai (spaziatura ampia, molto leggibile). Self-hosted in
+   app/static/fonts/ — local() prima, così su Windows usa quello di sistema.
+   Il marchio (Electronize) resta solo nel logo PNG, nessun webfont. */
+@font-face {
+  font-family: "Dubai";
+  font-weight: 400;
+  font-display: swap;
+  src: local("Dubai Regular"), local("Dubai-Regular"),
+       url("../fonts/Dubai-Regular.woff2") format("woff2"),
+       url("../fonts/Dubai-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Dubai";
+  font-weight: 500;
+  font-display: swap;
+  src: local("Dubai Medium"), local("Dubai-Medium"),
+       url("../fonts/Dubai-Medium.woff2") format("woff2"),
+       url("../fonts/Dubai-Medium.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Dubai";
+  font-weight: 700;
+  font-display: swap;
+  src: local("Dubai Bold"), local("Dubai-Bold"),
+       url("../fonts/Dubai-Bold.woff2") format("woff2"),
+       url("../fonts/Dubai-Bold.ttf") format("truetype");
+}
+
 [data-theme="linkbay"] {
   color-scheme: light;
+  font-family: "Dubai", "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
   --color-base-100: #ffffff;
   --color-base-200: #f6f6f7;

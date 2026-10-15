@@ -1,71 +1,59 @@
-{% extends "base.html" %}
+{% extends "auth/layout.html" %}
 {% block title %}{{ _("Sign up") }}{% endblock %}
 {% block head %}
 {% if turnstile_site_key %}
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 {% endif %}
 {% endblock %}
-{% block content %}
-<div class="min-h-screen flex items-center justify-center p-6">
-  <div class="card w-full max-w-sm bg-base-100 border border-base-300 shadow-sm">
-    <div class="card-body">
-      <a class="flex justify-center mb-4" href="{{ url_for('main.index') }}">
-        <img class="h-7 w-auto" src="{{ url_for('static', filename='shared/logo.png') }}" alt="LinkBayCMS">
-      </a>
-      <h1 class="text-xl font-medium text-center mb-4">{{ _("Create account") }}</h1>
+{% block auth_title %}{{ _("Create account") }}{% endblock %}
+{% block auth_subtitle %}{{ _("Find the pages losing Google traffic, in a few minutes.") }}{% endblock %}
+{% block auth_body %}
+<form method="post" novalidate>
+  {{ form.hidden_tag() }}
 
-      <form method="post" novalidate>
-        {{ form.hidden_tag() }}
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">{{ form.name.label.text }}</legend>
+    <label class="input w-full focus-within:outline-0">
+      <span class="iconify text-base-content/60 size-5" data-icon="lucide:user"></span>
+      {{ form.name(class_="grow focus:outline-0", placeholder="Mario Rossi") }}
+    </label>
+    {% for error in form.name.errors %}<p class="text-error text-sm mt-1">{{ error }}</p>{% endfor %}
+  </fieldset>
 
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">{{ form.name.label.text }}</legend>
-          <label class="input w-full focus-within:outline-0">
-            <span class="iconify text-base-content/60 size-5" data-icon="lucide:user"></span>
-            {{ form.name(class_="grow focus:outline-0", placeholder="Mario Rossi") }}
-          </label>
-          {% for error in form.name.errors %}<p class="text-error text-sm mt-1">{{ error }}</p>{% endfor %}
-        </fieldset>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">{{ form.email.label.text }}</legend>
+    <label class="input w-full focus-within:outline-0">
+      <span class="iconify text-base-content/60 size-5" data-icon="lucide:mail"></span>
+      {{ form.email(class_="grow focus:outline-0", placeholder="your@company.com") }}
+    </label>
+    {% for error in form.email.errors %}<p class="text-error text-sm mt-1">{{ error }}</p>{% endfor %}
+  </fieldset>
 
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">{{ form.email.label.text }}</legend>
-          <label class="input w-full focus-within:outline-0">
-            <span class="iconify text-base-content/60 size-5" data-icon="lucide:mail"></span>
-            {{ form.email(class_="grow focus:outline-0", placeholder="your@company.com") }}
-          </label>
-          {% for error in form.email.errors %}<p class="text-error text-sm mt-1">{{ error }}</p>{% endfor %}
-        </fieldset>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">{{ form.password.label.text }}</legend>
+    <label class="input w-full focus-within:outline-0">
+      <span class="iconify text-base-content/60 size-5" data-icon="lucide:key-round"></span>
+      {{ form.password(class_="grow focus:outline-0", placeholder=_("Minimum 8 characters")) }}
+    </label>
+    {% for error in form.password.errors %}<p class="text-error text-sm mt-1">{{ error }}</p>{% endfor %}
+  </fieldset>
 
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">{{ form.password.label.text }}</legend>
-          <label class="input w-full focus-within:outline-0">
-            <span class="iconify text-base-content/60 size-5" data-icon="lucide:key-round"></span>
-            {{ form.password(class_="grow focus:outline-0", placeholder=_("Minimum 8 characters")) }}
-          </label>
-          {% for error in form.password.errors %}<p class="text-error text-sm mt-1">{{ error }}</p>{% endfor %}
-        </fieldset>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">{{ form.confirm_password.label.text }}</legend>
+    <label class="input w-full focus-within:outline-0">
+      <span class="iconify text-base-content/60 size-5" data-icon="lucide:key-round"></span>
+      {{ form.confirm_password(class_="grow focus:outline-0", placeholder=_("Repeat password")) }}
+    </label>
+    {% for error in form.confirm_password.errors %}<p class="text-error text-sm mt-1">{{ error }}</p>{% endfor %}
+  </fieldset>
 
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">{{ form.confirm_password.label.text }}</legend>
-          <label class="input w-full focus-within:outline-0">
-            <span class="iconify text-base-content/60 size-5" data-icon="lucide:key-round"></span>
-            {{ form.confirm_password(class_="grow focus:outline-0", placeholder=_("Repeat password")) }}
-          </label>
-          {% for error in form.confirm_password.errors %}<p class="text-error text-sm mt-1">{{ error }}</p>{% endfor %}
-        </fieldset>
+  {% if turnstile_site_key %}
+  <div class="cf-turnstile mt-4" data-sitekey="{{ turnstile_site_key }}"></div>
+  {% endif %}
 
-        {% if turnstile_site_key %}
-        <div class="cf-turnstile mt-4" data-sitekey="{{ turnstile_site_key }}"></div>
-        {% endif %}
-
-        {{ form.submit(class_="btn btn-error text-white btn-block mt-4") }}
-      </form>
-
-      <p class="text-center text-sm text-base-content/60 mt-4">
-        {{ _("Already have an account?") }} <a class="link" href="{{ url_for('auth.login') }}">{{ _("Sign in") }}</a>
-      </p>
-
-      {% include "partials/lang_switcher.html" %}
-    </div>
-  </div>
-</div>
+  {{ form.submit(class_="btn btn-primary btn-block mt-4") }}
+</form>
+{% endblock %}
+{% block auth_footer %}
+<p>{{ _("Already have an account?") }} <a class="link font-medium" href="{{ url_for('auth.login') }}">{{ _("Sign in") }}</a></p>
 {% endblock %}

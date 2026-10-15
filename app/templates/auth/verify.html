@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "auth/layout.html" %}
 {% block title %}{{ _("Verify your email") }}{% endblock %}
 {% block head %}
 <style>
@@ -14,79 +14,63 @@
     outline: none; transition: border-color .15s, box-shadow .15s;
   }
   .otp input:focus {
-    border-color: var(--color-error, #e11d48);
-    box-shadow: 0 0 0 2px color-mix(in oklch, var(--color-error, #e11d48) 25%, transparent);
+    border-color: var(--color-primary, #ff5758);
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--color-primary, #ff5758) 25%, transparent);
   }
 </style>
 {% endblock %}
-{% block content %}
-<div class="min-h-screen flex items-center justify-center p-6">
-  <div class="card w-full max-w-sm bg-base-100 border border-base-300 shadow-sm">
-    <div class="card-body">
-      <a class="flex justify-center mb-4" href="{{ url_for('main.index') }}">
-        <img class="h-7 w-auto" src="{{ url_for('static', filename='shared/logo.png') }}" alt="LinkBayCMS">
-      </a>
-      <h1 class="text-xl font-medium text-center">
-        {% if purpose == "register" %}{{ _("Confirm your email") }}{% else %}{{ _("Enter your code") }}{% endif %}
-      </h1>
-      <p class="text-center text-sm text-base-content/60 mt-1 mb-6">
-        {{ _("We sent a 6-digit code to") }}<br>
-        <span class="font-medium text-base-content">{{ email }}</span>
-      </p>
+{% block auth_title %}{% if purpose == "register" %}{{ _("Confirm your email") }}{% else %}{{ _("Enter your code") }}{% endif %}{% endblock %}
+{% block auth_subtitle %}
+{{ _("We sent a 6-digit code to") }}<br>
+<span class="font-medium text-base-content">{{ email }}</span>
+{% endblock %}
+{% block auth_body %}
+<form method="post" action="{{ url_for('auth.verify') }}" id="otp-form" novalidate>
+  {{ form.hidden_tag() }}
+  {# Valore completo ricomposto dal JS dalle 6 caselle. #}
+  <input type="hidden" name="code" id="otp-code">
 
-      <form method="post" action="{{ url_for('auth.verify') }}" id="otp-form" novalidate>
-        {{ form.hidden_tag() }}
-        {# Valore completo ricomposto dal JS dalle 6 caselle. #}
-        <input type="hidden" name="code" id="otp-code">
+  {# Campo dedicato all'autofill del codice via SMS/QuickType (iOS) o SMS
+     Retriever (Android): `autocomplete="one-time-code"` su una casella
+     reale da 1 carattere fa sì che il sistema tenga il focus/tastiera in
+     attesa del codice, bloccando la digitazione manuale finché non si
+     preme un tasto qualsiasi (su desktop; su mobile non c'è modo). Va
+     isolato su un campo separato, non visibile ma non `display:none`
+     (Safari non fa autofill su elementi che non prendono spazio nel
+     layout), che poi distribuisce le cifre nelle 6 caselle visibili. #}
+  <input type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6"
+         id="otp-autofill" tabindex="-1" aria-hidden="true"
+         class="absolute opacity-0 pointer-events-none h-px w-px overflow-hidden">
 
-        {# Campo dedicato all'autofill del codice via SMS/QuickType (iOS) o SMS
-           Retriever (Android): `autocomplete="one-time-code"` su una casella
-           reale da 1 carattere fa sì che il sistema tenga il focus/tastiera in
-           attesa del codice, bloccando la digitazione manuale finché non si
-           preme un tasto qualsiasi (su desktop; su mobile non c'è modo). Va
-           isolato su un campo separato, non visibile ma non `display:none`
-           (Safari non fa autofill su elementi che non prendono spazio nel
-           layout), che poi distribuisce le cifre nelle 6 caselle visibili. #}
-        <input type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6"
-               id="otp-autofill" tabindex="-1" aria-hidden="true"
-               class="absolute opacity-0 pointer-events-none h-px w-px overflow-hidden">
-
-        <div class="otp" data-otp aria-label="{{ _('6-digit verification code') }}">
-          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=1) }}" autofocus>
-          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=2) }}">
-          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=3) }}">
-          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=4) }}">
-          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=5) }}">
-          <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=6) }}">
-        </div>
-        {% for error in form.code.errors %}
-          <p class="text-error text-sm mt-3 text-center">{{ error }}</p>
-        {% endfor %}
-
-        {{ form.submit(class_="btn btn-error text-white btn-block mt-6") }}
-      </form>
-
-      <form method="post" action="{{ url_for('auth.resend') }}" class="mt-4 text-center">
-        {{ form.csrf_token }}
-        <span class="text-sm text-base-content/60">{{ _("Didn't get the email?") }}</span>
-        <button id="resend-btn" type="submit"
-                class="link text-sm ms-1"
-                data-label-default="{{ _('Resend code') }}"
-                data-label-cooldown-tpl="{{ _('Resend in {s}s') }}"
-                {% if cooldown_left and cooldown_left > 0 %}disabled data-cooldown="{{ cooldown_left }}"{% endif %}>
-          <span id="resend-label">{{ _("Resend code") }}</span>
-        </button>
-      </form>
-
-      <p class="text-center text-sm text-base-content/50 mt-4">
-        <a class="link" href="{{ url_for('auth.cancel_verify') }}">{{ _("Use a different account") }}</a>
-      </p>
-
-      {% include "partials/lang_switcher.html" %}
-    </div>
+  <div class="otp" data-otp aria-label="{{ _('6-digit verification code') }}">
+    <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=1) }}" autofocus>
+    <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=2) }}">
+    <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=3) }}">
+    <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=4) }}">
+    <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=5) }}">
+    <input inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="{{ _('Digit %(n)s', n=6) }}">
   </div>
-</div>
+  {% for error in form.code.errors %}
+    <p class="text-error text-sm mt-3 text-center">{{ error }}</p>
+  {% endfor %}
 
+  {{ form.submit(class_="btn btn-primary btn-block mt-6") }}
+</form>
+
+<form method="post" action="{{ url_for('auth.resend') }}" class="mt-4 text-center">
+  {{ form.csrf_token }}
+  <span class="text-sm text-base-content/60">{{ _("Didn't get the email?") }}</span>
+  <button id="resend-btn" type="submit"
+          class="link text-sm ms-1"
+          data-label-default="{{ _('Resend code') }}"
+          data-label-cooldown-tpl="{{ _('Resend in {s}s') }}"
+          {% if cooldown_left and cooldown_left > 0 %}disabled data-cooldown="{{ cooldown_left }}"{% endif %}>
+    <span id="resend-label">{{ _("Resend code") }}</span>
+  </button>
+</form>
+{% endblock %}
+{% block auth_footer %}
+<p><a class="link font-medium" href="{{ url_for('auth.cancel_verify') }}">{{ _("Use a different account") }}</a></p>
 <script>
   (function () {
     const wrap = document.querySelector("[data-otp]");

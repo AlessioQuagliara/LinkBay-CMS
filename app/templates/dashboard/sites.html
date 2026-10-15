@@ -2,30 +2,14 @@
 {% block title %}{{ _("Sites") }}{% endblock %}
 {% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
 {% block dashboard_content %}
+{% from "partials/ui.html" import page_header %}
 
-<div class="mb-6 flex flex-wrap items-end justify-between gap-4">
-  <div>
-    <h1 class="text-2xl font-semibold">{{ _("Sites") }}</h1>
-    <p class="text-base-content/60 mt-1">{{ _("Choose which Search Console properties to monitor.") }}</p>
-  </div>
+{% call page_header(_("Sites"), _("Choose which Search Console properties to monitor.")) %}
   <span class="badge badge-soft badge-primary hidden" id="sites-count-badge"></span>
-</div>
+{% endcall %}
 
 {% if not connection %}
-  <div class="card card-border bg-base-100 max-w-md shadow-xs">
-    <div class="card-body">
-      <h2 class="card-title">{{ _("Connect Google") }}</h2>
-      <p class="text-base-content/70">
-        {{ _("To use the service, connect the Google account that owns the websites you want to monitor.") }}
-      </p>
-      <div class="justify-end card-actions mt-2">
-        <a class="btn btn-primary" href="{{ url_for('dashboard.connect') }}">
-          <span class="iconify size-4" data-icon="lucide:unplug"></span>
-          {{ _("Connect") }}
-        </a>
-      </div>
-    </div>
-  </div>
+  {% include "partials/connect_required.html" %}
 {% else %}
 
   <div id="sites-loading" class="skeleton h-40 w-full max-w-xl"></div>
@@ -38,7 +22,7 @@
       <div class="card-body">
         <h2 class="card-title text-base">{{ _("Monitored sites") }}</h2>
         <div class="flex flex-col divide-y divide-base-200" id="monitored-list"></div>
-        <p class="text-sm text-base-content/50 hidden" id="monitored-empty">
+        <p class="text-sm text-base-content/60 hidden" id="monitored-empty">
           {{ _("No sites monitored yet — add one below.") }}
         </p>
       </div>
@@ -48,7 +32,7 @@
       <div class="card-body">
         <h2 class="card-title text-base">{{ _("Available Search Console properties") }}</h2>
         <div class="flex flex-col divide-y divide-base-200" id="available-list"></div>
-        <p class="text-sm text-base-content/50 hidden" id="available-empty">
+        <p class="text-sm text-base-content/60 hidden" id="available-empty">
           {{ _("All your verified properties are already monitored.") }}
         </p>
         <p class="text-sm text-error hidden" id="site-limit-hint">

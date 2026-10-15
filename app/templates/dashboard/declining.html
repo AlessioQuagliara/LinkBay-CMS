@@ -2,21 +2,17 @@
 {% block title %}{{ _("Declining Pages") }}{% endblock %}
 {% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
 {% block dashboard_content %}
+{% from "partials/ui.html" import page_header %}
 
 {# Safelist: classi colore iniettate via JS (badge priorità), elencate qui
    nascoste così il runtime Tailwind del CDN le genera comunque. #}
 <div class="hidden badge-error badge-warning badge-neutral text-error text-warning text-primary"></div>
 
-<div class="mb-4 flex flex-wrap items-end justify-between gap-4">
-  <div>
-    <h1 class="text-2xl font-semibold">{{ _("Declining Pages") }}</h1>
-    <p class="text-base-content/60 mt-1">
-      {{ _("Pages that are losing organic traffic on their own, ordered by priority.") }}
-    </p>
-  </div>
+{% call page_header(_("Declining Pages"), _("Pages that are losing organic traffic on their own, ordered by priority.")) %}
 
   {# Stesso selettore sito di Insights: puro switcher tra i siti già
      monitorati (popolato via JS da /gsc/api/monitored-sites) #}
+  {% if connection %}
   <label class="form-control w-full max-w-xs">
     <select id="site-select" class="select select-bordered" disabled
             data-sites-url="{{ url_for('gsc.api_monitored_sites') }}"
@@ -27,25 +23,11 @@
       <option>{{ _("Loading sites…") }}</option>
     </select>
   </label>
-</div>
+  {% endif %}
+{% endcall %}
 
 {% if not connection %}
-  <div class="card card-border bg-base-100 shadow-xs">
-    <div class="card-body items-center text-center py-12">
-      <span class="iconify text-base-content/30 size-10" data-icon="lucide:cable"></span>
-      <p class="font-medium mt-3">{{ _("No Search Console account connected") }}</p>
-      <p class="text-sm text-base-content/60 max-w-sm mt-1">
-        {{ _("Connect your Google Search Console account to see which pages are losing organic traffic.") }}
-      </p>
-      <a class="btn btn-primary mt-5" href="{{ url_for('gsc.authorize') }}">
-        <span class="iconify size-4" data-icon="lucide:link"></span>
-        {{ _("Connect Search Console") }}
-      </a>
-      <p class="text-xs text-base-content/50 mt-4">
-        {{ _("Read-only access. See our") }} <a class="link link-hover" href="{{ url_for('main.privacy_policy') }}" target="_blank" rel="noopener">{{ _("Privacy Policy") }}</a>.
-      </p>
-    </div>
-  </div>
+  {% include "partials/connect_required.html" %}
 {% else %}
 
   {# Filtro per stato #}

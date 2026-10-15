@@ -1,0 +1,20 @@
+{# Mostrato dalle pagine che servono dati GSC quando l'account Google non è
+   ancora collegato: un solo messaggio e un solo bottone (passo 1 del flusso). #}
+<div class="card card-border bg-base-100">
+  <div class="card-body items-center py-14 text-center">
+    <span class="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+      <span class="iconify size-6" data-icon="lucide:cable"></span>
+    </span>
+    <p class="mt-4 text-lg font-semibold">{{ _("No Search Console account connected") }}</p>
+    <p class="mt-1 max-w-sm text-base-content/70">
+      {{ _("Connect your Google Search Console account to see which pages are losing organic traffic.") }}
+    </p>
+    <a class="btn btn-primary mt-6" href="{{ url_for('gsc.authorize') }}">
+      <span class="iconify size-4" data-icon="lucide:link"></span>
+      {{ _("Connect Search Console") }}
+    </a>
+    <p class="mt-4 text-sm text-base-content/60">
+      {{ _("Read-only access. See our") }} <a class="link link-hover" href="{{ url_for('main.privacy_policy') }}" target="_blank" rel="noopener">{{ _("Privacy Policy") }}</a>.
+    </p>
+  </div>
+</div>

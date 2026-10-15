@@ -1,0 +1,62 @@
+{# Percorso guidato A→Z in Overview. `onboarding` arriva da
+   dashboard.routes.overview. Mostra la barra dei passi e UNA sola card con il
+   prossimo passo; sparisce quando l'utente ha completato tutto. #}
+{% set ob = onboarding %}
+{% if not (ob.connected and ob.has_sites and ob.has_audit) %}
+{% set steps = [
+  (_("Connect Google"), ob.connected),
+  (_("Choose sites"), ob.has_sites),
+  (_("Review declines"), ob.has_audit),
+  (_("Create an audit"), ob.has_audit),
+] %}
+<section class="card card-border bg-base-100 mb-8" aria-labelledby="onboarding-title">
+  <div class="card-body gap-6 p-6 sm:p-8">
+    <div>
+      <p class="text-sm font-medium text-primary">{{ _("Getting started") }}</p>
+      <h2 id="onboarding-title" class="text-xl font-semibold">{{ _("Four steps to your first audit") }}</h2>
+    </div>
+
+    <ul class="steps steps-vertical sm:steps-horizontal w-full">
+      {% for label, done in steps %}
+        {# Passo corrente = primo non fatto: evidenziato come i fatti. #}
+        {% set current = not done and (loop.first or steps[loop.index0 - 1][1]) %}
+        <li class="step {{ 'step-primary' if done or current }}" {% if done %}data-content="✓"{% endif %}>{{ label }}</li>
+      {% endfor %}
+    </ul>
+
+    <div class="flex flex-col gap-4 rounded-box bg-base-200 p-5 sm:flex-row sm:items-center sm:justify-between">
+      {% if not ob.connected %}
+        <div>
+          <p class="font-semibold">{{ _("Connect your Google Search Console") }}</p>
+          <p class="text-base-content/70">{{ _("Read-only access: we read your performance data, we never change your site.") }}</p>
+        </div>
+        <a class="btn btn-primary shrink-0" href="{{ url_for('dashboard.connect') }}">
+          {{ _("Connect Google") }}
+          <span class="iconify size-4" data-icon="lucide:arrow-right"></span>
+        </a>
+      {% elif not ob.has_sites %}
+        <div>
+          <p class="font-semibold">{{ _("Choose the sites to monitor") }}</p>
+          <p class="text-base-content/70">{{ _("Pick one or more Search Console properties. We start checking them right away.") }}</p>
+        </div>
+        <a class="btn btn-primary shrink-0" href="{{ url_for('dashboard.sites') }}">
+          {{ _("Choose sites") }}
+          <span class="iconify size-4" data-icon="lucide:arrow-right"></span>
+        </a>
+      {% else %}
+        <div>
+          <p class="font-semibold">{{ _("See which pages are losing traffic") }}</p>
+          <p class="text-base-content/70">{{ _("Review the declining pages, then turn them into a shareable audit presentation.") }}</p>
+        </div>
+        <div class="flex shrink-0 flex-wrap gap-2">
+          <a class="btn btn-ghost" href="{{ url_for('audits.index') }}">{{ _("Create an audit") }}</a>
+          <a class="btn btn-primary" href="{{ url_for('dashboard.declining') }}">
+            {{ _("Review declines") }}
+            <span class="iconify size-4" data-icon="lucide:arrow-right"></span>
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}

@@ -7,6 +7,7 @@ from app.entitlements.service import (
     get_usage_summary,
     levels_from_usage,
 )
+from app.models import AuditPresentation
 
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 
@@ -21,9 +22,18 @@ def overview():
     # ridondante quando servono tutte e tre le dimensioni insieme).
     usage = get_usage_summary(current_user)
     usage_levels = levels_from_usage(usage)
+    connection = current_user.gsc_connection
+    # Percorso guidato A→Z (partials/onboarding_steps.html): ogni passo è
+    # "fatto" in base a dati reali, non a click registrati.
+    onboarding = {
+        "connected": connection is not None,
+        "has_sites": usage.sites_used > 0,
+        "has_audit": AuditPresentation.query.filter_by(user_id=current_user.id).first() is not None,
+    }
     return render_template(
         "dashboard/overview.html",
-        connection=current_user.gsc_connection,
+        connection=connection,
+        onboarding=onboarding,
         usage=usage,
         usage_levels=usage_levels,
         plan_name=get_plan_limits(current_user).name,

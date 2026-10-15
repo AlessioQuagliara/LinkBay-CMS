@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% block html_attrs %} data-theme="linkbay"{% endblock %}
 {% block content %}
 <div class="drawer lg:drawer-open bg-base-200">
   <input id="dashboard-drawer" type="checkbox" class="drawer-toggle" aria-label="Toggle sidebar">
@@ -43,17 +42,19 @@
         <img class="h-6 w-auto" src="{{ url_for('static', filename='shared/logo.png') }}" alt="LinkBayCMS">
       </a>
 
-      <ul class="menu w-full flex-1 gap-1 px-3">
+      <ul class="menu w-full flex-1 gap-0.5 px-3">
+        <li class="menu-title mt-4 first:mt-0">{{ _("Start") }}</li>
         <li>
           <a class="{{ 'menu-active' if request.endpoint == 'dashboard.overview' }}" href="{{ url_for('dashboard.overview') }}">
             <span class="iconify size-4" data-icon="lucide:panels-top-left"></span>
             {{ _("Overview") }}
           </a>
         </li>
+        <li class="menu-title mt-4 first:mt-0">{{ _("Analyze") }}</li>
         <li>
-          <a class="{{ 'menu-active' if request.endpoint == 'dashboard.sites' }}" href="{{ url_for('dashboard.sites') }}">
-            <span class="iconify size-4" data-icon="lucide:globe"></span>
-            {{ _("Sites") }}
+          <a class="{{ 'menu-active' if request.endpoint == 'dashboard.declining' }}" href="{{ url_for('dashboard.declining') }}">
+            <span class="iconify size-4" data-icon="lucide:trending-down"></span>
+            {{ _("Declining Pages") }}
           </a>
         </li>
         <li>
@@ -63,9 +64,16 @@
           </a>
         </li>
         <li>
-          <a class="{{ 'menu-active' if request.endpoint == 'dashboard.declining' }}" href="{{ url_for('dashboard.declining') }}">
-            <span class="iconify size-4" data-icon="lucide:trending-down"></span>
-            {{ _("Declining Pages") }}
+          <a class="{{ 'menu-active' if request.endpoint and request.endpoint.startswith('audits.') }}" href="{{ url_for('audits.index') }}">
+            <span class="iconify size-4" data-icon="lucide:presentation"></span>
+            {{ _("Audit Presentations") }}
+          </a>
+        </li>
+        <li class="menu-title mt-4 first:mt-0">{{ _("Setup") }}</li>
+        <li>
+          <a class="{{ 'menu-active' if request.endpoint == 'dashboard.sites' }}" href="{{ url_for('dashboard.sites') }}">
+            <span class="iconify size-4" data-icon="lucide:globe"></span>
+            {{ _("Sites") }}
           </a>
         </li>
         <li>
@@ -74,12 +82,7 @@
             {{ _("Connector") }}
           </a>
         </li>
-        <li>
-          <a class="{{ 'menu-active' if request.endpoint and request.endpoint.startswith('audits.') }}" href="{{ url_for('audits.index') }}">
-            <span class="iconify size-4" data-icon="lucide:presentation"></span>
-            {{ _("Audit Presentations") }}
-          </a>
-        </li>
+        <li class="menu-title mt-4 first:mt-0">{{ _("Account") }}</li>
         <li>
           <a class="{{ 'menu-active' if request.endpoint == 'billing.subscription' }}" href="{{ url_for('billing.subscription') }}">
             <span class="iconify size-4" data-icon="lucide:credit-card"></span>
@@ -101,12 +104,12 @@
           </a>
         </li>
         {% if current_user.is_admin %}
-          <li>
-            <a href="{{ url_for('admin.index') }}">
-              <span class="iconify size-4" data-icon="lucide:shield"></span>
-              Flask-Admin
-            </a>
-          </li>
+        <li>
+          <a href="{{ url_for('admin.index') }}">
+            <span class="iconify size-4" data-icon="lucide:shield"></span>
+            Flask-Admin
+          </a>
+        </li>
         {% endif %}
       </ul>
 
@@ -121,7 +124,7 @@
               <span class="truncate text-sm font-semibold">{{ current_user.name }}</span>
               <span class="truncate text-xs text-base-content/60">{{ current_user.email }}</span>
             </span>
-            <span class="iconify size-4 text-base-content/50 shrink-0" data-icon="lucide:chevron-up"></span>
+            <span class="iconify size-4 text-base-content/60 shrink-0" data-icon="lucide:chevron-up"></span>
           </button>
           <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-30 mb-2 w-56 border border-base-300 p-2 shadow-lg">
             <li>
