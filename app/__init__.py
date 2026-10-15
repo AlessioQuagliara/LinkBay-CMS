@@ -4,12 +4,22 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from config import Config
 
 
+# Valori assenti o pubblicati nel repo (vecchio default di config.py e
+# placeholder di .env.example): con questi chiunque firma cookie di sessione.
+_PUBLIC_SECRET_KEYS = {None, "", "dev-secret-key-change-me", "dev-secret-change-me"}
+
+
 def create_app(config_class=Config):
     from app.billing.access import init_access_gate
     from app.errors import register_error_handlers
 
     app = Flask(__name__)
     app.config.from_object(config_class)
+    if app.config.get("SECRET_KEY") in _PUBLIC_SECRET_KEYS and not app.testing:
+        raise RuntimeError(
+            "SECRET_KEY mancante o uguale a un valore pubblico: impostane una in .env "
+            '(python -c "import secrets; print(secrets.token_hex(32))").'
+        )
 
     # Dietro Traefik l'app riceve richieste in HTTP dall'host interno
     # (web:3000), ma è servita pubblicamente su https://www.linkbay-cms.com.

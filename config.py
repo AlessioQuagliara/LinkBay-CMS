@@ -7,7 +7,9 @@ load_dotenv()
 
 
 class Config:
-    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
+    # Nessun default: una chiave pubblica nel repo permetterebbe di forgiare
+    # cookie di sessione. create_app() rifiuta di partire se manca.
+    SECRET_KEY = os.environ.get("SECRET_KEY")
 
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DATABASE_URL", "postgresql://linkbay:linkbay@localhost:5432/linkbay_cms"

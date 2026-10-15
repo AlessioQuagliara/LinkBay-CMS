@@ -1,0 +1,25 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>esc() attribute injection regression</title>
+<!-- Carica il VERO app/static/js/common.js e riproduce il template di
+     renderQueries() in app/static/js/insights.js. Nessuna rete. Aprire il file
+     in un browser: il risultato è scritto in #result. Atteso dopo la fix:
+     injected_attribute_present=false, handler_executed=false. -->
+<table><tbody id="queries-body"></tbody></table>
+<pre id="result"></pre>
+<script src="../../app/static/js/common.js"></script>
+<script>
+  const esc = window.Common.esc;
+  // Query di ricerca "di terzi" come la restituirebbe Search Console.
+  const q = { query: 'x" onmouseover="window.__xss=1" data-x="' };
+  document.getElementById("queries-body").innerHTML =
+    `<tr><td class="max-w-xs truncate" title="${esc(q.query)}">${esc(q.query)}</td></tr>`;   // insights.js renderQueries
+  const td = document.querySelector("#queries-body td");
+  td.dispatchEvent(new MouseEvent("mouseover"));
+  document.getElementById("result").textContent = JSON.stringify({
+    esc_output: esc(q.query),
+    injected_attribute_present: td.hasAttribute("onmouseover"),
+    handler_executed: window.__xss === 1,
+    title_roundtrip_ok: td.getAttribute("title") === q.query,
+  });
+</script>

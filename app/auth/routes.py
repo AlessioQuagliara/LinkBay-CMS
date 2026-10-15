@@ -29,6 +29,14 @@ def _start_otp_flow(user, purpose):
     session[_PENDING_PURPOSE] = purpose
     session[_PENDING_EMAIL] = user.email
 
+    # Ogni nuovo codice riparte da zero tentativi: se il login potesse
+    # emetterne uno a ogni invio, il limite OTP_MAX_ATTEMPTS sarebbe aggirabile
+    # (e la vittima riceverebbe email a raffica). Stesso cooldown del resend.
+    allowed, remaining = otp_service.can_resend(user.id, purpose)
+    if not allowed:
+        flash(_("Please wait %(seconds)ss before requesting a new code.", seconds=remaining), "error")
+        return redirect(url_for("auth.verify"))
+
     sent, code = otp_service.issue_code(user, purpose)
     _flash_code_status(sent, code)
     return redirect(url_for("auth.verify"))
@@ -75,6 +83,7 @@ def register():
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
+@limiter.limit("10 per minute;50 per hour", methods=["POST"])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for("dashboard.overview"))
@@ -92,6 +101,7 @@ def login():
 
 
 @auth_bp.route("/forgot-password", methods=["GET", "POST"])
+@limiter.limit("5 per minute;20 per hour", methods=["POST"])
 def forgot_password():
     if current_user.is_authenticated:
         return redirect(url_for("dashboard.overview"))
@@ -139,6 +149,7 @@ def reset_password(token):
 
 
 @auth_bp.route("/verify", methods=["GET", "POST"])
+@limiter.limit("10 per minute;60 per hour", methods=["POST"])
 def verify():
     if current_user.is_authenticated:
         return redirect(url_for("dashboard.overview"))
@@ -178,6 +189,7 @@ def verify():
 
 
 @auth_bp.route("/verify/resend", methods=["POST"])
+@limiter.limit("5 per minute;20 per hour", methods=["POST"])
 def resend():
     user_id = session.get(_PENDING_USER)
     purpose = session.get(_PENDING_PURPOSE)

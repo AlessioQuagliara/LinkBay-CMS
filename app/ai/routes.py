@@ -65,7 +65,8 @@ def analyze():
             return jsonify({"error": "cooldown", "days_left": remaining}), 429
 
     job = get_queue(queue_name_for_user(current_user)).enqueue(
-        run_ai_analysis_job, current_user.id, site, job_timeout=180
+        run_ai_analysis_job, current_user.id, site, job_timeout=180,
+        meta={"user_id": current_user.id},
     )
     return jsonify({"status": "queued", "job_id": job.id})
 
@@ -79,7 +80,7 @@ def analyze_status(job_id):
     allega anche get_status() aggiornato così il frontend può ridisegnare
     punteggi/cooldown con una sola chiamata."""
     site = request.args.get("site")
-    payload = job_status_payload(job_id)
+    payload = job_status_payload(job_id, current_user.id)
     job_result = payload.get("job_result") or {}
     if payload["status"] == "finished" and job_result.get("ok") and site:
         payload["ai_status"] = get_status(current_user.id, site)

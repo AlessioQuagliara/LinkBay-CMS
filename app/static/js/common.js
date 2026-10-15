@@ -8,10 +8,12 @@ window.Common = (function () {
     return (document.querySelector('meta[name="csrf-token"]') || {}).content || "";
   }
 
+  // Escape anche di " e ': il risultato finisce pure dentro attributi
+  // (title/href/data-*) con dati di Search Console scritti da terzi.
   function esc(s) {
-    const d = document.createElement("div");
-    d.textContent = s == null ? "" : s;
-    return d.innerHTML;
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   }
 
   async function postForm(url, params) {

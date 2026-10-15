@@ -89,16 +89,26 @@ def test_get_queue_falls_back_to_default_for_unknown_name(app, patch_redis):
 
 def test_job_status_payload_not_found(app, patch_redis):
     with app.app_context():
-        assert queue_module.job_status_payload("does-not-exist") == {"status": "not_found"}
+        assert queue_module.job_status_payload("does-not-exist", 1) == {"status": "not_found"}
 
 
 def test_job_status_payload_finished_includes_job_result(app, patch_redis, fake_redis):
     with app.app_context():
         q = Queue("default", connection=fake_redis, is_async=False)
-        job = q.enqueue(_dummy_ok_job)
-        payload = queue_module.job_status_payload(job.id)
+        job = q.enqueue(_dummy_ok_job, meta={"user_id": 1})
+        payload = queue_module.job_status_payload(job.id, 1)
         assert payload["status"] == "finished"
         assert payload["job_result"] == {"ok": True}
+
+
+def test_job_status_payload_hides_other_users_job(app, patch_redis, fake_redis):
+    with app.app_context():
+        q = Queue("default", connection=fake_redis, is_async=False)
+        job = q.enqueue(_dummy_ok_job, meta={"user_id": 1})
+        assert queue_module.job_status_payload(job.id, 2) == {"status": "not_found"}
+        # job accodato senza owner (prima di questa fix): mai esposto
+        legacy = q.enqueue(_dummy_ok_job)
+        assert queue_module.job_status_payload(legacy.id, 1) == {"status": "not_found"}
 
 
 # --- job functions (eseguiti in-process, non tramite worker) -----------------

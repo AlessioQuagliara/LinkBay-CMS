@@ -54,6 +54,7 @@ def generate():
 
     job = get_queue(queue_name_for_user(current_user)).enqueue(
         run_audit_presentation_job, current_user.id, site_url, job_timeout=180,
+        meta={"user_id": current_user.id},
     )
     return jsonify({"status": "queued", "job_id": job.id})
 
@@ -61,7 +62,7 @@ def generate():
 @audits_bp.route("/generate-status/<job_id>")
 @login_required
 def generate_status(job_id):
-    payload = job_status_payload(job_id)
+    payload = job_status_payload(job_id, current_user.id)
     job_result = payload.get("job_result") or {}
     if payload["status"] == "finished" and job_result.get("ok") and job_result.get("presentation_id"):
         presentation = AuditPresentation.query.filter_by(

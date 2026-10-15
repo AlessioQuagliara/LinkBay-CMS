@@ -27,7 +27,7 @@ def queue_name_for_user(user) -> str:
     return get_plan_limits(user).queue_priority
 
 
-def job_status_payload(job_id: str) -> dict:
+def job_status_payload(job_id: str, user_id: int) -> dict:
     """Payload JSON generico per gli endpoint di polling (analyze-status,
     audit generate-status): stato RQ + esito se già concluso. "failed" qui indica un
     crash imprevisto del job (bug) — un fallimento "atteso" (DeepSeek non
@@ -38,6 +38,10 @@ def job_status_payload(job_id: str) -> dict:
     try:
         job = Job.fetch(job_id, connection=get_redis())
     except Exception:  # noqa: BLE001 — job_id inesistente/scaduto: nessun job, non un errore
+        return {"status": "not_found"}
+    # Il job di un altro utente è indistinguibile da uno inesistente: chi
+    # accoda deve passare meta={"user_id": ...} (vedi ai/routes.py, audits/routes.py).
+    if job.meta.get("user_id") != user_id:
         return {"status": "not_found"}
     status = job.get_status(refresh=True)
     payload = {"status": status}
