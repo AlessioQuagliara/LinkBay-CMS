@@ -1,5 +1,5 @@
 // Audit Presentations (app/templates/dashboard/audits.html): stessa coda RQ +
-// polling di /ai/analyze (vedi app/static/js/insights.js::pollAiJob), qui su
+// polling di /ai/analyze (Common.pollJob), qui su
 // /dashboard/audits/generate + /dashboard/audits/generate-status/<job_id>.
 (function () {
   "use strict";
@@ -11,57 +11,12 @@
   const STATUS_URL_TPL = script.dataset.statusUrlTpl;
   const VIEW_URL_BASE = script.dataset.viewUrlBase;
   const CREDITS_URL = script.dataset.creditsUrl;
-  const LANG = script.dataset.lang || "en";
-
-  const STRINGS = {
-    en: {
-      running: "Generating your presentation…",
-      failed: "Something went wrong. Please try again.",
-      noData: "No declining pages found for this site yet — nothing to put in a presentation.",
-      providerError: "The AI provider is temporarily unavailable. Please try again shortly.",
-      insufficient: "Not enough AI credits for this (costs %COST% credits).",
-      buyCredits: "Buy AI credits",
-      done: "Done! Opening your presentation…",
-    },
-    it: {
-      running: "Sto generando la presentazione…",
-      failed: "Qualcosa è andato storto. Riprova.",
-      noData: "Nessuna pagina in calo trovata per questo sito — niente da mettere in presentazione.",
-      providerError: "Il provider AI non è disponibile al momento. Riprova a breve.",
-      insufficient: "Crediti AI insufficienti per questa richiesta (costa %COST% crediti).",
-      buyCredits: "Compra crediti AI",
-      done: "Fatto! Apro la tua presentazione…",
-    },
-  };
-  const t = (key) => (STRINGS[LANG] && STRINGS[LANG][key]) || STRINGS.en[key];
+  const t = (key, vars) => window.I18N.t("audit" + key.charAt(0).toUpperCase() + key.slice(1), vars);
 
   const form = document.getElementById("audit-generate-form");
   const select = document.getElementById("audit-site-select");
   const submitBtn = document.getElementById("audit-generate-submit");
   const statusEl = document.getElementById("audit-generate-status");
-
-  const POLL_INTERVAL_MS = 2000;
-  const POLL_MAX_ATTEMPTS = 90; // ~3 minuti
-
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-  async function pollJob(jobId) {
-    const statusUrl = STATUS_URL_TPL.replace("__job_id__", encodeURIComponent(jobId));
-    for (let attempt = 0; attempt < POLL_MAX_ATTEMPTS; attempt++) {
-      await sleep(POLL_INTERVAL_MS);
-      let data;
-      try {
-        const res = await fetch(statusUrl, { headers: { Accept: "application/json" } });
-        data = await res.json();
-      } catch (e) {
-        continue;
-      }
-      if (data.status === "finished" || data.status === "failed" || data.status === "not_found") {
-        return data;
-      }
-    }
-    return { status: "timeout" };
-  }
 
   if (form) {
     form.addEventListener("submit", async (e) => {
@@ -79,7 +34,7 @@
 
         if (res.status === 402) {
           statusEl.innerHTML = "";
-          const label = t("insufficient").replace("%COST%", data.cost);
+          const label = t("insufficient", { cost: data.cost });
           statusEl.appendChild(document.createTextNode(label + " "));
           if (data.upsell) {
             const a = document.createElement("a");
@@ -97,7 +52,8 @@
           return;
         }
 
-        const outcome = await pollJob(data.job_id);
+        const statusUrl = STATUS_URL_TPL.replace("__job_id__", encodeURIComponent(data.job_id));
+        const outcome = await window.Common.pollJob(statusUrl, 90); // ~3 minuti
         const jobResult = outcome.job_result || {};
         if (outcome.status === "finished" && jobResult.ok && outcome.presentation_id) {
           statusEl.textContent = t("done");

@@ -1,5 +1,5 @@
 // Dizionario i18n per gli script client-side della dashboard (overview.js,
-// insights.js, declining.js). Flask-Babel copre Python+Jinja; qui copriamo il
+// insights.js, declining.js, sites.js, audits.js). Flask-Babel copre Python+Jinja; qui copriamo il
 // testo generato via JS, che Babel non vede. La lingua corrente arriva da
 // `window.APP_LOCALE` (impostato dal template da get_locale()).
 window.I18N = (function () {
@@ -73,6 +73,15 @@ window.I18N = (function () {
       addSiteError: "Couldn't add this site. Please try again.",
       removeSiteError: "Couldn't remove this site. Please try again.",
       noSitesOption: "No sites monitored yet",
+
+      // audits.js
+      auditRunning: "Generating your presentation…",
+      auditFailed: "Something went wrong. Please try again.",
+      auditNoData: "No declining pages found for this site yet — nothing to put in a presentation.",
+      auditProviderError: "The AI provider is temporarily unavailable. Please try again shortly.",
+      auditInsufficient: "Not enough AI credits for this (costs {cost} credits).",
+      auditBuyCredits: "Buy AI credits",
+      auditDone: "Done! Opening your presentation…",
     },
     it: {
       noPriorData: "nessun dato precedente",
@@ -137,6 +146,14 @@ window.I18N = (function () {
       addSiteError: "Non è stato possibile aggiungere il sito. Riprova.",
       removeSiteError: "Non è stato possibile rimuovere il sito. Riprova.",
       noSitesOption: "Nessun sito ancora monitorato",
+
+      auditRunning: "Sto generando la presentazione…",
+      auditFailed: "Qualcosa è andato storto. Riprova.",
+      auditNoData: "Nessuna pagina in calo trovata per questo sito — niente da mettere in presentazione.",
+      auditProviderError: "Il provider AI non è disponibile al momento. Riprova a breve.",
+      auditInsufficient: "Crediti AI insufficienti per questa richiesta (costa {cost} crediti).",
+      auditBuyCredits: "Compra crediti AI",
+      auditDone: "Fatto! Apro la tua presentazione…",
     },
   };
 

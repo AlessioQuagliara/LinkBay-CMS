@@ -15,66 +15,12 @@
   const PAGE_LIMIT = parseInt(select.dataset.pageLimit || "3", 10);
   const DAYS = 28;
 
-  const states = {
-    loading: document.getElementById("state-loading"),
-    error: document.getElementById("state-error"),
-    empty: document.getElementById("state-empty"),
-    data: document.getElementById("state-data"),
-  };
-
-  function show(name) {
-    Object.entries(states).forEach(([key, el]) => {
-      if (el) el.classList.toggle("hidden", key !== name);
-    });
-  }
-  function showError(msg) {
-    const el = document.getElementById("state-error-msg");
-    if (el && msg) el.textContent = msg;
-    show("error");
-  }
-
-  // --- Formattazione ---------------------------------------------------------
-  const nf = new Intl.NumberFormat();
-  const fmtInt = (n) => nf.format(Math.round(n || 0));
-  const fmtPos = (n) => (n || 0).toFixed(1);
-
-  const esc = window.Common.esc;
-  function shortUrl(url) {
-    try {
-      const u = new URL(url);
-      return u.pathname === "/" ? u.hostname : u.pathname;
-    } catch (e) {
-      return url;
-    }
-  }
-  function shortDate(iso) {
-    const d = new Date(iso + "T00:00:00");
-    return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-  }
-
-  // Delta come descrizione stat (freccia + colore semantico).
-  function deltaDesc(deltaPct, lowerIsBetter) {
-    if (deltaPct === null || deltaPct === undefined) {
-      return `<span class="text-base-content/40">${t("noPriorData")}</span>`;
-    }
-    const good = lowerIsBetter ? deltaPct < 0 : deltaPct > 0;
-    const flat = Math.abs(deltaPct) < 0.05;
-    const arrow = flat ? "→" : deltaPct > 0 ? "↗︎" : "↘︎";
-    const cls = flat ? "text-base-content/50" : good ? "text-success" : "text-error";
-    return `<span class="${cls}">${arrow} ${Math.abs(deltaPct).toFixed(0)}% ${t("vsPrev")}</span>`;
-  }
-
-  function starsHtml(stars, seed) {
-    const color = stars >= 4 ? "bg-success" : stars === 3 ? "bg-warning" : "bg-error";
-    const name = "ov-rating-" + seed;
-    let out = '<div class="rating rating-xs" aria-label="Health ' + stars + ' of 5">';
-    for (let i = 1; i <= 5; i++) {
-      out +=
-        `<input type="radio" name="${name}" class="mask mask-star-2 ${color}" ` +
-        `aria-label="${i} star"${i === stars ? " checked" : ""} disabled />`;
-    }
-    return out + "</div>";
-  }
+  const { esc, fmtInt, fmtPos, shortUrl, shortDate } = window.Common;
+  const { show, showError } = window.Common.pageStates({
+    loading: "state-loading", error: "state-error", empty: "state-empty", data: "state-data",
+  });
+  const deltaDesc = (pct, lowerIsBetter) => window.Common.deltaHtml(pct, lowerIsBetter, t("noPriorData"), t("vsPrev"));
+  const starsHtml = (stars, seed) => window.Common.starsHtml(stars, "ov-rating-" + seed, "rating-xs");
 
   // siteUrl GSC -> URL navigabile (gestisce le domain property sc-domain:).
   function siteToUrl(siteUrl) {
@@ -176,19 +122,12 @@
     // Sorgente: solo i siti già aggiunti al monitoraggio (non tutte le
     // proprietà verificate GSC) — aggiungerne di nuovi si fa dalla pagina
     // Sites (/dashboard/sites), qui il selettore è un puro switcher.
-    fetch(SITES_URL, { headers: { "X-Requested-With": "fetch" } })
-      .then((r) => {
-        if (r.status === 401) throw new Error("not_connected");
-        return r.json();
-      })
-      .then((data) => {
-        const sites = data.sites || [];
+    window.Common.fillSiteSelect(select, SITES_URL)
+      .then((sites) => {
         if (!sites.length) {
           show("empty");
           return;
         }
-        select.innerHTML = sites.map((s) => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
-        select.disabled = sites.length < 2;
         select.addEventListener("change", () => loadInsights(select.value));
         loadInsights(sites[0]);
       })

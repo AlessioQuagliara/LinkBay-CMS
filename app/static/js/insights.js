@@ -16,69 +16,15 @@
   const AI_ANALYZE_URL = select.dataset.aiAnalyzeUrl;
   const AI_ANALYZE_STATUS_URL_TPL = select.dataset.aiAnalyzeStatusUrl; // contiene "__job_id__" da sostituire
 
-  const states = {
-    loading: document.getElementById("state-loading"),
-    error: document.getElementById("state-error"),
-    empty: document.getElementById("state-empty"),
-    data: document.getElementById("state-data"),
-  };
-
   let currentDays = 28;
   let aiAnalyses = {}; // url -> {score, suggestions, week_start}
 
-  function show(name) {
-    Object.entries(states).forEach(([key, el]) => {
-      if (el) el.classList.toggle("hidden", key !== name);
-    });
-  }
-  function showError(msg) {
-    const el = document.getElementById("state-error-msg");
-    if (el && msg) el.textContent = msg;
-    show("error");
-  }
-
-  // --- Formattazione ---------------------------------------------------------
-  const nf = new Intl.NumberFormat();
-  const fmtInt = (n) => nf.format(Math.round(n || 0));
-  const fmtPct = (frac) => (100 * (frac || 0)).toFixed(1) + "%";
-  const fmtPos = (n) => (n || 0).toFixed(1);
-
-  const esc = window.Common.esc;
-  function shortUrl(url) {
-    try {
-      const u = new URL(url);
-      return u.pathname === "/" ? u.hostname : u.pathname;
-    } catch (e) {
-      return url;
-    }
-  }
-  function shortDate(iso) {
-    const d = new Date(iso + "T00:00:00");
-    return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-  }
-
-  function deltaBadge(deltaPct, lowerIsBetter) {
-    if (deltaPct === null || deltaPct === undefined) {
-      return `<span class="text-base-content/40">— ${t("noPriorData")}</span>`;
-    }
-    const good = lowerIsBetter ? deltaPct < 0 : deltaPct > 0;
-    const flat = Math.abs(deltaPct) < 0.05;
-    const arrow = flat ? "→" : deltaPct > 0 ? "↗︎" : "↘︎";
-    const cls = flat ? "text-base-content/50" : good ? "text-success" : "text-error";
-    return `<span class="${cls}">${arrow} ${Math.abs(deltaPct).toFixed(0)}%</span>`;
-  }
-
-  function starsHtml(stars, keySeed) {
-    const color = stars >= 4 ? "bg-success" : stars === 3 ? "bg-warning" : "bg-error";
-    const name = "rating-" + keySeed;
-    let out = '<div class="rating rating-sm" aria-label="Health ' + stars + ' of 5">';
-    for (let i = 1; i <= 5; i++) {
-      out +=
-        `<input type="radio" name="${name}" class="mask mask-star-2 ${color}" ` +
-        `aria-label="${i} star"${i === stars ? " checked" : ""} disabled />`;
-    }
-    return out + "</div>";
-  }
+  const { esc, fmtInt, fmtPct, fmtPos, shortUrl, shortDate } = window.Common;
+  const { show, showError } = window.Common.pageStates({
+    loading: "state-loading", error: "state-error", empty: "state-empty", data: "state-data",
+  });
+  const deltaBadge = (pct, lowerIsBetter) => window.Common.deltaHtml(pct, lowerIsBetter, "— " + t("noPriorData"));
+  const starsHtml = (stars, seed) => window.Common.starsHtml(stars, "rating-" + seed, "rating-sm");
 
   function scoreColor(score) {
     return score >= 70 ? "text-success" : score >= 40 ? "text-warning" : "text-error";
@@ -331,31 +277,10 @@
   });
 
   // L'analisi gira in background (coda RQ, vedi app/jobs/): la POST accoda
-  // il job e ritorna subito un job_id, poi si fa polling finché non è
-  // "finished"/"failed" invece di aspettarsi il risultato nella risposta.
-  const AI_POLL_INTERVAL_MS = 2000;
-  const AI_POLL_MAX_ATTEMPTS = 60; // ~2 minuti, poi si arrende con un errore
-
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-  async function pollAiJob(jobId, site) {
+  // il job e ritorna subito un job_id, poi si fa polling (~2 minuti).
+  function pollAiJob(jobId, site) {
     const statusUrl = AI_ANALYZE_STATUS_URL_TPL.replace("__job_id__", encodeURIComponent(jobId));
-    for (let attempt = 0; attempt < AI_POLL_MAX_ATTEMPTS; attempt++) {
-      await sleep(AI_POLL_INTERVAL_MS);
-      let data;
-      try {
-        const res = await fetch(statusUrl + "?site=" + encodeURIComponent(site), {
-          headers: { Accept: "application/json" },
-        });
-        data = await res.json();
-      } catch (e) {
-        continue; // errore di rete transitorio: ritenta al prossimo giro
-      }
-      if (data.status === "finished" || data.status === "failed" || data.status === "not_found") {
-        return data;
-      }
-    }
-    return { status: "timeout" };
+    return window.Common.pollJob(statusUrl + "?site=" + encodeURIComponent(site), 60);
   }
 
   aiRun.addEventListener("click", async () => {
@@ -438,17 +363,12 @@
       // Sorgente: solo i siti già aggiunti al monitoraggio (non tutte le
       // proprietà verificate GSC) — aggiungerne di nuovi si fa dalla pagina
       // Sites (/dashboard/sites), qui il selettore è un puro switcher.
-      const res = await fetch(SITES_URL, { headers: { Accept: "application/json" } });
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const { sites } = await res.json();
-      if (!sites || !sites.length) {
+      const sites = await window.Common.fillSiteSelect(select, SITES_URL);
+      if (!sites.length) {
         select.innerHTML = `<option>${esc(t("noSitesOption"))}</option>`;
         show("empty");
         return;
       }
-      select.innerHTML = sites.map((s) => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
-      select.disabled = sites.length < 2;
-
       select.addEventListener("change", () => loadSite(select.value));
       loadSite(sites[0]);
     } catch (e) {

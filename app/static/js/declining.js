@@ -17,41 +17,15 @@
   const QUERY_LOSSES_URL = select.dataset.queryLossesUrl;
   const STATUS_URL = select.dataset.statusUrl;
 
-  const states = {
-    loading: document.getElementById("state-loading"),
-    error: document.getElementById("state-error"),
-    empty: document.getElementById("state-empty"),
-    noSites: document.getElementById("state-no-sites"),
-    data: document.getElementById("state-data"),
-  };
-
   let currentStatus = "new";
 
-  function show(name) {
-    Object.entries(states).forEach(([key, el]) => {
-      if (el) el.classList.toggle("hidden", key !== name);
-    });
-  }
-  function showError(msg) {
-    const el = document.getElementById("state-error-msg");
-    if (el && msg) el.textContent = msg;
-    show("error");
-  }
+  const { esc, fmtInt, fmtPos, shortUrl } = window.Common;
+  const { show, showError } = window.Common.pageStates({
+    loading: "state-loading", error: "state-error", empty: "state-empty",
+    noSites: "state-no-sites", data: "state-data",
+  });
+  const dataEl = document.getElementById("state-data");
 
-  // --- Formattazione ---------------------------------------------------------
-  const nf = new Intl.NumberFormat();
-  const fmtInt = (n) => nf.format(Math.round(n || 0));
-  const fmtPos = (n) => (n || 0).toFixed(1);
-
-  const esc = window.Common.esc;
-  function shortUrl(url) {
-    try {
-      const u = new URL(url);
-      return u.pathname === "/" ? u.hostname : u.pathname;
-    } catch (e) {
-      return url;
-    }
-  }
   function shortMonth(iso) {
     const d = new Date(iso + "T00:00:00");
     return d.toLocaleDateString(undefined, { month: "short", year: "2-digit" });
@@ -208,7 +182,7 @@
       show("empty");
       return;
     }
-    states.data.innerHTML =
+    dataEl.innerHTML =
       '<div class="flex flex-col gap-4">' + alerts.map(cardHtml).join("") + "</div>";
     wireCards();
     show("data");
@@ -217,7 +191,7 @@
   // --- Interazioni delle card ------------------------------------------------
   function wireCards() {
     // Cambio stato -> POST; se non appartiene più al filtro corrente, togli la card.
-    states.data.querySelectorAll(".status-select").forEach((sel) => {
+    dataEl.querySelectorAll(".status-select").forEach((sel) => {
       sel.dataset.prev = sel.value; // valore corrente, per il rollback in caso di errore
       sel.addEventListener("change", async () => {
         const id = sel.dataset.id;
@@ -229,12 +203,12 @@
           if (!res.ok) throw new Error("HTTP " + res.status);
           const { alert } = await res.json();
           sel.dataset.prev = alert.status;
-          const card = states.data.querySelector(`.card[data-id="${id}"]`);
+          const card = dataEl.querySelector(`.card[data-id="${id}"]`);
           if (card) card.dataset.status = alert.status;
           // Se il filtro non è "Tutte" e lo stato non combacia più, rimuovi la card.
           if (currentStatus !== "all" && alert.status !== currentStatus) {
             card && card.remove();
-            if (!states.data.querySelector(".card")) show("empty");
+            if (!dataEl.querySelector(".card")) show("empty");
           }
         } catch (e) {
           sel.value = prev; // rollback visivo
@@ -246,7 +220,7 @@
     });
 
     // Espansione: fetch una sola volta al primo apri (trend + query in perdita).
-    states.data.querySelectorAll(".trend-toggle").forEach((toggle) => {
+    dataEl.querySelectorAll(".trend-toggle").forEach((toggle) => {
       toggle.addEventListener("change", async () => {
         if (!toggle.checked || toggle.dataset.loaded === "1") return;
         toggle.dataset.loaded = "1";
@@ -312,17 +286,12 @@
     try {
       // Sorgente: solo i siti già aggiunti al monitoraggio — puro switcher,
       // aggiungerne di nuovi si fa dalla pagina Sites (/dashboard/sites).
-      const res = await fetch(SITES_URL, { headers: { Accept: "application/json" } });
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const { sites } = await res.json();
-      if (!sites || !sites.length) {
+      const sites = await window.Common.fillSiteSelect(select, SITES_URL);
+      if (!sites.length) {
         select.innerHTML = `<option>${esc(t("noSitesOption"))}</option>`;
         show("noSites");
         return;
       }
-      select.innerHTML = sites.map((s) => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
-      select.disabled = sites.length < 2;
-
       select.addEventListener("change", () => loadAlerts(select.value));
       loadAlerts(sites[0]);
     } catch (e) {

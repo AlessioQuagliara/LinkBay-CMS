@@ -67,13 +67,14 @@
   </div>
 </div>
 
+<script>window.APP_LOCALE = {{ get_locale()|tojson }};</script>
 <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+<script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
 <script
   id="audits-script"
   src="{{ url_for('static', filename='js/audits.js') }}"
   data-generate-url="{{ url_for('audits.generate') }}"
   data-status-url-tpl="{{ url_for('audits.generate_status', job_id='__job_id__') }}"
   data-view-url-base="{{ url_for('audits.index') }}"
-  data-credits-url="{{ url_for('billing.credits') }}"
-  data-lang="{{ get_locale() }}"></script>
+  data-credits-url="{{ url_for('billing.credits') }}"></script>
 {% endblock %}
