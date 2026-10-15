@@ -158,10 +158,8 @@ class User(db.Model, UserMixin):
     # "paddle_1m" | "paddle_3m" | "paddle_12m" (stessi limiti/prezzi dei tre
     # piani legacy equivalenti, vedi app/billing/paddle_products.py) |
     # "appsumo_tier1" | "appsumo_tier2" |
-    # "appsumo_tier3". NULL per utenti non ancora migrati —
-    # vedi `flask backfill-plan-type` e
-    # app/entitlements/service.py::get_plan_limits (fallback sicuro a "trial"
-    # se NULL).
+    # "appsumo_tier3". NULL ricade su "trial" (vedi
+    # app/entitlements/service.py::get_plan_limits).
     plan_type = db.Column(db.String(30), nullable=True)
     billing_interval = db.Column(db.String(10), nullable=True)  # "monthly" | "annual" | None
 

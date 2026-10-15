@@ -13,7 +13,7 @@ from app.gsc.sites import add_monitored_site
 
 
 def test_plan_limits_covers_every_plan_type_used_in_the_codebase():
-    # Valori usati altrove nel codice (backfill-plan-type, redeem, checkout):
+    # Valori usati altrove nel codice (redeem, checkout, webhook):
     # ognuno deve avere una entry in PLAN_LIMITS, altrimenti get_plan_limits
     # ricadrebbe silenziosamente su "trial" per un utente pagante.
     expected = {

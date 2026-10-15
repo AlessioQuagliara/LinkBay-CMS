@@ -5,6 +5,9 @@ from config import Config
 
 
 def create_app(config_class=Config):
+    from app.billing.access import init_access_gate
+    from app.errors import register_error_handlers
+
     app = Flask(__name__)
     app.config.from_object(config_class)
 
@@ -19,9 +22,9 @@ def create_app(config_class=Config):
 
     _register_extensions(app)
     _register_blueprints(app)
-    _register_access_gate(app)
+    init_access_gate(app)
     _register_cli(app)
-    _register_error_handlers(app)
+    register_error_handlers(app)
     _register_context_processors(app)
     # NB: la creazione delle tabelle NON avviene più qui. Con gunicorn ogni
     # worker importa run:app e chiamerebbe create_all() in parallelo → race su
@@ -30,12 +33,6 @@ def create_app(config_class=Config):
     # run.py per il dev server. Vedi gunicorn.conf.py per il perché.
 
     return app
-
-
-def _register_error_handlers(app):
-    from app.errors import register_error_handlers
-
-    register_error_handlers(app)
 
 
 def _register_context_processors(app):
@@ -101,7 +98,7 @@ def _register_blueprints(app):
     from app.ai.routes import ai_bp
     from app.alerts.routes import alerts_bp
     from app.auth.routes import auth_bp
-    from app.billing.access import init_rate_limits
+    from app.billing.access import GATED_BLUEPRINTS, init_rate_limits
     from app.billing.routes import billing_bp
     from app.audits.routes import audits_bp
     from app.chat.routes import chat_bp
@@ -112,29 +109,14 @@ def _register_blueprints(app):
     from app.settings.routes import settings_bp
     from app.webhooks.routes import webhooks_bp
 
-    # Rate limit per piano (vedi app/billing/access.py) — va applicato prima
-    # della registrazione sull'app, idioma standard dei limiti a livello di
-    # blueprint di Flask-Limiter.
-    init_rate_limits([dashboard_bp, gsc_bp, ai_bp, alerts_bp, exports_bp, audits_bp])
-
-    app.register_blueprint(main_bp)
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(billing_bp)
-    app.register_blueprint(dashboard_bp)
-    app.register_blueprint(gsc_bp)
-    app.register_blueprint(ai_bp)
-    app.register_blueprint(alerts_bp)
-    app.register_blueprint(settings_bp)
-    app.register_blueprint(exports_bp)
-    app.register_blueprint(chat_bp)
-    app.register_blueprint(audits_bp)
-    app.register_blueprint(webhooks_bp)
-
-
-def _register_access_gate(app):
-    from app.billing.access import init_access_gate
-
-    init_access_gate(app)
+    blueprints = [
+        main_bp, auth_bp, billing_bp, dashboard_bp, gsc_bp, ai_bp, alerts_bp,
+        settings_bp, exports_bp, chat_bp, audits_bp, webhooks_bp,
+    ]
+    # Rate limit per piano solo sui blueprint a pagamento, prima della registrazione.
+    init_rate_limits([bp for bp in blueprints if bp.name in GATED_BLUEPRINTS])
+    for bp in blueprints:
+        app.register_blueprint(bp)
 
 
 def _register_cli(app):
@@ -146,6 +128,7 @@ def _register_cli(app):
     def init_db():
         """Crea le tabelle nel database configurato (DATABASE_URL)."""
         db.create_all()
+        _ensure_columns(db)
         print("Tabelle create.")
 
     @app.cli.command("make-admin")
@@ -315,69 +298,6 @@ def _register_cli(app):
 
         print(f"Digest inviati: {sent}, saltati (nessun alert): {skipped}, errori: {errors}.")
 
-    @app.cli.command("backfill-monitored-sites")
-    def backfill_monitored_sites_cmd():
-        """Una tantum: copia GscConnection.monitored_site_url (singolare,
-        deprecato) in una riga MonitoredSite per ogni utente. Idempotente —
-        rilanciabile senza creare duplicati (add_monitored_site riattiva una
-        riga esistente invece di duplicarla). Da lanciare una volta prima del
-        deploy che introduce il multi-sito, così i job schedulati (che ora
-        iterano MonitoredSite) continuano a coprire gli utenti già connessi."""
-        from app.gsc.sites import add_monitored_site
-        from app.models import GscConnection
-
-        connections = GscConnection.query.filter(GscConnection.monitored_site_url.isnot(None)).all()
-
-        added = 0
-        for conn in connections:
-            add_monitored_site(conn.user_id, conn.monitored_site_url)
-            added += 1
-
-        print(f"Backfill completato: {added} collegamenti utente→sito verificati/creati in monitored_sites.")
-
-    @app.cli.command("backfill-plan-type")
-    def backfill_plan_type_cmd():
-        """Una tantum: deriva User.plan_type dal subscription_status esistente
-        (che resta il gate di accesso invariato — vedi app/models/user.py).
-        Idempotente: salta chi ha già plan_type valorizzato, rilanciabile
-        senza effetti collaterali.
-
-        ATTENZIONE azione fuori dal codice: "lifetime" diventa "appsumo_tier1"
-        come pavimento provvisorio, perché AppSumoCode non ha mai avuto un
-        campo tier prima di questa fase — non c'è modo di recuperare via
-        query quali redenzioni storiche erano Tier 2/3. Vanno corrette a mano
-        incrociando l'export vendite di AppSumo (email/codice → tier) prima
-        del lancio dei limiti differenziati per tier."""
-        from app.models import User
-
-        mapping = {
-            "trialing": "trial",
-            "active": "subscription_monthly",
-            "canceled": "subscription_monthly",
-            "lifetime": "appsumo_tier1",
-        }
-
-        users = User.query.filter(User.plan_type.is_(None)).all()
-        updated = 0
-        for user in users:
-            plan_type = mapping.get(user.subscription_status)
-            if plan_type is None:
-                continue
-            user.plan_type = plan_type
-            if plan_type in ("subscription_monthly",):
-                user.billing_interval = "monthly"
-            updated += 1
-        db.session.commit()
-
-        lifetime_count = sum(1 for u in users if u.subscription_status == "lifetime")
-        print(f"plan_type impostato per {updated} utenti.")
-        if lifetime_count:
-            print(
-                f"  {lifetime_count} utenti 'lifetime' impostati a appsumo_tier1 come "
-                "pavimento provvisorio — correggi a mano i Tier 2/3 incrociando "
-                "l'export vendite AppSumo prima di abilitare i limiti differenziati."
-            )
-
     @app.cli.command("check-page-recovery")
     def check_page_recovery_cmd():
         """Recovery-check: pagine marcate "done" da 30 o 60 giorni, verifica
@@ -538,19 +458,6 @@ def _register_cli(app):
             )
 
 
-def _ensure_tables(app):
-    """Crea le tabelle mancanti all'avvio, così non serve ricordarsi di
-    lanciare `flask init-db` a mano (es. dopo un `docker compose up` da zero).
-    Non tocca le tabelle già esistenti: è lo stesso `db.create_all()` di
-    `init-db`, solo eseguito automaticamente. Vedi README per quando invece
-    servono migration vere."""
-    from app.extensions import db
-
-    with app.app_context():
-        db.create_all()
-        _ensure_columns(db)
-
-
 def init_db_schema():
     """Crea le tabelle mancanti usando un'app minimale usa-e-getta (solo il DB).
 
@@ -578,15 +485,70 @@ def init_db_schema():
         db.engine.dispose()
 
 
+# Colonne aggiunte dopo il primo deploy: (tabella, colonna, tipo DDL, SQL extra).
+# {false}/{true} vengono resi per dialetto. Aggiungere una riga per ogni nuova colonna.
+_ADDED_COLUMNS = [
+    ("users", "email_verified", "BOOLEAN NOT NULL DEFAULT {false}", None),
+    ("gsc_connections", "monitored_site_url", "VARCHAR(500)", None),
+    ("users", "trial_ends_at", "TIMESTAMPTZ", None),
+    ("users", "subscription_status", "VARCHAR(20) NOT NULL DEFAULT 'trialing'", None),
+    ("users", "ls_customer_id", "VARCHAR(255)", None),
+    ("users", "ls_subscription_id", "VARCHAR(255)", None),
+    ("users", "locale", "VARCHAR(5) NOT NULL DEFAULT 'en'", None),
+    ("users", "weekly_digest_enabled", "BOOLEAN NOT NULL DEFAULT {true}", None),
+    ("users", "plan_type", "VARCHAR(30)", None),
+    ("users", "billing_interval", "VARCHAR(10)", None),
+    ("users", "grace_period_ends_at", "TIMESTAMPTZ", None),
+    ("users", "ai_credit_balance", "INTEGER NOT NULL DEFAULT 0", None),
+    ("users", "heavy_user_flag", "BOOLEAN NOT NULL DEFAULT {false}", None),
+    ("users", "heavy_user_flagged_at", "TIMESTAMPTZ", None),
+    ("users", "white_label_enabled", "BOOLEAN NOT NULL DEFAULT {false}", None),
+    ("users", "appsumo_migration_unlocked", "BOOLEAN NOT NULL DEFAULT {false}", None),
+    ("users", "subscription_expires_at", "TIMESTAMPTZ", None),
+    ("users", "subscription_source", "VARCHAR(30)", None),
+    ("users", "subscription_activated_at", "TIMESTAMPTZ", None),
+    ("users", "subscription_activated_by_id", "INTEGER REFERENCES users(id)", None),
+    # UNIQUE standard (non parziale): Postgres e SQLite trattano ogni NULL come
+    # distinto, quindi più righe senza valore convivono senza violare il vincolo.
+    ("users", "subscription_activation_reference", "VARCHAR(255)",
+     "CREATE UNIQUE INDEX IF NOT EXISTS ix_users_subscription_activation_reference "
+     "ON users (subscription_activation_reference)"),
+    ("appsumo_codes", "tier", "INTEGER", None),
+    ("monitored_sites", "last_synced_at", "TIMESTAMPTZ", None),
+    ("page_alerts", "done_at", "TIMESTAMPTZ", None),
+    ("page_alerts", "checked_30d_at", "TIMESTAMPTZ", None),
+    ("page_alerts", "checked_60d_at", "TIMESTAMPTZ", None),
+    ("ai_credit_transactions", "balance_before", "INTEGER", None),
+    ("ai_credit_transactions", "product_key", "VARCHAR(50)", None),
+    ("ai_credit_transactions", "payment_source", "VARCHAR(30)", None),
+    ("ai_credit_transactions", "approved_by_user_id", "INTEGER REFERENCES users(id)", None),
+    ("ai_credit_transactions", "admin_note", "TEXT", None),
+    ("ai_credit_transactions", "payment_reference", "VARCHAR(255)",
+     "CREATE UNIQUE INDEX IF NOT EXISTS ix_ai_credit_transactions_payment_reference "
+     "ON ai_credit_transactions (payment_reference)"),
+    ("ai_credit_transactions", "action", "VARCHAR(30)", None),
+    ("audit_presentations", "chart_data", "TEXT", None),
+    ("users", "paddle_customer_id", "VARCHAR(255)",
+     "CREATE INDEX IF NOT EXISTS ix_users_paddle_customer_id ON users (paddle_customer_id)"),
+    ("users", "paddle_subscription_id", "VARCHAR(255)",
+     "CREATE UNIQUE INDEX IF NOT EXISTS ix_users_paddle_subscription_id ON users (paddle_subscription_id)"),
+    ("users", "paddle_price_id", "VARCHAR(255)", None),
+    ("users", "paddle_environment", "VARCHAR(10)", None),
+    ("users", "current_period_ends_at", "TIMESTAMPTZ", None),
+    ("users", "cancel_at_period_end", "BOOLEAN NOT NULL DEFAULT {false}", None),
+    ("users", "last_paddle_sync_at", "TIMESTAMPTZ", None),
+]
+
+
 def _ensure_columns(db):
     """Micro-migrazione idempotente: `db.create_all()` crea le tabelle mancanti
     ma NON aggiunge colonne nuove a tabelle già esistenti. Senza un tool di
-    migration, aggiungiamo qui a mano le colonne introdotte dopo il primo
-    deploy, solo se mancano. Aggiungere una riga per ogni nuova colonna."""
+    migration, aggiunge qui le colonne di _ADDED_COLUMNS solo se mancano."""
     from sqlalchemy import inspect, text
 
     inspector = inspect(db.engine)
-    dialect = db.engine.dialect.name
+    pg = db.engine.dialect.name == "postgresql"
+    bools = {"false": "false" if pg else "0", "true": "true" if pg else "1"}
 
     def has_column(table, column):
         try:
@@ -594,260 +556,10 @@ def _ensure_columns(db):
         except Exception:  # noqa: BLE001 — tabella non ancora esistente, ecc.
             return False
 
-    # users.email_verified (introdotta con l'OTP email al login/registrazione).
-    if has_column("users", "id") and not has_column("users", "email_verified"):
-        default = "false" if dialect == "postgresql" else "0"
+    for table, column, ddl, extra_sql in _ADDED_COLUMNS:
+        if not has_column(table, "id") or has_column(table, column):
+            continue
         with db.engine.begin() as conn:
-            conn.execute(
-                text(
-                    f"ALTER TABLE users ADD COLUMN email_verified BOOLEAN NOT NULL DEFAULT {default}"
-                )
-            )
-
-    # gsc_connections.monitored_site_url (sito scelto per il monitoraggio).
-    if has_column("gsc_connections", "id") and not has_column("gsc_connections", "monitored_site_url"):
-        with db.engine.begin() as conn:
-            conn.execute(
-                text(
-                    "ALTER TABLE gsc_connections ADD COLUMN monitored_site_url VARCHAR(500)"
-                )
-            )
-
-    # users: trial 14gg + stato abbonamento Lemon Squeezy / AppSumo (vedi app/billing/).
-    if has_column("users", "id") and not has_column("users", "trial_ends_at"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE users ADD COLUMN trial_ends_at TIMESTAMPTZ"))
-    if has_column("users", "id") and not has_column("users", "subscription_status"):
-        with db.engine.begin() as conn:
-            conn.execute(
-                text(
-                    "ALTER TABLE users ADD COLUMN subscription_status VARCHAR(20) NOT NULL DEFAULT 'trialing'"
-                )
-            )
-    if has_column("users", "id") and not has_column("users", "ls_customer_id"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE users ADD COLUMN ls_customer_id VARCHAR(255)"))
-    if has_column("users", "id") and not has_column("users", "ls_subscription_id"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE users ADD COLUMN ls_subscription_id VARCHAR(255)"))
-
-    # users.locale (preferenza lingua, vedi app/i18n.py e app/settings/).
-    if has_column("users", "id") and not has_column("users", "locale"):
-        with db.engine.begin() as conn:
-            conn.execute(
-                text("ALTER TABLE users ADD COLUMN locale VARCHAR(5) NOT NULL DEFAULT 'en'")
-            )
-
-    # users.weekly_digest_enabled (opt-out digest lunedì, vedi app/emails/digest.py).
-    if has_column("users", "id") and not has_column("users", "weekly_digest_enabled"):
-        default = "true" if dialect == "postgresql" else "1"
-        with db.engine.begin() as conn:
-            conn.execute(
-                text(
-                    f"ALTER TABLE users ADD COLUMN weekly_digest_enabled BOOLEAN NOT NULL DEFAULT {default}"
-                )
-            )
-
-    # users: piano/limiti tecnici (vedi app/entitlements/ e app/models/user.py).
-    if has_column("users", "id") and not has_column("users", "plan_type"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE users ADD COLUMN plan_type VARCHAR(30)"))
-    if has_column("users", "id") and not has_column("users", "billing_interval"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE users ADD COLUMN billing_interval VARCHAR(10)"))
-    if has_column("users", "id") and not has_column("users", "grace_period_ends_at"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE users ADD COLUMN grace_period_ends_at TIMESTAMPTZ"))
-    if has_column("users", "id") and not has_column("users", "ai_credit_balance"):
-        with db.engine.begin() as conn:
-            conn.execute(
-                text("ALTER TABLE users ADD COLUMN ai_credit_balance INTEGER NOT NULL DEFAULT 0")
-            )
-    if has_column("users", "id") and not has_column("users", "heavy_user_flag"):
-        default = "false" if dialect == "postgresql" else "0"
-        with db.engine.begin() as conn:
-            conn.execute(
-                text(
-                    f"ALTER TABLE users ADD COLUMN heavy_user_flag BOOLEAN NOT NULL DEFAULT {default}"
-                )
-            )
-    if has_column("users", "id") and not has_column("users", "heavy_user_flagged_at"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE users ADD COLUMN heavy_user_flagged_at TIMESTAMPTZ"))
-    if has_column("users", "id") and not has_column("users", "white_label_enabled"):
-        default = "false" if dialect == "postgresql" else "0"
-        with db.engine.begin() as conn:
-            conn.execute(
-                text(
-                    f"ALTER TABLE users ADD COLUMN white_label_enabled BOOLEAN NOT NULL DEFAULT {default}"
-                )
-            )
-    if has_column("users", "id") and not has_column("users", "appsumo_migration_unlocked"):
-        default = "false" if dialect == "postgresql" else "0"
-        with db.engine.begin() as conn:
-            conn.execute(
-                text(
-                    f"ALTER TABLE users ADD COLUMN appsumo_migration_unlocked BOOLEAN NOT NULL DEFAULT {default}"
-                )
-            )
-
-    # users: colonne condivise da Paddle e dal (dismesso) canale Revolut
-    # manuale — vedi app/models/user.py per il dettaglio campo per campo. Le
-    # colonne ls_customer_id/ls_subscription_id restano dove sono, invariate,
-    # per l'audit storico Lemon Squeezy.
-    if has_column("users", "id") and not has_column("users", "subscription_expires_at"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE users ADD COLUMN subscription_expires_at TIMESTAMPTZ"))
-    if has_column("users", "id") and not has_column("users", "subscription_source"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE users ADD COLUMN subscription_source VARCHAR(30)"))
-    if has_column("users", "id") and not has_column("users", "subscription_activated_at"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE users ADD COLUMN subscription_activated_at TIMESTAMPTZ"))
-    if has_column("users", "id") and not has_column("users", "subscription_activated_by_id"):
-        with db.engine.begin() as conn:
-            conn.execute(
-                text(
-                    "ALTER TABLE users ADD COLUMN subscription_activated_by_id INTEGER "
-                    "REFERENCES users(id)"
-                )
-            )
-    if has_column("users", "id") and not has_column("users", "subscription_activation_reference"):
-        with db.engine.begin() as conn:
-            conn.execute(
-                text(
-                    "ALTER TABLE users ADD COLUMN subscription_activation_reference VARCHAR(255)"
-                )
-            )
-            # UNIQUE standard (non parziale): sia Postgres sia SQLite trattano
-            # ogni NULL come distinto dagli altri, quindi più utenti senza
-            # riferimento convivono senza violare il vincolo.
-            conn.execute(
-                text(
-                    "CREATE UNIQUE INDEX IF NOT EXISTS ix_users_subscription_activation_reference "
-                    "ON users (subscription_activation_reference)"
-                )
-            )
-
-    # appsumo_codes.tier (1-3, vedi Fase 4 del piano multi-tier).
-    if has_column("appsumo_codes", "id") and not has_column("appsumo_codes", "tier"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE appsumo_codes ADD COLUMN tier INTEGER"))
-
-    # monitored_sites.last_synced_at — aggiunta qui e non solo via create_all()
-    # perché la tabella nasce da create_all() ma questa colonna documenta il
-    # significato "ultimo sync riuscito" fin dal principio; nessuna azione se
-    # la tabella non esiste ancora (has_column ritorna False e basta).
-    if has_column("monitored_sites", "id") and not has_column("monitored_sites", "last_synced_at"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE monitored_sites ADD COLUMN last_synced_at TIMESTAMPTZ"))
-
-    # page_alerts: timestamp per il recovery-check a 30/60gg (vedi app/rules/recovery.py).
-    if has_column("page_alerts", "id") and not has_column("page_alerts", "done_at"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE page_alerts ADD COLUMN done_at TIMESTAMPTZ"))
-    if has_column("page_alerts", "id") and not has_column("page_alerts", "checked_30d_at"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE page_alerts ADD COLUMN checked_30d_at TIMESTAMPTZ"))
-    if has_column("page_alerts", "id") and not has_column("page_alerts", "checked_60d_at"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE page_alerts ADD COLUMN checked_60d_at TIMESTAMPTZ"))
-
-    # ai_credit_transactions: colonne per l'accredito dei top-up a pagamento
-    # (Paddle, e storicamente Revolut manuale — vedi
-    # app/models/ai_credit_transaction.py). ls_order_id/site_url restano dove
-    # sono, invariate, per l'audit storico Lemon Squeezy.
-    if has_column("ai_credit_transactions", "id") and not has_column("ai_credit_transactions", "balance_before"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE ai_credit_transactions ADD COLUMN balance_before INTEGER"))
-    if has_column("ai_credit_transactions", "id") and not has_column("ai_credit_transactions", "product_key"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE ai_credit_transactions ADD COLUMN product_key VARCHAR(50)"))
-    if has_column("ai_credit_transactions", "id") and not has_column("ai_credit_transactions", "payment_source"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE ai_credit_transactions ADD COLUMN payment_source VARCHAR(30)"))
-    if has_column("ai_credit_transactions", "id") and not has_column("ai_credit_transactions", "approved_by_user_id"):
-        with db.engine.begin() as conn:
-            conn.execute(
-                text(
-                    "ALTER TABLE ai_credit_transactions ADD COLUMN approved_by_user_id INTEGER "
-                    "REFERENCES users(id)"
-                )
-            )
-    if has_column("ai_credit_transactions", "id") and not has_column("ai_credit_transactions", "admin_note"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE ai_credit_transactions ADD COLUMN admin_note TEXT"))
-    if has_column("ai_credit_transactions", "id") and not has_column("ai_credit_transactions", "payment_reference"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE ai_credit_transactions ADD COLUMN payment_reference VARCHAR(255)"))
-            # UNIQUE standard (non parziale): più righe storiche senza
-            # riferimento (NULL) convivono senza violare il vincolo — stessa
-            # nota di ix_users_subscription_activation_reference sopra.
-            conn.execute(
-                text(
-                    "CREATE UNIQUE INDEX IF NOT EXISTS ix_ai_credit_transactions_payment_reference "
-                    "ON ai_credit_transactions (payment_reference)"
-                )
-            )
-    # action (vedi app/entitlements/ai_credits.py::consume_credits e
-    # app/models/ai_credit_transaction.py) — etichetta leggibile dello
-    # storico crediti, popolata solo dai due punti reali che consumano
-    # crediti (app/jobs/tasks.py).
-    if has_column("ai_credit_transactions", "id") and not has_column("ai_credit_transactions", "action"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE ai_credit_transactions ADD COLUMN action VARCHAR(30)"))
-
-    # audit_presentations.chart_data (vedi app/audits/charts.py) — JSON
-    # serializzato come testo (stessa scelta di app/models/ai_credit_transaction.py
-    # per admin_note ecc.: TEXT è portabile su Postgres e SQLite senza
-    # ambiguità di tipo, la (de)serializzazione resta applicativa). NULL per
-    # ogni presentazione generata prima di questa colonna — il rendering
-    # mostra un fallback, non rigenera né consuma crediti.
-    if has_column("audit_presentations", "id") and not has_column("audit_presentations", "chart_data"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE audit_presentations ADD COLUMN chart_data TEXT"))
-
-    # users: integrazione Paddle Billing (vedi app/billing/paddle_client.py,
-    # app/billing/paddle_subscriptions.py, docs/paddle-billing.md). Le
-    # tabelle nuove (paddle_webhook_events, paddle_transactions) sono create
-    # da db.create_all() sopra, non serve _ensure_columns per quelle — solo
-    # per le colonne aggiunte a una tabella `users` già esistente.
-    if has_column("users", "id") and not has_column("users", "paddle_customer_id"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE users ADD COLUMN paddle_customer_id VARCHAR(255)"))
-            conn.execute(
-                text("CREATE INDEX IF NOT EXISTS ix_users_paddle_customer_id ON users (paddle_customer_id)")
-            )
-    if has_column("users", "id") and not has_column("users", "paddle_subscription_id"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE users ADD COLUMN paddle_subscription_id VARCHAR(255)"))
-            # UNIQUE standard (non parziale): stessa nota di
-            # ix_users_subscription_activation_reference sopra — più utenti
-            # senza subscription Paddle (NULL) convivono senza violare il
-            # vincolo, su Postgres e SQLite.
-            conn.execute(
-                text(
-                    "CREATE UNIQUE INDEX IF NOT EXISTS ix_users_paddle_subscription_id "
-                    "ON users (paddle_subscription_id)"
-                )
-            )
-    if has_column("users", "id") and not has_column("users", "paddle_price_id"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE users ADD COLUMN paddle_price_id VARCHAR(255)"))
-    if has_column("users", "id") and not has_column("users", "paddle_environment"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE users ADD COLUMN paddle_environment VARCHAR(10)"))
-    if has_column("users", "id") and not has_column("users", "current_period_ends_at"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE users ADD COLUMN current_period_ends_at TIMESTAMPTZ"))
-    if has_column("users", "id") and not has_column("users", "cancel_at_period_end"):
-        default = "false" if dialect == "postgresql" else "0"
-        with db.engine.begin() as conn:
-            conn.execute(
-                text(
-                    f"ALTER TABLE users ADD COLUMN cancel_at_period_end BOOLEAN NOT NULL DEFAULT {default}"
-                )
-            )
-    if has_column("users", "id") and not has_column("users", "last_paddle_sync_at"):
-        with db.engine.begin() as conn:
-            conn.execute(text("ALTER TABLE users ADD COLUMN last_paddle_sync_at TIMESTAMPTZ"))
+            conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {ddl.format(**bools)}"))
+            if extra_sql:
+                conn.execute(text(extra_sql))

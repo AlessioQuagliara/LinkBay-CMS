@@ -302,7 +302,6 @@ def seed_demo_account(email: str, password: str, name: str = "Alessio Demo") -> 
     user.locale = "it"
     user.subscription_status = "active"
     user.plan_type = "subscription_annual"
-    user.billing_interval = "annual"
     user.weekly_digest_enabled = False  # niente email reali dal cron settimanale per questo account
     db.session.commit()
 

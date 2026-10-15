@@ -112,7 +112,7 @@ docker compose up --build
 python run.py
 ```
 
-La tabella `users` viene creata automaticamente all'avvio se non esiste già (`db.create_all()` dentro `create_app()`, vedi `_ensure_tables` in `app/__init__.py`) — non serve un passo manuale a parte. Se preferisci crearla esplicitamente (es. in uno script, senza avviare il server):
+La tabella `users` viene creata automaticamente all'avvio se non esiste già (`init_db_schema` in `app/__init__.py`, chiamato da `run.py` e da `gunicorn.conf.py`) — non serve un passo manuale a parte. Se preferisci crearla esplicitamente (es. in uno script, senza avviare il server):
 
 ```bash
 export FLASK_APP=run.py     # su Windows (PowerShell): $env:FLASK_APP = "run.py"
@@ -258,7 +258,7 @@ Nient'altro va toccato: niente file di configurazione centrale da aggiornare olt
 
 ## Database: perché `create_all()` e non le migration
 
-Per restare semplici, la creazione delle tabelle usa `db.create_all()` — eseguito automaticamente ad ogni avvio dell'app (`_ensure_tables` in `app/__init__.py`), oppure a mano con `flask init-db` — non Flask-Migrate/Alembic. Va benissimo finché:
+Per restare semplici, la creazione delle tabelle usa `db.create_all()` — eseguito automaticamente ad ogni avvio dell'app (`init_db_schema` in `app/__init__.py`), oppure a mano con `flask init-db` — non Flask-Migrate/Alembic. Va benissimo finché:
 
 - sei l'unico sviluppatore,
 - non hai ancora dati reali da preservare tra una modifica di schema e l'altra.
