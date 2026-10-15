@@ -15,13 +15,13 @@ from app.models import PageAlert
 TOP_N = 5
 
 
-def build_top_declining(user_id, site_url, limit=TOP_N):
+def build_top_declining(user_id, site_url):
     """Le pagine "new" con priorità più alta per (utente, sito) — stessa query
     di app/alerts/routes.py::api_list, limitata alle top N."""
     return (
         PageAlert.query.filter_by(user_id=user_id, site_url=site_url, status="new")
         .order_by(PageAlert.priority_score.desc())
-        .limit(limit)
+        .limit(TOP_N)
         .all()
     )
 

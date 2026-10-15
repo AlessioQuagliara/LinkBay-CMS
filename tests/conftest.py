@@ -55,7 +55,6 @@ class TestConfig(Config):
     PADDLE_ENVIRONMENT = "sandbox"
     PADDLE_API_KEY = "test-paddle-api-key"
     PADDLE_WEBHOOK_SECRET = "test-paddle-webhook-secret"
-    PADDLE_CLIENT_TOKEN = "test-paddle-client-token"
     PADDLE_SANDBOX_PRICE_ID_1M = "pri_test_1m"
     PADDLE_SANDBOX_PRICE_ID_3M = "pri_test_3m"
     PADDLE_SANDBOX_PRICE_ID_12M = "pri_test_12m"

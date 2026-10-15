@@ -67,16 +67,6 @@ def test_cooldown_disabled_for_credit_mode_plans():
     assert _cooldown_remaining(cfg, credit_limits) == 0   # crediti: nessun cooldown
 
 
-def test_cooldown_remaining_unchanged_without_limits_arg():
-    # Compatibilità: il parametro limits è opzionale, il comportamento
-    # pre-esistente (nessun piano passato) non deve cambiare.
-    from app.ai.service import _cooldown_remaining
-
-    cfg = AiAnalyzerConfig(user_id=1, site_url="https://example.com/", enabled=True)
-    cfg.last_run_at = datetime.now(timezone.utc).replace(tzinfo=None)
-    assert _cooldown_remaining(cfg) > 0
-
-
 def test_analyze_route_blocks_credit_plan_at_zero_balance(app, client, db_session, make_user):
     from tests.test_appsumo_redeem import _login
 

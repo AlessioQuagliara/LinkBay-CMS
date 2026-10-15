@@ -18,13 +18,9 @@ from datetime import datetime, timedelta, timezone
 
 from flask import current_app, render_template, url_for
 
-from app.auth.otp import dev_fallback_enabled  # noqa: F401 — riesportata per le route
 from app.emails import send_email
 from app.extensions import db
 from app.models import PasswordResetToken
-
-__all__ = ["request_reset", "find_valid_token", "consume", "dev_fallback_enabled"]
-
 
 def _now():
     return datetime.now(timezone.utc)

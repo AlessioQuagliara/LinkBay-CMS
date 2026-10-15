@@ -16,7 +16,7 @@ dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 def overview():
     # Una sola query batch (get_usage_summary) invece di quattro: i livelli
     # di avviso si derivano dagli stessi numeri già calcolati, non da
-    # check_site_limit/check_page_limit/check_export_limit (che rifarebbero
+    # check_site_limit/check_export_limit (che rifarebbero
     # da capo le stesse query — corretto per un singolo controllo isolato,
     # ridondante quando servono tutte e tre le dimensioni insieme).
     usage = get_usage_summary(current_user)

@@ -18,15 +18,8 @@ from app.billing.paddle_products import reverse_lookup_plan
 from app.extensions import db
 from app.models import User
 
-# Stati Paddle che mappano 1:1 a subscription_status locale — stesso
-# vocabolario dell'API Paddle, nessuna traduzione necessaria.
-PADDLE_TO_LOCAL_STATUS = {
-    "active": "active",
-    "trialing": "trialing",
-    "past_due": "past_due",
-    "paused": "paused",
-    "canceled": "canceled",
-}
+# Stati Paddle accettati: stesso vocabolario di subscription_status locale.
+PADDLE_STATUSES = {"active", "trialing", "past_due", "paused", "canceled"}
 
 
 @dataclass(frozen=True)
@@ -122,9 +115,8 @@ def apply_subscription_event(
     if _is_stale(user, event_occurred_at):
         return SubscriptionApplyResult(outcome="ignored_stale", reason="evento più vecchio dell'ultimo sync", user_id=user.id)
 
-    paddle_status = data.get("status")
-    local_status = PADDLE_TO_LOCAL_STATUS.get(paddle_status)
-    if local_status is None:
+    local_status = paddle_status = data.get("status")
+    if paddle_status not in PADDLE_STATUSES:
         return SubscriptionApplyResult(
             outcome="ignored_no_user", reason=f"status Paddle sconosciuto: {paddle_status!r}", user_id=user.id
         )

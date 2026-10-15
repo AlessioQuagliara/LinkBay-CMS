@@ -30,16 +30,21 @@ class PlanLimits:
     queue_priority: QueuePriority = "default"
 
 
+# Limiti Pro: condivisi da trial e da tutti i plan_type Pro (attivi e legacy).
+_PRO = dict(
+    site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
+    ai_cooldown_days=None, ai_credit_topups_allowed=False,
+    white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
+)
+_PRO_CREDIT = dict(_PRO, ai_mode="credit", ai_credit_grant=100)
+
 PLAN_LIMITS: dict[str, PlanLimits] = {
-    # Trial: prova del piano Pro per intero (13gg, nessuna carta) — stessi
-    # limiti di Pro Mensile, non un tier separato. L'AI resta a cooldown (non
-    # a crediti): durante un trial non pagato non c'è un evento di billing
-    # che possa accreditare una quota mensile.
+    # Trial: prova del piano Pro per intero (13gg, nessuna carta). L'AI resta
+    # a cooldown (non a crediti): durante un trial non pagato non c'è un
+    # evento di billing che possa accreditare una quota mensile.
     "trial": PlanLimits(
         name="Trial (Pro)",
-        site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
-        ai_mode="cooldown", ai_cooldown_days=7, ai_credit_grant=0, ai_credit_topups_allowed=False,
-        white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="low",
+        **dict(_PRO, ai_mode="cooldown", ai_cooldown_days=7, ai_credit_grant=0, queue_priority="low"),
     ),
     # AppSumo Tier 1 — $79 one-time.
     "appsumo_tier1": PlanLimits(
@@ -62,68 +67,18 @@ PLAN_LIMITS: dict[str, PlanLimits] = {
         ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=75, ai_credit_topups_allowed=True,
         white_label=True, concurrent_scans=3, api_rate_per_min=120, queue_priority="high",
     ),
-    # Pro Mensile — legacy Lemon Squeezy, dismesso dal flusso commerciale.
-    # Voce mantenuta per gli utenti già su questo plan_type: stessi limiti
-    # tecnici di sempre, solo non più assegnabile a un nuovo utente.
-    "subscription_monthly": PlanLimits(
-        name="Pro Monthly (legacy)",
-        site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
-        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
-        white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
-    ),
-    # Pro Annuale — legacy Lemon Squeezy, stessa nota di subscription_monthly.
-    "subscription_annual": PlanLimits(
-        name="Pro Annual (legacy)",
-        site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
-        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
-        white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
-    ),
-    # Pro via Revolut — legacy, canale di pagamento dismesso (l'attivazione
-    # manuale da Flask-Admin non esiste più). Voce mantenuta SOLO per gli
-    # utenti già attivati su questo plan_type prima della dismissione: stessi
-    # limiti tecnici di sempre, non più assegnabile a un nuovo utente.
-    "revolut_1m": PlanLimits(
-        name="Pro — 1 Month (Revolut)",
-        site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
-        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
-        white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
-    ),
-    "revolut_3m": PlanLimits(
-        name="Pro — 3 Months (Revolut)",
-        site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
-        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
-        white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
-    ),
-    "revolut_12m": PlanLimits(
-        name="Pro — 12 Months (Revolut)",
-        site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
-        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
-        white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
-    ),
-    # Pro via Paddle Billing (checkout server-driven, abbonamento RICORRENTE:
-    # Paddle rinnova da solo a ogni ciclo; vedi
-    # app/billing/paddle_subscriptions.py). Stessi identici limiti tecnici
-    # dei tre piani legacy "revolut_*" sopra: è lo stesso piano Pro, cambia
-    # solo processore e meccanica di rinnovo — vedi
-    # app/billing/paddle_products.py.
-    "paddle_1m": PlanLimits(
-        name="Pro — Monthly (Paddle)",
-        site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
-        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
-        white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
-    ),
-    "paddle_3m": PlanLimits(
-        name="Pro — Quarterly (Paddle)",
-        site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
-        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
-        white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
-    ),
-    "paddle_12m": PlanLimits(
-        name="Pro — Annual (Paddle)",
-        site_limit=100, page_limit=250_000, refresh_days=1, export_limit_month=-1,
-        ai_mode="credit", ai_cooldown_days=None, ai_credit_grant=100, ai_credit_topups_allowed=False,
-        white_label=True, concurrent_scans=5, api_rate_per_min=180, queue_priority="high",
-    ),
+    # Legacy Lemon Squeezy e Revolut: canali dismessi, voci mantenute solo per
+    # gli utenti già su questi plan_type (non più assegnabili).
+    "subscription_monthly": PlanLimits(name="Pro Monthly (legacy)", **_PRO_CREDIT),
+    "subscription_annual": PlanLimits(name="Pro Annual (legacy)", **_PRO_CREDIT),
+    "revolut_1m": PlanLimits(name="Pro — 1 Month (Revolut)", **_PRO_CREDIT),
+    "revolut_3m": PlanLimits(name="Pro — 3 Months (Revolut)", **_PRO_CREDIT),
+    "revolut_12m": PlanLimits(name="Pro — 12 Months (Revolut)", **_PRO_CREDIT),
+    # Pro via Paddle Billing (abbonamento ricorrente, vedi
+    # app/billing/paddle_subscriptions.py).
+    "paddle_1m": PlanLimits(name="Pro — Monthly (Paddle)", **_PRO_CREDIT),
+    "paddle_3m": PlanLimits(name="Pro — Quarterly (Paddle)", **_PRO_CREDIT),
+    "paddle_12m": PlanLimits(name="Pro — Annual (Paddle)", **_PRO_CREDIT),
 }
 
 DEFAULT_PLAN_TYPE = "trial"
@@ -159,17 +114,4 @@ AI_CREDIT_ACTION_COSTS = {
     "multi_site_report": 25,    # report AI multi-sito/agency (20-30 crediti)
 }
 
-# Prezzi/etichette dei piani, per la UI (pricing landing, pagina upgrade,
-# redeem). Fonte unica anche per queste stringhe, invece di hardcoderle in
-# più template.
-APPSUMO_TIER_PRICES = {
-    "appsumo_tier1": 79,
-    "appsumo_tier2": 149,
-    "appsumo_tier3": 239,
-}
-# Legacy Lemon Squeezy — non più in vendita, mantenuti solo per il testo
-# "Pro — attivo/legacy" mostrato agli utenti già su questi plan_type
-# (vedi app/templates/billing/subscription.html).
-PRO_MONTHLY_PRICE = 79
-PRO_ANNUAL_PRICE = 790
 TRIAL_DAYS = 13

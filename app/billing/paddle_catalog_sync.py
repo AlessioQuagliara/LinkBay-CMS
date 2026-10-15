@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from app.billing.paddle_client import api_request as _request
+from app.billing.paddle_client import _request
 from app.billing.paddle_products import PADDLE_CREDIT_PACKAGES, PADDLE_SUBSCRIPTION_PLANS
 
 PRODUCT_NAME_PREFIX = "LinkBay CMS"

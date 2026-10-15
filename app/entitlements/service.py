@@ -9,24 +9,12 @@ from datetime import datetime, timezone
 from typing import Literal
 
 from flask import url_for
-from werkzeug.routing import BuildError
 
 from app.entitlements.limits import DEFAULT_PLAN_TYPE, PLAN_LIMITS, PlanLimits
 from app.extensions import db
 from app.models import AiCreditTransaction, GscPageMonthly, MonitoredSite, ResourceUsageLog
 
 Level = Literal["ok", "warn_80", "warn_95", "blocked"]
-
-
-def _safe_url_for(endpoint: str, fallback_endpoint: str) -> str:
-    """`billing.credits` (pacchetti crediti AI) nasce in una fase successiva
-    del piano multi-tier — finché non esiste, l'upsell ripiega su
-    `billing.upgrade` (sempre presente) invece di far esplodere la richiesta
-    con un BuildError."""
-    try:
-        return url_for(endpoint)
-    except BuildError:
-        return url_for(fallback_endpoint)
 
 
 def get_plan_limits(user) -> PlanLimits:
@@ -36,10 +24,6 @@ def get_plan_limits(user) -> PlanLimits:
     per errore."""
     plan_type = getattr(user, "plan_type", None)
     return PLAN_LIMITS.get(plan_type, PLAN_LIMITS[DEFAULT_PLAN_TYPE])
-
-
-def _is_appsumo(user) -> bool:
-    return bool(user.plan_type) and user.plan_type.startswith("appsumo")
 
 
 def _aware(dt):
@@ -104,7 +88,7 @@ def _level_for_ratio(used: int, limit: int) -> Level:
     if limit < 0:
         return "ok"
     if limit == 0:
-        return "blocked" if used > 0 else "blocked"
+        return "blocked"
     ratio = used / limit
     if ratio >= 1:
         return "blocked"
@@ -116,13 +100,13 @@ def _level_for_ratio(used: int, limit: int) -> Level:
 
 
 def _upsell_for(user) -> dict | None:
-    if _is_appsumo(user):
-        return {"type": "ai_credits", "url": _safe_url_for("billing.credits", "billing.upgrade")}
+    if get_plan_limits(user).ai_credit_topups_allowed:
+        return {"type": "ai_credits", "url": url_for("billing.credits")}
     return {"type": "subscription_upgrade", "url": url_for("billing.upgrade")}
 
 
 def _check_result(user, used: int, limit: int, resource_label: str) -> LimitCheckResult:
-    """Corpo comune a check_site_limit/check_page_limit/check_export_limit:
+    """Corpo comune a check_site_limit/check_export_limit:
     stessa forma (livello dai numeri, messaggio, upsell se bloccato), cambia
     solo l'etichetta della risorsa."""
     level = _level_for_ratio(used, limit)
@@ -186,7 +170,7 @@ def get_usage_summary(user) -> UsageSummary:
 def levels_from_usage(usage: UsageSummary) -> dict[str, Level]:
     """Livelli 80/95/100% derivati da un UsageSummary già calcolato — per chi
     (es. la dashboard) deve mostrare più dimensioni insieme e non deve
-    rifare le query di check_site_limit/check_page_limit/check_export_limit:
+    rifare le query di check_site_limit/check_export_limit:
     una sola get_usage_summary invece di quattro round-trip separati."""
     return {
         "sites": _level_for_ratio(usage.sites_used, usage.sites_limit),
@@ -199,12 +183,6 @@ def check_site_limit(user) -> LimitCheckResult:
     limits = get_plan_limits(user)
     used = len(_active_site_urls(user.id))
     return _check_result(user, used, limits.site_limit, "site")
-
-
-def check_page_limit(user, site_url: str | None = None) -> LimitCheckResult:
-    limits = get_plan_limits(user)
-    used = _count_active_pages(user.id, _active_site_urls(user.id))
-    return _check_result(user, used, limits.page_limit, "page")
 
 
 def check_export_limit(user) -> LimitCheckResult:
@@ -225,7 +203,7 @@ def check_ai_credits(user, cost: int = 1) -> LimitCheckResult:
         return LimitCheckResult(allowed=True, level="ok", message="")
     if user.ai_credit_balance < cost:
         upsell = (
-            {"type": "ai_credits", "url": _safe_url_for("billing.credits", "billing.upgrade")}
+            {"type": "ai_credits", "url": url_for("billing.credits")}
             if limits.ai_credit_topups_allowed
             else None
         )
@@ -302,9 +280,10 @@ def get_ai_credit_overview(user) -> AiCreditOverview:
     (AiCreditTransaction) e dal piano (PLAN_LIMITS), mai da un valore inviato
     dal client."""
     limits = get_plan_limits(user)
+    active = has_active_entitlement(user)
 
     next_grant = None
-    if limits.ai_mode == "credit" and limits.ai_credit_grant > 0 and has_active_entitlement(user):
+    if limits.ai_mode == "credit" and limits.ai_credit_grant > 0 and active:
         next_grant = _next_monthly_grant_at(datetime.now(timezone.utc))
 
     now = datetime.now(timezone.utc)
@@ -334,7 +313,7 @@ def get_ai_credit_overview(user) -> AiCreditOverview:
         monthly_quota=limits.ai_credit_grant,
         cooldown_days=limits.ai_cooldown_days,
         topups_allowed=limits.ai_credit_topups_allowed,
-        has_active_access=has_active_entitlement(user),
+        has_active_access=active,
         next_monthly_grant_at=next_grant,
         consumed_this_month=abs(consumed_this_month),  # "consume" è negativo nel ledger
         purchased_total=purchased_total,

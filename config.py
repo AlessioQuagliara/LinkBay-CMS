@@ -102,18 +102,10 @@ class Config:
     # endpoint > "Signing secret"), usato SOLO per verificare l'header
     # Paddle-Signature sul raw body — mai per autenticare richieste in uscita.
     PADDLE_WEBHOOK_SECRET = os.environ.get("PADDLE_WEBHOOK_SECRET")
-    # Client-side token (Dashboard > Developer Tools > Authentication > Client-
-    # side tokens) — l'unico valore Paddle sicuro da esporre nel browser. Non
-    # usato dal flusso di checkout attuale (hosted checkout: il backend crea
-    # la transazione e reindirizza a transaction.checkout.url, niente
-    # Paddle.js/overlay) — riservato per un futuro overlay checkout, vedi
-    # docs/paddle-billing.md.
-    PADDLE_CLIENT_TOKEN = os.environ.get("PADDLE_CLIENT_TOKEN")
     # URL di ritorno dopo il pagamento. Se non impostata, si usa la pagina
     # interna billing.paddle_pending (polling su /billing/status finché il
     # webhook non conferma) — vedi app/billing/paddle_routes.py.
     PADDLE_SUCCESS_URL = os.environ.get("PADDLE_SUCCESS_URL")
-    PADDLE_DEFAULT_CURRENCY = os.environ.get("PADDLE_DEFAULT_CURRENCY", "EUR")
 
     # Price ID Paddle per i tre piani Pro (vedi PADDLE_PLAN_PRICES in
     # app/billing/paddle_products.py) e per i tre pacchetti crediti AI

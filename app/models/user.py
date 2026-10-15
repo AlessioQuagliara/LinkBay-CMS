@@ -36,7 +36,7 @@ class User(db.Model, UserMixin):
     # app/emails/digest.py) — questo flag decide solo l'opt-out personale.
     weekly_digest_enabled = db.Column(db.Boolean, nullable=False, default=True)
 
-    # Trial di 14 giorni senza carta, impostato alla registrazione (vedi
+    # Trial di 13 giorni (TRIAL_DAYS) senza carta, impostato alla registrazione (vedi
     # app/auth/routes.py::register). Scaduto il trial senza un abbonamento
     # attivo, app/billing/access.py blocca l'accesso alla app.
     trial_ends_at = db.Column(db.DateTime(timezone=True))
@@ -100,8 +100,6 @@ class User(db.Model, UserMixin):
     # doppia sottomissione dello stesso pagamento. Colonna mantenuta solo per
     # l'audit storico; nessun codice la scrive più.
     subscription_activation_reference = db.Column(db.String(255), nullable=True, unique=True)
-
-    subscription_activated_by = db.relationship("User", remote_side=[id])
 
     # --- Paddle Billing (vedi app/billing/paddle_client.py,
     # app/billing/paddle_subscriptions.py, docs/paddle-billing.md) ----------
@@ -190,10 +188,7 @@ class User(db.Model, UserMixin):
     # lo consente (PlanLimits.white_label); il toggle da solo non basta.
     white_label_enabled = db.Column(db.Boolean, nullable=False, default=False)
 
-    # Escape hatch per la migrazione controllata AppSumo→abbonamento: un
-    # utente appsumo_* non può auto-servirsi da /billing/checkout finché
-    # questo flag non viene attivato a mano dal supporto (Flask-Admin), dopo
-    # una conversazione — mai da un bottone self-service.
+    # Flag legacy (gateava /billing/checkout, rimosso): non letto da nessun codice.
     appsumo_migration_unlocked = db.Column(db.Boolean, nullable=False, default=False)
 
     gsc_connection = db.relationship(

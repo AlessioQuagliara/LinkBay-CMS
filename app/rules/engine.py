@@ -6,6 +6,7 @@ relevance -> window averages -> pct_loss -> abs_loss -> persistence ->
 seasonality -> site_relative. Ci si ferma al primo filtro fallito.
 """
 from app.rules.filters import (
+    _pct_change,
     check_seasonality,
     compute_window_averages,
     passes_abs_loss,
@@ -80,13 +81,11 @@ def evaluate_page(
 
     impr_current = _window_mean(series.monthly, "impressions", w, offset=0)
     impr_previous = _window_mean(series.monthly, "impressions", w, offset=1)
-    impressions_trend_pct = (
-        (impr_current - impr_previous) / impr_previous * 100.0 if impr_previous > 0 else 0.0
-    )
+    impressions_trend_pct = _pct_change(impr_current, impr_previous)
 
     v = value_score(best_month_clicks)
     s = severity_score(click_loss_pct)
-    r = recoverability_score(position_before, position_after)
+    r = recoverability_score(position_after)
     d = demand_score(impressions_trend_pct)
     score = priority_score(v, s, r, d)
 

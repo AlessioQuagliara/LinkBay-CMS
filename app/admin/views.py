@@ -20,7 +20,7 @@ class UserAdminView(SecureModelView):
         "paddle_customer_id", "paddle_subscription_id", "cancel_at_period_end",
         "ai_credit_balance", "heavy_user_flag", "created_at",
     )
-    # appsumo_migration_unlocked e white_label_enabled sono editabili solo da
+    # white_label_enabled è editabile solo da
     # qui (nessun bottone self-service nell'app) — vedi
     # app/billing/routes.py::redeem(). heavy_user_flag NON è nella form: è
     # calcolato dal job settimanale flask flag-heavy-users, non va corretto a
@@ -35,7 +35,7 @@ class UserAdminView(SecureModelView):
     # custom_data perso) prima che arrivi/venga riconciliato il prossimo
     # evento — vedi anche `flask paddle-reconcile`.
     form_columns = (
-        "name", "email", "is_admin", "plan_type", "appsumo_migration_unlocked", "white_label_enabled",
+        "name", "email", "is_admin", "plan_type", "white_label_enabled",
         "paddle_customer_id", "paddle_subscription_id",
     )
     column_searchable_list = ("name", "email", "paddle_customer_id", "paddle_subscription_id")

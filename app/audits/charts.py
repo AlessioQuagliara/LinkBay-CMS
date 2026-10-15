@@ -30,7 +30,6 @@ MAX_CHART_PAGES = 5  # "top 5" richiesto per i bar chart
 HIGH_PRIORITY_THRESHOLD = 66
 
 BRAND_RED = "#ff5758"
-BRAND_DARK = "#16181d"
 BRAND_GRAY = "#9aa0a6"
 BRAND_GRAY_LIGHT = "#e7e7ea"
 

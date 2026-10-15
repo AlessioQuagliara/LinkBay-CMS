@@ -6,7 +6,7 @@ Adattato dalla bozza originale: qui l'account collegato è lo `User` loggato
 app/gsc/repository.py, non in sessione e non su file.
 """
 import os
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 
 from flask import Blueprint, current_app, flash, jsonify, redirect, request, session, url_for
 from flask_babel import gettext as _
@@ -33,7 +33,7 @@ from app.gsc.sites import (
     touch_last_synced,
 )
 from app.jobs.concurrency import acquire_scan_slot
-from app.jobs.queue import get_queue, job_status_payload, queue_name_for_user
+from app.jobs.queue import get_queue, queue_name_for_user
 from app.jobs.tasks import run_gsc_scan_job
 
 
@@ -174,39 +174,13 @@ def disconnect():
     return redirect(url_for("dashboard.connect"))
 
 
-@gsc_bp.route("/sites")
-@login_required
-def sites():
-    creds = load_gsc_credentials(current_user.id)
-    if not creds:
-        return redirect(url_for("gsc.authorize"))
-
-    credentials = _credentials_from_dict(creds)
-    service = _build_service(credentials)
-
-    site_list = service.sites().list().execute()
-    verified_sites = [
-        s for s in site_list.get("siteEntry", [])
-        if s["permissionLevel"] != "siteUnverifiedUser"
-    ]
-
-    # Il token potrebbe essere stato aggiornato automaticamente dalla libreria
-    # (refresh trasparente): salva la versione aggiornata.
-    save_gsc_credentials(current_user.id, credentials_to_dict(credentials))
-
-    return jsonify(verified_sites)
-
-
 @gsc_bp.route("/api/sites")
 @login_required
 def api_sites():
     """Elenco JSON dei siti verificati, per popolare il selettore in dashboard."""
-    creds = load_gsc_credentials(current_user.id)
-    if not creds:
+    service, credentials = get_user_gsc_service(current_user.id)
+    if service is None:
         return jsonify({"error": "not_connected"}), 401
-
-    credentials = _credentials_from_dict(creds)
-    service = _build_service(credentials)
 
     site_list = service.sites().list().execute()
     sites = [
@@ -220,11 +194,6 @@ def api_sites():
     return jsonify({
         "sites": sites,
         "monitored_site_urls": [row.site_url for row in monitored],
-        # Alias singolare deprecato: mantenuto per un ciclo di deploy così il
-        # JS esistente (overview.js/insights.js/declining.js), che legge
-        # ancora questo campo per preselezionare la tendina, continua a
-        # funzionare senza modifiche. Va rimosso in Fase 6 (UI multi-sito).
-        "monitored_site_url": monitored[0].site_url if monitored else None,
     })
 
 
@@ -265,10 +234,8 @@ def api_monitored_site():
         record_usage(current_user, "site_added", site_url=site)
 
     try:
-        creds = load_gsc_credentials(current_user.id)
-        if creds:
-            credentials = _credentials_from_dict(creds)
-            service = _build_service(credentials)
+        service, credentials = get_user_gsc_service(current_user.id)
+        if service is not None:
             sync_site_daily(service, current_user.id, site, days=28)
             sync_page_monthly(service, current_user.id, site)
             save_gsc_credentials(current_user.id, credentials_to_dict(credentials))
@@ -359,12 +326,9 @@ def api_insights():
     if days not in ALLOWED_PERIODS:
         days = 28
 
-    creds = load_gsc_credentials(current_user.id)
-    if not creds:
+    service, credentials = get_user_gsc_service(current_user.id)
+    if service is None:
         return jsonify({"error": "not_connected"}), 401
-
-    credentials = _credentials_from_dict(creds)
-    service = _build_service(credentials)
 
     try:
         data = build_insights(service, site_url, days=days)
@@ -380,73 +344,3 @@ def api_insights():
     # piano multi-tier).
     data["stale"] = _maybe_queue_background_scan(current_user, site_url)
     return jsonify(data)
-
-
-@gsc_bp.route("/api/scan-now", methods=["POST"])
-@login_required
-def api_scan_now():
-    """Refresh manuale di un sito già monitorato. Bloccato da due limiti del
-    piano: il refresh_interval minimo (evita di aggirare il rate-limit di
-    refresh ricliccando) e concurrent_scans (semaforo Redis, vedi
-    app/jobs/concurrency.py)."""
-    site_url = request.form.get("site")
-    if not site_url:
-        return jsonify({"error": "missing_site"}), 400
-
-    row = get_monitored_site_row(current_user.id, site_url)
-    if row is None or not row.is_active:
-        return jsonify({"error": "not_monitored"}), 404
-
-    limits = get_plan_limits(current_user)
-    last_synced = _aware(row.last_synced_at)
-    if last_synced is not None:
-        elapsed = datetime.now(timezone.utc) - last_synced
-        min_interval = timedelta(days=limits.refresh_days)
-        if elapsed < min_interval:
-            retry_after = min_interval - elapsed
-            return jsonify({
-                "error": "refresh_too_soon",
-                "retry_after_hours": max(1, int(retry_after.total_seconds() // 3600)),
-            }), 429
-
-    if not acquire_scan_slot(current_user.id, limits.concurrent_scans):
-        return jsonify({"error": "concurrent_limit"}), 409
-
-    job = get_queue(queue_name_for_user(current_user)).enqueue(
-        run_gsc_scan_job, current_user.id, site_url, job_timeout=300
-    )
-    return jsonify({"status": "queued", "job_id": job.id})
-
-
-@gsc_bp.route("/api/scan-status/<job_id>")
-@login_required
-def api_scan_status(job_id):
-    return jsonify(job_status_payload(job_id))
-
-
-@gsc_bp.route("/analytics/<path:site_url>")
-@login_required
-def analytics(site_url):
-    """Click, impressioni, CTR e posizione media per sito, ultimi 3 mesi."""
-    creds = load_gsc_credentials(current_user.id)
-    if not creds:
-        return redirect(url_for("gsc.authorize"))
-
-    credentials = _credentials_from_dict(creds)
-    service = _build_service(credentials)
-
-    end_date = date.today()
-    start_date = end_date - timedelta(days=90)
-
-    body = {
-        "startDate": start_date.isoformat(),
-        "endDate": end_date.isoformat(),
-        "dimensions": ["query", "page"],
-        "rowLimit": 100,
-    }
-
-    response = service.searchanalytics().query(siteUrl=site_url, body=body).execute()
-
-    save_gsc_credentials(current_user.id, credentials_to_dict(credentials))
-
-    return jsonify(response.get("rows", []))

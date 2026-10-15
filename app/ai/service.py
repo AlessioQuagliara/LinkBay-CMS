@@ -63,15 +63,11 @@ def set_enabled(user_id, site_url, enabled: bool):
     return cfg
 
 
-def _cooldown_remaining(cfg, limits=None):
+def _cooldown_remaining(cfg, limits):
     """Giorni mancanti al prossimo run consentito (0 se disponibile ora).
-
-    `limits` (app.entitlements.limits.PlanLimits) è opzionale per non rompere
-    i chiamanti esistenti, ma va passato quando disponibile: se
-    limits.ai_mode == "credit" (Pro mensile/annuale) il freno è a crediti,
-    non a tempo — il cooldown è sempre 0 e il controllo reale è
-    app.entitlements.service.check_ai_credits, chiamato dal chiamante."""
-    if limits is not None and limits.ai_mode == "credit":
+    Se limits.ai_mode == "credit" il freno è a crediti, non a tempo: il
+    controllo reale è app.entitlements.service.check_ai_credits."""
+    if limits.ai_mode == "credit":
         return 0
     if not cfg.last_run_at:
         return 0

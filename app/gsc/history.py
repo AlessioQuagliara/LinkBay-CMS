@@ -39,7 +39,7 @@ def sync_site_daily(service, user_id, site_url, days):
         .first()
         is not None
     )
-    window = BACKFILL_DAYS if not has_history else max(days + FRESH_DAYS, days)
+    window = BACKFILL_DAYS if not has_history else days + FRESH_DAYS
     start = end - timedelta(days=window - 1)
 
     rows = _query_daily(service, site_url, start, end)

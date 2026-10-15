@@ -7,7 +7,6 @@ app/gsc/gsc.py, che resta responsabile solo di OAuth e delle route.
 """
 from datetime import date, timedelta
 
-DEFAULT_DAYS = 28
 
 
 def _query(service, site_url, start, end, dimensions, row_limit=1000, dimension_filter_groups=None):
@@ -60,7 +59,7 @@ def _health_stars(clicks_delta_pct):
     return 1
 
 
-def build_insights(service, site_url, days=DEFAULT_DAYS):
+def build_insights(service, site_url, days):
     today = date.today()
     # Search Console ha ~2-3 giorni di ritardo: chiudiamo la finestra a ieri
     # per non confrontare periodi con dati ancora incompleti.

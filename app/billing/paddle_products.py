@@ -79,8 +79,7 @@ PADDLE_SUBSCRIPTION_PLANS = {
 
 # --- Pacchetti crediti AI (one-time) ----------------------------------------
 
-# Stesse chiavi/crediti di app/billing/revolut_products.py::AI_TOPUP_CREDITS
-# — deliberatamente condivise (vedi docstring del modulo).
+# Stessi crediti di app/entitlements/limits.py::AI_CREDIT_PACKS.
 PADDLE_CREDIT_PACKAGE_CREDITS = {
     "ai_topup_starter": 50,
     "ai_topup_growth": 150,
@@ -119,7 +118,7 @@ def resolve_price_id(catalog: dict, key: str) -> str | None:
     """Price ID configurato per `key` nell'environment corrente, o None se la
     env var non è (ancora) valorizzata — mai un default/placeholder
     hardcoded: il chiamante deve trattare None come "checkout non
-    disponibile", stessa convenzione delle CTA Revolut disabilitate."""
+    disponibile"."""
     entry = catalog.get(key)
     if entry is None:
         return None

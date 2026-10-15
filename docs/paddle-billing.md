@@ -60,9 +60,7 @@ Vedi `.env.example` per i commenti riga per riga. Riepilogo:
 | `PADDLE_ENVIRONMENT` | `sandbox` (default) o `production` — l'unica leva che decide base URL API e quale set di price ID viene letto |
 | `PADDLE_API_KEY` | API key server-side, mai esposta al frontend |
 | `PADDLE_WEBHOOK_SECRET` | Solo per verificare `Paddle-Signature` |
-| `PADDLE_CLIENT_TOKEN` | Riservato per un futuro overlay Paddle.js — non usato dal checkout hosted attuale |
 | `PADDLE_SUCCESS_URL` | Override facoltativo; default: pagina interna `/billing/paddle/pending` |
-| `PADDLE_DEFAULT_CURRENCY` | `EUR` di default |
 | `PADDLE_SANDBOX_PRICE_ID_*` | Price ID sandbox per i 3 piani Pro + 3 pacchetti crediti |
 | `PADDLE_PRODUCTION_PRICE_ID_*` | Equivalenti production — **mai** gli stessi ID di sandbox |
 

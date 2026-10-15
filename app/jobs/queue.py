@@ -27,23 +27,17 @@ def queue_name_for_user(user) -> str:
     return get_plan_limits(user).queue_priority
 
 
-def fetch_job(job_id: str) -> Job | None:
-    try:
-        return Job.fetch(job_id, connection=get_redis())
-    except Exception:  # noqa: BLE001 — job_id inesistente/scaduto: nessun job, non un errore
-        return None
-
-
 def job_status_payload(job_id: str) -> dict:
-    """Payload JSON generico per gli endpoint di polling (scan-status,
-    analyze-status): stato RQ + esito se già concluso. "failed" qui indica un
+    """Payload JSON generico per gli endpoint di polling (analyze-status,
+    audit generate-status): stato RQ + esito se già concluso. "failed" qui indica un
     crash imprevisto del job (bug) — un fallimento "atteso" (DeepSeek non
     configurato, utente non connesso a GSC, ecc.) è invece incapsulato nel
     valore di ritorno del job stesso (status "finished" con result["ok"] =
     False), per non confondere errori di business con crash veri. Vedi
     app/jobs/tasks.py::run_ai_analysis_job."""
-    job = fetch_job(job_id)
-    if job is None:
+    try:
+        job = Job.fetch(job_id, connection=get_redis())
+    except Exception:  # noqa: BLE001 — job_id inesistente/scaduto: nessun job, non un errore
         return {"status": "not_found"}
     status = job.get_status(refresh=True)
     payload = {"status": status}

@@ -111,7 +111,7 @@ def forgot_password():
             _("If an account exists for that email, we've sent a password reset link."),
             "success",
         )
-        if token and not sent and password_reset_service.dev_fallback_enabled():
+        if token and not sent and otp_service.dev_fallback_enabled():
             link = url_for("auth.reset_password", token=token, _external=True)
             flash(_("Dev mode (email not configured): %(link)s", link=link), "info")
         return redirect(url_for("auth.login"))

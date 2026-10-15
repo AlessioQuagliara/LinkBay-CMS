@@ -97,15 +97,6 @@ def _request(method: str, path: str, *, json: dict | None = None) -> dict:
     return response.json()
 
 
-def api_request(method: str, path: str, *, json: dict | None = None) -> dict:
-    """Wrapper pubblico su _request — usato da app/billing/paddle_catalog_sync.py
-    per le chiamate di gestione catalogo (list/create products/prices) che
-    non hanno un metodo dedicato qui sopra (create_transaction, ecc.): niente
-    da duplicare, lo script del catalogo resta l'unico chiamante di endpoint
-    "di setup" invece di aggiungere qui funzioni usate una sola volta."""
-    return _request(method, path, json=json)
-
-
 def create_transaction(*, items: list[dict], custom_data: dict, customer_email: str | None = None,
                         success_url: str | None = None) -> dict:
     """POST /transactions — crea una transazione hosted-checkout. Ritorna il
@@ -125,10 +116,6 @@ def create_transaction(*, items: list[dict], custom_data: dict, customer_email: 
     if checkout:
         payload["checkout"] = checkout
     return _request("POST", "/transactions", json=payload)
-
-
-def get_transaction(transaction_id: str) -> dict:
-    return _request("GET", f"/transactions/{transaction_id}")
 
 
 def get_subscription(subscription_id: str) -> dict:

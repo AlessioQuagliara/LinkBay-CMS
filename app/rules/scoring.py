@@ -27,7 +27,7 @@ def severity_score(click_loss_pct: float) -> float:
     return max(0.0, min(100.0, abs(click_loss_pct)))
 
 
-def recoverability_score(position_before: float, position_after: float) -> float:
+def recoverability_score(position_after: float) -> float:
     """Quanto è facile da recuperare. Alto se la posizione attuale è vicina alla
     prima pagina (pos 11 molto recuperabile, pos 60 poco), 0-100."""
     span = _POS_WORST - _POS_BEST

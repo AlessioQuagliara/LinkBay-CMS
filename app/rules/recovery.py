@@ -14,7 +14,6 @@ from app.extensions import db
 from app.models import GscPageMonthly, PageAlert
 
 RECOVERY_THRESHOLD = 0.8  # click recenti >= 80% del picco pre-calo = recuperata
-CHECKPOINTS = (30, 60)
 
 
 def _aware(dt):

@@ -1,6 +1,6 @@
 """Script di sync catalogo (app/billing/paddle_catalog_sync.py) — idempotente:
 un secondo run non deve mai creare un secondo prodotto/price per lo stesso
-piano/pacchetto. Nessuna chiamata di rete reale: monkeypatch di api_request."""
+piano/pacchetto. Nessuna chiamata di rete reale: monkeypatch di _request."""
 from app.billing.paddle_catalog_sync import sync_catalog
 from app.billing.paddle_products import PADDLE_CREDIT_PACKAGES, PADDLE_SUBSCRIPTION_PLANS
 
