@@ -280,10 +280,17 @@ def _register_cli(app):
         from app.gsc.sites import list_monitored_sites
         from app.models import User
 
-        users = User.query.filter(
-            User.subscription_status.in_(("active", "lifetime")),
-            User.weekly_digest_enabled.is_(True),
-        ).all()
+        from app.entitlements.service import has_active_entitlement
+
+        # Lo status da solo non basta: un abbonamento "active" con scadenza
+        # passata (webhook di fine periodo non ancora arrivato) non ha accesso.
+        users = [
+            u for u in User.query.filter(
+                User.subscription_status.in_(("active", "lifetime")),
+                User.weekly_digest_enabled.is_(True),
+            ).all()
+            if has_active_entitlement(u)
+        ]
 
         sent = skipped = errors = 0
         for user in users:
@@ -387,29 +394,7 @@ def _register_cli(app):
     @app.cli.command("grant-monthly-ai-credits")
     def grant_monthly_ai_credits_cmd():
         """Accredita la quota AI mensile a ogni piano ai_mode=="credit" con
-        una quota da accreditare (AppSumo + Pro Paddle, e storicamente Pro
-        Revolut).
-
-        Prima della rimozione di Lemon Squeezy, i piani Pro (subscription_monthly/
-        annual) ricevevano la quota da un webhook (subscription_payment_success,
-        ora eliminato insieme al resto dell'integrazione). Con l'attivazione
-        Revolut manuale (canale poi a sua volta dismesso) non c'era più un
-        evento di rinnovo ricorrente da cui agganciarsi, quindi da qui in poi
-        TUTTI i piani a crediti passano da questo comando mensile, non solo
-        AppSumo — altrimenti gli utenti Pro (legacy Revolut/Lemon Squeezy
-        ancora attivi) smetterebbero silenziosamente di ricevere la quota
-        inclusa nel piano. Vale anche per gli utenti Paddle
-        (paddle_1m/3m/12m): pur avendo un ciclo di fatturazione ricorrente
-        reale, la quota crediti resta assegnata da questo comando mensile
-        fisso, non dal timing esatto del loro rinnovo — stessa scelta già
-        fatta per i piani legacy, non una nuova eccezione.
-
-        Salta chi non ha accesso attivo in questo momento
-        (has_active_entitlement — vedi app/entitlements/service.py) — un
-        piano legacy scaduto non ancora sistemato da un admin, o un
-        abbonamento Paddle il cui webhook di scadenza non è ancora arrivato,
-        non deve continuare ad accumulare crediti. Idempotente per mese: non
-        doppio-accredita se rilanciato più volte nello stesso mese."""
+        accesso attivo (has_active_entitlement). Idempotente per mese."""
         from datetime import datetime, timezone
 
         from app.entitlements.ai_credits import grant_credits
@@ -439,6 +424,7 @@ def _register_cli(app):
                     skipped += 1
                     continue
                 grant_credits(user, limits.ai_credit_grant, type="grant_monthly_quota")
+                db.session.commit()
                 granted += 1
 
         print(f"Quota AI mensile accreditata a {granted} utenti, {skipped} già accreditati questo mese o senza accesso attivo.")

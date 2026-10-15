@@ -4,13 +4,13 @@ from datetime import datetime, timezone
 
 import pytest
 
-from app.entitlements.ai_credits import adjust_credits, consume_credits, grant_credits
+from app.entitlements.ai_credits import consume_credits, grant_credits
 from app.models import AiCreditTransaction, AiAnalyzerConfig
 
 
 def test_grant_credits_updates_balance_and_ledger(db_session, make_user):
     user = make_user(ai_credit_balance=0)
-    tx = grant_credits(user, 500, type="grant_purchase", ls_order_id="order_1")
+    tx = grant_credits(user, 500, type="grant_purchase")
     assert user.ai_credit_balance == 500
     assert tx.amount == 500
     assert tx.balance_after == 500
@@ -41,19 +41,9 @@ def test_consume_credits_returns_none_when_insufficient(db_session, make_user):
     assert user.ai_credit_balance == 2  # invariato
 
 
-def test_adjust_credits_can_go_negative(db_session, make_user):
-    user = make_user(ai_credit_balance=100)
-    consume_credits(user, 100)
-    assert user.ai_credit_balance == 0
-    # Rimborso di un ordine i cui crediti sono già stati consumati: il saldo
-    # scende sotto zero, accettato (segnale per il supporto, non un blocco).
-    adjust_credits(user, -500, ls_order_id="order_refunded_1")
-    assert user.ai_credit_balance == -500
-
-
 def test_ledger_records_every_transaction(db_session, make_user):
     user = make_user(ai_credit_balance=0)
-    grant_credits(user, 500, type="grant_purchase", ls_order_id="order_1")
+    grant_credits(user, 500, type="grant_purchase")
     consume_credits(user, 1)
     consume_credits(user, 1)
     count = AiCreditTransaction.query.filter_by(user_id=user.id).count()

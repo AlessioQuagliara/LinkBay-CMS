@@ -317,6 +317,29 @@ def test_webhook_transaction_completed_grants_credits_once(client, db_session, m
     assert row.credits_granted == 50
 
 
+def test_webhook_failed_final_commit_leaves_no_credits(client, db_session, make_user, monkeypatch):
+    # L'accredito e la riga evento devono stare nella STESSA transazione: se il
+    # commit finale fallisce, il retry di Paddle deve ripartire da zero.
+    from app.extensions import db
+
+    user = make_user(plan_type="appsumo_tier1", subscription_status="lifetime")
+    real_commit = db.session.commit
+
+    def failing_commit():
+        if any(isinstance(o, PaddleWebhookEvent) for o in db.session.new):
+            raise RuntimeError("db down")
+        real_commit()
+
+    monkeypatch.setattr(db.session, "commit", failing_commit)
+    payload = _transaction_completed_payload(event_id="evt_txn_fail", user_id=user.id, transaction_id="txn_fail")
+    assert _post(client, payload).status_code == 500
+    monkeypatch.undo()
+
+    db_session.refresh(user)
+    assert user.ai_credit_balance == 0
+    assert AiCreditTransaction.query.filter_by(user_id=user.id).count() == 0
+
+
 def test_webhook_transaction_completed_different_event_id_same_transaction_id_is_idempotent(client, db_session, make_user):
     # Simula due CONSEGNE diverse (event_id diverso) dello stesso
     # transaction.completed (può succedere con Paddle) — la difesa di

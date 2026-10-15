@@ -180,6 +180,7 @@ def run_weekly() -> dict:
     utente con più siti viene processato una volta per sito."""
     from app.gsc import page_history
     from app.gsc.gsc import get_user_gsc_service
+    from app.gsc.repository import credentials_to_dict, save_gsc_credentials
     from app.gsc.sites import touch_last_synced
 
     sites = MonitoredSite.query.filter_by(is_active=True).all()
@@ -188,11 +189,12 @@ def run_weekly() -> dict:
     errors = []
     for row in sites:
         try:
-            service, _ = get_user_gsc_service(row.user_id)
+            service, credentials = get_user_gsc_service(row.user_id)
             if service is None:
                 errors.append(f"user {row.user_id}: non connesso a GSC")
                 continue
             page_history.sync_page_monthly(service, row.user_id, row.site_url)
+            save_gsc_credentials(row.user_id, credentials_to_dict(credentials))
             run_for_site(row.user_id, row.site_url)
             touch_last_synced(row.user_id, row.site_url)
             processed += 1
